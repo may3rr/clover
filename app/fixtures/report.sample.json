@@ -1,0 +1,3142 @@
+{
+ "document": {
+  "title": "Citation Behaviour in Neural Models",
+  "filename": "numeric_en.docx",
+  "citation_style": "numeric",
+  "managed_by": null,
+  "word_count": 630
+ },
+ "sections": [
+  {
+   "id": "s0",
+   "title": "",
+   "canonical": "other",
+   "heading_paragraph_id": null
+  },
+  {
+   "id": "s1",
+   "title": "1 Introduction",
+   "canonical": "intro",
+   "heading_paragraph_id": "p2"
+  },
+  {
+   "id": "s2",
+   "title": "2 Related Work",
+   "canonical": "related",
+   "heading_paragraph_id": "p5"
+  },
+  {
+   "id": "s3",
+   "title": "3 Method",
+   "canonical": "method",
+   "heading_paragraph_id": "p9"
+  },
+  {
+   "id": "s4",
+   "title": "4 Experiments",
+   "canonical": "experiment",
+   "heading_paragraph_id": "p12"
+  },
+  {
+   "id": "s5",
+   "title": "5 Discussion",
+   "canonical": "discussion",
+   "heading_paragraph_id": "p18"
+  },
+  {
+   "id": "s6",
+   "title": "6 Conclusion",
+   "canonical": "conclusion",
+   "heading_paragraph_id": "p20"
+  },
+  {
+   "id": "s7",
+   "title": "References",
+   "canonical": "other",
+   "heading_paragraph_id": "p22"
+  }
+ ],
+ "paragraphs": [
+  {
+   "id": "p0",
+   "section_id": "s0",
+   "text": "Citation Behaviour in Neural Models",
+   "char_offset": 0
+  },
+  {
+   "id": "p1",
+   "section_id": "s0",
+   "text": "A short study manuscript for parser testing.",
+   "char_offset": 36
+  },
+  {
+   "id": "p2",
+   "section_id": "s1",
+   "text": "1 Introduction",
+   "char_offset": 81
+  },
+  {
+   "id": "p3",
+   "section_id": "s1",
+   "text": "Transformer architectures [1,3] have reshaped natural language processing, and pre-trained models [2] achieve strong benchmark results.",
+   "char_offset": 96
+  },
+  {
+   "id": "p4",
+   "section_id": "s1",
+   "text": "Retrieval-augmented generation [4] and dense retrieval [16] ground responses in external evidence, while hallucination remains a central concern [5].",
+   "char_offset": 232
+  },
+  {
+   "id": "p5",
+   "section_id": "s2",
+   "text": "2 Related Work",
+   "char_offset": 382
+  },
+  {
+   "id": "p6",
+   "section_id": "s2",
+   "text": "Early sequence models relied on recurrent networks [8] and long short-term memory [12]; attention mechanisms [1,13] improved alignment.",
+   "char_offset": 397
+  },
+  {
+   "id": "p7",
+   "section_id": "s2",
+   "text": "Word representations evolved from word2vec [7] to contextual embeddings [2], and optimization is typically handled by Adam [9].",
+   "char_offset": 533
+  },
+  {
+   "id": "p8",
+   "section_id": "s2",
+   "text": "Surveys of BERTology [15] and transfer learning [11] summarize fine-tuning practice [2,4-6,9].",
+   "char_offset": 661
+  },
+  {
+   "id": "p9",
+   "section_id": "s3",
+   "text": "3 Method",
+   "char_offset": 756
+  },
+  {
+   "id": "p10",
+   "section_id": "s3",
+   "text": "We build on the Transformer encoder [1] and initialize from BERT [2]. Following earlier work [2-5], we fine-tune with residual connections [6] and dropout.",
+   "char_offset": 765
+  },
+  {
+   "id": "p11",
+   "section_id": "s3",
+   "text": "The full pipeline [1,4,16] combines\tretrieval and generation in one stage.",
+   "char_offset": 921
+  },
+  {
+   "id": "p12",
+   "section_id": "s4",
+   "text": "4 Experiments",
+   "char_offset": 996
+  },
+  {
+   "id": "p13",
+   "section_id": "s4",
+   "text": "We evaluate on three benchmarks [2,4-6,9] using standard metrics [10-11].",
+   "char_offset": 1010
+  },
+  {
+   "id": "p14",
+   "section_id": "s4",
+   "text": "Setting",
+   "char_offset": 1084
+  },
+  {
+   "id": "p15",
+   "section_id": "s4",
+   "text": "Result",
+   "char_offset": 1092
+  },
+  {
+   "id": "p16",
+   "section_id": "s4",
+   "text": "baseline GloVe [14]",
+   "char_offset": 1099
+  },
+  {
+   "id": "p17",
+   "section_id": "s4",
+   "text": "reported in 8",
+   "char_offset": 1119
+  },
+  {
+   "id": "p18",
+   "section_id": "s5",
+   "text": "5 Discussion",
+   "char_offset": 1133
+  },
+  {
+   "id": "p19",
+   "section_id": "s5",
+   "text": "Our findings align with prior reports [15] although coverage differs [3,10].",
+   "char_offset": 1146
+  },
+  {
+   "id": "p20",
+   "section_id": "s6",
+   "text": "6 Conclusion",
+   "char_offset": 1223
+  },
+  {
+   "id": "p21",
+   "section_id": "s6",
+   "text": "We presented a compact pipeline [1] that performs on par with larger systems [3,10,11].",
+   "char_offset": 1236
+  },
+  {
+   "id": "p22",
+   "section_id": "s7",
+   "text": "References",
+   "char_offset": 1324
+  },
+  {
+   "id": "p23",
+   "section_id": "s7",
+   "text": "[1] Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need. Advances in Neural Information Processing Systems. 2017;30:5998-6008.",
+   "char_offset": 1335
+  },
+  {
+   "id": "p24",
+   "section_id": "s7",
+   "text": "[2] Devlin J, Chang M-W, Lee K, Toutanova K. BERT: Pre-training of deep bidirectional transformers for language understanding. Proceedings of NAACL-HLT. 2019:4171-4186. doi:10.18653/v1/N19-1423.",
+   "char_offset": 1475
+  },
+  {
+   "id": "p25",
+   "section_id": "s7",
+   "text": "[3] Brown TB, Mann B, Ryder N, et al. Language models are few-shot learners. Advances in Neural Information Processing Systems. 2020;33:1877-1901.",
+   "char_offset": 1670
+  },
+  {
+   "id": "p26",
+   "section_id": "s7",
+   "text": "[4] Lewis P, Perez E, Piktus A, et al. Retrieval-augmented generation for knowledge-intensive NLP tasks. Advances in Neural Information Processing Systems. 2020;33:9459-9474.",
+   "char_offset": 1817
+  },
+  {
+   "id": "p27",
+   "section_id": "s7",
+   "text": "[5] Ji Z, Lee N, Frieske R, et al. Survey of hallucination in natural language generation. ACM Computing Surveys. 2023;55(12):1-38. doi:10.1145/3571730.",
+   "char_offset": 1992
+  },
+  {
+   "id": "p28",
+   "section_id": "s7",
+   "text": "[6] He K, Zhang X, Ren S, Sun J. Deep residual learning for image recognition. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016:770-778. doi:10.1109/CVPR.2016.90.",
+   "char_offset": 2145
+  },
+  {
+   "id": "p29",
+   "section_id": "s7",
+   "text": "[7] Mikolov T, Chen K, Corrado G, Dean J. Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781. 2013.",
+   "char_offset": 2343
+  },
+  {
+   "id": "p30",
+   "section_id": "s7",
+   "text": "[8] Sutskever I, Vinyals O, Le QV. Sequence to sequence learning with neural networks. Advances in Neural Information Processing Systems. 2014;27:3104-3112.",
+   "char_offset": 2485
+  },
+  {
+   "id": "p31",
+   "section_id": "s7",
+   "text": "[9] Kingma DP, Ba J. Adam: A method for stochastic optimization. International Conference on Learning Representations. 2015.",
+   "char_offset": 2642
+  },
+  {
+   "id": "p32",
+   "section_id": "s7",
+   "text": "[10] Radford A, Wu J, Child R, et al. Language models are unsupervised multitask learners. OpenAI Technical Report. 2019.",
+   "char_offset": 2767
+  },
+  {
+   "id": "p33",
+   "section_id": "s7",
+   "text": "[11] Raffel C, Shazeer N, Roberts A, et al. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research. 2020;21(140):1-67.",
+   "char_offset": 2889
+  },
+  {
+   "id": "p34",
+   "section_id": "s7",
+   "text": "[12] Hochreiter S, Schmidhuber J. Long short-term memory. Neural Computation. 1997;9(8):1735-1780. doi:10.1162/neco.1997.9.8.1735.",
+   "char_offset": 3073
+  },
+  {
+   "id": "p35",
+   "section_id": "s7",
+   "text": "[13] Bahdanau D, Cho K, Bengio Y. Neural machine translation by jointly learning to align and translate. International Conference on Learning Representations. 2015.",
+   "char_offset": 3204
+  },
+  {
+   "id": "p36",
+   "section_id": "s7",
+   "text": "[14] Pennington J, Socher R, Manning CD. GloVe: Global vectors for word representation. Proceedings of EMNLP. 2014:1532-1543. doi:10.3115/v1/D14-1162.",
+   "char_offset": 3369
+  },
+  {
+   "id": "p37",
+   "section_id": "s7",
+   "text": "[15] Rogers A, Kovaleva O, Rumshisky A. A primer in BERTology: What we know about how BERT works. Transactions of the Association for Computational Linguistics. 2020;8:842-866. doi:10.1162/tacl_a_00349.",
+   "char_offset": 3520
+  },
+  {
+   "id": "p38",
+   "section_id": "s7",
+   "text": "[16] Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval for open-domain question answering. Proceedings of EMNLP. 2020:6769-6781. doi:10.18653/v1/2020.emnlp-main.550.",
+   "char_offset": 3723
+  }
+ ],
+ "markers": [
+  {
+   "id": "m0",
+   "paragraph_id": "p3",
+   "start": 26,
+   "end": 31,
+   "raw": "[1,3]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r1",
+    "r3"
+   ]
+  },
+  {
+   "id": "m1",
+   "paragraph_id": "p3",
+   "start": 98,
+   "end": 101,
+   "raw": "[2]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r2"
+   ]
+  },
+  {
+   "id": "m2",
+   "paragraph_id": "p4",
+   "start": 31,
+   "end": 34,
+   "raw": "[4]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r4"
+   ]
+  },
+  {
+   "id": "m3",
+   "paragraph_id": "p4",
+   "start": 55,
+   "end": 59,
+   "raw": "[16]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r16"
+   ]
+  },
+  {
+   "id": "m4",
+   "paragraph_id": "p4",
+   "start": 145,
+   "end": 148,
+   "raw": "[5]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r5"
+   ]
+  },
+  {
+   "id": "m5",
+   "paragraph_id": "p6",
+   "start": 51,
+   "end": 54,
+   "raw": "[8]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r8"
+   ]
+  },
+  {
+   "id": "m6",
+   "paragraph_id": "p6",
+   "start": 82,
+   "end": 86,
+   "raw": "[12]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r12"
+   ]
+  },
+  {
+   "id": "m7",
+   "paragraph_id": "p6",
+   "start": 109,
+   "end": 115,
+   "raw": "[1,13]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r1",
+    "r13"
+   ]
+  },
+  {
+   "id": "m8",
+   "paragraph_id": "p7",
+   "start": 43,
+   "end": 46,
+   "raw": "[7]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r7"
+   ]
+  },
+  {
+   "id": "m9",
+   "paragraph_id": "p7",
+   "start": 72,
+   "end": 75,
+   "raw": "[2]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r2"
+   ]
+  },
+  {
+   "id": "m10",
+   "paragraph_id": "p7",
+   "start": 123,
+   "end": 126,
+   "raw": "[9]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r9"
+   ]
+  },
+  {
+   "id": "m11",
+   "paragraph_id": "p8",
+   "start": 21,
+   "end": 25,
+   "raw": "[15]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r15"
+   ]
+  },
+  {
+   "id": "m12",
+   "paragraph_id": "p8",
+   "start": 48,
+   "end": 52,
+   "raw": "[11]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r11"
+   ]
+  },
+  {
+   "id": "m13",
+   "paragraph_id": "p8",
+   "start": 84,
+   "end": 93,
+   "raw": "[2,4-6,9]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r2",
+    "r4",
+    "r5",
+    "r6",
+    "r9"
+   ]
+  },
+  {
+   "id": "m14",
+   "paragraph_id": "p10",
+   "start": 36,
+   "end": 39,
+   "raw": "[1]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r1"
+   ]
+  },
+  {
+   "id": "m15",
+   "paragraph_id": "p10",
+   "start": 65,
+   "end": 68,
+   "raw": "[2]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r2"
+   ]
+  },
+  {
+   "id": "m16",
+   "paragraph_id": "p10",
+   "start": 93,
+   "end": 98,
+   "raw": "[2-5]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r2",
+    "r3",
+    "r4",
+    "r5"
+   ]
+  },
+  {
+   "id": "m17",
+   "paragraph_id": "p10",
+   "start": 139,
+   "end": 142,
+   "raw": "[6]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r6"
+   ]
+  },
+  {
+   "id": "m18",
+   "paragraph_id": "p11",
+   "start": 18,
+   "end": 26,
+   "raw": "[1,4,16]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r1",
+    "r4",
+    "r16"
+   ]
+  },
+  {
+   "id": "m19",
+   "paragraph_id": "p13",
+   "start": 32,
+   "end": 41,
+   "raw": "[2,4-6,9]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r2",
+    "r4",
+    "r5",
+    "r6",
+    "r9"
+   ]
+  },
+  {
+   "id": "m20",
+   "paragraph_id": "p13",
+   "start": 65,
+   "end": 72,
+   "raw": "[10-11]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r10",
+    "r11"
+   ]
+  },
+  {
+   "id": "m21",
+   "paragraph_id": "p16",
+   "start": 15,
+   "end": 19,
+   "raw": "[14]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r14"
+   ]
+  },
+  {
+   "id": "m22",
+   "paragraph_id": "p17",
+   "start": 12,
+   "end": 13,
+   "raw": "8",
+   "kind": "superscript",
+   "ref_ids": [
+    "r8"
+   ]
+  },
+  {
+   "id": "m23",
+   "paragraph_id": "p19",
+   "start": 38,
+   "end": 42,
+   "raw": "[15]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r15"
+   ]
+  },
+  {
+   "id": "m24",
+   "paragraph_id": "p19",
+   "start": 69,
+   "end": 75,
+   "raw": "[3,10]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r3",
+    "r10"
+   ]
+  },
+  {
+   "id": "m25",
+   "paragraph_id": "p21",
+   "start": 32,
+   "end": 35,
+   "raw": "[1]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r1"
+   ]
+  },
+  {
+   "id": "m26",
+   "paragraph_id": "p21",
+   "start": 77,
+   "end": 86,
+   "raw": "[3,10,11]",
+   "kind": "numeric",
+   "ref_ids": [
+    "r3",
+    "r10",
+    "r11"
+   ]
+  }
+ ],
+ "references": [
+  {
+   "id": "r1",
+   "raw": "[1] Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need. Advances in Neural Information Processing Systems. 2017;30:5998-6008.",
+   "title": "Attention is all you need",
+   "authors": [
+    "Vaswani A",
+    "Shazeer N",
+    "Parmar N"
+   ],
+   "year": 2017,
+   "venue": "Advances in Neural Information Processing Systems",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p23",
+   "label": "1"
+  },
+  {
+   "id": "r2",
+   "raw": "[2] Devlin J, Chang M-W, Lee K, Toutanova K. BERT: Pre-training of deep bidirectional transformers for language understanding. Proceedings of NAACL-HLT. 2019:4171-4186. doi:10.18653/v1/N19-1423.",
+   "title": "BERT: Pre-training of deep bidirectional transformers for language understanding",
+   "authors": [
+    "Devlin J",
+    "Chang M-W",
+    "Lee K",
+    "Toutanova K"
+   ],
+   "year": 2019,
+   "venue": "Proceedings of NAACL-HLT",
+   "doi": "10.18653/v1/N19-1423",
+   "lang": "en",
+   "paragraph_id": "p24",
+   "label": "2"
+  },
+  {
+   "id": "r3",
+   "raw": "[3] Brown TB, Mann B, Ryder N, et al. Language models are few-shot learners. Advances in Neural Information Processing Systems. 2020;33:1877-1901.",
+   "title": "Language models are few-shot learners",
+   "authors": [
+    "Brown TB",
+    "Mann B",
+    "Ryder N"
+   ],
+   "year": 2020,
+   "venue": "Advances in Neural Information Processing Systems",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p25",
+   "label": "3"
+  },
+  {
+   "id": "r4",
+   "raw": "[4] Lewis P, Perez E, Piktus A, et al. Retrieval-augmented generation for knowledge-intensive NLP tasks. Advances in Neural Information Processing Systems. 2020;33:9459-9474.",
+   "title": "Retrieval-augmented generation for knowledge-intensive NLP tasks",
+   "authors": [
+    "Lewis P",
+    "Perez E",
+    "Piktus A"
+   ],
+   "year": 2020,
+   "venue": "Advances in Neural Information Processing Systems",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p26",
+   "label": "4"
+  },
+  {
+   "id": "r5",
+   "raw": "[5] Ji Z, Lee N, Frieske R, et al. Survey of hallucination in natural language generation. ACM Computing Surveys. 2023;55(12):1-38. doi:10.1145/3571730.",
+   "title": "Survey of hallucination in natural language generation",
+   "authors": [
+    "Ji Z",
+    "Lee N",
+    "Frieske R"
+   ],
+   "year": 2023,
+   "venue": "ACM Computing Surveys",
+   "doi": "10.1145/3571730",
+   "lang": "en",
+   "paragraph_id": "p27",
+   "label": "5"
+  },
+  {
+   "id": "r6",
+   "raw": "[6] He K, Zhang X, Ren S, Sun J. Deep residual learning for image recognition. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016:770-778. doi:10.1109/CVPR.2016.90.",
+   "title": "Deep residual learning for image recognition",
+   "authors": [
+    "He K",
+    "Zhang X",
+    "Ren S",
+    "Sun J"
+   ],
+   "year": 2016,
+   "venue": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition",
+   "doi": "10.1109/CVPR.2016.90",
+   "lang": "en",
+   "paragraph_id": "p28",
+   "label": "6"
+  },
+  {
+   "id": "r7",
+   "raw": "[7] Mikolov T, Chen K, Corrado G, Dean J. Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781. 2013.",
+   "title": "Efficient estimation of word representations in vector space",
+   "authors": [
+    "Mikolov T",
+    "Chen K",
+    "Corrado G",
+    "Dean J"
+   ],
+   "year": 2013,
+   "venue": "arXiv preprint arXiv:1301.3781",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p29",
+   "label": "7"
+  },
+  {
+   "id": "r8",
+   "raw": "[8] Sutskever I, Vinyals O, Le QV. Sequence to sequence learning with neural networks. Advances in Neural Information Processing Systems. 2014;27:3104-3112.",
+   "title": "Sequence to sequence learning with neural networks",
+   "authors": [
+    "Sutskever I",
+    "Vinyals O",
+    "Le QV"
+   ],
+   "year": 2014,
+   "venue": "Advances in Neural Information Processing Systems",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p30",
+   "label": "8"
+  },
+  {
+   "id": "r9",
+   "raw": "[9] Kingma DP, Ba J. Adam: A method for stochastic optimization. International Conference on Learning Representations. 2015.",
+   "title": "Adam: A method for stochastic optimization",
+   "authors": [
+    "Kingma DP",
+    "Ba J"
+   ],
+   "year": 2015,
+   "venue": "International Conference on Learning Representations",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p31",
+   "label": "9"
+  },
+  {
+   "id": "r10",
+   "raw": "[10] Radford A, Wu J, Child R, et al. Language models are unsupervised multitask learners. OpenAI Technical Report. 2019.",
+   "title": "Language models are unsupervised multitask learners",
+   "authors": [
+    "Radford A",
+    "Wu J",
+    "Child R"
+   ],
+   "year": 2019,
+   "venue": "OpenAI Technical Report",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p32",
+   "label": "10"
+  },
+  {
+   "id": "r11",
+   "raw": "[11] Raffel C, Shazeer N, Roberts A, et al. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research. 2020;21(140):1-67.",
+   "title": "Exploring the limits of transfer learning with a unified text-to-text transformer",
+   "authors": [
+    "Raffel C",
+    "Shazeer N",
+    "Roberts A"
+   ],
+   "year": 2020,
+   "venue": "Journal of Machine Learning Research",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p33",
+   "label": "11"
+  },
+  {
+   "id": "r12",
+   "raw": "[12] Hochreiter S, Schmidhuber J. Long short-term memory. Neural Computation. 1997;9(8):1735-1780. doi:10.1162/neco.1997.9.8.1735.",
+   "title": "Long short-term memory",
+   "authors": [
+    "Hochreiter S",
+    "Schmidhuber J"
+   ],
+   "year": 1997,
+   "venue": "Neural Computation",
+   "doi": "10.1162/neco.1997.9.8.1735",
+   "lang": "en",
+   "paragraph_id": "p34",
+   "label": "12"
+  },
+  {
+   "id": "r13",
+   "raw": "[13] Bahdanau D, Cho K, Bengio Y. Neural machine translation by jointly learning to align and translate. International Conference on Learning Representations. 2015.",
+   "title": "Neural machine translation by jointly learning to align and translate",
+   "authors": [
+    "Bahdanau D",
+    "Cho K",
+    "Bengio Y"
+   ],
+   "year": 2015,
+   "venue": "International Conference on Learning Representations",
+   "doi": null,
+   "lang": "en",
+   "paragraph_id": "p35",
+   "label": "13"
+  },
+  {
+   "id": "r14",
+   "raw": "[14] Pennington J, Socher R, Manning CD. GloVe: Global vectors for word representation. Proceedings of EMNLP. 2014:1532-1543. doi:10.3115/v1/D14-1162.",
+   "title": "GloVe: Global vectors for word representation",
+   "authors": [
+    "Pennington J",
+    "Socher R",
+    "Manning CD"
+   ],
+   "year": 2014,
+   "venue": "Proceedings of EMNLP",
+   "doi": "10.3115/v1/D14-1162",
+   "lang": "en",
+   "paragraph_id": "p36",
+   "label": "14"
+  },
+  {
+   "id": "r15",
+   "raw": "[15] Rogers A, Kovaleva O, Rumshisky A. A primer in BERTology: What we know about how BERT works. Transactions of the Association for Computational Linguistics. 2020;8:842-866. doi:10.1162/tacl_a_00349.",
+   "title": "A primer in BERTology: What we know about how BERT works",
+   "authors": [
+    "Rogers A",
+    "Kovaleva O",
+    "Rumshisky A"
+   ],
+   "year": 2020,
+   "venue": "Transactions of the Association for Computational Linguistics",
+   "doi": "10.1162/tacl_a_00349",
+   "lang": "en",
+   "paragraph_id": "p37",
+   "label": "15"
+  },
+  {
+   "id": "r16",
+   "raw": "[16] Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval for open-domain question answering. Proceedings of EMNLP. 2020:6769-6781. doi:10.18653/v1/2020.emnlp-main.550.",
+   "title": "Dense passage retrieval for open-domain question answering",
+   "authors": [
+    "Karpukhin V",
+    "Oguz B",
+    "Min S"
+   ],
+   "year": 2020,
+   "venue": "Proceedings of EMNLP",
+   "doi": "10.18653/v1/2020.emnlp-main.550",
+   "lang": "en",
+   "paragraph_id": "p38",
+   "label": "16"
+  }
+ ],
+ "ref_checks": [
+  {
+   "ref_id": "r1",
+   "status": "mismatch",
+   "matched": {
+    "source": "crossref",
+    "title": "Attention Is All You Need",
+    "authors": [
+     "Vaswani, Ashish",
+     "Shazeer, Noam",
+     "Parmar, Niki",
+     "Uszkoreit, Jakob",
+     "Jones, Llion",
+     "N.Gomez, Aidan",
+     "Kaiser, Lukasz",
+     "Polosukhin, Illia"
+    ],
+    "year": 2025,
+    "venue": null,
+    "doi": "10.65215/r5bs2d54",
+    "url": "https://doi.org/10.65215/r5bs2d54",
+    "abstract": null,
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": [
+    "年份不一致：文中写 2017，数据库记录为 2025"
+   ]
+  },
+  {
+   "ref_id": "r2",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+    "authors": [
+     "Devlin, Jacob",
+     "Chang, Ming-Wei",
+     "Lee, Kenton",
+     "Toutanova, Kristina"
+    ],
+    "year": 2019,
+    "venue": "Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)",
+    "doi": "10.18653/v1/n19-1423",
+    "url": "https://doi.org/10.18653/v1/n19-1423",
+    "abstract": null,
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": []
+  },
+  {
+   "ref_id": "r3",
+   "status": "mismatch",
+   "matched": {
+    "source": "crossref",
+    "title": "Language Models are Few-Shot Learners",
+    "authors": [
+     "Malakar, Sourav"
+    ],
+    "year": 2026,
+    "venue": "Neural Horizons The Uncharted Future of Deep Learning",
+    "doi": "10.65525/svup.9788199778009.2026.224-230",
+    "url": "https://doi.org/10.65525/svup.9788199778009.2026.224-230",
+    "abstract": null,
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": [
+    "首作者不一致：文中写 Brown TB，数据库记录为 Malakar, Sourav",
+    "年份不一致：文中写 2020，数据库记录为 2026"
+   ]
+  },
+  {
+   "ref_id": "r4",
+   "status": "unverifiable",
+   "matched": null,
+   "issues": [
+    "检索服务暂不可用，未能完成核验"
+   ]
+  },
+  {
+   "ref_id": "r5",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "Survey of Hallucination in Natural Language Generation",
+    "authors": [
+     "Ji, Ziwei",
+     "Lee, Nayeon",
+     "Frieske, Rita",
+     "Yu, Tiezheng",
+     "Su, Dan",
+     "Xu, Yan",
+     "Ishii, Etsuko",
+     "Bang, Ye Jin",
+     "Madotto, Andrea",
+     "Fung, Pascale"
+    ],
+    "year": 2023,
+    "venue": "ACM Computing Surveys",
+    "doi": "10.1145/3571730",
+    "url": "https://doi.org/10.1145/3571730",
+    "abstract": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models. This advancement has led to more fluent and coherent NLG, leading to improved development in downstream tasks such as abstractive summarization, dialogue generation, and data-to-text generation. However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios. To address this issue, many studies have been presented in measuring and mitigating hallucinated texts, but these have never been reviewed in a comprehensive manner before. In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG. The survey is organized into two parts: (1) a general overview of metrics, mitigation methods, and future directions, and (2) an overview of task-specific research progress on hallucinations in the following downstream tasks, namely abstractive summarization, dialogue generation, generative question answering, data-to-text generation, and machine translation. This survey serves to facilitate collaborative efforts among researchers in tackling the challenge of hallucinated texts in NLG.",
+    "pdf_url": "https://arxiv.org/pdf/2202.03629",
+    "arxiv_id": "2202.03629",
+    "alt_year": 2022
+   },
+   "issues": []
+  },
+  {
+   "ref_id": "r6",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "Deep Residual Learning for Image Recognition",
+    "authors": [
+     "He, Kaiming",
+     "Zhang, Xiangyu",
+     "Ren, Shaoqing",
+     "Sun, Jian"
+    ],
+    "year": 2016,
+    "venue": "2016 IEEE Conference on Computer Vision and Pattern Recognition (CVPR)",
+    "doi": "10.1109/cvpr.2016.90",
+    "url": "https://doi.org/10.1109/cvpr.2016.90",
+    "abstract": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers - 8× deeper than VGG nets [40] but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions1, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.",
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": []
+  },
+  {
+   "ref_id": "r7",
+   "status": "mismatch",
+   "matched": {
+    "source": "crossref",
+    "title": "Efficient Estimation of Nepali Word Representations in Vector Space",
+    "authors": [
+     "Bhatta, Janardan",
+     "Shrestha, Dipesh",
+     "Nepal, Santosh",
+     "Pandey, Saurav",
+     "Koirala, Shekhar"
+    ],
+    "year": 2020,
+    "venue": "Journal of Innovations in Engineering Education",
+    "doi": "10.3126/jiee.v3i1.34327",
+    "url": "https://doi.org/10.3126/jiee.v3i1.34327",
+    "abstract": null,
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": [
+    "首作者不一致：文中写 Mikolov T，数据库记录为 Bhatta, Janardan",
+    "年份不一致：文中写 2013，数据库记录为 2020"
+   ]
+  },
+  {
+   "ref_id": "r8",
+   "status": "unverifiable",
+   "matched": null,
+   "issues": [
+    "检索服务暂不可用，未能完成核验"
+   ]
+  },
+  {
+   "ref_id": "r9",
+   "status": "unverifiable",
+   "matched": null,
+   "issues": [
+    "检索服务暂不可用，未能完成核验"
+   ]
+  },
+  {
+   "ref_id": "r10",
+   "status": "unverifiable",
+   "matched": null,
+   "issues": [
+    "检索服务暂不可用，未能完成核验"
+   ]
+  },
+  {
+   "ref_id": "r11",
+   "status": "unverifiable",
+   "matched": null,
+   "issues": [
+    "检索服务暂不可用，未能完成核验"
+   ]
+  },
+  {
+   "ref_id": "r12",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "Long Short-Term Memory",
+    "authors": [
+     "Hochreiter, Sepp",
+     "Schmidhuber, Jürgen"
+    ],
+    "year": 1997,
+    "venue": "Neural Computation",
+    "doi": "10.1162/neco.1997.9.8.1735",
+    "url": "https://doi.org/10.1162/neco.1997.9.8.1735",
+    "abstract": "Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's (1991) analysis of this problem, then address it by introducing a novel, efficient, gradient-based method called long short-term memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete-time steps by enforcing constant error flow through constant error carousels within special units. Multiplicative gate units learn to open and close access to the constant error flow. LSTM is local in space and time; its computational complexity per time step and weight is O(1). Our experiments with artificial data involve local, distributed, real-valued, and noisy pattern representations. In comparisons with real-time recurrent learning, back propagation through time, recurrent cascade correlation, Elman nets, and neural sequence chunking, LSTM leads to many more successful runs, and learns much faster. LSTM also solves complex, artificial long-time-lag tasks that have never been solved by previous recurrent network algorithms.",
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": []
+  },
+  {
+   "ref_id": "r13",
+   "status": "unverifiable",
+   "matched": null,
+   "issues": [
+    "检索服务暂不可用，未能完成核验"
+   ]
+  },
+  {
+   "ref_id": "r14",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "Glove: Global Vectors for Word Representation",
+    "authors": [
+     "Pennington, Jeffrey",
+     "Socher, Richard",
+     "Manning, Christopher"
+    ],
+    "year": 2014,
+    "venue": "Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)",
+    "doi": "10.3115/v1/d14-1162",
+    "url": "https://doi.org/10.3115/v1/d14-1162",
+    "abstract": "Recent methods for learning vector space representations of words have succeeded in capturing fine-grained semantic and syntactic regularities using vector arith-metic, but the origin of these regularities has remained opaque. We analyze and make explicit the model properties needed for such regularities to emerge in word vectors. The result is a new global log-bilinear regression model that combines the advantages of the two major model families in the literature: global matrix factorization and local context window methods. Our model efficiently leverages statistical information by training only on the nonzero elements in a word-word co-occurrence matrix, rather than on the en-tire sparse matrix or on individual context windows in a large corpus. The model pro-duces a vector space with meaningful sub-structure, as evidenced by its performance of 75 % on a recent word analogy task. It also outperforms related models on simi-larity tasks and named entity recognition. 1",
+    "pdf_url": null,
+    "arxiv_id": null,
+    "alt_year": null
+   },
+   "issues": []
+  },
+  {
+   "ref_id": "r15",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "A Primer in BERTology: What We Know About How BERT Works",
+    "authors": [
+     "Rogers, Anna",
+     "Kovaleva, Olga",
+     "Rumshisky, Anna"
+    ],
+    "year": 2020,
+    "venue": "Transactions of the Association for Computational Linguistics",
+    "doi": "10.1162/tacl_a_00349",
+    "url": "https://doi.org/10.1162/tacl_a_00349",
+    "abstract": "Transformer-based models have pushed state of the art in many areas of NLP, but our understanding of what is behind their success is still limited. This paper is the first survey of over 150 studies of the popular BERT model. We review the current state of knowledge about how BERT works, what kind of information it learns and how it is represented, common modifications to its training objectives and architecture, the overparameterization issue, and approaches to compression. We then outline directions for future research.",
+    "pdf_url": "https://direct.mit.edu/tacl/article-pdf/doi/10.1162/tacl_a_00349/1923281/tacl_a_00349.pdf",
+    "arxiv_id": "2002.12327",
+    "alt_year": 2020
+   },
+   "issues": []
+  },
+  {
+   "ref_id": "r16",
+   "status": "verified",
+   "matched": {
+    "source": "crossref",
+    "title": "Dense Passage Retrieval for Open-Domain Question Answering",
+    "authors": [
+     "Karpukhin, Vladimir",
+     "Oguz, Barlas",
+     "Min, Sewon",
+     "Lewis, Patrick",
+     "Wu, Ledell",
+     "Edunov, Sergey",
+     "Chen, Danqi",
+     "Yih, Wen-tau"
+    ],
+    "year": 2020,
+    "venue": "Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)",
+    "doi": "10.18653/v1/2020.emnlp-main.550",
+    "url": "https://doi.org/10.18653/v1/2020.emnlp-main.550",
+    "abstract": null,
+    "pdf_url": "https://www.aclweb.org/anthology/2020.emnlp-main.550.pdf",
+    "arxiv_id": "2004.04906",
+    "alt_year": 2020
+   },
+   "issues": []
+  }
+ ],
+ "claims": [
+  {
+   "id": "c0",
+   "paragraph_id": "p3",
+   "start": 0,
+   "end": 73,
+   "text": "Transformer architectures have reshaped natural language processing",
+   "marker_ids": [
+    "m0"
+   ],
+   "sentence": "Transformer architectures [1,3] have reshaped natural language processing, and pre-trained models [2] achieve strong benchmark results."
+  },
+  {
+   "id": "c1",
+   "paragraph_id": "p3",
+   "start": 79,
+   "end": 134,
+   "text": "pre-trained models achieve strong benchmark results",
+   "marker_ids": [
+    "m1"
+   ],
+   "sentence": "Transformer architectures [1,3] have reshaped natural language processing, and pre-trained models [2] achieve strong benchmark results."
+  },
+  {
+   "id": "c2",
+   "paragraph_id": "p4",
+   "start": 105,
+   "end": 144,
+   "text": "hallucination remains a central concern",
+   "marker_ids": [
+    "m4"
+   ],
+   "sentence": "Retrieval-augmented generation [4] and dense retrieval [16] ground responses in external evidence, while hallucination remains a central concern [5]."
+  },
+  {
+   "id": "c3",
+   "paragraph_id": "p4",
+   "start": 0,
+   "end": 144,
+   "text": "Retrieval-augmented generation and dense retrieval ground responses in external evidence, while hallucination remains a central concern",
+   "marker_ids": [
+    "m2",
+    "m3"
+   ],
+   "sentence": "Retrieval-augmented generation [4] and dense retrieval [16] ground responses in external evidence, while hallucination remains a central concern [5]."
+  },
+  {
+   "id": "c4",
+   "paragraph_id": "p6",
+   "start": 0,
+   "end": 50,
+   "text": "Early sequence models relied on recurrent networks",
+   "marker_ids": [
+    "m5"
+   ],
+   "sentence": "Early sequence models relied on recurrent networks [8] and long short-term memory [12];"
+  },
+  {
+   "id": "c5",
+   "paragraph_id": "p6",
+   "start": 55,
+   "end": 81,
+   "text": "and long short-term memory",
+   "marker_ids": [
+    "m6"
+   ],
+   "sentence": "Early sequence models relied on recurrent networks [8] and long short-term memory [12];"
+  },
+  {
+   "id": "c6",
+   "paragraph_id": "p6",
+   "start": 88,
+   "end": 134,
+   "text": "attention mechanisms improved alignment",
+   "marker_ids": [
+    "m7"
+   ],
+   "sentence": "attention mechanisms [1,13] improved alignment."
+  },
+  {
+   "id": "c7",
+   "paragraph_id": "p7",
+   "start": 0,
+   "end": 42,
+   "text": "Word representations evolved from word2vec",
+   "marker_ids": [
+    "m8"
+   ],
+   "sentence": "Word representations evolved from word2vec [7] to contextual embeddings [2], and optimization is typically handled by Adam [9]."
+  },
+  {
+   "id": "c8",
+   "paragraph_id": "p7",
+   "start": 81,
+   "end": 122,
+   "text": "optimization is typically handled by Adam",
+   "marker_ids": [
+    "m10"
+   ],
+   "sentence": "Word representations evolved from word2vec [7] to contextual embeddings [2], and optimization is typically handled by Adam [9]."
+  },
+  {
+   "id": "c9",
+   "paragraph_id": "p7",
+   "start": 0,
+   "end": 122,
+   "text": "Word representations evolved from word2vec to contextual embeddings , and optimization is typically handled by Adam",
+   "marker_ids": [
+    "m9"
+   ],
+   "sentence": "Word representations evolved from word2vec [7] to contextual embeddings [2], and optimization is typically handled by Adam [9]."
+  },
+  {
+   "id": "c10",
+   "paragraph_id": "p8",
+   "start": 53,
+   "end": 83,
+   "text": "summarize fine-tuning practice",
+   "marker_ids": [
+    "m13"
+   ],
+   "sentence": "Surveys of BERTology [15] and transfer learning [11] summarize fine-tuning practice [2,4-6,9]."
+  },
+  {
+   "id": "c11",
+   "paragraph_id": "p8",
+   "start": 0,
+   "end": 83,
+   "text": "Surveys of BERTology and transfer learning summarize fine-tuning practice",
+   "marker_ids": [
+    "m11",
+    "m12"
+   ],
+   "sentence": "Surveys of BERTology [15] and transfer learning [11] summarize fine-tuning practice [2,4-6,9]."
+  },
+  {
+   "id": "c12",
+   "paragraph_id": "p10",
+   "start": 0,
+   "end": 35,
+   "text": "We build on the Transformer encoder",
+   "marker_ids": [
+    "m14"
+   ],
+   "sentence": "We build on the Transformer encoder [1] and initialize from BERT [2]."
+  },
+  {
+   "id": "c13",
+   "paragraph_id": "p10",
+   "start": 0,
+   "end": 64,
+   "text": "We build on the Transformer encoder and initialize from BERT",
+   "marker_ids": [
+    "m15"
+   ],
+   "sentence": "We build on the Transformer encoder [1] and initialize from BERT [2]."
+  },
+  {
+   "id": "c14",
+   "paragraph_id": "p10",
+   "start": 100,
+   "end": 138,
+   "text": "we fine-tune with residual connections",
+   "marker_ids": [
+    "m17"
+   ],
+   "sentence": "Following earlier work [2-5], we fine-tune with residual connections [6] and dropout."
+  },
+  {
+   "id": "c15",
+   "paragraph_id": "p10",
+   "start": 70,
+   "end": 154,
+   "text": "Following earlier work , we fine-tune with residual connections and dropout",
+   "marker_ids": [
+    "m16"
+   ],
+   "sentence": "Following earlier work [2-5], we fine-tune with residual connections [6] and dropout."
+  },
+  {
+   "id": "c16",
+   "paragraph_id": "p11",
+   "start": 0,
+   "end": 74,
+   "text": "The full pipeline combines\tretrieval and generation in one stage.",
+   "marker_ids": [
+    "m18"
+   ],
+   "sentence": "The full pipeline [1,4,16] combines\tretrieval and generation in one stage."
+  },
+  {
+   "id": "c17",
+   "paragraph_id": "p13",
+   "start": 0,
+   "end": 31,
+   "text": "We evaluate on three benchmarks",
+   "marker_ids": [
+    "m19"
+   ],
+   "sentence": "We evaluate on three benchmarks [2,4-6,9] using standard metrics [10-11]."
+  },
+  {
+   "id": "c18",
+   "paragraph_id": "p13",
+   "start": 0,
+   "end": 64,
+   "text": "We evaluate on three benchmarks using standard metrics",
+   "marker_ids": [
+    "m20"
+   ],
+   "sentence": "We evaluate on three benchmarks [2,4-6,9] using standard metrics [10-11]."
+  },
+  {
+   "id": "c19",
+   "paragraph_id": "p16",
+   "start": 0,
+   "end": 14,
+   "text": "baseline GloVe",
+   "marker_ids": [
+    "m21"
+   ],
+   "sentence": "baseline GloVe [14]"
+  },
+  {
+   "id": "c20",
+   "paragraph_id": "p17",
+   "start": 0,
+   "end": 11,
+   "text": "reported in",
+   "marker_ids": [
+    "m22"
+   ],
+   "sentence": "reported in 8"
+  },
+  {
+   "id": "c21",
+   "paragraph_id": "p19",
+   "start": 0,
+   "end": 37,
+   "text": "Our findings align with prior reports",
+   "marker_ids": [
+    "m23"
+   ],
+   "sentence": "Our findings align with prior reports [15] although coverage differs [3,10]."
+  },
+  {
+   "id": "c22",
+   "paragraph_id": "p19",
+   "start": 0,
+   "end": 68,
+   "text": "Our findings align with prior reports although coverage differs",
+   "marker_ids": [
+    "m24"
+   ],
+   "sentence": "Our findings align with prior reports [15] although coverage differs [3,10]."
+  },
+  {
+   "id": "c23",
+   "paragraph_id": "p21",
+   "start": 0,
+   "end": 31,
+   "text": "We presented a compact pipeline",
+   "marker_ids": [
+    "m25"
+   ],
+   "sentence": "We presented a compact pipeline [1] that performs on par with larger systems [3,10,11]."
+  },
+  {
+   "id": "c24",
+   "paragraph_id": "p21",
+   "start": 41,
+   "end": 76,
+   "text": "performs on par with larger systems",
+   "marker_ids": [
+    "m26"
+   ],
+   "sentence": "We presented a compact pipeline [1] that performs on par with larger systems [3,10,11]."
+  }
+ ],
+ "support_checks": [
+  {
+   "claim_id": "c0",
+   "ref_id": "r1",
+   "label": "supported",
+   "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.",
+   "source_kind": "abstract",
+   "rationale": "原文片段介绍了Transformer架构并展示了其在机器翻译任务中超越现有最佳模型的性能，这直接支持了该架构重塑自然语言处理领域的论断。",
+   "source_title": "Attention Is All You Need",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "evidence_span": [
+    239,
+    562
+   ]
+  },
+  {
+   "claim_id": "c0",
+   "ref_id": "r3",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "abstract",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Language Models are Few-Shot Learners",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c1",
+   "ref_id": "r2",
+   "label": "supported",
+   "evidence": "It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "source_kind": "abstract",
+   "rationale": "原文片段明确指出BERT模型在多个自然语言处理任务上取得了新的最先进（state-of-the-art）结果，这直接支持了预训练模型能在基准测试中取得强劲表现的论断。",
+   "source_title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "source_excerpt": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "evidence_span": [
+    661,
+    1022
+   ]
+  },
+  {
+   "claim_id": "c2",
+   "ref_id": "r5",
+   "label": "supported",
+   "evidence": "However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios.",
+   "source_kind": "fulltext",
+   "rationale": "原文指出基于深度学习的生成容易幻觉，导致系统性能下降且无法满足用户期望，这直接支持了幻觉仍是一个核心关切（central concern）的论断。",
+   "source_title": "Survey of Hallucination in Natural Language Generation",
+   "source_excerpt": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models. This advancement has led to more fluent and coherent NLG, leading to improved development in downstream tasks such as abstractive summarization, dialogue generation, and data-to-text generation. However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios. To address this issue, many studies have been presented in measuring and mitigating hallucinated texts, but these have never been reviewed in a comprehensive manner before. In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG. The survey is organized into two parts: (1) a general overview of metrics, mitigation methods, and future directions, and (2) an overview of task-specific research progress on hallucinations in the following downstream tasks, namely abstractive summarization, dialogue generation, generative question answering, data-to-text generation, and machine translation. This survey serves to facilitate collaborative efforts among researchers in tackling the challenge of hallucinated texts in NLG. 8.2.3 Hallucination Metrics. For generation-based dialogue systems, especially open-domain chatbots, the hallucination evaluation method remains an open problem [ 223]. As of now, there is no standard metric. Under this setting, the study of extrinsic hallucination is of great value but still poorly investigated. 8.2.3 Hallucination Metrics. For generation-based dialogue systems, especially open-domain chatbots, the hallucination evaluation method remains an open problem [ 223]. Hallucination is an artifact of neural-based NLG and is of concern because they appear fluent and can therefore be misleading to users. In some scenarios and tasks, hallucination can cause harm. We survey various contributors to hallucination, ranging from noisy data, erroneous parametric knowledge, incorrect attention mechanism, inappropriate training strategy, to inference exposure bias, etc. For generation-based dialogue systems, especially open-domain chatbots, the hallucination evaluation method remains an open problem [ 223]. As of now, there is no standard metric. Therefore, chatbots are usually evaluated by h",
+   "evidence_span": [
+    392,
+    601
+   ]
+  },
+  {
+   "claim_id": "c3",
+   "ref_id": "r4",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c3",
+   "ref_id": "r16",
+   "label": "partial",
+   "evidence": "In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献提出了密集检索（DPR）方法并证明其可用于开放域问答的上下文选择，支持了论断中关于“dense retrieval”的部分，但原文片段未涉及“ground responses in external evidence”的具体表述，也未提及“hallucination remains a central concern”。",
+   "source_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+   "source_excerpt": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks. Retrieval-augmented generation for knowledge-intensive NLP tasks. In Advances in Neural Information Processing Systems (NeurIPS). 6779 Yankai Lin, Haozhe Ji, Zhiyuan Liu, and Maosong Sun. Table 1 shows the number of questions in training/dev/test sets for all the datasets and the actual questions used for training the retriever. 5 Experiments: Passage Retrieval In this section, we evaluate the retrieval performance of our Dense Passage Retriever (DPR), along with analysis on how its output differs from 6We use the unﬁltered TriviaQA version and discard the noisy evidence documents mined from Bing. 7The improvement of using gold contexts over passages that contain answers is small. 7 We discard the questions when the matching is failed due to different Wikipedia versions or pre-processing. Table 1 shows the number of questions in training/dev/test sets for all the datasets and the actual questions used for training the retriever. 5 Experiments: Passage Retrieval In this section, we evaluate the retrieval performance of our Dense Passage Retriever (DPR), along with analysis on how its output differs from 6We use the unﬁltered TriviaQA version and discard the noisy evidence documents mined from Bing. 8 Conclusion In this work, we demonstrated that dense retrieval can outperform and potentially replace the traditional sparse retrieval component in open-domain question answering. While a simple dual-encoder approach can be made to work surprisingly well, we showed that there are some critical ingredients to training a dense retriever successfully. Moreover, our empirical analysis and ablation studies indicate that more complex model frameworks or similarity functions do not necessarily provide additional values. REALM: Retrieval-augmented language model pre-training. A",
+   "evidence_span": [
+    194,
+    407
+   ]
+  },
+  {
+   "claim_id": "c4",
+   "ref_id": "r8",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c5",
+   "ref_id": "r12",
+   "label": "supported",
+   "evidence": "We briefly review Hochreiter's (1991) analysis of this problem, then address it by introducing a novel, efficient, gradient-based method called long short-term memory (LSTM).",
+   "source_kind": "abstract",
+   "rationale": "被引文献明确提出了长短期记忆网络（LSTM）这一方法，直接支持了论断中关于早期序列模型依赖LSTM的说法。",
+   "source_title": "Long Short-Term Memory",
+   "source_excerpt": "Learning to store information over extended time intervals by recurrent backpropagation takes a very long time, mostly because of insufficient, decaying error backflow. We briefly review Hochreiter's (1991) analysis of this problem, then address it by introducing a novel, efficient, gradient-based method called long short-term memory (LSTM). Truncating the gradient where this does not do harm, LSTM can learn to bridge minimal time lags in excess of 1000 discrete-time steps by enforcing constant error flow through constant error carousels within special units. Multiplicative gate units learn to open and close access to the constant error flow. LSTM is local in space and time; its computational complexity per time step and weight is O(1). Our experiments with artificial data involve local, distributed, real-valued, and noisy pattern representations. In comparisons with real-time recurrent learning, back propagation through time, recurrent cascade correlation, Elman nets, and neural sequence chunking, LSTM leads to many more successful runs, and learns much faster. LSTM also solves complex, artificial long-time-lag tasks that have never been solved by previous recurrent network algorithms.",
+   "evidence_span": [
+    169,
+    343
+   ]
+  },
+  {
+   "claim_id": "c6",
+   "ref_id": "r1",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "abstract",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Attention Is All You Need",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c6",
+   "ref_id": "r13",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c7",
+   "ref_id": "r7",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": "Efficient Estimation of Nepali Word Representations in Vector Space",
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c8",
+   "ref_id": "r9",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c9",
+   "ref_id": "r2",
+   "label": "undetermined",
+   "evidence": "",
+   "source_kind": "abstract",
+   "rationale": "被引文献片段主要介绍BERT模型及其性能，未提及word2vec到上下文嵌入的演变历史，也未明确说明优化器通常由Adam处理。",
+   "source_title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "source_excerpt": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c10",
+   "ref_id": "r2",
+   "label": "partial",
+   "evidence": "As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications.",
+   "source_kind": "abstract",
+   "rationale": "原文片段简要描述了BERT模型只需增加一个输出层即可进行微调的方法，属于具体的微调实践，但并未对微调实践进行系统性的总结或综述。",
+   "source_title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "source_excerpt": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "evidence_span": [
+    337,
+    606
+   ]
+  },
+  {
+   "claim_id": "c10",
+   "ref_id": "r4",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c10",
+   "ref_id": "r5",
+   "label": "unsupported",
+   "evidence": "In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献是一篇关于自然语言生成中幻觉问题的综述，并未总结微调实践（fine-tuning practice），与论断不符。",
+   "source_title": "Survey of Hallucination in Natural Language Generation",
+   "source_excerpt": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models. This advancement has led to more fluent and coherent NLG, leading to improved development in downstream tasks such as abstractive summarization, dialogue generation, and data-to-text generation. However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios. To address this issue, many studies have been presented in measuring and mitigating hallucinated texts, but these have never been reviewed in a comprehensive manner before. In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG. The survey is organized into two parts: (1) a general overview of metrics, mitigation methods, and future directions, and (2) an overview of task-specific research progress on hallucinations in the following downstream tasks, namely abstractive summarization, dialogue generation, generative question answering, data-to-text generation, and machine translation. This survey serves to facilitate collaborative efforts among researchers in tackling the challenge of hallucinated texts in NLG. Data for Instruction-tuning. During the fine-tuning stage, data refinement can also be used to dampen hallucinations. As the size of fine-tuning data is significantly smaller, manual approaches can also be practically used [316]. 13.3.2 Modelling and Inference Methods. Safety Fine-Tuning and Reinforcement Learning with Human Feedback (RLHF). Safety fine-tuning is a prevalent method to mitigate risks associated with LLMs, such as hallucinations. Safety Fine-Tuning and Reinforcement Learning with Human Feedback (RLHF). Safety fine-tuning is a prevalent method to mitigate risks associated with LLMs, such as hallucinations. A prominent technique in this domain is Reinforcement Learning with Human Feedback (RLHF). Conversely, Chen et al. [31] point out that widely used fine-tuning datasets e.g. Alpaca’s 52k data contain low-quality instances with incorrect or irrelevant responses which are detrimental to fine-tuning, used an automated approach leveraging strong LLMs to identify and discard such low-quality ACM Comput. Surv. , Vol. As the size of fine-tuning data is significantly smaller, manual a",
+   "evidence_span": [
+    775,
+    900
+   ]
+  },
+  {
+   "claim_id": "c10",
+   "ref_id": "r6",
+   "label": "undetermined",
+   "evidence": "We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions.",
+   "source_kind": "abstract",
+   "rationale": "被引文献原文片段仅介绍了用于图像识别的深度残差学习框架，未涉及任何关于微调（fine-tuning）实践的内容。",
+   "source_title": "Deep Residual Learning for Image Recognition",
+   "source_excerpt": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers - 8× deeper than VGG nets [40] but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions1, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c10",
+   "ref_id": "r9",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c11",
+   "ref_id": "r15",
+   "label": "supported",
+   "evidence": "This paper is the first survey of over 150 studies of the popular BERT model. We review the current state of knowledge about how BERT works, what kind of information it learns and how it is represented, common modifications to its training objectives and architecture, the overparameterization issue, and approaches to compression.",
+   "source_kind": "abstract",
+   "rationale": "原文片段明确表明该文献是关于BERT的综述（survey），并回顾了包括训练目标修改在内的知识，这与论断中提到的“Surveys of BERTology... summarize fine-tuning practice”在语义上是一致的。",
+   "source_title": "A Primer in BERTology: What We Know About How BERT Works",
+   "source_excerpt": "Transformer-based models have pushed state of the art in many areas of NLP, but our understanding of what is behind their success is still limited. This paper is the first survey of over 150 studies of the popular BERT model. We review the current state of knowledge about how BERT works, what kind of information it learns and how it is represented, common modifications to its training objectives and architecture, the overparameterization issue, and approaches to compression. We then outline directions for future research.",
+   "evidence_span": [
+    148,
+    479
+   ]
+  },
+  {
+   "claim_id": "c11",
+   "ref_id": "r11",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c12",
+   "ref_id": "r1",
+   "label": "supported",
+   "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+   "source_kind": "abstract",
+   "rationale": "被引文献明确提出了Transformer架构，论断声称基于该架构构建，因此原文支持存在该基础组件的事实。",
+   "source_title": "Attention Is All You Need",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "evidence_span": [
+    239,
+    393
+   ]
+  },
+  {
+   "claim_id": "c13",
+   "ref_id": "r2",
+   "label": "supported",
+   "evidence": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers.",
+   "source_kind": "abstract",
+   "rationale": "被引文献明确定义BERT为基于Transformer编码器的预训练模型，支持论断中关于使用Transformer编码器并从BERT初始化的描述。",
+   "source_title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "source_excerpt": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "evidence_span": [
+    0,
+    135
+   ]
+  },
+  {
+   "claim_id": "c14",
+   "ref_id": "r6",
+   "label": "supported",
+   "evidence": "We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions.",
+   "source_kind": "abstract",
+   "rationale": "被引文献明确提出了残差学习框架（residual learning framework）并描述了其核心机制，这直接支持了论断中关于使用“residual connections”（即残差连接/残差网络架构）的说法。",
+   "source_title": "Deep Residual Learning for Image Recognition",
+   "source_excerpt": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers - 8× deeper than VGG nets [40] but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions1, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.",
+   "evidence_span": [
+    52,
+    331
+   ]
+  },
+  {
+   "claim_id": "c15",
+   "ref_id": "r2",
+   "label": "undetermined",
+   "evidence": "As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications.",
+   "source_kind": "abstract",
+   "rationale": "原文片段仅提到BERT可以通过添加一个输出层进行微调且无需大幅修改架构，但未提及使用残差连接（residual connections）和dropout。",
+   "source_title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "source_excerpt": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c15",
+   "ref_id": "r3",
+   "label": "undetermined",
+   "evidence": "For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model.",
+   "source_kind": "abstract",
+   "rationale": "被引文献片段明确指出GPT-3不使用任何微调，且未提及残差连接和dropout，因此无法支持论断中关于使用残差连接和dropout进行微调的说法。",
+   "source_title": "Language Models are Few-Shot Learners",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c15",
+   "ref_id": "r4",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c15",
+   "ref_id": "r5",
+   "label": "undetermined",
+   "evidence": "The results suggest that simply scaling up the model is less promising than fine-tuning it in terms of improving truthfulness since larger models are better at learning the training distribution from web data and thus tend to produce more imitative falsehoods.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献原文片段仅讨论了微调与模型规模扩展在提升真实性方面的对比，未涉及使用残差连接和dropout进行微调的具体方法。",
+   "source_title": "Survey of Hallucination in Natural Language Generation",
+   "source_excerpt": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models. This advancement has led to more fluent and coherent NLG, leading to improved development in downstream tasks such as abstractive summarization, dialogue generation, and data-to-text generation. However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios. To address this issue, many studies have been presented in measuring and mitigating hallucinated texts, but these have never been reviewed in a comprehensive manner before. In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG. The survey is organized into two parts: (1) a general overview of metrics, mitigation methods, and future directions, and (2) an overview of task-specific research progress on hallucinations in the following downstream tasks, namely abstractive summarization, dialogue generation, generative question answering, data-to-text generation, and machine translation. This survey serves to facilitate collaborative efforts among researchers in tackling the challenge of hallucinated texts in NLG. This work investigates the performances of GPT-3 [20], GPT-Neo/J [266], GPT-2 [209] and a T5-based model [210]. The results suggest that simply scaling up the model is less promising than fine-tuning it in terms of improving truthfulness since larger models are better at learning the training distribution from web data and thus tend to produce more imitative falsehoods. In another recent work, Nakano et al. [189] fine-tune GPT-3 to answer long-form questions with a web-browsing environment, which allows the model to navigate the web as well as use human feedback to optimize answer quality directly using imitation learning [107]. Post-processing. Petite Unsupervised Research and Revision (PURR) [27] fine-tune an editor to denoise the corruptions and use the editor to correct the hallucinations in the initial outputs. Other works like REFEED [304] leverage retrieved documents for post-correction. The results suggest that simply scaling up the model is less promising than fine-tuning it in terms of improving truthfulness since larger models are better at learning the training distribution from ",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c16",
+   "ref_id": "r1",
+   "label": "undetermined",
+   "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+   "source_kind": "abstract",
+   "rationale": "被引文献原文片段仅介绍了Transformer架构及其在机器翻译等任务上的表现，未涉及将检索与生成结合在一个阶段的论断。",
+   "source_title": "Attention Is All You Need",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c16",
+   "ref_id": "r4",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c16",
+   "ref_id": "r16",
+   "label": "partial",
+   "evidence": "In terms of the end-to-end QA results, our joint-training scheme does not provide better results compared to the usual retriever/reader training pipeline, resulting in the same 39.8 exact match score on NQ dev as in our regular reader model training.",
+   "source_kind": "fulltext",
+   "rationale": "原文片段提到了'usual retriever/reader training pipeline'（即检索与生成的流水线），但明确指出其联合训练方案并未优于该常规流水线，仅部分涉及论断中关于将检索与生成结合在一个阶段的描述。",
+   "source_title": "Dense Passage Retrieval for Open-Domain Question Answering",
+   "source_excerpt": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks. Retrieval-augmented generation for knowledge-intensive NLP tasks. In Advances in Neural Information Processing Systems (NeurIPS). 6779 Yankai Lin, Haozhe Ji, Zhiyuan Liu, and Maosong Sun. . . P˚al Sverre Valheim Hagen (born 6 November 1980) is a Norwegian stage and screen actor. During training, we sample one positive and ˜m− 1 negative passages from the top 100 passages returned by the retrieval system (BM25 or DPR) for each question. ˜m is a hyper-parameter and we use ˜m = 24 in all the experiments. The training objective is to maximize the marginal log-likelihood of all the correct answer spans in the positive passage (the answer string may appear multiple times in one passage), combined with the log-likelihood of the positive passage being selected. See text for more details. traditional retrieval methods, the effects of different training schemes and the run-time efﬁciency. The DPR model used in our main experiments is trained using the in-batch negative setting (Section 3.2) with a batch size of128 and one additional BM25 negative passage per question. In terms of the end-to-end QA results, our joint-training scheme does not provide better results compared to the usual retriever/reader training pipeline, resulting in the same 39.8 exact match score on NQ dev as in our regular reader model training.",
+   "evidence_span": [
+    1781,
+    2031
+   ]
+  },
+  {
+   "claim_id": "c17",
+   "ref_id": "r2",
+   "label": "undetermined",
+   "evidence": "",
+   "source_kind": "abstract",
+   "rationale": "被引文献片段仅介绍BERT模型及其在多个NLP任务上的表现，未提及“三个基准测试”或相关评估设置，无法支持该论断。",
+   "source_title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "source_excerpt": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications. BERT is conceptually simple and empirically powerful. It obtains new state-of-the-art results on eleven natural language processing tasks, including pushing the GLUE score to 80.5% (7.7% point absolute improvement), MultiNLI accuracy to 86.7% (4.6% absolute improvement), SQuAD v1.1 question answering Test F1 to 93.2 (1.5 point absolute improvement) and SQuAD v2.0 Test F1 to 83.1 (5.1 point absolute improvement).",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c17",
+   "ref_id": "r4",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c17",
+   "ref_id": "r5",
+   "label": "undetermined",
+   "evidence": "",
+   "source_kind": "fulltext",
+   "rationale": "被引文献片段主要讨论幻觉检测的基准（如HaluEval和HaDes）及方法，未提及论断中关于“在三个基准上进行评估”的具体实验设置或数量信息。",
+   "source_title": "Survey of Hallucination in Natural Language Generation",
+   "source_excerpt": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models. This advancement has led to more fluent and coherent NLG, leading to improved development in downstream tasks such as abstractive summarization, dialogue generation, and data-to-text generation. However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios. To address this issue, many studies have been presented in measuring and mitigating hallucinated texts, but these have never been reviewed in a comprehensive manner before. In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG. The survey is organized into two parts: (1) a general overview of metrics, mitigation methods, and future directions, and (2) an overview of task-specific research progress on hallucinations in the following downstream tasks, namely abstractive summarization, dialogue generation, generative question answering, data-to-text generation, and machine translation. This survey serves to facilitate collaborative efforts among researchers in tackling the challenge of hallucinated texts in NLG. Uncertainty-based methods rely on the token probabilities assigned by the LLM during generation, whereas consistency-based methods evaluate the coherence of multiple completions generated by the LLM. There are also some benchmarks to measure the effectiveness of these reference-free hallucination metrics, which are also termed “hallucination detection benchmarks”, such as HaluEval [143] and HaDes [161] These benchmarks serve as meta-metrics of hallucination metrics, offering valuable resources for developing more effective methods to identify hallucinations. Uncertainty-based Hallucination Detection. Reference-free metrics generally fall into two categories: uncertainty-based and consistency-based hallucination detection. Uncertainty-based methods rely on the token probabilities assigned by the LLM during generation, whereas consistency-based methods evaluate the coherence of multiple completions generated by the LLM. There are also some benchmarks to measure the effectiveness of these reference-free hallucination metrics, which are also termed “hallucination detection benchmarks”, such as H",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c17",
+   "ref_id": "r6",
+   "label": "undetermined",
+   "evidence": "",
+   "source_kind": "abstract",
+   "rationale": "被引文献片段主要介绍残差学习框架及其在ImageNet、CIFAR-10和COCO上的具体实验结果，并未提及“三个基准测试”这一概括性论断或相关表述。",
+   "source_title": "Deep Residual Learning for Image Recognition",
+   "source_excerpt": "Deeper neural networks are more difficult to train. We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs, instead of learning unreferenced functions. We provide comprehensive empirical evidence showing that these residual networks are easier to optimize, and can gain accuracy from considerably increased depth. On the ImageNet dataset we evaluate residual nets with a depth of up to 152 layers - 8× deeper than VGG nets [40] but still having lower complexity. An ensemble of these residual nets achieves 3.57% error on the ImageNet test set. This result won the 1st place on the ILSVRC 2015 classification task. We also present analysis on CIFAR-10 with 100 and 1000 layers. The depth of representations is of central importance for many visual recognition tasks. Solely due to our extremely deep representations, we obtain a 28% relative improvement on the COCO object detection dataset. Deep residual nets are foundations of our submissions to ILSVRC & COCO 2015 competitions1, where we also won the 1st places on the tasks of ImageNet detection, ImageNet localization, COCO detection, and COCO segmentation.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c17",
+   "ref_id": "r9",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c18",
+   "ref_id": "r10",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c18",
+   "ref_id": "r11",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c19",
+   "ref_id": "r14",
+   "label": "supported",
+   "evidence": "The result is a new global log-bilinear regression model that combines the advantages of the two major model families in the literature: global matrix factorization and local context window methods.",
+   "source_kind": "abstract",
+   "rationale": "被引文献标题为GloVe，且原文片段明确描述了该模型（global log-bilinear regression model）作为词向量表示方法，支持将其作为baseline GloVe的引用来源。",
+   "source_title": "Glove: Global Vectors for Word Representation",
+   "source_excerpt": "Recent methods for learning vector space representations of words have succeeded in capturing fine-grained semantic and syntactic regularities using vector arith-metic, but the origin of these regularities has remained opaque. We analyze and make explicit the model properties needed for such regularities to emerge in word vectors. The result is a new global log-bilinear regression model that combines the advantages of the two major model families in the literature: global matrix factorization and local context window methods. Our model efficiently leverages statistical information by training only on the nonzero elements in a word-word co-occurrence matrix, rather than on the en-tire sparse matrix or on individual context windows in a large corpus. The model pro-duces a vector space with meaningful sub-structure, as evidenced by its performance of 75 % on a recent word analogy task. It also outperforms related models on simi-larity tasks and named entity recognition. 1",
+   "evidence_span": [
+    333,
+    531
+   ]
+  },
+  {
+   "claim_id": "c20",
+   "ref_id": "r8",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c21",
+   "ref_id": "r15",
+   "label": "undetermined",
+   "evidence": "",
+   "source_kind": "abstract",
+   "rationale": "被引文献片段仅介绍了BERT综述论文的研究范围和背景，未包含任何具体实验结果或发现，因此无法判断其是否支持论断中提到的“与先前报告一致”的具体内容。",
+   "source_title": "A Primer in BERTology: What We Know About How BERT Works",
+   "source_excerpt": "Transformer-based models have pushed state of the art in many areas of NLP, but our understanding of what is behind their success is still limited. This paper is the first survey of over 150 studies of the popular BERT model. We review the current state of knowledge about how BERT works, what kind of information it learns and how it is represented, common modifications to its training objectives and architecture, the overparameterization issue, and approaches to compression. We then outline directions for future research.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c22",
+   "ref_id": "r3",
+   "label": "undetermined",
+   "evidence": "",
+   "source_kind": "abstract",
+   "rationale": "被引文献片段主要介绍GPT-3在少样本学习中的性能提升及局限性，未提及与当前研究“发现一致”或“覆盖率不同”的具体对比信息。",
+   "source_title": "Language Models are Few-Shot Learners",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c22",
+   "ref_id": "r10",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c23",
+   "ref_id": "r1",
+   "label": "undetermined",
+   "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+   "source_kind": "abstract",
+   "rationale": "被引文献原文片段仅介绍了Transformer架构的提出及其在机器翻译等任务上的表现，并未涉及引用该文献的论文所提出的“compact pipeline”这一论断。",
+   "source_title": "Attention Is All You Need",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c24",
+   "ref_id": "r3",
+   "label": "supported",
+   "evidence": "Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches.",
+   "source_kind": "abstract",
+   "rationale": "被引文献指出通过扩大模型规模（即构建更大的系统）可以达到与先前最先进方法相竞争的性能，这支持了论断中关于较大系统性能基准的描述。",
+   "source_title": "Language Models are Few-Shot Learners",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "evidence_span": [
+    505,
+    695
+   ]
+  },
+  {
+   "claim_id": "c24",
+   "ref_id": "r10",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  },
+  {
+   "claim_id": "c24",
+   "ref_id": "r11",
+   "label": "undetermined",
+   "evidence": null,
+   "source_kind": "none",
+   "rationale": "未能获取被引文献原文",
+   "source_title": null,
+   "source_excerpt": null,
+   "evidence_span": null
+  }
+ ],
+ "distribution": {
+  "benchmark_id": "arxiv_cs_cl",
+  "benchmark_name": "arXiv 计算语言学",
+  "n_papers": 150,
+  "comparable_density": true,
+  "note": null,
+  "sections": [
+   {
+    "section_id": "s0",
+    "canonical": "other",
+    "title": "",
+    "words": 12,
+    "citations": 0,
+    "share": 0.0,
+    "density": 0.0,
+    "bench_share": {
+     "median": 0.047947454844006566,
+     "q1": 0.0,
+     "q3": 0.1468253968253968
+    },
+    "bench_density": {
+     "median": 1.5121509837122757,
+     "q1": 0.0,
+     "q3": 5.362996467867761
+    },
+    "share_flag": "within",
+    "density_flag": "within"
+   },
+   {
+    "section_id": "s1",
+    "canonical": "intro",
+    "title": "1 Introduction",
+    "words": 31,
+    "citations": 6,
+    "share": 0.13043478260869565,
+    "density": 193.5483870967742,
+    "bench_share": {
+     "median": 0.23606811145510836,
+     "q1": 0.14893617021276595,
+     "q3": 0.3248310810810811
+    },
+    "bench_density": {
+     "median": 23.40939748201439,
+     "q1": 14.213015318186493,
+     "q3": 32.25806451612903
+    },
+    "share_flag": "below",
+    "density_flag": "above"
+   },
+   {
+    "section_id": "s2",
+    "canonical": "related",
+    "title": "2 Related Work",
+    "words": 42,
+    "citations": 14,
+    "share": 0.30434782608695654,
+    "density": 333.3333333333333,
+    "bench_share": {
+     "median": 0.39551649219830143,
+     "q1": 0.25614617940199336,
+     "q3": 0.5263157894736842
+    },
+    "bench_density": {
+     "median": 67.33167082294264,
+     "q1": 45.19774011299435,
+     "q3": 99.23664122137404
+    },
+    "share_flag": "within",
+    "density_flag": "above"
+   },
+   {
+    "section_id": "s3",
+    "canonical": "method",
+    "title": "3 Method",
+    "words": 31,
+    "citations": 10,
+    "share": 0.21739130434782608,
+    "density": 322.5806451612903,
+    "bench_share": {
+     "median": 0.0,
+     "q1": 0.0,
+     "q3": 0.06539395070948469
+    },
+    "bench_density": {
+     "median": 3.802281368821293,
+     "q1": 1.2015171589639675,
+     "q3": 11.907575098776867
+    },
+    "share_flag": "above",
+    "density_flag": "above"
+   },
+   {
+    "section_id": "s4",
+    "canonical": "experiment",
+    "title": "4 Experiments",
+    "words": 15,
+    "citations": 9,
+    "share": 0.1956521739130435,
+    "density": 600.0,
+    "bench_share": {
+     "median": 0.16076555023923444,
+     "q1": 0.01909722222222222,
+     "q3": 0.2805263157894737
+    },
+    "bench_density": {
+     "median": 8.643916598176462,
+     "q1": 2.795553605711242,
+     "q3": 16.40843363834804
+    },
+    "share_flag": "within",
+    "density_flag": "above"
+   },
+   {
+    "section_id": "s5",
+    "canonical": "discussion",
+    "title": "5 Discussion",
+    "words": 10,
+    "citations": 3,
+    "share": 0.06521739130434782,
+    "density": 300.0,
+    "bench_share": null,
+    "bench_density": null,
+    "share_flag": "na",
+    "density_flag": "na"
+   },
+   {
+    "section_id": "s6",
+    "canonical": "conclusion",
+    "title": "6 Conclusion",
+    "words": 13,
+    "citations": 4,
+    "share": 0.08695652173913043,
+    "density": 307.6923076923077,
+    "bench_share": null,
+    "bench_density": null,
+    "share_flag": "na",
+    "density_flag": "na"
+   },
+   {
+    "section_id": "s7",
+    "canonical": "other",
+    "title": "References",
+    "words": 320,
+    "citations": 0,
+    "share": 0.0,
+    "density": 0.0,
+    "bench_share": {
+     "median": 0.047947454844006566,
+     "q1": 0.0,
+     "q3": 0.1468253968253968
+    },
+    "bench_density": {
+     "median": 1.5121509837122757,
+     "q1": 0.0,
+     "q3": 5.362996467867761
+    },
+    "share_flag": "within",
+    "density_flag": "within"
+   }
+  ],
+  "sentence_refs": {
+   "share_ge2": 0.8571428571428571,
+   "share_ge3": 0.6428571428571429,
+   "share_ge5": 0.21428571428571427,
+   "bench_ge2": {
+    "median": 0.4759725400457666,
+    "q1": 0.375,
+    "q3": 0.6
+   },
+   "bench_ge3": {
+    "median": 0.26006441223832527,
+    "q1": 0.16666666666666666,
+    "q3": 0.35294117647058826
+   },
+   "bench_ge5": {
+    "median": 0.05607966457023061,
+    "q1": 0.0,
+    "q3": 0.11976190476190476
+   }
+  },
+  "functions": {
+   "background": 18,
+   "method": 5,
+   "comparison": 2,
+   "result": 2,
+   "critique": 0
+  },
+  "marker_functions": {
+   "m0": "background",
+   "m1": "result",
+   "m2": "background",
+   "m3": "background",
+   "m4": "background",
+   "m5": "background",
+   "m6": "background",
+   "m7": "method",
+   "m8": "background",
+   "m9": "background",
+   "m10": "method",
+   "m11": "background",
+   "m12": "background",
+   "m13": "background",
+   "m14": "background",
+   "m15": "background",
+   "m16": "background",
+   "m17": "method",
+   "m18": "method",
+   "m19": "background",
+   "m20": "method",
+   "m21": "background",
+   "m22": "background",
+   "m23": "background",
+   "m24": "comparison",
+   "m25": "result",
+   "m26": "comparison"
+  }
+ },
+ "findings": [
+  {
+   "id": "f1",
+   "layer": "distribution",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p2",
+    "start": 0,
+    "end": 14
+   },
+   "title": "引言部分的引用分布偏离该领域常见范围",
+   "detail": "依据：本文引言部分引用占比 13.0%低于常见范围 14.9% 至 32.5%，每千词引用 193.5 次高于常见范围 14.2 至 32.3 次，对标的 150 篇arXiv 计算语言学论文。\n建议：确认引言部分对已有方法、数据集和工具的引用是否恰当。",
+   "refs": []
+  },
+  {
+   "id": "f2",
+   "layer": "support",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p4",
+    "start": 0,
+    "end": 144
+   },
+   "title": "被引文献只部分支持这条论断",
+   "detail": "依据：被引文献提出了密集检索（DPR）方法并证明其可用于开放域问答的上下文选择，支持了论断中关于“dense retrieval”的部分，但原文片段未涉及“ground responses in external evidence”的具体表述，也未提及“hallucination remains a central concern”。\n建议：检查论断中未被覆盖的部分是否需要另外的文献支撑。",
+   "refs": [
+    "r16"
+   ]
+  },
+  {
+   "id": "f3",
+   "layer": "distribution",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p5",
+    "start": 0,
+    "end": 14
+   },
+   "title": "相关工作部分的引用分布偏离该领域常见范围",
+   "detail": "依据：本文相关工作部分每千词引用 333.3 次高于常见范围 45.2 至 99.2 次，对标的 150 篇arXiv 计算语言学论文。\n建议：确认相关工作部分对已有方法、数据集和工具的引用是否恰当。",
+   "refs": []
+  },
+  {
+   "id": "f4",
+   "layer": "distribution",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p8",
+    "start": 0,
+    "end": 94
+   },
+   "title": "这句话同时引用了 7 篇文献",
+   "detail": "依据：一句话内集中引用了多篇文献。\n建议：确认每篇文献与这句话的具体关系，必要时拆分或给出各自的对应点。",
+   "refs": []
+  },
+  {
+   "id": "f5",
+   "layer": "support",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p8",
+    "start": 53,
+    "end": 83
+   },
+   "title": "被引文献只部分支持这条论断",
+   "detail": "依据：原文片段简要描述了BERT模型只需增加一个输出层即可进行微调的方法，属于具体的微调实践，但并未对微调实践进行系统性的总结或综述。\n建议：检查论断中未被覆盖的部分是否需要另外的文献支撑。",
+   "refs": [
+    "r2"
+   ]
+  },
+  {
+   "id": "f6",
+   "layer": "support",
+   "severity": "high",
+   "anchor": {
+    "paragraph_id": "p8",
+    "start": 53,
+    "end": 83
+   },
+   "title": "被引文献不支持这条论断",
+   "detail": "依据：被引文献是一篇关于自然语言生成中幻觉问题的综述，并未总结微调实践（fine-tuning practice），与论断不符。\n建议：核对论断与文献内容，考虑删除引用或修改论断。",
+   "refs": [
+    "r5"
+   ]
+  },
+  {
+   "id": "f7",
+   "layer": "distribution",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p9",
+    "start": 0,
+    "end": 8
+   },
+   "title": "方法部分的引用分布偏离该领域常见范围",
+   "detail": "依据：本文方法部分引用占比 21.7%高于常见范围 0.0% 至 6.5%，每千词引用 322.6 次高于常见范围 1.2 至 11.9 次，对标的 150 篇arXiv 计算语言学论文。\n建议：确认方法部分对已有方法、数据集和工具的引用是否恰当。",
+   "refs": []
+  },
+  {
+   "id": "f8",
+   "layer": "distribution",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p10",
+    "start": 70,
+    "end": 155
+   },
+   "title": "这句话同时引用了 5 篇文献",
+   "detail": "依据：一句话内集中引用了多篇文献。\n建议：确认每篇文献与这句话的具体关系，必要时拆分或给出各自的对应点。",
+   "refs": []
+  },
+  {
+   "id": "f9",
+   "layer": "support",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p11",
+    "start": 0,
+    "end": 74
+   },
+   "title": "被引文献只部分支持这条论断",
+   "detail": "依据：原文片段提到了'usual retriever/reader training pipeline'（即检索与生成的流水线），但明确指出其联合训练方案并未优于该常规流水线，仅部分涉及论断中关于将检索与生成结合在一个阶段的描述。\n建议：检查论断中未被覆盖的部分是否需要另外的文献支撑。",
+   "refs": [
+    "r16"
+   ]
+  },
+  {
+   "id": "f10",
+   "layer": "distribution",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p12",
+    "start": 0,
+    "end": 13
+   },
+   "title": "实验部分的引用分布偏离该领域常见范围",
+   "detail": "依据：本文实验部分每千词引用 600.0 次高于常见范围 2.8 至 16.4 次，对标的 150 篇arXiv 计算语言学论文。\n建议：确认实验部分对已有方法、数据集和工具的引用是否恰当。",
+   "refs": []
+  },
+  {
+   "id": "f11",
+   "layer": "distribution",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p13",
+    "start": 0,
+    "end": 73
+   },
+   "title": "这句话同时引用了 7 篇文献",
+   "detail": "依据：一句话内集中引用了多篇文献。\n建议：确认每篇文献与这句话的具体关系，必要时拆分或给出各自的对应点。",
+   "refs": []
+  },
+  {
+   "id": "f12",
+   "layer": "authenticity",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p23",
+    "start": 0,
+    "end": 139
+   },
+   "title": "文献信息与数据库记录不一致",
+   "detail": "依据：年份不一致：文中写 2017，数据库记录为 2025。\n建议：核对文献的作者、年份、DOI 等字段。",
+   "refs": [
+    "r1"
+   ]
+  },
+  {
+   "id": "f13",
+   "layer": "authenticity",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p25",
+    "start": 0,
+    "end": 146
+   },
+   "title": "文献信息与数据库记录不一致",
+   "detail": "依据：首作者不一致：文中写 Brown TB，数据库记录为 Malakar, Sourav；年份不一致：文中写 2020，数据库记录为 2026。\n建议：核对文献的作者、年份、DOI 等字段。",
+   "refs": [
+    "r3"
+   ]
+  },
+  {
+   "id": "f14",
+   "layer": "authenticity",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p26",
+    "start": 0,
+    "end": 174
+   },
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
+   "refs": [
+    "r4"
+   ]
+  },
+  {
+   "id": "f15",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p26",
+    "start": 0,
+    "end": 174
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r4"
+   ]
+  },
+  {
+   "id": "f16",
+   "layer": "authenticity",
+   "severity": "medium",
+   "anchor": {
+    "paragraph_id": "p29",
+    "start": 0,
+    "end": 141
+   },
+   "title": "文献信息与数据库记录不一致",
+   "detail": "依据：首作者不一致：文中写 Mikolov T，数据库记录为 Bhatta, Janardan；年份不一致：文中写 2013，数据库记录为 2020。\n建议：核对文献的作者、年份、DOI 等字段。",
+   "refs": [
+    "r7"
+   ]
+  },
+  {
+   "id": "f17",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p29",
+    "start": 0,
+    "end": 141
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r7"
+   ]
+  },
+  {
+   "id": "f18",
+   "layer": "authenticity",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p30",
+    "start": 0,
+    "end": 156
+   },
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
+   "refs": [
+    "r8"
+   ]
+  },
+  {
+   "id": "f19",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p30",
+    "start": 0,
+    "end": 156
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r8"
+   ]
+  },
+  {
+   "id": "f20",
+   "layer": "authenticity",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p31",
+    "start": 0,
+    "end": 124
+   },
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
+   "refs": [
+    "r9"
+   ]
+  },
+  {
+   "id": "f21",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p31",
+    "start": 0,
+    "end": 124
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r9"
+   ]
+  },
+  {
+   "id": "f22",
+   "layer": "authenticity",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p32",
+    "start": 0,
+    "end": 121
+   },
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
+   "refs": [
+    "r10"
+   ]
+  },
+  {
+   "id": "f23",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p32",
+    "start": 0,
+    "end": 121
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r10"
+   ]
+  },
+  {
+   "id": "f24",
+   "layer": "authenticity",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p33",
+    "start": 0,
+    "end": 183
+   },
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
+   "refs": [
+    "r11"
+   ]
+  },
+  {
+   "id": "f25",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p33",
+    "start": 0,
+    "end": 183
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r11"
+   ]
+  },
+  {
+   "id": "f26",
+   "layer": "authenticity",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p35",
+    "start": 0,
+    "end": 164
+   },
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
+   "refs": [
+    "r13"
+   ]
+  },
+  {
+   "id": "f27",
+   "layer": "support",
+   "severity": "low",
+   "anchor": {
+    "paragraph_id": "p35",
+    "start": 0,
+    "end": 164
+   },
+   "title": "未能获取这篇文献的原文，相关论断无法判断",
+   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
+   "refs": [
+    "r13"
+   ]
+  }
+ ],
+ "revisions": [
+  {
+   "id": "v1",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p25",
+    "start": 0,
+    "end": 146
+   },
+   "old": "[3] Brown TB, Mann B, Ryder N, et al. Language models are few-shot learners. Advances in Neural Information Processing Systems. 2020;33:1877-1901.",
+   "new": "[2] Brown TB, Mann B, Ryder N, et al. Language models are few-shot learners. Advances in Neural Information Processing Systems. 2020;33:1877-1901.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p23"
+  },
+  {
+   "id": "v2",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p24",
+    "start": 1,
+    "end": 2
+   },
+   "old": "2",
+   "new": "3",
+   "reason": "文献重排后的新编号",
+   "move_after": null
+  },
+  {
+   "id": "v3",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p38",
+    "start": 0,
+    "end": 174
+   },
+   "old": "[16] Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval for open-domain question answering. Proceedings of EMNLP. 2020:6769-6781. doi:10.18653/v1/2020.emnlp-main.550.",
+   "new": "[5] Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval for open-domain question answering. Proceedings of EMNLP. 2020:6769-6781. doi:10.18653/v1/2020.emnlp-main.550.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p26"
+  },
+  {
+   "id": "v4",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p27",
+    "start": 1,
+    "end": 2
+   },
+   "old": "5",
+   "new": "6",
+   "reason": "文献重排后的新编号",
+   "move_after": null
+  },
+  {
+   "id": "v5",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p30",
+    "start": 0,
+    "end": 156
+   },
+   "old": "[8] Sutskever I, Vinyals O, Le QV. Sequence to sequence learning with neural networks. Advances in Neural Information Processing Systems. 2014;27:3104-3112.",
+   "new": "[7] Sutskever I, Vinyals O, Le QV. Sequence to sequence learning with neural networks. Advances in Neural Information Processing Systems. 2014;27:3104-3112.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p27"
+  },
+  {
+   "id": "v6",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p34",
+    "start": 0,
+    "end": 130
+   },
+   "old": "[12] Hochreiter S, Schmidhuber J. Long short-term memory. Neural Computation. 1997;9(8):1735-1780. doi:10.1162/neco.1997.9.8.1735.",
+   "new": "[8] Hochreiter S, Schmidhuber J. Long short-term memory. Neural Computation. 1997;9(8):1735-1780. doi:10.1162/neco.1997.9.8.1735.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p30"
+  },
+  {
+   "id": "v7",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p35",
+    "start": 0,
+    "end": 164
+   },
+   "old": "[13] Bahdanau D, Cho K, Bengio Y. Neural machine translation by jointly learning to align and translate. International Conference on Learning Representations. 2015.",
+   "new": "[9] Bahdanau D, Cho K, Bengio Y. Neural machine translation by jointly learning to align and translate. International Conference on Learning Representations. 2015.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p34"
+  },
+  {
+   "id": "v8",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p29",
+    "start": 1,
+    "end": 2
+   },
+   "old": "7",
+   "new": "10",
+   "reason": "文献重排后的新编号",
+   "move_after": null
+  },
+  {
+   "id": "v9",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p31",
+    "start": 1,
+    "end": 2
+   },
+   "old": "9",
+   "new": "11",
+   "reason": "文献重排后的新编号",
+   "move_after": null
+  },
+  {
+   "id": "v10",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p37",
+    "start": 0,
+    "end": 202
+   },
+   "old": "[15] Rogers A, Kovaleva O, Rumshisky A. A primer in BERTology: What we know about how BERT works. Transactions of the Association for Computational Linguistics. 2020;8:842-866. doi:10.1162/tacl_a_00349.",
+   "new": "[12] Rogers A, Kovaleva O, Rumshisky A. A primer in BERTology: What we know about how BERT works. Transactions of the Association for Computational Linguistics. 2020;8:842-866. doi:10.1162/tacl_a_00349.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p31"
+  },
+  {
+   "id": "v11",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p33",
+    "start": 0,
+    "end": 183
+   },
+   "old": "[11] Raffel C, Shazeer N, Roberts A, et al. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research. 2020;21(140):1-67.",
+   "new": "[13] Raffel C, Shazeer N, Roberts A, et al. Exploring the limits of transfer learning with a unified text-to-text transformer. Journal of Machine Learning Research. 2020;21(140):1-67.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p37"
+  },
+  {
+   "id": "v12",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p28",
+    "start": 0,
+    "end": 197
+   },
+   "old": "[6] He K, Zhang X, Ren S, Sun J. Deep residual learning for image recognition. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016:770-778. doi:10.1109/CVPR.2016.90.",
+   "new": "[14] He K, Zhang X, Ren S, Sun J. Deep residual learning for image recognition. Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. 2016:770-778. doi:10.1109/CVPR.2016.90.",
+   "reason": "按正文首次引用顺序重排",
+   "move_after": "p33"
+  },
+  {
+   "id": "v13",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p32",
+    "start": 1,
+    "end": 3
+   },
+   "old": "10",
+   "new": "15",
+   "reason": "文献重排后的新编号",
+   "move_after": null
+  },
+  {
+   "id": "v14",
+   "kind": "ref_reorder",
+   "anchor": {
+    "paragraph_id": "p36",
+    "start": 1,
+    "end": 3
+   },
+   "old": "14",
+   "new": "16",
+   "reason": "文献重排后的新编号",
+   "move_after": null
+  },
+  {
+   "id": "v15",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p3",
+    "start": 26,
+    "end": 31
+   },
+   "old": "[1,3]",
+   "new": "[1,2]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v16",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p3",
+    "start": 98,
+    "end": 101
+   },
+   "old": "[2]",
+   "new": "[3]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v17",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p4",
+    "start": 55,
+    "end": 59
+   },
+   "old": "[16]",
+   "new": "[5]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v18",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p4",
+    "start": 145,
+    "end": 148
+   },
+   "old": "[5]",
+   "new": "[6]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v19",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p6",
+    "start": 51,
+    "end": 54
+   },
+   "old": "[8]",
+   "new": "[7]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v20",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p6",
+    "start": 82,
+    "end": 86
+   },
+   "old": "[12]",
+   "new": "[8]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v21",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p6",
+    "start": 109,
+    "end": 115
+   },
+   "old": "[1,13]",
+   "new": "[1,9]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v22",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p7",
+    "start": 43,
+    "end": 46
+   },
+   "old": "[7]",
+   "new": "[10]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v23",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p7",
+    "start": 72,
+    "end": 75
+   },
+   "old": "[2]",
+   "new": "[3]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v24",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p7",
+    "start": 123,
+    "end": 126
+   },
+   "old": "[9]",
+   "new": "[11]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v25",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p8",
+    "start": 21,
+    "end": 25
+   },
+   "old": "[15]",
+   "new": "[12]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v26",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p8",
+    "start": 48,
+    "end": 52
+   },
+   "old": "[11]",
+   "new": "[13]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v27",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p8",
+    "start": 84,
+    "end": 93
+   },
+   "old": "[2,4-6,9]",
+   "new": "[3,4,6,11,14]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v28",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p10",
+    "start": 65,
+    "end": 68
+   },
+   "old": "[2]",
+   "new": "[3]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v29",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p10",
+    "start": 93,
+    "end": 98
+   },
+   "old": "[2-5]",
+   "new": "[2-4,6]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v30",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p10",
+    "start": 139,
+    "end": 142
+   },
+   "old": "[6]",
+   "new": "[14]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v31",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p11",
+    "start": 18,
+    "end": 26
+   },
+   "old": "[1,4,16]",
+   "new": "[1,4,5]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v32",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p13",
+    "start": 32,
+    "end": 41
+   },
+   "old": "[2,4-6,9]",
+   "new": "[3,4,6,11,14]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v33",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p13",
+    "start": 65,
+    "end": 72
+   },
+   "old": "[10-11]",
+   "new": "[13,15]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v34",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p16",
+    "start": 15,
+    "end": 19
+   },
+   "old": "[14]",
+   "new": "[16]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v35",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p17",
+    "start": 12,
+    "end": 13
+   },
+   "old": "8",
+   "new": "7",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v36",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p19",
+    "start": 38,
+    "end": 42
+   },
+   "old": "[15]",
+   "new": "[12]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v37",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p19",
+    "start": 69,
+    "end": 75
+   },
+   "old": "[3,10]",
+   "new": "[2,15]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  },
+  {
+   "id": "v38",
+   "kind": "marker_renumber",
+   "anchor": {
+    "paragraph_id": "p21",
+    "start": 77,
+    "end": 86
+   },
+   "old": "[3,10,11]",
+   "new": "[2,13,15]",
+   "reason": "按正文首次引用顺序重新编号",
+   "move_after": null
+  }
+ ],
+ "meta": {
+  "llm_calls": {
+   "local": 0,
+   "cloud": 93
+  },
+  "layers": {
+   "authenticity": {
+    "status": "done",
+    "error": null,
+    "findings": 9
+   },
+   "support": {
+    "status": "done",
+    "error": null,
+    "findings": 11
+   },
+   "distribution": {
+    "status": "done",
+    "error": null,
+    "findings": 7
+   },
+   "norms": {
+    "status": "done",
+    "error": null,
+    "findings": 0
+   }
+  },
+  "duration_s": 90.2,
+  "token_usage": {
+   "qwen3.8-flash": {
+    "prompt": 5847,
+    "completion": 1274
+   },
+   "qwen3.8-max": {
+    "prompt": 2489,
+    "completion": 523
+   }
+  }
+ }
+}
