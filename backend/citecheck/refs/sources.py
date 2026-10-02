@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -31,6 +32,20 @@ class SourceResult:
     error: str | None = None
 
 
+_ARXIV_URL_RE = re.compile(r"arxiv\.org/(?:abs|pdf)/([0-9a-z.\-/]+)", re.I)
+
+
+def _arxiv_year(arxiv_id: str | None) -> int | None:
+    """Publication year encoded in an arXiv id (YYMM prefix, old or new style)."""
+    if not arxiv_id:
+        return None
+    m = re.match(r"(?:[a-z\-]+(?:\.[A-Z]{2})?/)?(\d{2})(\d{2})", arxiv_id)
+    if not m:
+        return None
+    yy = int(m.group(1))
+    return 1900 + yy if yy >= 91 else 2000 + yy
+
+
 def _openalex_abstract(work: dict) -> str | None:
     inv = work.get("abstract_inverted_index")
     if not inv:
@@ -47,7 +62,7 @@ def _norm_hit(source: str, raw: dict) -> dict:
     T3 also consumes (abstract / pdf_url / arxiv_id)."""
     hit: dict = {"source": source, "title": None, "authors": [], "year": None,
                  "venue": None, "doi": None, "url": None, "abstract": None,
-                 "pdf_url": None, "arxiv_id": None}
+                 "pdf_url": None, "arxiv_id": None, "alt_year": None}
     if source == "crossref":
         titles = raw.get("title") or []
         hit["title"] = titles[0] if titles else None
@@ -83,6 +98,18 @@ def _norm_hit(source: str, raw: dict) -> dict:
             hit["arxiv_id"] = ids["arxiv"].rsplit("/", 1)[-1]
         elif hit["doi"] and str(hit["doi"]).startswith("10.48550/arXiv."):
             hit["arxiv_id"] = str(hit["doi"]).split("arXiv.", 1)[-1]
+        if not hit["arxiv_id"]:
+            # reprints/versions often link the arXiv preprint via locations
+            for loc in raw.get("locations") or []:
+                m = _ARXIV_URL_RE.search(loc.get("landing_page_url") or "")
+                if m:
+                    hit["arxiv_id"] = re.sub(r"v\d+$", "", m.group(1))
+                    break
+        if not hit["pdf_url"]:
+            for loc in raw.get("locations") or []:
+                if loc.get("pdf_url"):
+                    hit["pdf_url"] = loc["pdf_url"]
+                    break
     elif source == "s2":
         hit["title"] = raw.get("title")
         hit["authors"] = [a.get("name", "") for a in raw.get("authors", [])]
@@ -95,6 +122,7 @@ def _norm_hit(source: str, raw: dict) -> dict:
         hit["abstract"] = raw.get("abstract")
         pdf = raw.get("openAccessPdf") or {}
         hit["pdf_url"] = pdf.get("url")
+    hit["alt_year"] = _arxiv_year(hit["arxiv_id"])
     return hit
 
 

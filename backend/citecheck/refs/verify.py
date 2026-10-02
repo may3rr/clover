@@ -142,7 +142,10 @@ def _evaluate(ref: Reference, hit: dict) -> list[str]:
                 f"首作者不一致：文中写 {ref.authors[0]}，数据库记录为 {hit['authors'][0]}"
             )
     if ref.year and hit.get("year"):
-        if abs(int(hit["year"]) - ref.year) > 1:
+        # a reprint's record year can postdate the work; the arXiv version's
+        # year (alt_year) is an acceptable match too
+        years = [y for y in (hit["year"], hit.get("alt_year")) if y]
+        if all(abs(int(y) - ref.year) > 1 for y in years):
             issues.append(
                 f"年份不一致：文中写 {ref.year}，数据库记录为 {hit['year']}"
             )
@@ -216,7 +219,7 @@ async def _verify_one(
         # fill abstract/pdf/arxiv from sibling records of the same work so
         # T3 gets the richest available source text
         for _s, h, _iss in title_matches[1:]:
-            for k in ("abstract", "pdf_url", "arxiv_id"):
+            for k in ("abstract", "pdf_url", "arxiv_id", "alt_year"):
                 if not matched.get(k) and h.get(k):
                     matched[k] = h[k]
         if (
