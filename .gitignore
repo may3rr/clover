@@ -10,3 +10,6 @@ app/dist/
 .DS_Store
 backend/benchmarks/.cache/
 backend/benchmarks/.build.log
+
+# T10 export artifacts
+*（引用体检*.docx

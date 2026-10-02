@@ -207,6 +207,9 @@ class LLMCalls(BaseModel):
 class ReportMeta(BaseModel):
     llm_calls: LLMCalls = Field(default_factory=LLMCalls)
     layers: dict[str, LayerStatus] = Field(default_factory=dict)
+    duration_s: float = 0.0
+    # model name -> {"prompt": tokens, "completion": tokens} (uncached calls)
+    token_usage: dict[str, dict[str, int]] = Field(default_factory=dict)
 
 
 class Report(BaseModel):

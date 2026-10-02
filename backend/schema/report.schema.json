@@ -578,6 +578,21 @@
           },
           "title": "Layers",
           "type": "object"
+        },
+        "duration_s": {
+          "default": 0.0,
+          "title": "Duration S",
+          "type": "number"
+        },
+        "token_usage": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "title": "Token Usage",
+          "type": "object"
         }
       },
       "title": "ReportMeta",
