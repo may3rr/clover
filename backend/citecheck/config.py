@@ -41,7 +41,7 @@ def _load_dotenv(path: Path) -> dict[str, str]:
 class CloudSettings(BaseModel):
     base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     timeout: float = 60
-    max_concurrency: int = 6
+    max_concurrency: int = 12
 
 
 class ModelNames(BaseModel):

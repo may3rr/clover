@@ -7,7 +7,7 @@ temperature = 0
 [llm.cloud]
 base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 timeout = 60
-max_concurrency = 6
+max_concurrency = 12
 
 [llm.models]
 judge = "qwen3.8-flash"
