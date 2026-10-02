@@ -163,6 +163,7 @@ async def run_pipeline(
 
     with stats_scope() as stats:
         own_retrieval = retrieval is None
+        cache = cache or Cache(get_settings().cache_path)
         retrieval = retrieval or RetrievalClient(cache=cache)
         try:
             auth_checks, auth_findings = [], []

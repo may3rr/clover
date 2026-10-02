@@ -225,6 +225,12 @@ class RetrievalClient:
         self._cache = cache
         # per-source stats for meta.timings: calls / seconds / cache hits
         self.stats: dict[str, dict] = {}
+        # circuit breaker: a source that answered with persistent 429 /
+        # exhausted budget — or keeps timing out — is down for the rest
+        # of this run; remaining calls fail fast instead of every one
+        # burning the full retry loop (~45s at timeout=15, retries=2)
+        self._down: set[str] = set()
+        self._consecutive_fails: dict[str, int] = {}
         self._client = httpx.AsyncClient(
             timeout=self._timeout,
             headers={"User-Agent": f"citecheck/0.1 (mailto:{self._mailto})"},
@@ -251,9 +257,6 @@ class RetrievalClient:
         self, url: str, params: dict, cache_key: str,
         headers: dict | None = None,
     ) -> SourceResult:
-        t0 = time.monotonic()
-        cached = self._cache is not None and self._cache.get(cache_key) is not None
-        r = await self._do_get(url, params, cache_key, headers)
         src = (
             "crossref" if "crossref" in url
             else "openalex" if "openalex" in url
@@ -261,12 +264,34 @@ class RetrievalClient:
             else "arxiv" if "arxiv" in url
             else url
         )
+        t0 = time.monotonic()
+        cached = self._cache is not None and self._cache.get(cache_key) is not None
+        if src in self._down:
+            self._track(src, 0.0, cached=False)
+            return SourceResult(ok=False, error="source unavailable")
+        r = await self._do_get(url, params, cache_key, headers, src)
+        if not r.ok and ("429" in (r.error or "") or "budget" in (r.error or "")):
+            self._down.add(src)
         self._track(src, time.monotonic() - t0, cached=cached)
         return r
 
+    def _note_result(self, src: str, ok: bool) -> None:
+        """Two consecutive transport failures take the source down for
+        this run — a host that times out repeatedly won't recover inside
+        one pipeline run."""
+        if ok:
+            self._consecutive_fails[src] = 0
+            return
+        n = self._consecutive_fails.get(src, 0) + 1
+        self._consecutive_fails[src] = n
+        if n >= 2 and src not in self._down:
+            self._down.add(src)
+            log.warning("%s keeps failing — skipping it for the rest of "
+                        "this run", src)
+
     async def _do_get(
         self, url: str, params: dict, cache_key: str,
-        headers: dict | None = None,
+        headers: dict | None = None, src: str = "",
     ) -> SourceResult:
         if self._cache is not None:
             hit = self._cache.get(cache_key)
@@ -275,9 +300,15 @@ class RetrievalClient:
             if hit is not None:
                 return SourceResult(ok=True, data=hit)
         last_err: str | None = None
+        retried_429 = False
         for attempt in range(self._retries + 1):
+            if src in self._down:
+                return SourceResult(ok=False, error="source unavailable")
             try:
                 async with self._sem:
+                    if src in self._down:
+                        return SourceResult(
+                            ok=False, error="source unavailable")
                     resp = await self._client.get(
                         url, params=params, headers=headers)
                 if resp.status_code == 429:
@@ -295,6 +326,16 @@ class RetrievalClient:
                             resp.text.strip()[:160])
                         return SourceResult(
                             ok=False, error="openalex budget exhausted")
+                    if retried_429:
+                        # a second 429 in this run means the shared budget
+                        # is gone — take the whole source down rather than
+                        # retry-stamping every remaining request
+                        self._down.add(src)
+                        log.warning(
+                            "%s rate-limited — skipping it for the rest "
+                            "of this run", src)
+                        return SourceResult(ok=False, error="429")
+                    retried_429 = True
                     await asyncio.sleep(2**attempt)
                     last_err = "429"
                     continue
@@ -302,15 +343,18 @@ class RetrievalClient:
                     last_err = f"HTTP {resp.status_code}"
                     continue
                 if resp.status_code == 404:
+                    self._note_result(src, True)
                     return SourceResult(ok=True, data=None, error="404")
                 resp.raise_for_status()
                 data = resp.json()
                 if self._cache is not None:
                     self._cache.set(cache_key, data)
+                self._note_result(src, True)
                 return SourceResult(ok=True, data=data)
             except (httpx.HTTPError, ValueError) as e:
                 last_err = str(e)
                 await asyncio.sleep(min(2**attempt, 4))
+        self._note_result(src, False)
         return SourceResult(ok=False, error=last_err)
 
     # -- Crossref ------------------------------------------------------
@@ -410,6 +454,9 @@ class RetrievalClient:
     ) -> SourceResult:
         """One raw arXiv API call. The Atom body is cached as
         {"xml": ...} so fixtures/tests can seed recorded feeds."""
+        if "arxiv" in self._down:
+            self._track("arxiv", 0.0, cached=False)
+            return SourceResult(ok=False, error="source unavailable")
         key = make_key("arxiv", "xml", search_query, max_results)
         t0 = time.monotonic()
         if self._cache is not None:
@@ -430,13 +477,17 @@ class RetrievalClient:
                 )
             if resp.status_code == 429 or resp.status_code >= 500:
                 self._track("arxiv", time.monotonic() - t0, cached=False)
+                if resp.status_code == 429:
+                    self._down.add("arxiv")
                 return SourceResult(ok=False, error=f"HTTP {resp.status_code}")
             resp.raise_for_status()
             xml_text = resp.text
         except httpx.HTTPError as e:
             self._track("arxiv", time.monotonic() - t0, cached=False)
+            self._note_result("arxiv", False)
             return SourceResult(ok=False, error=str(e))
         self._track("arxiv", time.monotonic() - t0, cached=False)
+        self._note_result("arxiv", True)
         if self._cache is not None:
             self._cache.set(key, {"xml": xml_text})
         return SourceResult(ok=True, data=xml_text)

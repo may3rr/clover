@@ -84,40 +84,71 @@ def _looks_like_ref_entry(window: str) -> bool:
     return names >= 3 and pages >= 1
 
 
-async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> str | None:
-    key = make_key("pdftext", url)
-    hit = cache.get(key)
-    if hit is not None:
-        return hit or None
+# in-flight dedup: several claim/ref pairs can need the same PDF/abstract
+# at once — without this every pair downloads it again (failures aren't
+# otherwise deduplicated within a run)
+_inflight: dict[str, asyncio.Task] = {}
+
+
+async def _shared(key: str, factory) -> str:
+    """Run factory() once per key; concurrent callers share the task."""
+    if key in _inflight:
+        return await _inflight[key]
+    task = asyncio.create_task(factory())
+    _inflight[key] = task
+    try:
+        return await task
+    finally:
+        _inflight.pop(key, None)
+
+
+async def _fetch_pdf_uncached(
+    url: str, client: httpx.AsyncClient
+) -> str:
+    """Download + parse; returns '' on any failure."""
     try:
         async with client.stream("GET", url, timeout=30) as resp:
             if resp.status_code != 200:
-                return None
+                return ""
             cl = resp.headers.get("content-length")
             if cl and int(cl) > _MAX_PDF_BYTES:
-                return None
+                return ""
             chunks: list[bytes] = []
             size = 0
             async for chunk in resp.aiter_bytes():
                 size += len(chunk)
                 if size > _MAX_PDF_BYTES:
-                    return None
+                    return ""
                 chunks.append(chunk)
         data = b"".join(chunks)
     except httpx.HTTPError as e:
         log.warning("pdf fetch failed %s: %s", url, e)
-        return None
+        return ""
     try:
         import io
 
         from pypdf import PdfReader
 
         reader = PdfReader(io.BytesIO(data))
-        text = "\n".join((p.extract_text() or "") for p in reader.pages)
+        # pypdf is CPU-bound — run it in a thread so PDF parsing a big
+        # paper doesn't stall the event loop for every other layer
+        text = await asyncio.to_thread(
+            lambda: "\n".join(
+                (p.extract_text() or "") for p in reader.pages))
     except Exception as e:  # noqa: BLE001
         log.warning("pdf parse failed %s: %s", url, e)
-        return None
-    text = _drop_reference_tail(_fix_pdf_text(text))
+        return ""
+    return _drop_reference_tail(_fix_pdf_text(text))
+
+
+async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> str | None:
+    key = make_key("pdftext", url)
+    hit = cache.get(key)
+    if hit is not None:
+        return hit or None
+    # dedup + cache '' so a failing PDF costs one fetch per run, once ever
+    text = await _shared(f"pdf:{url}",
+                         lambda: _fetch_pdf_uncached(url, client))
     cache.set(key, text)
     return text or None
 
@@ -156,11 +187,7 @@ def _bm25_excerpt(fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT) -> str
     return " ".join(parts)[:limit] if parts else fulltext[:limit]
 
 
-async def _arxiv_summary(arxiv_id: str, client: httpx.AsyncClient, cache: Cache) -> str | None:
-    key = make_key("arxiv_abs", arxiv_id)
-    hit = cache.get(key)
-    if hit is not None:
-        return hit or None
+async def _arxiv_summary_fetch(arxiv_id: str, client: httpx.AsyncClient) -> str:
     await _arxiv_throttle()
     try:
         resp = await client.get(
@@ -170,12 +197,37 @@ async def _arxiv_summary(arxiv_id: str, client: httpx.AsyncClient, cache: Cache)
         )
         resp.raise_for_status()
         m = re.search(r"<summary>(.*?)</summary>", resp.text, re.S)
-        summary = re.sub(r"\s+", " ", m.group(1)).strip() if m else None
+        return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
     except httpx.HTTPError as e:
         log.warning("arxiv api failed %s: %s", arxiv_id, e)
-        return None
-    cache.set(key, summary or "")
-    return summary
+        return ""
+
+
+async def _arxiv_summary(arxiv_id: str, client: httpx.AsyncClient, cache: Cache) -> str | None:
+    key = make_key("arxiv_abs", arxiv_id)
+    hit = cache.get(key)
+    if hit is not None:
+        return hit or None
+    summary = await _shared(f"ax:{arxiv_id}",
+                            lambda: _arxiv_summary_fetch(arxiv_id, client))
+    cache.set(key, summary)
+    return summary or None
+
+
+async def _arxiv_title_fetch(title: str, client: httpx.AsyncClient) -> str:
+    await _arxiv_throttle()
+    try:
+        resp = await client.get(
+            "https://export.arxiv.org/api/query",
+            params={"search_query": f'ti:"{title}"', "max_results": 1},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        m = re.search(r"<entry>.*?<summary>(.*?)</summary>", resp.text, re.S)
+        return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
+    except httpx.HTTPError as e:
+        log.warning("arxiv title search failed: %s", e)
+        return ""
 
 
 async def _arxiv_title_search(
@@ -187,21 +239,10 @@ async def _arxiv_title_search(
     hit = cache.get(key)
     if hit is not None:
         return hit or None
-    await _arxiv_throttle()
-    try:
-        resp = await client.get(
-            "https://export.arxiv.org/api/query",
-            params={"search_query": f'ti:"{title}"', "max_results": 1},
-            timeout=15,
-        )
-        resp.raise_for_status()
-        m = re.search(r"<entry>.*?<summary>(.*?)</summary>", resp.text, re.S)
-        summary = re.sub(r"\s+", " ", m.group(1)).strip() if m else None
-    except httpx.HTTPError as e:
-        log.warning("arxiv title search failed: %s", e)
-        return None
-    cache.set(key, summary or "")
-    return summary
+    summary = await _shared(f"axt:{title}",
+                            lambda: _arxiv_title_fetch(title, client))
+    cache.set(key, summary)
+    return summary or None
 
 
 def _strip_jats(text: str) -> str:

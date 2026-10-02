@@ -53,8 +53,12 @@ def split_sentences(text: str) -> list[Sentence]:
             if i > 0 and i + 1 < n and text[i - 1].isdigit() and text[i + 1].isdigit():
                 i += 1
                 continue
-            # abbreviation like "et al." / initials "J."
-            if _ABBREV_RE.search(prev) or _INITIAL_RE.search(text[:i]):
+            # abbreviation like "et al." / initials "J." — the initial
+            # test is $-anchored: only the last 2 chars can match, so
+            # don't rescan the whole prefix (O(n^2) on PDF fulltext)
+            if _ABBREV_RE.search(prev) or _INITIAL_RE.search(
+                text[max(0, i - 2):i]
+            ):
                 i += 1
                 continue
             # "file.txt" style: '.' followed directly by lowercase
