@@ -35,7 +35,7 @@ _NUMERIC_RE = re.compile(
 )
 
 _EN_SURNAME = (
-    r"(?:van|von|de|der|den|di|la|le)?\s*"
+    r"(?:(?:van|von|de|der|den|di|la|le)\s+)?"
     r"[A-Z][A-Za-z'’\-]+"
     r"(?:\s+(?:van|von|de|der|den|di|la|le)\s+[A-Z][A-Za-z'’\-]+)*"
 )
