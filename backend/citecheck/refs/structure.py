@@ -8,6 +8,7 @@ extract are left None rather than guessed.
 from __future__ import annotations
 
 import re
+from typing import Any
 
 _DOI_RE = re.compile(r"10\.\d{4,9}/[^\s\"<>，。；]+")
 _YEAR_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})[a-z]?(?!\d)")
@@ -140,3 +141,37 @@ def parse_reference(raw: str) -> dict:
         out["venue"] = venue
         break
     return out
+
+
+# ------------------------------------------------------------------ LLM
+
+_PROMPT = (
+    "把下面这条参考文献解析为 JSON。字段：title（论文标题，去掉[J][M]等类型标识）、"
+    "authors（作者列表，英文保留原写法，中文每人一个字符串）、year（发表年份，整数）、"
+    "venue（期刊或会议名）、doi。提取不出的字段用 null。只输出 JSON。\n\n"
+    "参考文献：{raw}"
+)
+
+
+async def complete_reference_fields(raw: str) -> dict[str, Any]:
+    """LLM fallback (task 'structure', cloud) for entries the regexes left
+    incomplete. Returns a partial dict; empty on failure."""
+    from pydantic import BaseModel
+
+    from ..llm.client import chat_json
+
+    class RefCompletion(BaseModel):
+        title: str | None = None
+        authors: list[str] = []
+        year: int | None = None
+        venue: str | None = None
+        doi: str | None = None
+
+    res = await chat_json(
+        "structure",
+        [{"role": "user", "content": _PROMPT.format(raw=raw)}],
+        RefCompletion,
+    )
+    if res.value is None:
+        return {}
+    return {k: v for k, v in res.value.model_dump().items() if v}
