@@ -39,7 +39,7 @@ from .schema import (
     ReportMeta,
     Revision,
 )
-from .support.layer import run_support
+from .support.layer import SupportRun
 
 log = logging.getLogger(__name__)
 
@@ -126,8 +126,16 @@ async def run_pipeline(
             })
         return out
 
+    layer_start: dict[str, float] = {}
+    layer_times: dict[str, float] = {}
+
     def _layer(layer: str, status: str, n: int = 0, error: str | None = None,
                anchors: list[dict] | None = None):
+        if status == "running":
+            layer_start[layer] = time.monotonic()
+        elif layer in layer_start:
+            layer_times[layer] = round(
+                time.monotonic() - layer_start[layer], 1)
         meta.layers[layer].status = status  # type: ignore[assignment]
         meta.layers[layer].findings = n
         meta.layers[layer].error = error
@@ -150,6 +158,7 @@ async def run_pipeline(
         raise PipelineError(PARSE_ERROR) from e
 
     para_by_id = {p.id: p for p in parsed.paragraphs}
+    t_parsed = time.monotonic()
     send({"type": "parsed", "outline": _outline(parsed)})
 
     with stats_scope() as stats:
@@ -163,38 +172,36 @@ async def run_pipeline(
             revisions: list[Revision] = []
             dist_findings: list[Finding] = []
 
-            async def _authenticity() -> None:
+            async def _auth_then_support() -> None:
                 nonlocal auth_checks, auth_findings
+                nonlocal claims, support_checks, sup_findings
+                # claims extraction (LLM) doesn't need verification — it
+                # starts immediately; each ref's judge pairs queue as its
+                # RefCheck lands (on_ref), overlapping auth and support.
+                _layer("support", "running")
+                sup = SupportRun(
+                    parsed, cache=cache, http=retrieval._client)
                 _layer("authenticity", "running")
                 try:
                     auth_checks, auth_findings = await verify_references(
-                        parsed.references, parsed.paragraphs, retrieval)
+                        parsed.references, parsed.paragraphs, retrieval,
+                        on_ref=sup.add_check)
                 except Exception as e:  # noqa: BLE001
                     log.warning("authenticity layer failed: %s", e)
                     _layer("authenticity", "failed", error=_short_error(e))
-                    return
-                _layer("authenticity", "done", len(auth_findings),
-                       anchors=_anchors(auth_findings))
-
-            async def _support() -> None:
-                nonlocal claims, support_checks, sup_findings
-                _layer("support", "running")
+                else:
+                    _layer("authenticity", "done", len(auth_findings),
+                           anchors=_anchors(auth_findings))
                 try:
-                    claims, support_checks, sup_findings = await run_support(
-                        parsed, auth_checks,
-                        cache=cache, http=retrieval._client)
+                    # support finishes even when authenticity failed
+                    # (no checks -> every pair undetermined, none source)
+                    claims, support_checks, sup_findings = await sup.finish()
                 except Exception as e:  # noqa: BLE001
                     log.warning("support layer failed: %s", e)
                     _layer("support", "failed", error=_short_error(e))
                     return
                 _layer("support", "done", len(sup_findings),
                        anchors=_anchors(sup_findings))
-
-            async def _auth_then_support() -> None:
-                await _authenticity()
-                # support runs even when authenticity failed (checks=[] ->
-                # every pair undetermined with source_kind=none)
-                await _support()
 
             async def _distribution() -> None:
                 nonlocal dist, dist_findings
@@ -243,6 +250,14 @@ async def run_pipeline(
             meta.llm_calls = LLMCalls(local=stats.local, cloud=stats.cloud)
             meta.duration_s = round(time.monotonic() - t0, 1)
             meta.token_usage = {m: dict(u) for m, u in stats.usage.items()}
+            meta.timings = {
+                "parse": round(t_parsed - t0, 1),
+                "layers": layer_times,
+                "sources": {
+                    k: dict(v)
+                    for k, v in getattr(retrieval, "stats", {}).items()
+                },
+            }
 
             report = Report(
                 document=parsed.document,

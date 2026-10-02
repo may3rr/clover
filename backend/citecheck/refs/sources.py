@@ -223,6 +223,8 @@ class RetrievalClient:
         self._openalex_key = s.openalex_api_key
         self._s2_key = s.s2_api_key
         self._cache = cache
+        # per-source stats for meta.timings: calls / seconds / cache hits
+        self.stats: dict[str, dict] = {}
         self._client = httpx.AsyncClient(
             timeout=self._timeout,
             headers={"User-Agent": f"citecheck/0.1 (mailto:{self._mailto})"},
@@ -238,7 +240,31 @@ class RetrievalClient:
     async def __aexit__(self, *exc: object) -> None:
         await self.close()
 
+    def _track(self, source: str, dt: float, cached: bool) -> None:
+        st = self.stats.setdefault(source, {"calls": 0, "seconds": 0.0, "cached": 0})
+        st["calls"] += 1
+        st["seconds"] = round(st["seconds"] + dt, 3)
+        if cached:
+            st["cached"] += 1
+
     async def _get(
+        self, url: str, params: dict, cache_key: str,
+        headers: dict | None = None,
+    ) -> SourceResult:
+        t0 = time.monotonic()
+        cached = self._cache is not None and self._cache.get(cache_key) is not None
+        r = await self._do_get(url, params, cache_key, headers)
+        src = (
+            "crossref" if "crossref" in url
+            else "openalex" if "openalex" in url
+            else "s2" if "semanticscholar" in url
+            else "arxiv" if "arxiv" in url
+            else url
+        )
+        self._track(src, time.monotonic() - t0, cached=cached)
+        return r
+
+    async def _do_get(
         self, url: str, params: dict, cache_key: str,
         headers: dict | None = None,
     ) -> SourceResult:
@@ -385,11 +411,14 @@ class RetrievalClient:
         """One raw arXiv API call. The Atom body is cached as
         {"xml": ...} so fixtures/tests can seed recorded feeds."""
         key = make_key("arxiv", "xml", search_query, max_results)
+        t0 = time.monotonic()
         if self._cache is not None:
             hit = self._cache.get(key)
             if isinstance(hit, dict) and "__error__" in hit:
+                self._track("arxiv", 0.0, cached=True)
                 return SourceResult(ok=False, error=hit["__error__"])
             if isinstance(hit, dict) and "xml" in hit:
+                self._track("arxiv", 0.0, cached=True)
                 return SourceResult(ok=True, data=hit["xml"])
         await arxiv_throttle()
         try:
@@ -400,11 +429,14 @@ class RetrievalClient:
                             "max_results": max_results},
                 )
             if resp.status_code == 429 or resp.status_code >= 500:
+                self._track("arxiv", time.monotonic() - t0, cached=False)
                 return SourceResult(ok=False, error=f"HTTP {resp.status_code}")
             resp.raise_for_status()
             xml_text = resp.text
         except httpx.HTTPError as e:
+            self._track("arxiv", time.monotonic() - t0, cached=False)
             return SourceResult(ok=False, error=str(e))
+        self._track("arxiv", time.monotonic() - t0, cached=False)
         if self._cache is not None:
             self._cache.set(key, {"xml": xml_text})
         return SourceResult(ok=True, data=xml_text)
@@ -422,12 +454,42 @@ class RetrievalClient:
             return r
         hits = parse_arxiv_feed(r.data)
         if not hits and not author:
-            words = [w for w in re.findall(r"[A-Za-z0-9]+", title)
-                     if len(w) > 2][:8]
-            if len(words) > 1:
-                q2 = " AND ".join(f"ti:{w}" for w in words)
-                r2 = await self._arxiv_query(q2, max_results)
-                if not r2.ok:
-                    return r2
-                hits = parse_arxiv_feed(r2.data)
+            return await self.arxiv_loose_search(title, max_results)
         return SourceResult(ok=True, data=hits)
+
+    async def arxiv_loose_search(
+        self, title: str, author: str | None = None, max_results: int = 5
+    ) -> SourceResult:
+        """Loose ANDed ti:word query (no phrase); used as the per-ref
+        fallback after a batched phrase lookup finds nothing."""
+        words = [w for w in re.findall(r"[A-Za-z0-9]+", title)
+                 if len(w) > 2][:8]
+        if len(words) <= 1 and not author:
+            return SourceResult(ok=True, data=[])
+        q = " AND ".join(f"ti:{w}" for w in words)
+        if author:
+            q += f' AND au:"{author}"'
+        r = await self._arxiv_query(q, max_results)
+        if not r.ok:
+            return r
+        return SourceResult(ok=True, data=parse_arxiv_feed(r.data))
+
+    async def arxiv_search_batch(
+        self, titles: list[str], max_results: int = 10
+    ) -> SourceResult:
+        """One request covering several refs: ti:"a" OR ti:"b" … .
+        Callers match entries back per ref by title similarity. A single
+        title produces the same ti:"phrase" query as arxiv_search."""
+        titles = [t for t in titles if t]
+        if not titles:
+            return SourceResult(ok=True, data=[])
+        if len(titles) == 1:
+            q = f'ti:"{titles[0]}"'
+            n = max_results
+        else:
+            q = " OR ".join(f'ti:"{t}"' for t in titles)
+            n = max(max_results, 3 * len(titles))
+        r = await self._arxiv_query(q, n)
+        if not r.ok:
+            return r
+        return SourceResult(ok=True, data=parse_arxiv_feed(r.data))

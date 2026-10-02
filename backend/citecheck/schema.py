@@ -85,6 +85,8 @@ class RefCheck(BaseModel):
     status: RefStatus
     matched: dict | None = None
     issues: list[str] = Field(default_factory=list)
+    # which sources actually answered (a 429/timeout is NOT an answer)
+    answered: list[str] = Field(default_factory=list)
 
 
 class Claim(BaseModel):
@@ -210,6 +212,8 @@ class ReportMeta(BaseModel):
     duration_s: float = 0.0
     # model name -> {"prompt": tokens, "completion": tokens} (uncached calls)
     token_usage: dict[str, dict[str, int]] = Field(default_factory=dict)
+    # {"parse": s, "layers": {layer: s}, "sources": {src: {calls, seconds, cached}}}
+    timings: dict = Field(default_factory=dict)
 
 
 class Report(BaseModel):

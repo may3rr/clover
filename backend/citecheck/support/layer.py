@@ -28,6 +28,108 @@ from .sources import build_source
 log = logging.getLogger(__name__)
 
 
+class SupportRun:
+    """Incremental support layer (T6): claim extraction starts as soon as
+    the run is created; ``add_check`` queues that reference's judge pairs
+    the moment its RefCheck lands (verification and judging overlap).
+    ``finish`` also covers refs that never got a check (authenticity
+    failed -> undetermined / source_kind=none)."""
+
+    def __init__(
+        self,
+        parsed: ParsedDocument,
+        *,
+        cache: Cache | None = None,
+        http: httpx.AsyncClient | None = None,
+    ):
+        self._parsed = parsed
+        self._cache = cache or Cache(get_settings().cache_path)
+        self._own_http = http is None
+        self._http = http or httpx.AsyncClient(follow_redirects=True)
+        self._matched: dict[str, dict | None] = {}
+        self._out: dict[tuple[str, str], SupportCheck] = {}
+        self._queued: set[tuple[str, str]] = set()
+        self._queue_tasks: list[asyncio.Task] = []
+        self._judge_tasks: list[asyncio.Task] = []
+        # claim extraction doesn't need verification — start immediately
+        self._claims_task = asyncio.create_task(self._extract())
+
+    async def _extract(self) -> list[Claim]:
+        parsed = self._parsed
+        para_by_id = {p.id: p for p in parsed.paragraphs}
+        by_para: dict[str, list] = {}
+        for m in parsed.markers:
+            by_para.setdefault(m.paragraph_id, []).append(m)
+        claim_lists = await asyncio.gather(
+            *[
+                extract_claims(
+                    para_by_id[pid], sorted(ms, key=lambda m: m.start))
+                for pid, ms in by_para.items()
+                if pid in para_by_id
+            ]
+        )
+        claims: list[Claim] = [c for lst in claim_lists for c in lst]
+        for i, c in enumerate(claims):
+            c.id = f"c{i}"
+        # (claim, ref) job list in claims order — shared by add_check and
+        # finish() so each pair is judged exactly once
+        marker_by_id = {m.id: m for m in parsed.markers}
+        ref_ids: set[str] = {r.id for r in parsed.references}
+        jobs: list[tuple[Claim, str]] = []
+        for c in claims:
+            wanted: list[str] = []
+            for mid in c.marker_ids:
+                mk = marker_by_id.get(mid)
+                if mk:
+                    for rid in mk.ref_ids:
+                        if rid in ref_ids and rid not in wanted:
+                            wanted.append(rid)
+            for rid in wanted:
+                jobs.append((c, rid))
+        self._jobs = jobs
+        return claims
+
+    def add_check(self, rc: RefCheck) -> None:
+        """Queue this ref's judge pairs (claims may still be extracting —
+        the queue task waits for them)."""
+        self._matched[rc.ref_id] = rc.matched
+        self._queue_tasks.append(
+            asyncio.create_task(self._queue_ref(rc.ref_id)))
+
+    async def _queue_ref(self, rid: str) -> None:
+        await self._claims_task
+        for c, rrid in self._jobs:
+            if rrid == rid:
+                self._spawn(c, rid)
+
+    def _spawn(self, c: Claim, rid: str) -> None:
+        if (c.id, rid) in self._queued:
+            return
+        self._queued.add((c.id, rid))
+        self._judge_tasks.append(asyncio.create_task(self._do(c, rid)))
+
+    async def _do(self, c: Claim, rid: str) -> None:
+        self._out[(c.id, rid)] = await _judge_pair(
+            c, rid, self._matched.get(rid), self._cache, self._http)
+
+    async def finish(
+        self,
+    ) -> tuple[list[Claim], list[SupportCheck], list[Finding]]:
+        claims = await self._claims_task
+        # refs that never produced a check -> undetermined pairs
+        for c, rid in self._jobs:
+            self._spawn(c, rid)
+        # queueing tasks may still be spawning judges — wait for them
+        # first, then for every judge task
+        await asyncio.gather(*self._queue_tasks)
+        await asyncio.gather(*self._judge_tasks)
+        checks = [self._out[(c.id, rid)] for c, rid in self._jobs]
+        findings = _support_findings(self._parsed, self._jobs, checks)
+        if self._own_http:
+            await self._http.aclose()
+        return claims, checks, findings
+
+
 async def run_support(
     parsed: ParsedDocument,
     ref_checks: list[RefCheck],
@@ -35,56 +137,19 @@ async def run_support(
     cache: Cache | None = None,
     http: httpx.AsyncClient | None = None,
 ) -> tuple[list[Claim], list[SupportCheck], list[Finding]]:
-    matched_by_ref = {rc.ref_id: rc.matched for rc in ref_checks}
-    marker_by_id = {m.id: m for m in parsed.markers}
-    para_by_id = {p.id: p for p in parsed.paragraphs}
+    run = SupportRun(parsed, cache=cache, http=http)
+    for rc in ref_checks:
+        run.add_check(rc)
+    return await run.finish()
+
+
+def _support_findings(
+    parsed: ParsedDocument,
+    jobs: list[tuple[Claim, str]],
+    checks: list[SupportCheck],
+) -> list[Finding]:
     ref_para = {r.id: r.paragraph_id for r in parsed.references}
     para_len = {p.id: len(p.text) for p in parsed.paragraphs}
-    ref_ids: set[str] = {r.id for r in parsed.references}
-
-    # ---- claim extraction (one LLM call per cited sentence) ----------
-    by_para: dict[str, list] = {}
-    for m in parsed.markers:
-        by_para.setdefault(m.paragraph_id, []).append(m)
-    claim_lists = await asyncio.gather(
-        *[
-            extract_claims(para_by_id[pid], sorted(ms, key=lambda m: m.start))
-            for pid, ms in by_para.items()
-            if pid in para_by_id
-        ]
-    )
-    claims: list[Claim] = [c for lst in claim_lists for c in lst]
-    for i, c in enumerate(claims):
-        c.id = f"c{i}"
-
-    # ---- per (claim, ref) judgement ----------------------------------
-    jobs: list[tuple[Claim, str]] = []
-    for c in claims:
-        wanted: list[str] = []
-        for mid in c.marker_ids:
-            mk = marker_by_id.get(mid)
-            if mk:
-                for rid in mk.ref_ids:
-                    if rid in ref_ids and rid not in wanted:
-                        wanted.append(rid)
-        for rid in wanted:
-            jobs.append((c, rid))
-
-    cache = cache or Cache(get_settings().cache_path)
-    own_http = http is None
-    http = http or httpx.AsyncClient(follow_redirects=True)
-    try:
-        checks = await asyncio.gather(
-            *[
-                _judge_pair(c, rid, matched_by_ref.get(rid), cache, http)
-                for c, rid in jobs
-            ]
-        )
-    finally:
-        if own_http:
-            await http.aclose()
-
-    # ---- findings -----------------------------------------------------
     findings: list[Finding] = []
     no_source_refs: set[str] = set()
     for (claim, rid), check in zip(jobs, checks):
@@ -128,7 +193,7 @@ async def run_support(
         )
     for i, f in enumerate(findings):
         f.id = f"sup-{i}"
-    return claims, list(checks), findings
+    return findings
 
 
 _POSITIVE = {"supported", "partial", "unsupported"}

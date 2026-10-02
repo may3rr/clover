@@ -120,6 +120,40 @@ async def test_fabricated_not_found(recorded_client, paras):
 
 
 @pytest.mark.asyncio
+async def test_fabricated_not_found_s2_limited(recorded_client, paras, monkeypatch):
+    """New not_found rule: S2 is optional — a fabricated ref reaches
+    not_found when Crossref + OpenAlex + arXiv all answered with no match,
+    even while S2 is rate-limited/down."""
+    global paras_fixture
+    paras_fixture = paras
+
+    async def dead_s2(*a, **kw):
+        return SourceResult(ok=False, error="429")
+
+    monkeypatch.setattr(recorded_client, "s2_search", dead_s2)
+    check, findings = await _verify(RAWS["fabricated"], recorded_client)
+    assert check.status == "not_found", check.issues
+    assert findings[0].severity == "high"
+
+
+@pytest.mark.asyncio
+async def test_required_source_down_unverifiable(recorded_client, paras, monkeypatch):
+    """If any of Crossref/OpenAlex/arXiv was unavailable the same ref is
+    unverifiable, not not_found — an errored source is not 'no hit'."""
+    global paras_fixture
+    paras_fixture = paras
+
+    async def dead_oa(*a, **kw):
+        return SourceResult(ok=False, error="429")
+
+    monkeypatch.setattr(recorded_client, "openalex_search", dead_oa)
+    check, findings = await _verify(RAWS["fabricated"], recorded_client)
+    assert check.status == "unverifiable"
+    assert "检索服务暂不可用" in check.issues[0]
+    assert findings[0].severity == "low"
+
+
+@pytest.mark.asyncio
 async def test_chinese_never_not_found(recorded_client, paras):
     global paras_fixture
     paras_fixture = paras
@@ -273,28 +307,25 @@ async def test_both_differ_record_ignored(rescue_client, paras, monkeypatch):
         "year": 2025, "venue": "x", "doi": None, "url": None,
         "abstract": None, "pdf_url": None, "arxiv_id": None, "alt_year": None,
     }
-    empty_arxiv = next(
-        v["xml"] for v in RECORDED.values()
-        if isinstance(v, dict) and v.get("xml")
-        and not parse_arxiv_feed(v["xml"])
-    )
-
     async def fake_crossref(query, rows=5, year=None, author=None):
         return SourceResult(ok=True, data=[wrong])
 
     async def fake_empty(*a, **kw):
         return SourceResult(ok=True, data=[])
 
-    async def fake_arxiv(title, author=None, max_results=5):
-        return SourceResult(ok=True, data=parse_arxiv_feed(empty_arxiv))
-
     monkeypatch.setattr(rescue_client, "crossref_search", fake_crossref)
     monkeypatch.setattr(rescue_client, "openalex_search", fake_empty)
     monkeypatch.setattr(rescue_client, "s2_search", fake_empty)
-    monkeypatch.setattr(rescue_client, "arxiv_search", fake_arxiv)
+    # arXiv answered but found nothing (the recorded rescue feed must not
+    # leak in here — verification queries go through the batch method)
+    monkeypatch.setattr(rescue_client, "arxiv_search_batch", fake_empty)
+    monkeypatch.setattr(rescue_client, "arxiv_loose_search", fake_empty)
+    monkeypatch.setattr(rescue_client, "arxiv_search", fake_empty)
     check, findings = await _verify(RAWS["vaswani"], rescue_client)
     assert check.status == "not_found"
-    assert check.issues == ["四个数据库均未检索到相符文献"]
+    assert check.issues == [
+        "Crossref、OpenAlex、Semantic Scholar、arXiv均未检索到相符文献"
+    ]
     assert findings[0].severity == "high"
 
 
@@ -336,3 +367,36 @@ async def test_source_api_keys(tmp_path, monkeypatch):
     await client.s2_search("anything")
     assert seen[0]["params"]["api_key"] == "OAKEY"
     assert seen[1]["headers"]["x-api-key"] == "S2KEY"
+
+
+@pytest.mark.asyncio
+async def test_arxiv_batch_one_request(tmp_path, monkeypatch):
+    """Batched title lookup: several titles go into ONE ti:"a" OR ti:"b"
+    request, and entries come back for the caller to distribute."""
+    client = RetrievalClient(cache=Cache(tmp_path / "b.sqlite"))
+    calls: list[str] = []
+
+    async def capture(url, params=None, headers=None, **kw):
+        calls.append((params or {}).get("search_query", ""))
+        xml = (
+            '<?xml version="1.0"?>'
+            '<feed xmlns="http://www.w3.org/2005/Atom">'
+            "<entry><id>http://arxiv.org/abs/1706.03762v7</id>"
+            "<title>Attention Is All You Need</title>"
+            "<published>2017-06-12T00:00:00Z</published>"
+            "<author><name>Ashish Vaswani</name></author>"
+            "<summary>Attention paper.</summary></entry>"
+            "</feed>"
+        )
+        return httpx.Response(
+            200, text=xml, request=httpx.Request("GET", url))
+
+    monkeypatch.setattr(client._client, "get", capture)
+    r = await client.arxiv_search_batch(
+        ["Attention is all you need", "BERT: pre-training"])
+    assert r.ok and len(r.data) == 1 and r.data[0]["source"] == "arxiv"
+    assert len(calls) == 1
+    assert 'ti:"Attention is all you need"' in calls[0]
+    assert 'ti:"BERT: pre-training"' in calls[0]
+    assert " OR " in calls[0]
+    await client.close()
