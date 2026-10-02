@@ -121,8 +121,10 @@ async def test_share_flags_both_directions(tmp_path):
     by_canon = {s.canonical: s for s in d.sections}
     assert by_canon["intro"].share_flag == "below"    # 1/25 < q1 0.05
     assert by_canon["related"].share_flag == "above"  # 24/25 > q3 0.2
-    f_rel = [f for f in findings if "相关工作" in f.title and "占比" in f.title]
+    # one merged finding per section even when share AND density are out
+    f_rel = [f for f in findings if "相关工作" in f.title]
     assert len(f_rel) == 1 and f_rel[0].severity == "low"
+    assert "占比" in f_rel[0].detail and "每千词" in f_rel[0].detail
     # anchored on the heading paragraph, spanning the whole heading text
     sec = [s for s in p.sections if s.canonical == "related"][0]
     assert f_rel[0].anchor.paragraph_id == sec.heading_paragraph_id
@@ -137,8 +139,8 @@ async def test_density_flag_and_finding(tmp_path):
         p, bench_path=bench_json(tmp_path), classify=False)
     sd = d.sections[0]
     assert sd.density_flag == "above"
-    f = [x for x in findings if "密度" in x.title]
-    assert len(f) == 1 and "高于" in f[0].title
+    f = [x for x in findings if "分布" in x.title]
+    assert len(f) == 1 and "每千词" in f[0].detail and "高于" in f[0].detail
 
 
 @pytest.mark.asyncio
@@ -149,7 +151,7 @@ async def test_language_mismatch_density_na(tmp_path):
         p, bench_path=bench_json(tmp_path), classify=False)
     assert d.comparable_density is False and d.note
     assert all(s.density_flag == "na" for s in d.sections)
-    assert not any("密度" in f.title for f in findings)
+    assert not any("每千词" in f.detail for f in findings)
 
 
 @pytest.mark.asyncio

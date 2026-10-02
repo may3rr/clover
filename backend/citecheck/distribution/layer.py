@@ -140,8 +140,17 @@ async def run_distribution(
         share = cites / total_cites if total_cites else 0.0
         density = cites * 1000.0 / words if words else 0.0
         bsec = bench_sections.get(s.canonical)
+        # only compare canonicals the benchmark actually covers: the
+        # section must appear in >=50% of benchmark papers and the IQR
+        # must have width > 0 (a degenerate [0,0] range flags everything)
         bshare = _stat((bsec or {}).get("share"))
         bdensity = _stat((bsec or {}).get("density_per_1k_words"))
+        if not bsec or bsec.get("present_in", 0) < bench.get("n_papers", 1) / 2:
+            bshare = bdensity = None
+        if bshare and bshare.q3 - bshare.q1 <= 0:
+            bshare = None
+        if bdensity and bdensity.q3 - bdensity.q1 <= 0:
+            bdensity = None
         dist_sections.append(SectionDist(
             section_id=s.id, canonical=s.canonical, title=s.title,
             words=words, citations=cites, share=share, density=density,
@@ -235,33 +244,31 @@ async def run_distribution(
         name = _CANON_ZH.get(sd.canonical, sd.title or sd.canonical)
         n_papers = bench.get("n_papers", 0)
         bname = bench.get("name", "基准")
-        if sd.share_flag in {"below", "above"} and sd.bench_share:
-            side = "低于" if sd.share_flag == "below" else "高于"
-            findings.append(Finding(
-                id="", layer="distribution", severity="low", anchor=anchor,
-                title=f"{name}部分的引用占比{side}该领域常见范围",
-                detail=f"依据：本文{name}部分引用占总引用的 "
-                       f"{sd.share * 100:.1f}%，对标的 {n_papers} 篇"
-                       f"{bname}论文中，常见范围为 "
-                       f"{sd.bench_share.q1 * 100:.1f}% 至 "
-                       f"{sd.bench_share.q3 * 100:.1f}%。\n"
-                       f"建议：确认{name}部分对已有工作的覆盖是否恰当。",
-                refs=[],
-            ))
-        if (
+        # at most one finding per section; share and density merge
+        bits: list[str] = []
+        share_out = sd.share_flag in {"below", "above"} and sd.bench_share
+        dens_out = (
             comparable and sd.density_flag in {"below", "above"}
             and sd.bench_density and sd.words > 0
-        ):
+        )
+        if share_out:
+            side = "低于" if sd.share_flag == "below" else "高于"
+            bits.append(f"引用占比 {sd.share * 100:.1f}%{side}常见范围 "
+                        f"{sd.bench_share.q1 * 100:.1f}% 至 "
+                        f"{sd.bench_share.q3 * 100:.1f}%")
+        if dens_out:
             side = "低于" if sd.density_flag == "below" else "高于"
+            bits.append(f"每千词引用 {sd.density:.1f} 次{side}常见范围 "
+                        f"{sd.bench_density.q1:.1f} 至 "
+                        f"{sd.bench_density.q3:.1f} 次")
+        if bits:
             findings.append(Finding(
                 id="", layer="distribution", severity="low", anchor=anchor,
-                title=f"{name}部分的引用密度{side}该领域常见范围",
-                detail=f"依据：本文{name}部分每千词 {sd.density:.1f} 次引用，"
-                       f"对标的 {n_papers} 篇{bname}论文中，常见范围为 "
-                       f"{sd.bench_density.q1:.1f} 至 "
-                       f"{sd.bench_density.q3:.1f} 次。\n"
-                       f"建议：确认{name}部分用到的已有方法、数据集和工具"
-                       "是否都已注明出处。",
+                title=f"{name}部分的引用分布偏离该领域常见范围",
+                detail=f"依据：本文{name}部分{'，'.join(bits)}，对标的 "
+                       f"{n_papers} 篇{bname}论文。\n"
+                       f"建议：确认{name}部分对已有方法、数据集和工具"
+                       "的引用是否恰当。",
                 refs=[],
             ))
 
