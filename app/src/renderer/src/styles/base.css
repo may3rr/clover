@@ -79,6 +79,12 @@ select {
   }
 }
 
+/* no orphan line ends in running text / callouts */
+.paper p,
+.callout {
+  text-wrap: pretty;
+}
+
 /* 17px / 1.7 reading surface */
 .paper {
   font-size: 17px;
@@ -110,16 +116,32 @@ select {
 .drag-strip {
   -webkit-app-region: drag;
 }
-/* translucent strip material — scrolled content blurs under the text */
-.bar-blur {
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+/* solid strip material (backdrop-filter was unreliable over the paper) */
+.bar-solid {
+  background: var(--bg);
 }
-.bar-blur-subtle {
-  background: color-mix(in srgb, var(--bg-subtle) 82%, transparent);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
+.bar-solid-subtle {
+  background: var(--bg-subtle);
+}
+/* macOS behavior: a 1px separator hairline fades in under the strip only
+   while the pane below is scrolled */
+.strip-edge {
+  position: relative;
+}
+.strip-edge::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  box-shadow: 0 1px 0 var(--separator);
+  opacity: 0;
+  transition: opacity 160ms var(--ease);
+  pointer-events: none;
+}
+.strip-edge.scrolled::after {
+  opacity: 1;
 }
 .drag-strip button,
 .drag-strip a,

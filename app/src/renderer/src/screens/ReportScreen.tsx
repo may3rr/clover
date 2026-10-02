@@ -65,6 +65,7 @@ export default function ReportScreen({
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const [exported, setExported] = useState<string | null>(null)
   const [exportErr, setExportErr] = useState<string | null>(null)
   const segRefs = useRef(new Map<string, HTMLElement[]>())
@@ -259,7 +260,7 @@ export default function ReportScreen({
         style={{ marginLeft: 240, marginRight: 380, background: 'var(--bg)' }}
       >
         <div
-          className="drag-strip bar-blur flex items-center justify-between"
+          className={`drag-strip bar-solid strip-edge flex items-center justify-between${scrolled ? ' scrolled' : ''}`}
           style={{ height: 52, flex: 'none', padding: '0 24px' }}
         >
           <div className="font-semibold">{filterName}</div>
@@ -307,6 +308,7 @@ export default function ReportScreen({
         </div>
         <main
           className="paper flex-1 overflow-y-auto"
+          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
           style={{
             padding: '0 24px 48px',
             background: 'var(--bg)',
@@ -585,7 +587,7 @@ function InspectorList({
   return (
     <>
       <div
-        className="font-semibold bar-blur-subtle"
+        className="font-semibold bar-solid-subtle"
         style={{ fontSize: 17, padding: '14px 16px', flex: 'none', height: 52 }}
       >
         {items.length} 个问题
