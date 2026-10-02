@@ -872,32 +872,30 @@
  "ref_checks": [
   {
    "ref_id": "r1",
-   "status": "mismatch",
+   "status": "verified",
    "matched": {
-    "source": "crossref",
+    "source": "arxiv",
     "title": "Attention Is All You Need",
     "authors": [
-     "Vaswani, Ashish",
-     "Shazeer, Noam",
-     "Parmar, Niki",
-     "Uszkoreit, Jakob",
-     "Jones, Llion",
-     "N.Gomez, Aidan",
-     "Kaiser, Lukasz",
-     "Polosukhin, Illia"
+     "Ashish Vaswani",
+     "Noam Shazeer",
+     "Niki Parmar",
+     "Jakob Uszkoreit",
+     "Llion Jones",
+     "Aidan N. Gomez",
+     "Lukasz Kaiser",
+     "Illia Polosukhin"
     ],
-    "year": 2025,
-    "venue": null,
-    "doi": "10.65215/r5bs2d54",
-    "url": "https://doi.org/10.65215/r5bs2d54",
-    "abstract": null,
-    "pdf_url": null,
-    "arxiv_id": null,
-    "alt_year": null
+    "year": 2017,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/1706.03762v7",
+    "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+    "pdf_url": "https://arxiv.org/pdf/1706.03762",
+    "arxiv_id": "1706.03762",
+    "alt_year": 2017
    },
-   "issues": [
-    "年份不一致：文中写 2017，数据库记录为 2025"
-   ]
+   "issues": []
   },
   {
    "ref_id": "r2",
@@ -924,34 +922,84 @@
   },
   {
    "ref_id": "r3",
-   "status": "mismatch",
+   "status": "verified",
    "matched": {
-    "source": "crossref",
+    "source": "arxiv",
     "title": "Language Models are Few-Shot Learners",
     "authors": [
-     "Malakar, Sourav"
+     "Tom B. Brown",
+     "Benjamin Mann",
+     "Nick Ryder",
+     "Melanie Subbiah",
+     "Jared Kaplan",
+     "Prafulla Dhariwal",
+     "Arvind Neelakantan",
+     "Pranav Shyam",
+     "Girish Sastry",
+     "Amanda Askell",
+     "Sandhini Agarwal",
+     "Ariel Herbert-Voss",
+     "Gretchen Krueger",
+     "Tom Henighan",
+     "Rewon Child",
+     "Aditya Ramesh",
+     "Daniel M. Ziegler",
+     "Jeffrey Wu",
+     "Clemens Winter",
+     "Christopher Hesse",
+     "Mark Chen",
+     "Eric Sigler",
+     "Mateusz Litwin",
+     "Scott Gray",
+     "Benjamin Chess",
+     "Jack Clark",
+     "Christopher Berner",
+     "Sam McCandlish",
+     "Alec Radford",
+     "Ilya Sutskever",
+     "Dario Amodei"
     ],
-    "year": 2026,
-    "venue": "Neural Horizons The Uncharted Future of Deep Learning",
-    "doi": "10.65525/svup.9788199778009.2026.224-230",
-    "url": "https://doi.org/10.65525/svup.9788199778009.2026.224-230",
-    "abstract": null,
-    "pdf_url": null,
-    "arxiv_id": null,
-    "alt_year": null
+    "year": 2020,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/2005.14165v4",
+    "abstract": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+    "pdf_url": "https://arxiv.org/pdf/2005.14165",
+    "arxiv_id": "2005.14165",
+    "alt_year": 2020
    },
-   "issues": [
-    "首作者不一致：文中写 Brown TB，数据库记录为 Malakar, Sourav",
-    "年份不一致：文中写 2020，数据库记录为 2026"
-   ]
+   "issues": []
   },
   {
    "ref_id": "r4",
-   "status": "unverifiable",
-   "matched": null,
-   "issues": [
-    "检索服务暂不可用，未能完成核验"
-   ]
+   "status": "verified",
+   "matched": {
+    "source": "arxiv",
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "authors": [
+     "Patrick Lewis",
+     "Ethan Perez",
+     "Aleksandra Piktus",
+     "Fabio Petroni",
+     "Vladimir Karpukhin",
+     "Naman Goyal",
+     "Heinrich Küttler",
+     "Mike Lewis",
+     "Wen-tau Yih",
+     "Tim Rocktäschel",
+     "Sebastian Riedel",
+     "Douwe Kiela"
+    ],
+    "year": 2020,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/2005.11401v4",
+    "abstract": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline.",
+    "pdf_url": "https://arxiv.org/pdf/2005.11401",
+    "arxiv_id": "2005.11401",
+    "alt_year": 2020
+   },
+   "issues": []
   },
   {
    "ref_id": "r5",
@@ -1007,46 +1055,69 @@
   },
   {
    "ref_id": "r7",
-   "status": "mismatch",
+   "status": "verified",
    "matched": {
-    "source": "crossref",
-    "title": "Efficient Estimation of Nepali Word Representations in Vector Space",
+    "source": "arxiv",
+    "title": "Efficient Estimation of Word Representations in Vector Space",
     "authors": [
-     "Bhatta, Janardan",
-     "Shrestha, Dipesh",
-     "Nepal, Santosh",
-     "Pandey, Saurav",
-     "Koirala, Shekhar"
+     "Tomas Mikolov",
+     "Kai Chen",
+     "Greg Corrado",
+     "Jeffrey Dean"
     ],
-    "year": 2020,
-    "venue": "Journal of Innovations in Engineering Education",
-    "doi": "10.3126/jiee.v3i1.34327",
-    "url": "https://doi.org/10.3126/jiee.v3i1.34327",
-    "abstract": null,
-    "pdf_url": null,
-    "arxiv_id": null,
-    "alt_year": null
+    "year": 2013,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/1301.3781v3",
+    "abstract": "We propose two novel model architectures for computing continuous vector representations of words from very large data sets. The quality of these representations is measured in a word similarity task, and the results are compared to the previously best performing techniques based on different types of neural networks. We observe large improvements in accuracy at much lower computational cost, i.e. it takes less than a day to learn high quality word vectors from a 1.6 billion words data set. Furthermore, we show that these vectors provide state-of-the-art performance on our test set for measuring syntactic and semantic word similarities.",
+    "pdf_url": "https://arxiv.org/pdf/1301.3781",
+    "arxiv_id": "1301.3781",
+    "alt_year": 2013
    },
-   "issues": [
-    "首作者不一致：文中写 Mikolov T，数据库记录为 Bhatta, Janardan",
-    "年份不一致：文中写 2013，数据库记录为 2020"
-   ]
+   "issues": []
   },
   {
    "ref_id": "r8",
-   "status": "unverifiable",
-   "matched": null,
-   "issues": [
-    "检索服务暂不可用，未能完成核验"
-   ]
+   "status": "verified",
+   "matched": {
+    "source": "arxiv",
+    "title": "Sequence to Sequence Learning with Neural Networks",
+    "authors": [
+     "Ilya Sutskever",
+     "Oriol Vinyals",
+     "Quoc V. Le"
+    ],
+    "year": 2014,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/1409.3215v3",
+    "abstract": "Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks. Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences. In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure. Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector of a fixed dimensionality, and then another deep LSTM to decode the target sequence from the vector. Our main result is that on an English to French translation task from the WMT'14 dataset, the translations produced by the LSTM achieve a BLEU score of 34.8 on the entire test set, where the LSTM's BLEU score was penalized on out-of-vocabulary words. Additionally, the LSTM did not have difficulty on long sentences. For comparison, a phrase-based SMT system achieves a BLEU score of 33.3 on the same dataset. When we used the LSTM to rerank the 1000 hypotheses produced by the aforementioned SMT system, its BLEU score increases to 36.5, which is close to the previous best result on this task. The LSTM also learned sensible phrase and sentence representations that are sensitive to word order and are relatively invariant to the active and the passive voice. Finally, we found that reversing the order of the words in all source sentences (but not target sentences) improved the LSTM's performance markedly, because doing so introduced many short term dependencies between the source and the target sentence which made the optimization problem easier.",
+    "pdf_url": "https://arxiv.org/pdf/1409.3215",
+    "arxiv_id": "1409.3215",
+    "alt_year": 2014
+   },
+   "issues": []
   },
   {
    "ref_id": "r9",
-   "status": "unverifiable",
-   "matched": null,
-   "issues": [
-    "检索服务暂不可用，未能完成核验"
-   ]
+   "status": "verified",
+   "matched": {
+    "source": "arxiv",
+    "title": "Adam: A Method for Stochastic Optimization",
+    "authors": [
+     "Diederik P. Kingma",
+     "Jimmy Ba"
+    ],
+    "year": 2014,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/1412.6980v9",
+    "abstract": "We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm.",
+    "pdf_url": "https://arxiv.org/pdf/1412.6980",
+    "arxiv_id": "1412.6980",
+    "alt_year": 2014
+   },
+   "issues": []
   },
   {
    "ref_id": "r10",
@@ -1058,11 +1129,31 @@
   },
   {
    "ref_id": "r11",
-   "status": "unverifiable",
-   "matched": null,
-   "issues": [
-    "检索服务暂不可用，未能完成核验"
-   ]
+   "status": "verified",
+   "matched": {
+    "source": "arxiv",
+    "title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+    "authors": [
+     "Colin Raffel",
+     "Noam Shazeer",
+     "Adam Roberts",
+     "Katherine Lee",
+     "Sharan Narang",
+     "Michael Matena",
+     "Yanqi Zhou",
+     "Wei Li",
+     "Peter J. Liu"
+    ],
+    "year": 2019,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/1910.10683v4",
+    "abstract": "Transfer learning, where a model is first pre-trained on a data-rich task before being fine-tuned on a downstream task, has emerged as a powerful technique in natural language processing (NLP). The effectiveness of transfer learning has given rise to a diversity of approaches, methodology, and practice. In this paper, we explore the landscape of transfer learning techniques for NLP by introducing a unified framework that converts all text-based language problems into a text-to-text format. Our systematic study compares pre-training objectives, architectures, unlabeled data sets, transfer approaches, and other factors on dozens of language understanding tasks. By combining the insights from our exploration with scale and our new ``Colossal Clean Crawled Corpus'', we achieve state-of-the-art results on many benchmarks covering summarization, question answering, text classification, and more. To facilitate future work on transfer learning for NLP, we release our data set, pre-trained models, and code.",
+    "pdf_url": "https://arxiv.org/pdf/1910.10683",
+    "arxiv_id": "1910.10683",
+    "alt_year": 2019
+   },
+   "issues": []
   },
   {
    "ref_id": "r12",
@@ -1087,11 +1178,25 @@
   },
   {
    "ref_id": "r13",
-   "status": "unverifiable",
-   "matched": null,
-   "issues": [
-    "检索服务暂不可用，未能完成核验"
-   ]
+   "status": "verified",
+   "matched": {
+    "source": "arxiv",
+    "title": "Neural Machine Translation by Jointly Learning to Align and Translate",
+    "authors": [
+     "Dzmitry Bahdanau",
+     "Kyunghyun Cho",
+     "Yoshua Bengio"
+    ],
+    "year": 2014,
+    "venue": "arXiv",
+    "doi": null,
+    "url": "http://arxiv.org/abs/1409.0473v7",
+    "abstract": "Neural machine translation is a recently proposed approach to machine translation. Unlike the traditional statistical machine translation, the neural machine translation aims at building a single neural network that can be jointly tuned to maximize the translation performance. The models proposed recently for neural machine translation often belong to a family of encoder-decoders and consists of an encoder that encodes a source sentence into a fixed-length vector from which a decoder generates a translation. In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder-decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. With this new approach, we achieve a translation performance comparable to the existing state-of-the-art phrase-based system on the task of English-to-French translation. Furthermore, qualitative analysis reveals that the (soft-)alignments found by the model agree well with our intuition.",
+    "pdf_url": "https://arxiv.org/pdf/1409.0473",
+    "arxiv_id": "1409.0473",
+    "alt_year": 2014
+   },
+   "issues": []
   },
   {
    "ref_id": "r14",
@@ -1450,10 +1555,10 @@
    "ref_id": "r1",
    "label": "supported",
    "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.",
-   "source_kind": "abstract",
-   "rationale": "原文片段介绍了Transformer架构并展示了其在机器翻译任务中超越现有最佳模型的性能，这直接支持了该架构重塑自然语言处理领域的论断。",
+   "source_kind": "fulltext",
+   "rationale": "原文片段明确提出了Transformer架构，并指出其在机器翻译任务中优于现有模型且训练效率更高，这直接支持了Transformer重塑自然语言处理（特别是序列转导任务）的论断。",
    "source_title": "Attention Is All You Need",
-   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data. arXiv:1706.03762v7 [cs. CL] 2 Aug 2023 1 Introduction Recurrent neural networks, long short-term memory [13] and gated recurrent [7] neural networks in particular, have been firmly established as state of the art approaches in sequence modeling and transduction problems such as language modeling and machine translation [ 35, 2, 5]. Numerous efforts have since continued to push the boundaries of recurrent language models and encoder-decoder architectures [38, 24, 15]. CL] 2 Aug 2023 1 Introduction Recurrent neural networks, long short-term memory [13] and gated recurrent [7] neural networks in particular, have been firmly established as state of the art approaches in sequence modeling and transduction problems such as language modeling and machine translation [ 35, 2, 5]. Numerous efforts have since continued to push the boundaries of recurrent language models and encoder-decoder architectures [38, 24, 15]. Recurrent models typically factor computation along the symbol positions of the input and output sequences. Numerous efforts have since continued to push the boundaries of recurrent language models and encoder-decoder architectures [38, 24, 15]. Recurrent models typically factor computation along the symbol positions of the input and output sequences. Aligning the positions to steps in computation time, they generate a sequence of hidden s",
    "evidence_span": [
     239,
     562
@@ -1463,11 +1568,11 @@
    "claim_id": "c0",
    "ref_id": "r3",
    "label": "undetermined",
-   "evidence": null,
-   "source_kind": "abstract",
-   "rationale": "证据未能在原文中定位",
+   "evidence": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献片段主要讨论预训练语言模型（GPT-3）的少样本学习性能提升，并未提及Transformer架构重塑自然语言处理这一论断。",
    "source_title": "Language Models are Few-Shot Learners",
-   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general. . 39 7 Related Work 39 8 Conclusion 40 A Details of Common Crawl Filtering 43 B Details of Model Training 43 C Details of Test Set Contamination Studies 43 D Total Compute Used to Train Language Models 46 E Human Quality Assessment of Synthetic News Articles 46 F Additional Samples from GPT-3 48 G Details of Task Phrasing and Speciﬁcations 50 H Results on All Tasks for All Model Sizes 63 2 1 Introduction Recent years have featured a trend towards pre-trained language representations in NLP systems, applied in increasingly ﬂexible and task-agnostic ways for downstream transfer. First, single-layer representations were learned using word vectors [MCCD13, PSM14] and fed to task-speciﬁc architectures, the",
    "evidence_span": null
   },
   {
@@ -1503,10 +1608,10 @@
    "ref_id": "r4",
    "label": "undetermined",
    "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "source_kind": "fulltext",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "source_excerpt": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline. We endow pre-trained, parametric-memory generation models with a non-parametric memory through a general-purpose ﬁne-tuning approach which we refer to as retrieval-augmented generation (RAG). We build RAG models where the parametric memory is a pre-trained seq2seq transformer, and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We combine these components in a probabilistic model trained end-to-end (Fig. 1). Pretrained models with a differentiable access mechanism to explicit non-parametric memory have so far been only investigated for extractive downstream tasks. We explore a general-purpose ﬁne-tuning recipe for retrieval-augmented generation (RAG) — models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory",
    "evidence_span": null
   },
   {
@@ -1515,9 +1620,9 @@
    "label": "partial",
    "evidence": "In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework.",
    "source_kind": "fulltext",
-   "rationale": "被引文献提出了密集检索（DPR）方法并证明其可用于开放域问答的上下文选择，支持了论断中关于“dense retrieval”的部分，但原文片段未涉及“ground responses in external evidence”的具体表述，也未提及“hallucination remains a central concern”。",
+   "rationale": "被引文献片段仅支持论断中关于“dense retrieval”的部分，未涉及检索增强生成（RAG）将回答基于外部证据以及幻觉问题。",
    "source_title": "Dense Passage Retrieval for Open-Domain Question Answering",
-   "source_excerpt": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks. Retrieval-augmented generation for knowledge-intensive NLP tasks. In Advances in Neural Information Processing Systems (NeurIPS). 6779 Yankai Lin, Haozhe Ji, Zhiyuan Liu, and Maosong Sun. Table 1 shows the number of questions in training/dev/test sets for all the datasets and the actual questions used for training the retriever. 5 Experiments: Passage Retrieval In this section, we evaluate the retrieval performance of our Dense Passage Retriever (DPR), along with analysis on how its output differs from 6We use the unﬁltered TriviaQA version and discard the noisy evidence documents mined from Bing. 7The improvement of using gold contexts over passages that contain answers is small. 7 We discard the questions when the matching is failed due to different Wikipedia versions or pre-processing. Table 1 shows the number of questions in training/dev/test sets for all the datasets and the actual questions used for training the retriever. 5 Experiments: Passage Retrieval In this section, we evaluate the retrieval performance of our Dense Passage Retriever (DPR), along with analysis on how its output differs from 6We use the unﬁltered TriviaQA version and discard the noisy evidence documents mined from Bing. 8 Conclusion In this work, we demonstrated that dense retrieval can outperform and potentially replace the traditional sparse retrieval component in open-domain question answering. While a simple dual-encoder approach can be made to work surprisingly well, we showed that there are some critical ingredients to training a dense retriever successfully. Moreover, our empirical analysis and ablation studies indicate that more complex model frameworks or similarity functions do not necessarily provide additional values. REALM: Retrieval-augmented language model pre-training. A",
+   "source_excerpt": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks. 8 Conclusion In this work, we demonstrated that dense retrieval can outperform and potentially replace the traditional sparse retrieval component in open-domain question answering. While a simple dual-encoder approach can be made to work surprisingly well, we showed that there are some critical ingredients to training a dense retriever successfully. Moreover, our empirical analysis and ablation studies indicate that more complex model frameworks or similarity functions do not necessarily provide additional values. ”A term-based system would have difﬁculty retrieving such a context, while a dense retrieval system would be able to better match “bad guy” with “villain” and fetch the correct context. Dense encodings are also learnable by adjusting the embedding functions, which provides additional ﬂexibility to have a task-speciﬁc representation. With special in-memory data structures and indexing schemes, retrieval can be done efﬁciently using maximum inner product search (MIPS) algorithms (e.g., Shrivastava and Li (2014); Table 1 shows the number of questions in training/dev/test sets for all the datasets and the actual questions used for training the retriever. 5 Experiments: Passage Retrieval In this section, we evaluate the retrieval performance of our Dense Passage Retriever (DPR), along with analysis on how its output differs from 6We use the unﬁltered TriviaQA version and discard the noisy evidence documents mined from Bing. 7The improvement of using gold contexts over passages that contain answers is small. 7 We discard the questions when the matching is failed due to different Wikipedia versions or pre-processing. Table 1 shows the number of questions in training/dev/test sets for all the datasets and the actual questions used for training the retriever. 5 E",
    "evidence_span": [
     194,
     407
@@ -1526,13 +1631,16 @@
   {
    "claim_id": "c4",
    "ref_id": "r8",
-   "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
-   "evidence_span": null
+   "label": "supported",
+   "evidence": "The Recurrent Neural Network (RNN) [31, 28] is a natural gene ralization of feedforward neural networks to sequences.",
+   "source_kind": "fulltext",
+   "rationale": "原文片段明确指出循环神经网络（RNN）是处理序列的自然推广，且该论文本身使用LSTM（一种RNN变体）进行序列学习，支持了早期序列模型依赖循环网络这一论断。",
+   "source_title": "Sequence to Sequence Learning with Neural Networks",
+   "source_excerpt": "Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks. Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences. In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure. Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector of a fixed dimensionality, and then another deep LSTM to decode the target sequence from the vector. Our main result is that on an English to French translation task from the WMT'14 dataset, the translations produced by the LSTM achieve a BLEU score of 34.8 on the entire test set, where the LSTM's BLEU score was penalized on out-of-vocabulary words. Additionally, the LSTM did not have difficulty on long sentences. For comparison, a phrase-based SMT system achieves a BLEU score of 33.3 on the same dataset. When we used the LSTM to rerank the 1000 hypotheses produced by the aforementioned SMT system, its BLEU score increases to 36.5, which is close to the previous best result on this task. The LSTM also learned sensible phrase and sentence representations that are sensitive to word order and are relatively invariant to the active and the passive voice. Finally, we found that reversing the order of the words in all source sentences (but not target sentences) improved the LSTM's performance markedly, because doing so introduced many short term dependencies between the source and the target sentence which made the optimization problem easier. 2 The model The Recurrent Neural Network (RNN) [31, 28] is a natural gene ralization of feedforward neural networks to sequences. Given a sequence of inputs (x1, . . [18] N. Kalchbrenner and P. Blunsom. Recurrent continuous t ranslation models. In EMNLP, 2013. arXiv:1409.3215v3 [cs. CL] 14 Dec 2014 Sequence to Sequence Learning with Neural Networks Ilya Sutskever Google ilyasu@google.com Oriol Vinyals Google vinyals@google.com Quoc V . Le Google qvl@google.com Abstract Deep Neural Networks (DNNs) are powerful models that have ac hieved excellent performance on difﬁcult learning tasks. [25] R. Pascanu, T. Mikolov, and Y . Bengio. On the difﬁculty o f training recurrent neural networks. CL] 14 Dec 2014 Sequence to Sequence Learning with Neural Networks Ilya Sutskever Google ilyasu@google.com Oriol Vinyals Google vinyals@google.com Quoc V . Le Google qvl@g",
+   "evidence_span": [
+    1647,
+    1764
+   ]
   },
   {
    "claim_id": "c5",
@@ -1551,23 +1659,26 @@
   {
    "claim_id": "c6",
    "ref_id": "r1",
-   "label": "undetermined",
-   "evidence": null,
-   "source_kind": "abstract",
-   "rationale": "证据未能在原文中定位",
+   "label": "supported",
+   "evidence": "Attention mechanisms have become an integral part of compelling sequence modeling and transduction models in various tasks, allowing modeling of dependencies without regard to their distance in the input or output sequences [2, 19].",
+   "source_kind": "fulltext",
+   "rationale": "原文指出注意力机制允许建模输入输出序列中不考虑距离的依赖关系，这直接支持了论断中关于其改善对齐（alignment）的说法。",
    "source_title": "Attention Is All You Need",
-   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
-   "evidence_span": null
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data. The fundamental constraint of sequential computation, however, remains. Attention mechanisms have become an integral part of compelling sequence modeling and transduction models in various tasks, allowing modeling of dependencies without regard to their distance in the input or output sequences [2, 19]. In all but a few cases [27], however, such attention mechanisms are used in conjunction with a recurrent network. Attention mechanisms have become an integral part of compelling sequence modeling and transduction models in various tasks, allowing modeling of dependencies without regard to their distance in the input or output sequences [2, 19]. In all but a few cases [27], however, such attention mechanisms are used in conjunction with a recurrent network. In this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output. This allows every position in the decoder to attend over all positions in the input sequence. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models such as [38, 2, 9]. • The encoder contains self-attention layers. This mimics the typical encoder-decoder attention mechanisms in sequence-to-sequence models such as [38, 2, 9]. • The encoder contains self-attention lay",
+   "evidence_span": [
+    1209,
+    1441
+   ]
   },
   {
    "claim_id": "c6",
    "ref_id": "r13",
    "label": "undetermined",
    "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "source_kind": "fulltext",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Neural Machine Translation by Jointly Learning to Align and Translate",
+   "source_excerpt": "Neural machine translation is a recently proposed approach to machine translation. Unlike the traditional statistical machine translation, the neural machine translation aims at building a single neural network that can be jointly tuned to maximize the translation performance. The models proposed recently for neural machine translation often belong to a family of encoder-decoders and consists of an encoder that encodes a source sentence into a fixed-length vector from which a decoder generates a translation. In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder-decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. With this new approach, we achieve a translation performance comparable to the existing state-of-the-art phrase-based system on the task of English-to-French translation. Furthermore, qualitative analysis reveals that the (soft-)alignments found by the model agree well with our intuition. Intuitively, this implements a mechanism of attention in the decoder. The decoder decides parts of the source sentence to pay attention to. By letting the decoder have an attention mechanism, we relieve the encoder from the burden of having to encode all information in the source sentence into a ﬁxedlength vector. The probability αij, or its associated energy eij, reﬂects the importance of the annotation hj with respect to the previous hidden statesi−1 in deciding the next statesi and generatingyi. Intuitively, this implements a mechanism of attention in the decoder. The decoder decides parts of the source sentence to pay attention to. The decoder decides parts of the source sentence to pay attention to. By letting the decoder have an attention mechanism, we relieve the encoder from the burden of having to encode all information in the source sentence into a ﬁxedlength vector. With this new approach the information can be spread throughout the sequence of annotations, which can be selectively retrieved by the decoder accordingly. We show this allows a model to cope better with long sentences. In this paper, we show that the proposed approach of jointly learning to align and translate achieves signiﬁcantly improved translation performance over the basic encoder–decoder approach. The improvement is m",
    "evidence_span": null
   },
   {
@@ -1575,22 +1686,25 @@
    "ref_id": "r7",
    "label": "undetermined",
    "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": "Efficient Estimation of Nepali Word Representations in Vector Space",
-   "source_excerpt": null,
+   "source_kind": "fulltext",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Efficient Estimation of Word Representations in Vector Space",
+   "source_excerpt": "We propose two novel model architectures for computing continuous vector representations of words from very large data sets. The quality of these representations is measured in a word similarity task, and the results are compared to the previously best performing techniques based on different types of neural networks. We observe large improvements in accuracy at much lower computational cost, i.e. it takes less than a day to learn high quality word vectors from a 1.6 billion words data set. Furthermore, we show that these vectors provide state-of-the-art performance on our test set for measuring syntactic and semantic word similarities. 4The code is available at https://code.google.com/p/word2vec/ 11 [18] T. Mikolov, A. Deoras, D. Povey, L. Burget, J. ˇCernock´y. Strategies for Training Large Scale Neural Network Language Models, In: Proc. Automatic Speech Recognition and Understanding, 2011. Efﬁcient Estimation of Word Representations in Vector Space Tomas Mikolov Google Inc., Mountain View, CA tmikolov@google.com Kai Chen Google Inc., Mountain View, CA kaichen@google.com Greg Corrado Google Inc., Mountain View, CA gcorrado@google.com Jeffrey Dean Google Inc., Mountain View, CA jeff@google.com Abstract We propose two novel model architectures for computing continuous vector representations of words from very large data sets. The quality of these representations is measured in a word similarity task, and the results are compared to the previously best performing techniques based on different types of neural networks. We observe large improvements in accuracy at much lower computational cost, i.e. it takes less than a day to learn high quality word vectors from a 1.6 billion words data set. Ng. Improving Word Representations via Global Context and Multiple Word Prototypes. In: Proc. Improving Word Representations via Global Context and Multiple Word Prototypes. In: Proc. Association for Computational Linguistics, 2012. The quality of these representations is measured in a word similarity task, and the results are compared to the previously best performing techniques based on different types of neural networks. We observe large improvements in accuracy at much lower computational cost, i.e. it takes less than a day to learn high quality word vectors from a 1.6 billion words data set. Furthermore, we show that these vectors provide state-of-the-art performance on our test set for measuring syntactic and semantic word similarities.",
    "evidence_span": null
   },
   {
    "claim_id": "c8",
    "ref_id": "r9",
-   "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
-   "evidence_span": null
+   "label": "supported",
+   "evidence": "We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献明确将Adam定义为一种用于随机目标函数的一阶梯度优化算法，直接支持了论断中关于Adam作为优化工具的描述。",
+   "source_title": "Adam: A Method for Stochastic Optimization",
+   "source_excerpt": "We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Our following theorem holds when the learning rate αt is decaying at a rate of t−1 2 and ﬁrst moment running average coefﬁcientβ1,t decay exponentially withλ, that is typically close to 1, e.g. 1−10−8. Theorem 4.1. Assume that the functionft has bounded gradients,∥∇ft(θ)∥2≤G,∥∇ft(θ)∥∞≤ G∞for allθ∈Rd and distance between anyθt generated by Adam is bounded,∥θn−θm∥2≤D, ∥θm−θn∥∞≤D∞for anym,n∈{1,. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. The effective magnitude of the steps taken in parameter space at each timestep are approximately bounded by the stepsize setting α, i.e.,|∆ t|⪅ α. This can be understood as establishing a trust region around the current parameter value, beyond which the current gradient estimate does not provide sufﬁcient information.",
+   "evidence_span": [
+    0,
+    162
+   ]
   },
   {
    "claim_id": "c9",
@@ -1622,10 +1736,10 @@
    "ref_id": "r4",
    "label": "undetermined",
    "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "source_kind": "fulltext",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "source_excerpt": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline. We follow best practice and use pairwise comparative evaluation [34]. Evaluators are shown an answer and two generated questions, one from BART and one from RAG. They are then asked to pick one of four options—quuestion A is better, question B is better, both are good, or neither is good. We also perform two human evaluations, one to assess generation factuality, and one for speciﬁcity. We deﬁne factuality as whether a statement can be corroborated by trusted external sources, and speciﬁcity as high mutual dependence between the input and output [33]. We follow best practice and use pairwise comparative evaluation [34]. We deﬁne factuality as whether a statement can be corroborated by trusted external sources, and speciﬁcity as high mutual dependence between the input and output [33]. We follow best practice and use pairwise comparative evaluation [34]. Eva",
    "evidence_span": null
   },
   {
@@ -1657,11 +1771,11 @@
    "claim_id": "c10",
    "ref_id": "r9",
    "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "evidence": "We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献原文片段仅介绍了Adam优化算法的原理与特性，未涉及对微调实践（fine-tuning practice）的总结。",
+   "source_title": "Adam: A Method for Stochastic Optimization",
+   "source_excerpt": "We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. The method is straightforward to implement, is computationally efﬁcient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Unlike most fully connected neural nets, weight sharing in CNNs results in vastly different gradients in different layers. A smaller learning rate for the convolution layers is often used in practice when applying SGD. We show the effectiveness of Adam in deep CNNs. Emp",
    "evidence_span": null
   },
   {
@@ -1683,10 +1797,10 @@
    "ref_id": "r11",
    "label": "undetermined",
    "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "source_kind": "fulltext",
+   "rationale": "证据未能在原文中定位",
+   "source_title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+   "source_excerpt": "Transfer learning, where a model is first pre-trained on a data-rich task before being fine-tuned on a downstream task, has emerged as a powerful technique in natural language processing (NLP). The effectiveness of transfer learning has given rise to a diversity of approaches, methodology, and practice. In this paper, we explore the landscape of transfer learning techniques for NLP by introducing a unified framework that converts all text-based language problems into a text-to-text format. Our systematic study compares pre-training objectives, architectures, unlabeled data sets, transfer approaches, and other factors on dozens of language understanding tasks. By combining the insights from our exploration with scale and our new ``Colossal Clean Crawled Corpus'', we achieve state-of-the-art results on many benchmarks covering summarization, question answering, text classification, and more. To facilitate future work on transfer learning for NLP, we release our data set, pre-trained models, and code. The effectiveness of transfer learning has given rise to a diversity of approaches, methodology, and practice. In this paper, we explore the landscape of transfer learning techniques for NLP by introducing a unified framework that converts all text-based language problems into a text-to-text format. Our systematic study compares pre-training objectives, architectures, unlabeled data sets, transfer approaches, and other factors on dozens of language understanding tasks. For comparison, we also include results for our baseline (pre-train then fine-tune) and for standard multi-task learning (without fine-tuning) on an examples-proportional mixture withK = 2 19. We find that fine-tuning after multi-task pre-training results in comparable performance to our baseline. This suggests that using fine-tuning after multi-task learning can help mitigate some of the trade-offs between different mixing rates described in Section 3.5.2. In all of these variants, we follow our standard procedure of pre-training for219 steps before fine-tuning for218 steps. We compare the results of these approaches in Table 12. For comparison, we also include results for our baseline (pre-train then fine-tune) and for standard multi-task learning (without fine-tuning) on an examples-proportional mixture withK = 2 19. We note that Howard and Ruder (2018) suggested fine-tuning an additional layer after each epoch of training. However, since our supervised data sets vary so much in size and since ",
    "evidence_span": null
   },
   {
@@ -1694,10 +1808,10 @@
    "ref_id": "r1",
    "label": "supported",
    "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
-   "source_kind": "abstract",
-   "rationale": "被引文献明确提出了Transformer架构，论断声称基于该架构构建，因此原文支持存在该基础组件的事实。",
+   "source_kind": "fulltext",
+   "rationale": "被引文献明确提出了Transformer架构，论断声称基于该架构构建，引用关系成立且内容支持。",
    "source_title": "Attention Is All You Need",
-   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data. In contrast to RNN sequence-to-sequence models [37], the Transformer outperforms the BerkeleyParser [29] even when training only on the WSJ training set of 40K sentences. 7 Conclusion In this work, we presented the Transformer, the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention. For translation tasks, the Transformer can be trained significantly faster than architectures based on recurrent or convolutional layers. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. To the best of our knowledge, however, the Transformer is the first transduction model relying entirely on self-attention to compute representations of its input and output without using sequencealigned RNNs or convolution. In the following sections, we will describe the Transformer, motivate self-attention and discuss its advantages over models such as [17, 18] and [9]. 3 Model Architectur",
    "evidence_span": [
     239,
     393
@@ -1745,23 +1859,26 @@
   {
    "claim_id": "c15",
    "ref_id": "r3",
-   "label": "undetermined",
+   "label": "unsupported",
    "evidence": "For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model.",
-   "source_kind": "abstract",
-   "rationale": "被引文献片段明确指出GPT-3不使用任何微调，且未提及残差连接和dropout，因此无法支持论断中关于使用残差连接和dropout进行微调的说法。",
+   "source_kind": "fulltext",
+   "rationale": "被引文献明确指出GPT-3在所有任务中均不进行任何梯度更新或微调，因此不支持论断中关于使用残差连接和dropout进行微调的说法。",
    "source_title": "Language Models are Few-Shot Learners",
-   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
-   "evidence_span": null
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general. Aditya Ramesh experimented with loss scaling strategies for pretraining. Melanie Subbiah and Arvind Neelakantan implemented, experimented with, and tested beam search. Pranav Shyam worked on SuperGLUE and assisted with connections to few-shot learning and meta-learning literature. Melanie Subbiah and Arvind Neelakantan implemented, experimented with, and tested beam search. Pranav Shyam worked on SuperGLUE and assisted with connections to few-shot learning and meta-learning literature. Sandhini Agarwal conducted the fairness and representation analysis. Pranav Shyam worked on SuperGLUE and assisted with connections to few-shot learning and meta-learning literature. Sandhini Agarwal conducted the fairn",
+   "evidence_span": [
+    892,
+    1061
+   ]
   },
   {
    "claim_id": "c15",
    "ref_id": "r4",
    "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "evidence": "We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献原文片段仅讨论了检索增强生成（RAG）模型的微调方法，未提及残差连接（residual connections）和dropout，无法支持该论断。",
+   "source_title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "source_excerpt": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline. We combine a pre-trained retriever (Query Encoder + Document Index) with a pre-trained seq2seq model (Generator) and ﬁne-tune end-to-end. For queryx, we use Maximum Inner Product Search (MIPS) to ﬁnd the top-K documentszi. For ﬁnal predictiony, we treatz as a latent variable and marginalize over seq2seq predictions given different documents. We ﬁnd that the top retrieved document is from a gold article in 71% of cases, and a gold article is present in the top 10 retrieved articles in 90% of cases. 4.5 Additional Results Generation Diversity Section 4.3 shows that RAG models are more factual and speciﬁc than BART for Jeopardy question generation. Following recent work on diversity-promoting decoding [33, 59, 39], we also investigate generation diversity by calculating the ratio of distinct ngrams to total ngrams generated by different models. We use the spli",
    "evidence_span": null
   },
   {
@@ -1780,35 +1897,38 @@
    "ref_id": "r1",
    "label": "undetermined",
    "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
-   "source_kind": "abstract",
-   "rationale": "被引文献原文片段仅介绍了Transformer架构及其在机器翻译等任务上的表现，未涉及将检索与生成结合在一个阶段的论断。",
+   "source_kind": "fulltext",
+   "rationale": "被引文献原文片段仅介绍了Transformer架构及其注意力机制，未涉及将检索（retrieval）与生成（generation）结合在一个阶段中的内容。",
    "source_title": "Attention Is All You Need",
-   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data. Due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality. 3.2.3 Applications of Attention in our Model The Transformer uses multi-head attention in three different ways: • In \"encoder-decoder attention\" layers, the queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. This allows every position in the decoder to attend over all positions in the input sequence. For each of these we use dk = dv = dmodel/h = 64. Due to the reduced dimension of each head, the total computational cost is similar to that of single-head attention with full dimensionality. 3.2.3 Applications of Attention in our Model The Transformer uses multi-head attention in three different ways: • In \"encoder-decoder attention\" layers, the queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder. Making generation less sequential is another research goals of ours. The code we used to train and evaluate our models is available at https://github.com/ tensorflow/tensor2tensor. Acknowledgements We are grateful to Nal Kalchbrenner and Stephan Gouws for their fruitful comments, corrections and inspiration. In this work we employ h = 8 parallel attention layers, or heads. For each of these",
    "evidence_span": null
   },
   {
    "claim_id": "c16",
    "ref_id": "r4",
-   "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
-   "evidence_span": null
+   "label": "supported",
+   "evidence": "We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation.",
+   "source_kind": "fulltext",
+   "rationale": "原文指出RAG模型将预训练的参数化记忆（生成）和非参数化记忆（检索）结合用于语言生成，这支持了论断中关于流水线在一个阶段内结合检索和生成的说法。",
+   "source_title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "source_excerpt": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline. RAG combines the generation ﬂexibility of the “closed-book” (parametric only) approaches and the performance of \"open-book\" retrieval-based approaches. Unlike REALM and T5+SSM, RAG enjoys strong results without expensive, specialized “salient span masking” pre-training [ 20]. It is worth noting that RAG’s retriever is initialized using DPR’s retriever, which uses retrieval supervision on Natural Questions and TriviaQA. On all four open-domain QA tasks, RAG sets a new state of the art (only on the T5-comparable split for TQA). RAG combines the generation ﬂexibility of the “closed-book” (parametric only) approaches and the performance of \"open-book\" retrieval-based approaches. Unlike REALM and T5+SSM, RAG enjoys strong results without expensive, specialized “salient span masking” pre-training [ 20]. 4 Results 4.1 Open-domain Question Answering Table 1 shows r",
+   "evidence_span": [
+    671,
+    857
+   ]
   },
   {
    "claim_id": "c16",
    "ref_id": "r16",
-   "label": "partial",
+   "label": "unsupported",
    "evidence": "In terms of the end-to-end QA results, our joint-training scheme does not provide better results compared to the usual retriever/reader training pipeline, resulting in the same 39.8 exact match score on NQ dev as in our regular reader model training.",
    "source_kind": "fulltext",
-   "rationale": "原文片段提到了'usual retriever/reader training pipeline'（即检索与生成的流水线），但明确指出其联合训练方案并未优于该常规流水线，仅部分涉及论断中关于将检索与生成结合在一个阶段的描述。",
+   "rationale": "原文明确指出联合训练（即单阶段结合检索与生成）并未优于传统的检索器/阅读器分阶段流水线，这与论断中声称全流水线将两者合为一阶段的说法相矛盾。",
    "source_title": "Dense Passage Retrieval for Open-Domain Question Answering",
-   "source_excerpt": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks. Retrieval-augmented generation for knowledge-intensive NLP tasks. In Advances in Neural Information Processing Systems (NeurIPS). 6779 Yankai Lin, Haozhe Ji, Zhiyuan Liu, and Maosong Sun. . . P˚al Sverre Valheim Hagen (born 6 November 1980) is a Norwegian stage and screen actor. During training, we sample one positive and ˜m− 1 negative passages from the top 100 passages returned by the retrieval system (BM25 or DPR) for each question. ˜m is a hyper-parameter and we use ˜m = 24 in all the experiments. The training objective is to maximize the marginal log-likelihood of all the correct answer spans in the positive passage (the answer string may appear multiple times in one passage), combined with the log-likelihood of the positive passage being selected. See text for more details. traditional retrieval methods, the effects of different training schemes and the run-time efﬁciency. The DPR model used in our main experiments is trained using the in-batch negative setting (Section 3.2) with a batch size of128 and one additional BM25 negative passage per question. In terms of the end-to-end QA results, our joint-training scheme does not provide better results compared to the usual retriever/reader training pipeline, resulting in the same 39.8 exact match score on NQ dev as in our regular reader model training.",
+   "source_excerpt": "Open-domain question answering relies on efficient passage retrieval to select candidate contexts, where traditional sparse vector space models, such as TF-IDF or BM25, are the de facto method. In this work, we show that retrieval can be practically implemented using dense representations alone, where embeddings are learned from a small number of questions and passages by a simple dual-encoder framework. When evaluated on a wide range of open-domain QA datasets, our dense retriever outperforms a strong Lucene-BM25 system largely by 9%-19% absolute in terms of top-20 passage retrieval accuracy, and helps our end-to-end QA system establish new state-of-the-art on multiple open-domain QA benchmarks. . . P˚al Sverre Valheim Hagen (born 6 November 1980) is a Norwegian stage and screen actor. During training, we sample one positive and ˜m− 1 negative passages from the top 100 passages returned by the retrieval system (BM25 or DPR) for each question. ˜m is a hyper-parameter and we use ˜m = 24 in all the experiments. The training objective is to maximize the marginal log-likelihood of all the correct answer spans in the positive passage (the answer string may appear multiple times in one passage), combined with the log-likelihood of the positive passage being selected. In terms of the end-to-end QA results, our joint-training scheme does not provide better results compared to the usual retriever/reader training pipeline, resulting in the same 39.8 exact match score on NQ dev as in our regular reader model training. See text for more details. traditional retrieval methods, the effects of different training schemes and the run-time efﬁciency. The DPR model used in our main experiments is trained using the in-batch negative setting (Section 3.2) with a batch size of128 and one additional BM25 negative passage per question. The additional pretraining tasks are likely more useful only when the target training sets are small. Although the results of DPR on WQ and TREC in the single-dataset setting are less competitive, adding more question–answer pairs helps boost the performance, achieving the new state of the art. To compare our pipeline training approach with joint learning, we run an ablation on Natural Questions where the retriever and reader are jointly trained, following Lee et al. (2019).",
    "evidence_span": [
-    1781,
-    2031
+    1282,
+    1532
    ]
   },
   {
@@ -1826,11 +1946,11 @@
    "claim_id": "c17",
    "ref_id": "r4",
    "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "evidence": "We ﬁne-tune and evaluate our models on a wide range of knowledgeintensive NLP tasks and set the state of the art on three open domain QA tasks, outperforming parametric seq2seq models and task-speciﬁc retrieve-and-extract architectures.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献原文片段描述的是该文献自身在三个开放域问答任务上取得最优结果，并未涉及当前论文作者所评估的三个基准测试，无法支持该论断。",
+   "source_title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "source_excerpt": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, and another which can use different passages per token. We ﬁne-tune and evaluate our models on a wide range of knowledgeintensive NLP tasks and set the state of the art on three open domain QA tasks, outperforming parametric seq2seq models and task-speciﬁc retrieve-and-extract architectures. For language generation tasks, we ﬁnd that RAG models generate more speciﬁc, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline. We ﬁne-tune and evaluate our models on a wide range of knowledgeintensive NLP tasks and set the state of the art on three open domain QA tasks, outperforming parametric seq2seq models and task-speciﬁc retrieve-and-extract architectures. For language generation tasks, we ﬁnd that RAG models",
    "evidence_span": null
   },
   {
@@ -1859,11 +1979,11 @@
    "claim_id": "c17",
    "ref_id": "r9",
    "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "evidence": "",
+   "source_kind": "fulltext",
+   "rationale": "被引文献片段主要介绍Adam算法及其在MNIST数据集上的实验，未提及论断中关于“三个基准测试（three benchmarks）”的具体评估设置或数量。",
+   "source_title": "Adam: A Method for Stochastic Optimization",
+   "source_excerpt": "We introduce Adam, an algorithm for first-order gradient-based optimization of stochastic objective functions, based on adaptive estimates of lower-order moments. The method is straightforward to implement, is computationally efficient, has little memory requirements, is invariant to diagonal rescaling of the gradients, and is well suited for problems that are large in terms of data and/or parameters. The method is also appropriate for non-stationary objectives and problems with very noisy and/or sparse gradients. The hyper-parameters have intuitive interpretations and typically require little tuning. Some connections to related algorithms, on which Adam was inspired, are discussed. We also analyze the theoretical convergence properties of the algorithm and provide a regret bound on the convergence rate that is comparable to the best known results under the online convex optimization framework. Empirical results demonstrate that Adam works well in practice and compares favorably to other stochastic optimization methods. Finally, we discuss AdaMax, a variant of Adam based on the infinity norm. ,fT (θ). At each time t, our goal is to predict the parameter θt and evaluate it on a previously unknown cost function ft. Since the nature of the sequence is unknown in advance, we evaluate our algorithm using the regret, that is the sum of all the previous difference between the online prediction ft(θt) and the best ﬁxed point parameterft(θ∗) from a feasible setX for all the previous steps. . ,fT (θ). At each time t, our goal is to predict the parameter θt and evaluate it on a previously unknown cost function ft. We use the same parameter initialization when comparing different optimization algorithms. The hyper-parameters, such as learning rate and momentum, are searched over a dense grid and the results are reported using the best hyper-parameter setting. 6.1 E XPERIMENT : L OGISTIC REGRESSION We evaluate our proposed method on L2-regularized multi-class logistic regression using the MNIST dataset. At each time t, our goal is to predict the parameter θt and evaluate it on a previously unknown cost function ft. Since the nature of the sequence is unknown in advance, we evaluate our algorithm using the regret, that is the sum of all the previous difference between the online prediction ft(θt) and the best ﬁxed point parameterft(θ∗) from a feasible setX for all the previous steps. Concretely, the regret is deﬁned as: R(T ) = T∑ t=1 [ft(θt)−ft(θ∗)] (5) whereθ∗= arg mi",
    "evidence_span": null
   },
   {
@@ -1880,13 +2000,16 @@
   {
    "claim_id": "c18",
    "ref_id": "r11",
-   "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
-   "evidence_span": null
+   "label": "supported",
+   "evidence": "As such, we study downstream performance on a diverse set of benchmarks, including machine translation, question answering, abstractive summarization, and text classification.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献（T5论文）明确描述了其在多个基准测试（如GLUE、SuperGLUE等）上使用标准指标进行评估的方法，这与论断中提到的“使用标准指标在三个基准上评估”这一通用做法相符，支持了该引用作为方法论依据的合理性。",
+   "source_title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+   "source_excerpt": "Transfer learning, where a model is first pre-trained on a data-rich task before being fine-tuned on a downstream task, has emerged as a powerful technique in natural language processing (NLP). The effectiveness of transfer learning has given rise to a diversity of approaches, methodology, and practice. In this paper, we explore the landscape of transfer learning techniques for NLP by introducing a unified framework that converts all text-based language problems into a text-to-text format. Our systematic study compares pre-training objectives, architectures, unlabeled data sets, transfer approaches, and other factors on dozens of language understanding tasks. By combining the insights from our exploration with scale and our new ``Colossal Clean Crawled Corpus'', we achieve state-of-the-art results on many benchmarks covering summarization, question answering, text classification, and more. To facilitate future work on transfer learning for NLP, we release our data set, pre-trained models, and code. As such, we study downstream performance on a diverse set of benchmarks, including machine translation, question answering, abstractive summarization, and text classification. Specifically, we measure performance on the GLUE and SuperGLUE text classification meta-benchmarks; CNN/Daily Mail abstractive summarization; We include an additional experiment where we train our baseline model with a4×larger batch size to compare these two cases. It is common practice on many of the benchmarks we consider to eke out additional performance by training and evaluating using an ensemble of models. This provides an orthogonal way of using additional computation. We pre-train a standard Transformer (described in Section 2.1) using a simple denoising objective and then separately fine-tune on each of our downstream tasks. We describe the details of this experimental setup in the following subsections. 3.1.1 Model For our model, we use a standard encoder-decoder Transformer as proposed by Vaswani et al. (2017). We provide examples of the inputs and targets for these three methods in the first three rows of Table 3. The performance of these three objectives is shown in Table 4. Overall, we find that the BERT-style objective performs best, though the prefix language modeling objective attains similar performance on the translation tasks. It is common practice on many of the benchmarks we consider to eke out additional performance by training and evaluating using an ensemble of mod",
+   "evidence_span": [
+    1014,
+    1189
+   ]
   },
   {
    "claim_id": "c19",
@@ -1905,13 +2028,16 @@
   {
    "claim_id": "c20",
    "ref_id": "r8",
-   "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
-   "evidence_span": null
+   "label": "supported",
+   "evidence": "other researchers reported poor performance on long sen tences with a model similar to ours [5, 2, 26].",
+   "source_kind": "fulltext",
+   "rationale": "原文片段中明确出现了“reported”一词，且语境为引用其他研究者的报告结果，与论断中的关键词完全匹配。",
+   "source_title": "Sequence to Sequence Learning with Neural Networks",
+   "source_excerpt": "Deep Neural Networks (DNNs) are powerful models that have achieved excellent performance on difficult learning tasks. Although DNNs work well whenever large labeled training sets are available, they cannot be used to map sequences to sequences. In this paper, we present a general end-to-end approach to sequence learning that makes minimal assumptions on the sequence structure. Our method uses a multilayered Long Short-Term Memory (LSTM) to map the input sequence to a vector of a fixed dimensionality, and then another deep LSTM to decode the target sequence from the vector. Our main result is that on an English to French translation task from the WMT'14 dataset, the translations produced by the LSTM achieve a BLEU score of 34.8 on the entire test set, where the LSTM's BLEU score was penalized on out-of-vocabulary words. Additionally, the LSTM did not have difficulty on long sentences. For comparison, a phrase-based SMT system achieves a BLEU score of 33.3 on the same dataset. When we used the LSTM to rerank the 1000 hypotheses produced by the aforementioned SMT system, its BLEU score increases to 36.5, which is close to the previous best result on this task. The LSTM also learned sensible phrase and sentence representations that are sensitive to word order and are relatively invariant to the active and the passive voice. Finally, we found that reversing the order of the words in all source sentences (but not target sentences) improved the LSTM's performance markedly, because doing so introduced many short term dependencies between the source and the target sentence which made the optimization problem easier. We were also surprised by the ability of the LSTM to correctly translate very long sentences. We were initially convinced that the LSTM would fail on long sen tences due to its limited memory, and other researchers reported poor performance on long sen tences with a model similar to ours [5, 2, 26]. And yet, LSTMs trained on the reversed dataset had little difﬁculty translating long sentences. 1), we believe that a standard RNN should be easily trainable whe n the source sentences are reversed (although we did not verify it experimentally). We were also surprised by the ability of the LSTM to correctly translate very long sentences. We were initially convinced that the LSTM would fail on long sen tences due to its limited memory, and other researchers reported poor performance on long sen tences with a model similar to ours [5, 2, 26]. We were initially",
+   "evidence_span": [
+    1832,
+    1935
+   ]
   },
   {
    "claim_id": "c21",
@@ -1929,10 +2055,10 @@
    "ref_id": "r3",
    "label": "undetermined",
    "evidence": "",
-   "source_kind": "abstract",
-   "rationale": "被引文献片段主要介绍GPT-3在少样本学习中的性能提升及局限性，未提及与当前研究“发现一致”或“覆盖率不同”的具体对比信息。",
+   "source_kind": "fulltext",
+   "rationale": "被引文献片段主要介绍GPT-3的少样本学习能力和性能，未提及与论断中“coverage differs”（覆盖率差异）相关的对比或发现，无法支持该具体论断。",
    "source_title": "Language Models are Few-Shot Learners",
-   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general. Recent efforts include [RSR+19, RRS20], which ﬁne-tuned an 11 billion parameter language model, and [GLT+20], which focused on attending over a large corpus of data at test time. Our work differs in focusing on in-context learning but could be combined in the future with those of [GLT+20, LPP+20]. Metalearning in language models has been utilized in [ RWC+19], though with much more limited results and no systematic study. Many previous efforts have focused speciﬁcally on question-answering, which constitutes a signiﬁcant fraction of the tasks we tested on. Recent efforts include [RSR+19, RRS20], which ﬁne-tuned an 11 billion parameter language model, and [GLT+20], which focused on attending over a lar",
    "evidence_span": null
   },
   {
@@ -1950,11 +2076,11 @@
    "claim_id": "c23",
    "ref_id": "r1",
    "label": "undetermined",
-   "evidence": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
-   "source_kind": "abstract",
-   "rationale": "被引文献原文片段仅介绍了Transformer架构的提出及其在机器翻译等任务上的表现，并未涉及引用该文献的论文所提出的“compact pipeline”这一论断。",
+   "evidence": "In this work, we presented the Transformer, the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention.",
+   "source_kind": "fulltext",
+   "rationale": "被引文献原文片段介绍的是Transformer架构的提出，并未涉及当前论文作者所提出的“compact pipeline”这一论断。",
    "source_title": "Attention Is All You Need",
-   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "source_excerpt": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data. In contrast to RNN sequence-to-sequence models [37], the Transformer outperforms the BerkeleyParser [29] even when training only on the WSJ training set of 40K sentences. 7 Conclusion In this work, we presented the Transformer, the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention. For translation tasks, the Transformer can be trained significantly faster than architectures based on recurrent or convolutional layers. Our results in Table 4 show that despite the lack of task-specific tuning our model performs surprisingly well, yielding better results than all previously reported models with the exception of the Recurrent Neural Network Grammar [8]. In contrast to RNN sequence-to-sequence models [37], the Transformer outperforms the BerkeleyParser [29] even when training only on the WSJ training set of 40K sentences. 7 Conclusion In this work, we presented the Transformer, the first sequence transduction model based entirely on attention, replacing the recurrent layers most commonly used in encoder-decoder architectures with multi-headed self-attention. We trained a 4-layer transformer with dmodel = 1024 on the Wall Street Journal (WSJ) portion of the Penn Treebank [25], about 40K training sentences. We also trained",
    "evidence_span": null
   },
   {
@@ -1962,10 +2088,10 @@
    "ref_id": "r3",
    "label": "supported",
    "evidence": "Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches.",
-   "source_kind": "abstract",
-   "rationale": "被引文献指出通过扩大模型规模（即构建更大的系统）可以达到与先前最先进方法相竞争的性能，这支持了论断中关于较大系统性能基准的描述。",
+   "source_kind": "fulltext",
+   "rationale": "原文指出GPT-3（大模型）的性能有时能与之前的SOTA微调方法（通常指较小或专用系统）相竞争，这支持了论断中关于性能相当（on par）的描述。",
    "source_title": "Language Models are Few-Shot Learners",
-   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.",
+   "source_excerpt": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general. In general we observe GPT-3 is on par with initial baselines and early results trained using contextual representations on each respective dataset. GPT-3 performs best (within 3 points of the human baseline) on CoQA [RCM19] a free-form conversational dataset and performs worst (13 F1 below an ELMo baseline) on QuAC [CHI+18] a dataset which requires modeling structured dialog acts and answer span selections of teacher-student interactions. On DROP [DWD+19], a dataset testing discrete reasoning and numeracy in the context of reading comprehension, GPT-3 in a few-shot setting outperforms the ﬁne-tuned BERT baseline from the original paper but is still well below both human performance and state-of-the-ar",
    "evidence_span": [
     505,
     695
@@ -1986,11 +2112,11 @@
    "claim_id": "c24",
    "ref_id": "r11",
    "label": "undetermined",
-   "evidence": null,
-   "source_kind": "none",
-   "rationale": "未能获取被引文献原文",
-   "source_title": null,
-   "source_excerpt": null,
+   "evidence": "",
+   "source_kind": "fulltext",
+   "rationale": "被引文献片段主要介绍T5模型自身的预训练目标、数据规模及性能提升策略，并未提及该论文中的“compact pipeline”与“larger systems”进行对比或达到同等性能的具体论断。",
+   "source_title": "Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer",
+   "source_excerpt": "Transfer learning, where a model is first pre-trained on a data-rich task before being fine-tuned on a downstream task, has emerged as a powerful technique in natural language processing (NLP). The effectiveness of transfer learning has given rise to a diversity of approaches, methodology, and practice. In this paper, we explore the landscape of transfer learning techniques for NLP by introducing a unified framework that converts all text-based language problems into a text-to-text format. Our systematic study compares pre-training objectives, architectures, unlabeled data sets, transfer approaches, and other factors on dozens of language understanding tasks. By combining the insights from our exploration with scale and our new ``Colossal Clean Crawled Corpus'', we achieve state-of-the-art results on many benchmarks covering summarization, question answering, text classification, and more. To facilitate future work on transfer learning for NLP, we release our data set, pre-trained models, and code. Overall, we find that the BERT-style objective performs best, though the prefix language modeling objective attains similar performance on the translation tasks. Indeed, the motivation for the BERT objective was to outperform language model-based pre-training. The deshuffling objective performs considerably worse than both prefix language modeling and the BERT-style objective. We first consider a few disparate approaches in Section 3.3.1 and find that a BERT-style denoising objective performs best. Then, we consider various methods for simplifying the BERT objective so that it produces shorter target sequences in Section 3.3.2. Given that replacing dropped-out spans with sentinel tokens performs well and results in short target sequences, in Section 3.3.3 we experiment with different corruption rates. Given that replacing dropped-out spans with sentinel tokens performs well and results in short target sequences, in Section 3.3.3 we experiment with different corruption rates. Finally, we evaluate an objective that intentionally corrupts contiguous spans of tokens in Section 3.3.4. released alongside pre-trained models and code. However, we found that fine-tuning after pre-training on a mixture of tasks produced comparable performance to unsupervised pre-training. Scaling We compared various strategies for taking advantage of additional compute, including training the model on more data, training a larger model, and using an ensemble of models. We found each appro",
    "evidence_span": null
   }
  ],
@@ -2235,7 +2361,7 @@
     "end": 144
    },
    "title": "被引文献只部分支持这条论断",
-   "detail": "依据：被引文献提出了密集检索（DPR）方法并证明其可用于开放域问答的上下文选择，支持了论断中关于“dense retrieval”的部分，但原文片段未涉及“ground responses in external evidence”的具体表述，也未提及“hallucination remains a central concern”。\n建议：检查论断中未被覆盖的部分是否需要另外的文献支撑。",
+   "detail": "依据：被引文献片段仅支持论断中关于“dense retrieval”的部分，未涉及检索增强生成（RAG）将回答基于外部证据以及幻觉问题。\n建议：检查论断中未被覆盖的部分是否需要另外的文献支撑。",
    "refs": [
     "r16"
    ]
@@ -2311,6 +2437,21 @@
   },
   {
    "id": "f8",
+   "layer": "support",
+   "severity": "high",
+   "anchor": {
+    "paragraph_id": "p10",
+    "start": 70,
+    "end": 154
+   },
+   "title": "被引文献不支持这条论断",
+   "detail": "依据：被引文献明确指出GPT-3在所有任务中均不进行任何梯度更新或微调，因此不支持论断中关于使用残差连接和dropout进行微调的说法。\n建议：核对论断与文献内容，考虑删除引用或修改论断。",
+   "refs": [
+    "r3"
+   ]
+  },
+  {
+   "id": "f9",
    "layer": "distribution",
    "severity": "medium",
    "anchor": {
@@ -2323,22 +2464,22 @@
    "refs": []
   },
   {
-   "id": "f9",
+   "id": "f10",
    "layer": "support",
-   "severity": "medium",
+   "severity": "high",
    "anchor": {
     "paragraph_id": "p11",
     "start": 0,
     "end": 74
    },
-   "title": "被引文献只部分支持这条论断",
-   "detail": "依据：原文片段提到了'usual retriever/reader training pipeline'（即检索与生成的流水线），但明确指出其联合训练方案并未优于该常规流水线，仅部分涉及论断中关于将检索与生成结合在一个阶段的描述。\n建议：检查论断中未被覆盖的部分是否需要另外的文献支撑。",
+   "title": "被引文献不支持这条论断",
+   "detail": "依据：原文明确指出联合训练（即单阶段结合检索与生成）并未优于传统的检索器/阅读器分阶段流水线，这与论断中声称全流水线将两者合为一阶段的说法相矛盾。\n建议：核对论断与文献内容，考虑删除引用或修改论断。",
    "refs": [
     "r16"
    ]
   },
   {
-   "id": "f10",
+   "id": "f11",
    "layer": "distribution",
    "severity": "low",
    "anchor": {
@@ -2351,7 +2492,7 @@
    "refs": []
   },
   {
-   "id": "f11",
+   "id": "f12",
    "layer": "distribution",
    "severity": "medium",
    "anchor": {
@@ -2364,172 +2505,22 @@
    "refs": []
   },
   {
-   "id": "f12",
-   "layer": "authenticity",
-   "severity": "medium",
-   "anchor": {
-    "paragraph_id": "p23",
-    "start": 0,
-    "end": 139
-   },
-   "title": "文献信息与数据库记录不一致",
-   "detail": "依据：年份不一致：文中写 2017，数据库记录为 2025。\n建议：核对文献的作者、年份、DOI 等字段。",
-   "refs": [
-    "r1"
-   ]
-  },
-  {
    "id": "f13",
    "layer": "authenticity",
-   "severity": "medium",
+   "severity": "low",
    "anchor": {
-    "paragraph_id": "p25",
+    "paragraph_id": "p32",
     "start": 0,
-    "end": 146
+    "end": 121
    },
-   "title": "文献信息与数据库记录不一致",
-   "detail": "依据：首作者不一致：文中写 Brown TB，数据库记录为 Malakar, Sourav；年份不一致：文中写 2020，数据库记录为 2026。\n建议：核对文献的作者、年份、DOI 等字段。",
+   "title": "暂时无法核验这篇文献",
+   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
    "refs": [
-    "r3"
+    "r10"
    ]
   },
   {
    "id": "f14",
-   "layer": "authenticity",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p26",
-    "start": 0,
-    "end": 174
-   },
-   "title": "暂时无法核验这篇文献",
-   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
-   "refs": [
-    "r4"
-   ]
-  },
-  {
-   "id": "f15",
-   "layer": "support",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p26",
-    "start": 0,
-    "end": 174
-   },
-   "title": "未能获取这篇文献的原文，相关论断无法判断",
-   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
-   "refs": [
-    "r4"
-   ]
-  },
-  {
-   "id": "f16",
-   "layer": "authenticity",
-   "severity": "medium",
-   "anchor": {
-    "paragraph_id": "p29",
-    "start": 0,
-    "end": 141
-   },
-   "title": "文献信息与数据库记录不一致",
-   "detail": "依据：首作者不一致：文中写 Mikolov T，数据库记录为 Bhatta, Janardan；年份不一致：文中写 2013，数据库记录为 2020。\n建议：核对文献的作者、年份、DOI 等字段。",
-   "refs": [
-    "r7"
-   ]
-  },
-  {
-   "id": "f17",
-   "layer": "support",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p29",
-    "start": 0,
-    "end": 141
-   },
-   "title": "未能获取这篇文献的原文，相关论断无法判断",
-   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
-   "refs": [
-    "r7"
-   ]
-  },
-  {
-   "id": "f18",
-   "layer": "authenticity",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p30",
-    "start": 0,
-    "end": 156
-   },
-   "title": "暂时无法核验这篇文献",
-   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
-   "refs": [
-    "r8"
-   ]
-  },
-  {
-   "id": "f19",
-   "layer": "support",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p30",
-    "start": 0,
-    "end": 156
-   },
-   "title": "未能获取这篇文献的原文，相关论断无法判断",
-   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
-   "refs": [
-    "r8"
-   ]
-  },
-  {
-   "id": "f20",
-   "layer": "authenticity",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p31",
-    "start": 0,
-    "end": 124
-   },
-   "title": "暂时无法核验这篇文献",
-   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
-   "refs": [
-    "r9"
-   ]
-  },
-  {
-   "id": "f21",
-   "layer": "support",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p31",
-    "start": 0,
-    "end": 124
-   },
-   "title": "未能获取这篇文献的原文，相关论断无法判断",
-   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
-   "refs": [
-    "r9"
-   ]
-  },
-  {
-   "id": "f22",
-   "layer": "authenticity",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p32",
-    "start": 0,
-    "end": 121
-   },
-   "title": "暂时无法核验这篇文献",
-   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
-   "refs": [
-    "r10"
-   ]
-  },
-  {
-   "id": "f23",
    "layer": "support",
    "severity": "low",
    "anchor": {
@@ -2541,66 +2532,6 @@
    "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
    "refs": [
     "r10"
-   ]
-  },
-  {
-   "id": "f24",
-   "layer": "authenticity",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p33",
-    "start": 0,
-    "end": 183
-   },
-   "title": "暂时无法核验这篇文献",
-   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
-   "refs": [
-    "r11"
-   ]
-  },
-  {
-   "id": "f25",
-   "layer": "support",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p33",
-    "start": 0,
-    "end": 183
-   },
-   "title": "未能获取这篇文献的原文，相关论断无法判断",
-   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
-   "refs": [
-    "r11"
-   ]
-  },
-  {
-   "id": "f26",
-   "layer": "authenticity",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p35",
-    "start": 0,
-    "end": 164
-   },
-   "title": "暂时无法核验这篇文献",
-   "detail": "依据：检索服务暂不可用，未能完成核验。\n建议：稍后重新体检，或人工确认该文献是否真实存在。",
-   "refs": [
-    "r13"
-   ]
-  },
-  {
-   "id": "f27",
-   "layer": "support",
-   "severity": "low",
-   "anchor": {
-    "paragraph_id": "p35",
-    "start": 0,
-    "end": 164
-   },
-   "title": "未能获取这篇文献的原文，相关论断无法判断",
-   "detail": "依据：未找到可用的摘要或开放全文。\n建议：人工核对引用该文献的论断。",
-   "refs": [
-    "r13"
    ]
   }
  ],
@@ -3103,18 +3034,18 @@
  "meta": {
   "llm_calls": {
    "local": 0,
-   "cloud": 93
+   "cloud": 117
   },
   "layers": {
    "authenticity": {
     "status": "done",
     "error": null,
-    "findings": 9
+    "findings": 1
    },
    "support": {
     "status": "done",
     "error": null,
-    "findings": 11
+    "findings": 6
    },
    "distribution": {
     "status": "done",
@@ -3127,15 +3058,19 @@
     "findings": 0
    }
   },
-  "duration_s": 90.2,
+  "duration_s": 302.6,
   "token_usage": {
    "qwen3.8-flash": {
-    "prompt": 5847,
-    "completion": 1274
+    "prompt": 17733,
+    "completion": 2799
    },
    "qwen3.8-max": {
-    "prompt": 2489,
-    "completion": 523
+    "prompt": 6188,
+    "completion": 992
+   },
+   "qwen3.7-max": {
+    "prompt": 685,
+    "completion": 113
    }
   }
  }
