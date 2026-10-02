@@ -235,6 +235,96 @@ def _scan_blocks(body: str) -> tuple[list[Block], dict]:
     return blocks, meta
 
 
+# ------------------------------------------------------------ 预处理
+
+_FILEC_RE = re.compile(
+    r"\\begin\s*\{(filecontents\*?\+?)\}\s*(?:\[[^\]]*\])?\s*\{([^}]*)\}")
+
+
+def _extract_filecontents(src: str) -> tuple[str, dict[str, str]]:
+    """摘出 \\begin{filecontents}{name.bib} ... \\end{filecontents}
+    自包含文献（arXiv 单文件提交常见），返回 (去掉该环境的源码,
+    虚拟文件名→内容)。"""
+    virtual: dict[str, str] = {}
+    spans: list[tuple[int, int]] = []
+    for m in _FILEC_RE.finditer(src):
+        env, fname = m.group(1), m.group(2).strip()
+        end = re.search(r"\\end\s*\{" + re.escape(env) + r"\}", src[m.end():])
+        if end is None:
+            continue
+        virtual[fname] = src[m.end() : m.end() + end.start()]
+        spans.append((m.start(), m.end() + end.end()))
+    for a, b in reversed(spans):
+        src = src[:a] + src[b:]
+    return src, virtual
+
+
+_IF_RE = re.compile(r"\\(if[a-zA-Z]*)")
+_COND_TOK_RE = re.compile(r"\\(if[a-zA-Z]*|else|or|fi)\b")
+
+
+def _eval_conditional(src: str, i: int, name: str) -> tuple[str, int]:
+    """src[i] 紧跟 \\ifX 之后。返回 (保留源码, \\fi 后位置)。
+
+    \\iffalse 只保留 \\else 分支；其余条件无法求值，一律保留真分支、
+    丢弃 \\else 分支（乐观策略：模板里常见 \\ifx\\x\\undefined 之类）。"""
+    assumed = name != "iffalse"
+    depth = 1
+    else_span: tuple[int, int] | None = None
+    for m in _COND_TOK_RE.finditer(src, i):
+        t = m.group(1)
+        if t == "fi":
+            depth -= 1
+            if depth == 0:
+                if else_span:
+                    kept = src[i : else_span[0]] if assumed \
+                        else src[else_span[1] : m.start()]
+                else:
+                    kept = src[i : m.start()] if assumed else ""
+                return kept, m.end()
+        elif t.startswith("if"):
+            depth += 1
+        elif t in {"else", "or"} and depth == 1 and else_span is None:
+            else_span = (m.start(), m.end())
+    return (src[i:] if assumed else ""), len(src)
+
+
+def _expand_conditionals(src: str) -> str:
+    """把 \\if…\\else…\\fi 用假设真分支（\\iffalse 用假分支）展开掉。"""
+    while True:
+        m = _IF_RE.search(src)
+        if not m:
+            return src
+        keep, end = _eval_conditional(src, m.end(), m.group(1).lower())
+        src = src[: m.start()] + keep + src[end:]
+
+
+def _rewrite_cite_aliases(src: str) -> str:
+    """识别 \\let\\mycite\\citep 与 \\newcommand{\\mycite}[1]{\\citep{#1}}
+    这类单命令别名，把 \\mycite 改写成 \\citep，让下游统一处理。"""
+    aliases: dict[str, str] = {}
+    for m in re.finditer(
+        r"\\let\\([a-zA-Z]+)\s*=?\s*\\([a-zA-Z]+\*?)", src
+    ):
+        if tex.cite_kind(m.group(2).rstrip("*").lower()):
+            aliases[m.group(1)] = m.group(2)
+    for m in re.finditer(
+        r"\\(?:newcommand|renewcommand|providecommand|def)\s*"
+        r"\{?\\([a-zA-Z]+)\}?\s*(?:\[\d+\])?\s*(?:#\d\s*)*"
+        r"\{((?:[^{}]|\{[^{}]*\})*)\}",
+        src,
+    ):
+        body = m.group(2).strip()
+        inner = re.fullmatch(
+            r"\\([a-zA-Z]+\*?)\s*(\[[^\]]*\])?\s*(\{[#0-9\s]*\})?\s*", body)
+        if inner and tex.cite_kind(inner.group(1).rstrip("*").lower()):
+            aliases[m.group(1)] = inner.group(1)
+    for name, target in aliases.items():
+        src = re.sub(r"\\" + re.escape(name) + r"(?![a-zA-Z])",
+                     lambda _m, t=target: "\\" + t, src)
+    return src
+
+
 # ------------------------------------------------------------ 引用样式
 
 _AY_BIBSTYLES = re.compile(
@@ -320,23 +410,34 @@ def _parse_bibitems(region: str, style: str) -> list[Reference]:
 
 
 def _load_bib_refs(resources: list[str], projdir: Path, style: str,
-                   cite_order: list[str], nocite: list[str]) -> list[Reference]:
+                   cite_order: list[str], nocite: list[str],
+                   virtual: dict[str, str]) -> list[Reference]:
     """按 \\bibliography/\\addbibresource 顺序读 .bib，合成 Reference。
 
     .bib 是数据库：只有被 \\cite / \\nocite 点名的条目才会出现在排版
     后的参考文献里，因此未引用条目不进列表（norms 的"未被引用"检查
     对它们不适用）。"""
-    seen_files: set[Path] = set()
+    seen_files: set[str] = set()
     entries: list[BibEntry] = []
     for name in resources:
+        name = name.strip()
+        if name in seen_files:
+            continue
+        # filecontents 提供的虚拟 .bib 优先于磁盘
+        vtext = virtual.get(name) or virtual.get(name + ".bib") or next(
+            (v for k, v in virtual.items() if Path(k).stem == Path(name).stem),
+            None)
+        seen_files.add(name)
+        if vtext is not None:
+            entries += parse_bib(vtext)
+            continue
         f = None
         for cand in (projdir / name, projdir / (name + ".bib")):
             if cand.is_file():
                 f = cand.resolve()
                 break
-        if f is None or f in seen_files:
+        if f is None:
             continue
-        seen_files.add(f)
         try:
             entries += parse_bib(f.read_text(encoding="utf-8"))
         except UnicodeDecodeError:
@@ -444,6 +545,9 @@ def parse_latex(path: str | Path) -> ParsedDocument:
         main = path
         filename = path.name
     src = tex.expand_inputs(tex.read_tex(main), main.parent)
+    src, virtual_files = _extract_filecontents(src)
+    src = _expand_conditionals(src)
+    src = _rewrite_cite_aliases(src)
 
     # body：\begin{document} 与 \end{document} 之间；没有 document 环境
     # 就把整个文件当正文（片段式 .tex）。
@@ -451,6 +555,16 @@ def parse_latex(path: str | Path) -> ParsedDocument:
     body = src[bm.end():em.start()] if bm else src
 
     blocks, meta = _scan_blocks(body)
+    # biblatex 的 \addbibresource 标准位置在导言区
+    preamble = src[: bm.start()] if bm else ""
+    pre_bibs = [
+        f.strip()
+        for m in re.finditer(
+            r"\\addbibresource\s*(?:\[[^\]]*\])?\s*\{([^}]*)\}", preamble)
+        for f in m.group(1).split(",")
+        if f.strip()
+    ]
+    meta["bib_files"] = pre_bibs + meta["bib_files"]
     style = _detect_style(src, meta["bib_style"])
 
     # 参考文献：thebibliography 优先，其次 .bib 文件
@@ -462,7 +576,7 @@ def parse_latex(path: str | Path) -> ParsedDocument:
     elif meta["bib_files"]:
         references = _load_bib_refs(
             meta["bib_files"], main.parent, style, full_cite_order,
-            meta.get("nocite", []))
+            meta.get("nocite", []), virtual_files)
     keymap = {r.key: r for r in references if r.key}
     render_cite = _cite_renderer(style, keymap)
 

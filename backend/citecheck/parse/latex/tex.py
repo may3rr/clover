@@ -19,24 +19,30 @@ from typing import Callable
 _TEXTUAL = {"citet", "textcite", "citealt"}
 _AUTHOR_ONLY = {"citeauthor", "citeauthors"}
 _YEAR_ONLY = {"citeyear", "citeyearpar"}
+_PAREN = {
+    "cite", "citep", "citealp", "parencite", "autocite", "footcite",
+    "smartcite", "supercite", "notecite", "pnotecite", "citenum",
+}
 _MULTI = {
     "cites", "parencites", "textcites", "citets", "citeps",
     "footcites", "autocites", "smartcites", "supercites",
 }
-_CITE_NAME = re.compile(r"cite")
 
 
 def cite_kind(name: str) -> str | None:
-    """把命令名归类为 cite 类型；不是引用命令返回 None。"""
-    if not _CITE_NAME.search(name) or name.startswith("nocite"):
-        return None
+    """把命令名归类为 cite 类型；不是引用命令返回 None。
+
+    白名单制：\\mycite、\\citefield、\\citetrackerfalse 这类名字里
+    碰巧含 cite 的命令不算引用。"""
     if name in _AUTHOR_ONLY:
         return "author"
     if name in _YEAR_ONLY:
         return "year"
     if name in _TEXTUAL:
         return "textual"
-    return "paren"
+    if name in _PAREN or name in _MULTI:
+        return "paren"
+    return None
 
 
 # ------------------------------------------------------- 命令处理规则
@@ -404,15 +410,26 @@ def _accent_arg(src: str, i: int) -> tuple[str, int]:
 
 # ------------------------------------------------------------ 项目展开
 
+_VERB_LINE_RE = re.compile(r"\\verb\*?([^a-zA-Z])")
+
+
 def strip_comments(text: str) -> str:
-    """去掉 % 到行尾的注释；\\% 转义保留。"""
+    """去掉 % 到行尾的注释；\\% 转义、\\verb|..| 行内 verbatim 保留。"""
     lines = []
     for line in text.split("\n"):
+        verb_spans = []
+        for m in _VERB_LINE_RE.finditer(line):
+            d = m.group(1)
+            end = line.find(d, m.end())
+            verb_spans.append((m.start(), len(line) if end < 0 else end + 1))
         i = 0
         while True:
             j = line.find("%", i)
             if j < 0:
                 break
+            if any(a <= j < b for a, b in verb_spans):
+                i = j + 1
+                continue
             k, bs = j, 0
             while k > 0 and line[k - 1] == "\\":
                 k -= 1
@@ -443,11 +460,14 @@ def _resolve_tex(base: Path, name: str) -> Path | None:
 _INPUT_RE = re.compile(
     r"\\(?:input|include|subfile|subfileinclude)\s*\{([^}]*)\}"
 )
+# TeX 原语写法 \input file（空格/行尾收尾，不带括号）
+_INPUT_BARE_RE = re.compile(r"\\input\s+([^\s{]+)")
 
 
 def expand_inputs(src: str, base: Path, depth: int = 0,
                   seen: set[Path] | None = None) -> str:
-    """递归展开 \\input/\\include/\\subfile，深度上限 8，防循环。"""
+    """递归展开 \\input/\\include/\\subfile（含 \\input file 无括号写法），
+    深度上限 8，防循环。"""
     seen = seen if seen is not None else set()
     if depth > 8:
         return src
@@ -460,7 +480,8 @@ def expand_inputs(src: str, base: Path, depth: int = 0,
         sub = read_tex(f)
         return "\n\n" + expand_inputs(sub, f.parent, depth + 1, seen) + "\n\n"
 
-    return _INPUT_RE.sub(repl, src)
+    src = _INPUT_RE.sub(repl, src)
+    return _INPUT_BARE_RE.sub(repl, src)
 
 
 def iter_cite_keys(src: str) -> list[str]:

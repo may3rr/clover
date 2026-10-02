@@ -153,3 +153,56 @@ def test_no_markers_in_bibliography(numeric, authoryear):
 def test_json_roundtrip(numeric):
     """ParsedDocument 全部模型可序列化（前端消费）。"""
     json.dumps(numeric.model_dump(mode="json"))
+
+
+# ---------------------------------------------------------------- 鲁棒性
+
+def test_robustness_edge_cases(tmp_path):
+    """真实文章里的变体：导言区 addbibresource、无括号 \\input、
+    \\verb 里的 %、\\let/\\newcommand 别名、\\iffalse 块。"""
+    (tmp_path / "main.tex").write_text(
+        "\\documentclass{article}\n"
+        "\\usepackage[style=authoryear]{biblatex}\n"
+        "\\addbibresource{refs.bib}\n"
+        "\\let\\mycite\\citep\n"
+        "\\newcommand{\\scite}[1]{\\textcite{#1}}\n"
+        "\\begin{document}\n"
+        "\\section{Intro}\n"
+        "Citing \\cite{a1} and \\mycite{b2} and \\scite{c3}.\n"
+        "\\input sub\n"
+        "Code \\verb|a%b| stays.\n"
+        "\\iffalse hidden \\cite{ghost}\n\\fi\n"
+        "\\end{document}\n")
+    (tmp_path / "sub.tex").write_text(
+        "\\section{Method}\nWe follow \\citep{a1}.\n")
+    (tmp_path / "refs.bib").write_text(
+        "@article{a1, author={A}, title={T1}, year={2001}}\n"
+        "@article{b2, author={B}, title={T2}, year={2002}}\n"
+        "@article{c3, author={C}, title={T3}, year={2003}}\n")
+
+    d = parse_latex(tmp_path)
+    texts = [p.text for p in d.paragraphs]
+    keys = {k for m in d.markers for k in m.keys}
+    assert keys == {"a1", "b2", "c3"}          # 别名都算引用
+    assert {r.key for r in d.references} == {"a1", "b2", "c3"}
+    assert any("a%b stays" in t for t in texts)  # \verb 内 % 非注释
+    assert not any("hidden" in t for t in texts)  # \iffalse 丢弃
+    assert any("Method" == s.title for s in d.sections)
+
+
+def test_filecontents_embedded_bib(tmp_path):
+    """filecontents 自包含 .bib（arXiv 单文件提交常见）。"""
+    (tmp_path / "main.tex").write_text(
+        "\\documentclass{article}\n"
+        "\\usepackage[numbers]{natbib}\n"
+        "\\begin{filecontents}{embedded.bib}\n"
+        "@article{a1, author={A}, title={T}, year={2020}, journal={J}}\n"
+        "\\end{filecontents}\n"
+        "\\begin{document}\n"
+        "Text \\citep{a1}.\n"
+        "\\bibliographystyle{plainnat}\n"
+        "\\bibliography{embedded}\n"
+        "\\end{document}\n")
+    d = parse_latex(tmp_path)
+    assert [r.key for r in d.references] == ["a1"]
+    assert d.markers[0].ref_ids == ["r1"]
