@@ -24,6 +24,7 @@ class JudgeOut(BaseModel):
 _PROMPT = (
     "你是严谨的学术评审。判断“被引文献原文片段”是否支持“论断”。\n"
     "论断：{claim}\n"
+    "{sentence_line}"
     "被引文献标题：{title}\n"
     "被引文献原文片段：{excerpt}\n\n"
     "输出 JSON：{{\"label\": \"supported|partial|unsupported|undetermined\", "
@@ -33,22 +34,35 @@ _PROMPT = (
     "不要猜测。只输出 JSON。"
 )
 
+_CORRECTION = (
+    "\n\n注意：你上一次给出的 evidence 未能在原文片段中逐字定位。这次必须把"
+    " evidence 写成片段中一段完全连续的原文文字；如果片段里确实没有可作为"
+    "证据的文字，label 用 undetermined，evidence 留空。"
+)
+
 
 async def judge_claim(
-    claim_text: str, ref_title: str | None, excerpt: str
+    claim_text: str,
+    ref_title: str | None,
+    excerpt: str,
+    *,
+    sentence: str | None = None,
+    correction: bool = False,
+    task: str = "judge",
 ) -> JudgeOut | None:
+    """One judging pass. ``task`` selects the configured model: 'judge'
+    for the first pass, 'review'/'review_fallback' for the cascade."""
+    prompt = _PROMPT.format(
+        claim=claim_text,
+        sentence_line=f"所在句子：{sentence}\n" if sentence else "",
+        title=ref_title or "（无标题）",
+        excerpt=excerpt,
+    )
+    if correction:
+        prompt += _CORRECTION
     res = await chat_json(
-        "judge",
-        [
-            {
-                "role": "user",
-                "content": _PROMPT.format(
-                    claim=claim_text,
-                    title=ref_title or "（无标题）",
-                    excerpt=excerpt,
-                ),
-            }
-        ],
+        task,
+        [{"role": "user", "content": prompt}],
         JudgeOut,
     )
     return res.value

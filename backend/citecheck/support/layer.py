@@ -22,7 +22,7 @@ from ..parse.parser import ParsedDocument
 from ..schema import Anchor, Claim, Finding, RefCheck, SupportCheck
 from .claims import extract_claims
 from .evidence import locate_evidence
-from .judge import judge_claim
+from .judge import JudgeOut, judge_claim
 from .sources import build_source
 
 log = logging.getLogger(__name__)
@@ -131,11 +131,40 @@ async def run_support(
     return claims, list(checks), findings
 
 
+_POSITIVE = {"supported", "partial", "unsupported"}
+_ESCALATE = {"partial", "unsupported"}
+
+
+def _apply_verdict(
+    out: JudgeOut, excerpt: str
+) -> tuple[str, str | None, str, tuple[int, int] | None]:
+    """§5.3 verification of one judge verdict.
+    Returns (label, evidence, rationale, span)."""
+    label, evidence, rationale = out.label, out.evidence, out.rationale
+    if label not in _POSITIVE:
+        return label, evidence, rationale, None
+    if not evidence or not evidence.strip():
+        return "undetermined", None, "模型未给出原文证据", None
+    span = locate_evidence(evidence, excerpt)
+    if span is None:
+        return "undetermined", None, "证据未能在原文中定位", None
+    return label, evidence, rationale, span
+
+
 async def evaluate_with_excerpt(
     claim: Claim, ref_id: str, excerpt: str, title: str | None, source_kind: str
 ) -> SupportCheck:
-    """Judge + §5.3 evidence verification on a ready excerpt."""
-    out = await judge_claim(claim.text, title, excerpt)
+    """Judge + §5.3 evidence verification on a ready excerpt.
+
+    First pass uses task 'judge'. A verdict that survives verification as
+    partial/unsupported is escalated to the 'review' model (same prompt,
+    same §5.3 check); on review API failure it retries once via the
+    'review_fallback' model, and if that fails too the first-pass
+    verified result stands.
+    """
+    out = await judge_claim(
+        claim.text, title, excerpt, sentence=claim.sentence
+    )
     if out is None:
         return SupportCheck(
             claim_id=claim.id, ref_id=ref_id, label="undetermined",
@@ -143,19 +172,37 @@ async def evaluate_with_excerpt(
             rationale="模型输出无效，未作判断",
             source_title=title, source_excerpt=excerpt,
         )
-    label = out.label
-    evidence = out.evidence
-    rationale = out.rationale
-    span = None
-    if label in {"supported", "partial", "unsupported"}:
-        if not evidence or not evidence.strip():
-            label, evidence = "undetermined", None
-            rationale = "模型未给出原文证据"
-        else:
-            span = locate_evidence(evidence, excerpt)
-            if span is None:
-                label, evidence = "undetermined", None
+    label, evidence, rationale, span = _apply_verdict(out, excerpt)
+    if rationale == "证据未能在原文中定位":
+        # exactly one re-ask: the model must copy a contiguous span
+        # verbatim or concede undetermined (§5.3 unchanged)
+        out2 = await judge_claim(
+            claim.text, title, excerpt,
+            sentence=claim.sentence, correction=True,
+        )
+        if out2 is not None:
+            label, evidence, rationale, span = _apply_verdict(out2, excerpt)
+            if out2.label == "undetermined" and not out2.rationale:
                 rationale = "证据未能在原文中定位"
+
+    if label in _ESCALATE:
+        rev = await judge_claim(
+            claim.text, title, excerpt,
+            sentence=claim.sentence, task="review",
+        )
+        if rev is None:
+            rev = await judge_claim(
+                claim.text, title, excerpt,
+                sentence=claim.sentence, task="review_fallback",
+            )
+        if rev is None:
+            log.warning(
+                "review cascade failed for claim %s; keeping first-pass %s",
+                claim.id, label,
+            )
+        else:
+            label, evidence, rationale, span = _apply_verdict(rev, excerpt)
+
     return SupportCheck(
         claim_id=claim.id, ref_id=ref_id, label=label, evidence=evidence,
         source_kind=source_kind,  # type: ignore[arg-type]
