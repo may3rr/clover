@@ -146,6 +146,50 @@ class Revision(BaseModel):
     move_after: str | None = None
 
 
+class Stat(BaseModel):
+    median: float
+    q1: float
+    q3: float
+
+
+DistFlag = Literal["below", "within", "above", "na"]
+
+
+class SectionDist(BaseModel):
+    section_id: str
+    canonical: CanonicalSection
+    title: str
+    words: int
+    citations: int  # ref ids across markers in the section, with multiplicity
+    share: float  # section citations / paper citations
+    density: float  # citations per 1000 words
+    bench_share: Stat | None = None
+    bench_density: Stat | None = None
+    share_flag: DistFlag = "na"
+    density_flag: DistFlag = "na"
+
+
+class SentenceRefs(BaseModel):
+    share_ge2: float
+    share_ge3: float
+    share_ge5: float
+    bench_ge2: Stat | None = None
+    bench_ge3: Stat | None = None
+    bench_ge5: Stat | None = None
+
+
+class Distribution(BaseModel):
+    benchmark_id: str
+    benchmark_name: str
+    n_papers: int
+    comparable_density: bool
+    note: str | None = None
+    sections: list[SectionDist] = Field(default_factory=list)
+    sentence_refs: SentenceRefs | None = None
+    functions: dict[str, int] | None = None
+    marker_functions: dict[str, str] = Field(default_factory=dict)
+
+
 LayerStatusValue = Literal["pending", "running", "done", "failed"]
 
 
@@ -174,7 +218,7 @@ class Report(BaseModel):
     ref_checks: list[RefCheck] = Field(default_factory=list)
     claims: list[Claim] = Field(default_factory=list)
     support_checks: list[SupportCheck] = Field(default_factory=list)
-    distribution: dict | None = None
+    distribution: Distribution | None = None
     findings: list[Finding] = Field(default_factory=list)
     revisions: list[Revision] = Field(default_factory=list)
     meta: ReportMeta = Field(default_factory=ReportMeta)

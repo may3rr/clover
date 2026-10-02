@@ -4,6 +4,7 @@ from citecheck.schema import (
     Anchor,
     CitationMarker,
     Claim,
+    Distribution,
     Document,
     Finding,
     LayerStatus,
@@ -13,6 +14,9 @@ from citecheck.schema import (
     Report,
     Revision,
     Section,
+    SectionDist,
+    SentenceRefs,
+    Stat,
     SupportCheck,
 )
 
@@ -73,7 +77,25 @@ def _full_report() -> Report:
                 evidence_span=(12, 27),
             )
         ],
-        distribution={"intro": 0.4, "related": 0.6},
+        distribution=Distribution(
+            benchmark_id="arxiv_cs_cl", benchmark_name="arXiv 计算语言学",
+            n_papers=150, comparable_density=True,
+            sections=[
+                SectionDist(
+                    section_id="s1", canonical="intro", title="1 Introduction",
+                    words=500, citations=8, share=0.4, density=16.0,
+                    bench_share=Stat(median=0.3, q1=0.2, q3=0.45),
+                    bench_density=Stat(median=10.0, q1=5.0, q3=15.0),
+                    share_flag="within", density_flag="above",
+                )
+            ],
+            sentence_refs=SentenceRefs(
+                share_ge2=0.5, share_ge3=0.2, share_ge5=0.0,
+                bench_ge2=Stat(median=0.4, q1=0.3, q3=0.5),
+            ),
+            functions={"background": 3, "method": 4},
+            marker_functions={"m0": "background"},
+        ),
         findings=[
             Finding(
                 id="f0",

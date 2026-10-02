@@ -134,6 +134,86 @@
       "title": "Claim",
       "type": "object"
     },
+    "Distribution": {
+      "properties": {
+        "benchmark_id": {
+          "title": "Benchmark Id",
+          "type": "string"
+        },
+        "benchmark_name": {
+          "title": "Benchmark Name",
+          "type": "string"
+        },
+        "n_papers": {
+          "title": "N Papers",
+          "type": "integer"
+        },
+        "comparable_density": {
+          "title": "Comparable Density",
+          "type": "boolean"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "sections": {
+          "items": {
+            "$ref": "#/$defs/SectionDist"
+          },
+          "title": "Sections",
+          "type": "array"
+        },
+        "sentence_refs": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SentenceRefs"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "functions": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Functions"
+        },
+        "marker_functions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Marker Functions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "benchmark_id",
+        "benchmark_name",
+        "n_papers",
+        "comparable_density"
+      ],
+      "title": "Distribution",
+      "type": "object"
+    },
     "Document": {
       "properties": {
         "title": {
@@ -601,6 +681,181 @@
       "title": "Section",
       "type": "object"
     },
+    "SectionDist": {
+      "properties": {
+        "section_id": {
+          "title": "Section Id",
+          "type": "string"
+        },
+        "canonical": {
+          "enum": [
+            "intro",
+            "related",
+            "method",
+            "experiment",
+            "discussion",
+            "conclusion",
+            "other"
+          ],
+          "title": "Canonical",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "words": {
+          "title": "Words",
+          "type": "integer"
+        },
+        "citations": {
+          "title": "Citations",
+          "type": "integer"
+        },
+        "share": {
+          "title": "Share",
+          "type": "number"
+        },
+        "density": {
+          "title": "Density",
+          "type": "number"
+        },
+        "bench_share": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "bench_density": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "share_flag": {
+          "default": "na",
+          "enum": [
+            "below",
+            "within",
+            "above",
+            "na"
+          ],
+          "title": "Share Flag",
+          "type": "string"
+        },
+        "density_flag": {
+          "default": "na",
+          "enum": [
+            "below",
+            "within",
+            "above",
+            "na"
+          ],
+          "title": "Density Flag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "section_id",
+        "canonical",
+        "title",
+        "words",
+        "citations",
+        "share",
+        "density"
+      ],
+      "title": "SectionDist",
+      "type": "object"
+    },
+    "SentenceRefs": {
+      "properties": {
+        "share_ge2": {
+          "title": "Share Ge2",
+          "type": "number"
+        },
+        "share_ge3": {
+          "title": "Share Ge3",
+          "type": "number"
+        },
+        "share_ge5": {
+          "title": "Share Ge5",
+          "type": "number"
+        },
+        "bench_ge2": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "bench_ge3": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "bench_ge5": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "share_ge2",
+        "share_ge3",
+        "share_ge5"
+      ],
+      "title": "SentenceRefs",
+      "type": "object"
+    },
+    "Stat": {
+      "properties": {
+        "median": {
+          "title": "Median",
+          "type": "number"
+        },
+        "q1": {
+          "title": "Q1",
+          "type": "number"
+        },
+        "q3": {
+          "title": "Q3",
+          "type": "number"
+        }
+      },
+      "required": [
+        "median",
+        "q1",
+        "q3"
+      ],
+      "title": "Stat",
+      "type": "object"
+    },
     "SupportCheck": {
       "properties": {
         "claim_id": {
@@ -760,15 +1015,13 @@
     "distribution": {
       "anyOf": [
         {
-          "additionalProperties": true,
-          "type": "object"
+          "$ref": "#/$defs/Distribution"
         },
         {
           "type": "null"
         }
       ],
-      "default": null,
-      "title": "Distribution"
+      "default": null
     },
     "findings": {
       "items": {
