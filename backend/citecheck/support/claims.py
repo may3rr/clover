@@ -200,11 +200,21 @@ async def extract_claims(
                         changed = True
             while end > span[0] and paragraph.text[end - 1].isspace():
                 end -= 1
+            # claim text shown to the judge is marker-free; the span keeps
+            # paragraph coordinates so markers inside stay inside the anchor
+            inner = paragraph.text[span[0]:end]
+            inner_spans = [
+                (m.start - span[0], m.end - span[0])
+                for m in in_sent
+                if span[0] <= m.start and m.end <= end
+            ]
+            if inner_spans:
+                inner, _ = _remove_spans(inner, inner_spans)
             claims.append(
                 Claim(
                     id="", paragraph_id=paragraph.id,
                     start=span[0], end=end,
-                    text=paragraph.text[span[0]:end].strip() or claim_text,
+                    text=re.sub(r"\s{2,}", " ", inner).strip() or claim_text,
                     marker_ids=c["marker_ids"],
                     sentence=sent.text,
                 )
