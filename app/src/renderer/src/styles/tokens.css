@@ -1,22 +1,81 @@
 :root {
+  /* Notion warm neutrals */
   --bg: #ffffff;
-  --bg-subtle: #f5f5f7;      /* 区块分隔只靠这一层底色 */
-  --text: #1d1d1f;
-  --accent: #0071e3;         /* 唯一的交互强调色：主按钮、选中态、链接 */
+  --bg-subtle: #f7f7f5;      /* 区块分隔只靠这一层底色 */
+  --text: #37352f;
+  --text-secondary: rgba(55, 53, 47, 0.65);  /* 次要信息：计数、说明、组标签 */
+  --accent: #2383e2;         /* 唯一的交互强调色：主按钮、选中态、链接 */
 
-  --high: #d70015;           /* 语义：严重问题 */
-  --high-tint: rgba(255, 59, 48, 0.12);
-  --medium: #b25000;         /* 语义：需注意 */
-  --medium-tint: rgba(255, 149, 0, 0.14);
-  --ok: #248a3d;             /* 语义：已核验 */
-  --ok-tint: rgba(52, 199, 89, 0.12);
+  --fill: rgba(55, 53, 47, 0.06);          /* hover / 普通选中 */
+  --fill-strong: rgba(55, 53, 47, 0.09);   /* 按下列表行、低严重度底色 */
+  --sidebar-tint: rgba(247, 247, 245, 0.55);  /* 侧栏可选叠色，透出 vibrancy */
+  --glass-edge: 0 0 0 0.5px rgba(55, 53, 47, 0.09);
+  --glass-shadow: 0 8px 24px rgba(55, 53, 47, 0.10);
+  --separator: rgba(0, 0, 0, 0.1);   /* 侧栏/检查器与阅读区之间唯一的线 */
+
+  /* 语义色（图形用）：macOS 系统色 / 红绿灯配色——圆点、tile、图标、
+     进度条、勾选、spinner。太鲜艳不能当文本色，文本用 --*-text */
+  --high: #ff5f57;           /* 严重问题 */
+  --high-tint: rgba(255, 95, 87, 0.2);
+  --medium: #febc2e;         /* 需注意 */
+  --medium-tint: rgba(254, 188, 46, 0.22);
+  --ok: #28c840;             /* 已核验 / 修订 */
+  --ok-tint: rgba(40, 200, 64, 0.18);
+  --low: var(--text-secondary);          /* 低严重度（中性） */
+  --low-tint: var(--fill-strong);
+  /* 语义文本色（判定词、彩色计数）：深一档保证白底 ≥4.5:1 */
+  --high-text: #d70015;
+  --medium-text: #a05a00;
+  --ok-text: #1e7e34;
+
+  /* 图标色块（图层 tile；白字上图标，不需要文本对比度） */
+  --tile-blue: #007aff;      /* 论断支持度 */
+  --tile-purple: #af52de;    /* 引用分布 */
+  --tile-green: #28c840;     /* 文献真实性（= --ok） */
+  --tile-orange: #ff9f0a;    /* 格式规范 */
+  --tile-yellow: #ffcc00;
+  --tile-grey: #8e8e93;      /* 全部问题 */
+
+  /* 骨架页细边 / 占位微光 / SVG 页边描线（唯一允许线条的几处数据图形） */
+  --hairline: var(--separator);
+  --shimmer: rgba(255, 255, 255, 0.45);
+
+  /* 缓动：一次定义，全站共用 */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1c1e;
-    --bg-subtle: #2c2c2e;
-    --text: #f5f5f7;
-    --accent: #2997ff;
-    --high: #ff6961; --medium: #ffb340; --ok: #30d158;
+    --bg: #191919;
+    --bg-subtle: #202020;
+    --text: rgba(255, 255, 255, 0.87);
+    --text-secondary: rgba(255, 255, 255, 0.48);
+    --accent: #529cca;
+
+    --fill: rgba(255, 255, 255, 0.055);
+    --fill-strong: rgba(255, 255, 255, 0.09);
+    --sidebar-tint: rgba(32, 32, 32, 0.5);
+    --glass-edge: 0 0 0 0.5px rgba(255, 255, 255, 0.10);
+    --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    --separator: rgba(255, 255, 255, 0.1);
+
+    --high: #ff6961;
+    --high-tint: rgba(255, 105, 97, 0.28);
+    --medium: #ffc53d;
+    --medium-tint: rgba(255, 197, 61, 0.28);
+    --ok: #32d74b;
+    --ok-tint: rgba(50, 215, 75, 0.28);
+    --high-text: #ff6961;
+    --medium-text: #ffc53d;
+    --ok-text: #32d74b;
+
+    /* dark 下色块提亮（macOS dark system colors） */
+    --tile-blue: #0a84ff;
+    --tile-purple: #bf5af2;
+    --tile-green: #32d74b;
+    --tile-orange: #ff9f0a;
+    --tile-yellow: #ffd60a;
+    --tile-grey: #98989d;
+
+    --shimmer: rgba(255, 255, 255, 0.12);
   }
 }

@@ -133,65 +133,77 @@ class Report:         document, sections, paragraphs, markers, references,
 
 ## 6. 设计规范（必须严格执行）
 
-气质参考：苹果官网与 magpie。安静、克制、留白充足，一屏只做一件事。
+气质参考：Notion 的内容区 + macOS 26 的窗口壳——通高系统侧栏（原生 vibrancy）、彩色图层 tile（macOS 设置风格）、安静的排版。克制、留白充足，一屏只做一件事。
 
 ### 6.1 字体
 
 - **只用系统字体：** `font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", system-ui, sans-serif;`
   英文自动使用 SF Pro，中文自动使用苹方。禁止引入任何网络字体或自带字体文件。
 - **层级只靠字重区分。** 可用字重：400、500、600、700。
-- **字号只有两档：**
-  - 界面文字统一 `15px`（标题、按钮、标签、正文都是这一档，靠字重拉开层级）。
-  - 阅读区的论文正文 `17px`，行高 `1.7`。这是"内容"不是"界面"，单独一档是为了阅读舒适。
-- **文字颜色只有一种**（浅色 `#1d1d1f`，深色 `#f5f5f7`）。不使用灰色文字来表达次要信息，次要信息用字重 400，主要信息用 600。语义色只用于状态（见 6.2）。
-- 禁止全大写标签，禁止在标题里单独给某个词加粗或变色，禁止用中点连接元信息（如 `A · B · C`），按钮文字后面不加箭头。
+- **字号六档：**
+  - `13px`：次要文字——计数、说明、组标签、注释、属性行标签。
+  - `15px`：界面文字（标题、按钮、标签、列表行、属性值）。
+  - `17px`：阅读区论文正文（行高 `1.7`）与详情视图标题。
+  - `20px`：阅读区章节标题（600，上间距 32px）。
+  - `26px`：空状态 / 运行页大标题（600）。
+  - `32px`：阅读视图论文标题（700，Notion 页面标题）。
+- 主文字颜色 `--text`；次要信息（计数、说明、caption、组标签）用 `--text-secondary`。语义色只用于状态。
+- 禁止全大写标签，禁止在标题里单独给某个词加粗或变色（语义计数除外），禁止用中点连接元信息（如 `A · B · C`），按钮文字后面不加箭头，中文标题旁不放英文小字标签。
 
-### 6.2 颜色（`app/src/styles/tokens.css` 是唯一来源）
+### 6.2 颜色（`app/src/renderer/src/styles/tokens.css` 是唯一来源）
+
+tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量，只能引用变量。调色板是 Notion 暖中性色：
 
 ```css
 :root {
-  --bg: #ffffff;
-  --bg-subtle: #f5f5f7;      /* 区块分隔只靠这一层底色 */
-  --text: #1d1d1f;
-  --accent: #0071e3;         /* 唯一的交互强调色：主按钮、选中态、链接 */
-
-  --high: #d70015;           /* 语义：严重问题 */
-  --high-tint: rgba(255, 59, 48, 0.12);
-  --medium: #b25000;         /* 语义：需注意 */
-  --medium-tint: rgba(255, 149, 0, 0.14);
-  --ok: #248a3d;             /* 语义：已核验 */
-  --ok-tint: rgba(52, 199, 89, 0.12);
+  --bg: #ffffff;  --bg-subtle: #f7f7f5;
+  --text: #37352f;  --text-secondary: rgba(55,53,47,0.65);
+  --accent: #2383e2;
+  --fill: rgba(55,53,47,0.06);          /* hover */
+  --fill-strong: rgba(55,53,47,0.09);   /* 选中行（中性灰胶囊） */
+  --sidebar-tint: rgba(247,247,245,0.55); /* 侧栏可选叠色，透出 vibrancy */
+  --separator: rgba(0,0,0,0.1);          /* 窗格分隔线（唯一允许的面板线） */
+  --glass-edge / --glass-shadow          /* 骨架页边 / 浮层阴影 */
+  /* 语义图形色 = macOS 系统色：#FF5F57 / #FEBC2E / #28C840（浅），
+     #FF6961 / #FFC53D / #32D74B（深）；--*-tint 是同色 ~0.2 alpha（深 ~0.28）；
+     圆点、tile、图标、勾选、进度条、spinner 都用这一组 */
+  --high / --medium / --ok / --*-tint
+  /* 语义文本色 = 可读变体：#D70015 / #A05A00 / #1E7E34（浅），
+     深色同图形色。判定词、彩色计数用 --*-text，正文文本永不上彩色底 */
+  --high-text / --medium-text / --ok-text
+  --low = --text-secondary;  --low-tint = --fill-strong;
+  /* 图层 tile 也是 macOS 系统色：blue #007AFF、purple #AF52DE、
+     green = --ok、orange #FF9F0A、grey #8E8E93，dark 用深色系统色变体 */
+  --tile-blue/purple/green/orange/yellow/grey
+  --hairline / --shimmer                 /* SVG 页边 / 占位微光 */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1) /* 唯一缓动 */
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1c1c1e;
-    --bg-subtle: #2c2c2e;
-    --text: #f5f5f7;
-    --accent: #2997ff;
-    --high: #ff6961; --medium: #ffb340; --ok: #30d158;
-  }
-}
+/* dark：--bg #191919 等，同名定义在 tokens.css */
 ```
 
-组件里禁止出现任何十六进制颜色字面量，只能引用变量。
+图层 tile 配色：文献真实性 green，论断支持度 blue，引用分布 purple，格式规范 orange，全部问题 grey。
 
 ### 6.3 不加没有意义的线条
 
-- **禁止分割线、边框、描边、下划线装饰。** 区块之间靠留白和 `--bg-subtle` 底色区分。
-- 正文里的问题高亮用**柔和底色**（`--high-tint` 等），不用下划线、不用边框。
-- 阴影只允许用于浮层（菜单、弹出框），普通面板不加阴影。
+- **禁止分割线、边框、描边、下划线装饰。** 区块之间靠留白和底色区分。唯一的例外：侧栏 / 检查器与阅读区之间各一条 `1px var(--separator)` 发丝线（用 box-shadow 画，不用 border）。
+- 正文里的问题高亮用**柔和底色**（`--high-tint` 等，`padding: 0 2px; box-decoration-break: clone;`）。
+- 阴影只允许 `--glass-edge` / `--glass-shadow`，用在骨架页边和浮层菜单上；窗格和普通面板不加阴影。
 - 不要把内容切成一排排一模一样的圆角卡片。
 
 ### 6.4 间距、圆角、动效
 
 - 间距只用这组值：4 / 8 / 12 / 16 / 24 / 32 / 48 px。
-- 圆角：面板 12px，高亮 4px，主按钮用胶囊形（`border-radius: 980px`，苹果官网同款）。
-- 动效只在响应用户操作时出现，时长 200ms，`ease-out`。不做页面入场动画。尊重 `prefers-reduced-motion`。
-- 必须有可见的键盘焦点样式（`--accent` 色的 2px focus ring，这是唯一允许的"线"）。
+- 圆角：检查器内的详情卡 12px，callout 8px，列表行 8–10px，图层 tile 5px（20px 尺寸），高亮 4px，主按钮胶囊形（980px）。侧栏和检查器是通高直边窗格，没有圆角。
+- 动效曲线统一 `var(--ease)`；时长：hover/press 160ms、面板 240ms、跨屏 morph 320–400ms。只允许 transform / opacity（骨架条加 scaleX）。
+- 屏幕切换与列表→详情用 `document.startViewTransition`（`lib/vt.ts` 的 `morph()`，reduced-motion 时退化为直接切换）。
+- 尊重 `prefers-reduced-motion`：所有动画降为仅 opacity 或直接跳过。
+- 焦点环只在真实键盘焦点出现（`--accent` 2px，这是唯一允许的"线"）。不要在加载或鼠标点击后程序化 focus 元素。
 
 ### 6.5 窗口
 
-- `titleBarStyle: 'hiddenInset'`，红绿灯融入界面；左侧栏 `vibrancy: 'sidebar'`，其余区域 `--bg`。
+- `titleBarStyle: 'hiddenInset'`，红绿灯融入界面；窗口 `vibrancy: 'sidebar'`。
+- 报告页三窗格通高直边：左侧栏 240px（顶到窗口边缘，圆角 0，透明 / `--sidebar-tint` 透出原生 vibrancy），右检查器 380px（圆角 0，`--bg-subtle`），中间阅读区 `--bg`。窗格之间各一条 `1px var(--separator)` 发丝线。根节点透明，每个区域自己画底色。
+- 截图模式需 `backgroundThrottling: false`，否则窗口被遮挡时 `screencapture` 拿到旧帧。
 - 最小窗口 1100 × 720。
 
 ### 6.6 文案
@@ -199,3 +211,9 @@ class Report:         document, sections, paragraphs, markers, references,
 - 简体中文，主动语态，动词开头。按钮写清楚会发生什么，例如"开始体检"，不写"提交"。
 - 不道歉，不用感叹号，不写营销腔。
 - 空状态和错误都要告诉用户下一步怎么做。例如："无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。"
+
+### 6.7 图标与插画
+
+- 只用自绘的内联 SVG，SF Symbols 风格 **filled**（`.fill` 变体）：`fill="currentColor"`，双色处用 `var(--tile-bg)` 镂空。描边只留给 chevron 和 checkmark 的描画动画。禁止图标字体和图标库。
+- 图层图标放在 20–22px 圆角色块（`.tile`）里：白色实心 glyph + 图层色底（见 6.2）。
+- 插画（空状态纸张堆、阅读页 56px 页面图标、空筛选印章）全部内联 SVG，颜色只走 CSS 变量，viewBox + CSS 控尺寸，不用 PNG。
