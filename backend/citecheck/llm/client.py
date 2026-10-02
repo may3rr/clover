@@ -38,6 +38,9 @@ class LLMStats:
     def __init__(self) -> None:
         self.local = 0
         self.cloud = 0
+        # model -> {"prompt": tokens, "completion": tokens}; real API calls
+        # only — cache hits are counted in local/cloud but use no tokens
+        self.usage: dict[str, dict[str, int]] = {}
 
 
 _current_stats: ContextVar[LLMStats | None] = ContextVar("llm_stats", default=None)
@@ -72,6 +75,33 @@ def _count(route: str) -> None:
             s.cloud += 1
 
 
+def _record_usage(model: str, usage: Any) -> None:
+    s = _current_stats.get()
+    if s is None or usage is None:
+        return
+    u = s.usage.setdefault(model, {"prompt": 0, "completion": 0})
+    u["prompt"] += getattr(usage, "prompt_tokens", 0) or 0
+    u["completion"] += getattr(usage, "completion_tokens", 0) or 0
+
+
+def _err_desc(e: BaseException) -> str:
+    """Compact error description for logs — status and provider error code
+    (e.g. AllocationQuota.FreeTierOnly); never prompt content or keys."""
+    desc = type(e).__name__
+    status = getattr(e, "status_code", None)
+    if status:
+        desc += f" status={status}"
+    body = getattr(e, "body", None)
+    code = None
+    if isinstance(body, dict):
+        err = body.get("error")
+        code = (err or {}).get("code") if isinstance(err, dict) else err
+        code = code or body.get("code")
+    if code:
+        desc += f" code={code}"
+    return desc
+
+
 def _get_cache() -> Cache:
     global _cache
     if _cache is None:
@@ -101,6 +131,7 @@ class LLMResult:
     value: Any  # validated pydantic instance, or None on failure
     route: Route
     cached: bool = False
+    error: str | None = None  # compact error description when value is None
 
 
 def _ensure_json_word(messages: list[dict]) -> list[dict]:
@@ -114,14 +145,19 @@ def _ensure_json_word(messages: list[dict]) -> list[dict]:
 async def _cloud_call(model: str, messages: list[dict]) -> str:
     client, sem = _get_cloud()
     settings = get_settings()
-    async with sem:
-        resp = await client.chat.completions.create(
-            model=model,
-            messages=_ensure_json_word(messages),
-            temperature=settings.llm.temperature,
-            response_format={"type": "json_object"},
-            extra_body={"enable_thinking": False},
-        )
+    try:
+        async with sem:
+            resp = await client.chat.completions.create(
+                model=model,
+                messages=_ensure_json_word(messages),
+                temperature=settings.llm.temperature,
+                response_format={"type": "json_object"},
+                extra_body={"enable_thinking": False},
+            )
+    except Exception as e:
+        log.warning("cloud call failed model=%s: %s", model, _err_desc(e))
+        raise
+    _record_usage(model, resp.usage)
     return resp.choices[0].message.content or ""
 
 
@@ -166,7 +202,8 @@ async def chat_json(
     *,
     route: str = "auto",
 ) -> LLMResult:
-    """task ∈ judge|extract|typo|structure|function → configured model.
+    """task ∈ judge|review|review_fallback|extract|typo|structure|function
+    → configured model.
 
     Returns LLMResult(value=None) when generation or validation fails on
     every available route; callers map that to undetermined.
@@ -190,7 +227,8 @@ async def chat_json(
         try:
             value, _raw = await _attempt(schema, model, messages, r)
         except Exception as e:  # noqa: BLE001 — route failure -> next route
-            log.warning("llm %s route failed for task %s: %s", r, task, e)
+            log.warning("llm %s route failed for task %s: %s", r, task,
+                        _err_desc(e))
             last_error = e
             continue
         _count(r)
@@ -199,5 +237,9 @@ async def chat_json(
             return LLMResult(value=value, route=r)
         # generated output failed validation -> try the next route too
 
-    log.warning("all routes failed for task %s: %s", task, last_error)
-    return LLMResult(value=None, route=order[-1])
+    log.warning("all routes failed for task %s: %s", task,
+                _err_desc(last_error) if last_error else "invalid output")
+    return LLMResult(
+        value=None, route=order[-1],
+        error=_err_desc(last_error) if last_error else "invalid output",
+    )

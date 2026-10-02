@@ -10,14 +10,16 @@ timeout = 60
 max_concurrency = 6
 
 [llm.models]
-judge = "qwen-plus"
-extract = "qwen-flash"
-typo = "qwen-plus"
-structure = "qwen-flash"
-function = "qwen-flash"
+judge = "qwen3.8-flash"
+review = "qwen3.8-max"
+review_fallback = "qwen3.7-max"
+typo = "qwen3.8-flash"
+extract = "qwen3.7-flash"
+structure = "qwen3.7-flash"
+function = "qwen3.7-flash"
 
 [llm.local]
-enabled = true
+enabled = false
 model = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 hf_endpoint = "https://hf-mirror.com"
 timeout = 20

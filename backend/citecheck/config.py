@@ -45,15 +45,17 @@ class CloudSettings(BaseModel):
 
 
 class ModelNames(BaseModel):
-    judge: str = "qwen-plus"
-    extract: str = "qwen-flash"
-    typo: str = "qwen-plus"
-    structure: str = "qwen-flash"
-    function: str = "qwen-flash"
+    judge: str = "qwen3.8-flash"
+    review: str = "qwen3.8-max"
+    review_fallback: str = "qwen3.7-max"
+    extract: str = "qwen3.7-flash"
+    typo: str = "qwen3.8-flash"
+    structure: str = "qwen3.7-flash"
+    function: str = "qwen3.7-flash"
 
 
 class LocalSettings(BaseModel):
-    enabled: bool = True
+    enabled: bool = False
     model: str = "mlx-community/Qwen2.5-3B-Instruct-4bit"
     hf_endpoint: str = "https://hf-mirror.com"
     timeout: float = 20
