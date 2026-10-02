@@ -89,6 +89,7 @@ class Claim(BaseModel):
     end: int
     text: str
     marker_ids: list[str] = Field(default_factory=list)
+    sentence: str | None = None  # full containing sentence, shown to the judge
 
 
 SupportLabel = Literal["supported", "partial", "unsupported", "undetermined"]

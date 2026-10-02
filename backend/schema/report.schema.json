@@ -91,6 +91,18 @@
           },
           "title": "Marker Ids",
           "type": "array"
+        },
+        "sentence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sentence"
         }
       },
       "required": [

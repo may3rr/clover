@@ -130,6 +130,7 @@ async def extract_claims(
         marker_spans = [(m.start - sent.start, m.end - sent.start) for m in in_sent]
         verifiable, idx_map = _remove_spans(sent.text, marker_spans)
         n_verifiable, vmap = normalize(verifiable)
+        in_ids = {m.id for m in in_sent}
 
         def locate(claim_text: str) -> tuple[int, int] | None:
             n_claim, _ = normalize(claim_text)
@@ -142,23 +143,50 @@ async def extract_claims(
             v_end = idx_map[vmap[pos + len(n_claim) - 1]] + 1
             return sent.start + v_start, sent.start + v_end
 
+        def add_fallback(mids: list[str]) -> None:
+            """Whole-sentence claim (markers removed) for uncovered ids."""
+            if not mids or not idx_map:
+                return
+            # bound the span to the first/last non-punctuation kept char so
+            # tail markers and sentence-final '.' stay outside
+            punct = " \t\n。.!！?？,，;；"
+            nonpunct = [i for i, c in enumerate(verifiable) if c not in punct]
+            if not nonpunct:
+                return
+            i0, i1 = nonpunct[0], nonpunct[-1]
+            f_start = sent.start + idx_map[i0]
+            f_end = sent.start + idx_map[i1] + 1
+            claims.append(
+                Claim(
+                    id="", paragraph_id=paragraph.id,
+                    start=f_start, end=f_end,
+                    text=re.sub(r"\s{2,}", " ", verifiable[i0 : i1 + 1].strip()),
+                    marker_ids=mids,
+                    sentence=sent.text,
+                )
+            )
+
         produced: list[dict] = []
         if res.value is not None:
-            produced = [
-                c for c in res.value.claims
-                if isinstance(c, dict) and c.get("text") and c.get("marker_ids")
-            ]
-        if not produced:
-            produced = [{"text": sent.text.strip(), "marker_ids": [m.id for m in in_sent]}]
+            for c in res.value.claims:
+                if not isinstance(c, dict) or not c.get("text"):
+                    continue
+                # marker ids are global (m0..mN); keep only ids that are
+                # actually in this sentence
+                ids = [str(x) for x in c.get("marker_ids") or []
+                       if str(x) in in_ids]
+                if ids:
+                    produced.append({"text": str(c["text"]), "marker_ids": ids})
 
+        covered: set[str] = set()
+        fallback_ids: list[str] = []
         for c in produced:
-            span = locate(str(c["text"]))
-            if span is None:
-                # non-substring output: fall back to the whole sentence
-                span = (sent.start, sent.end)
-                claim_text = sent.text
-            else:
-                claim_text = str(c["text"])
+            span = locate(c["text"])
+            if span is None or _claim_too_short(c["text"]):
+                # non-substring / junk claim: whole sentence, markers removed
+                fallback_ids += [i for i in c["marker_ids"] if i not in fallback_ids]
+                continue
+            claim_text = c["text"]
             # exclude marker text that sits at the claim's tail (allowing
             # only whitespace / sentence-final punctuation after it)
             end = span[1]
@@ -177,7 +205,26 @@ async def extract_claims(
                     id="", paragraph_id=paragraph.id,
                     start=span[0], end=end,
                     text=paragraph.text[span[0]:end].strip() or claim_text,
-                    marker_ids=[str(x) for x in c["marker_ids"]],
+                    marker_ids=c["marker_ids"],
+                    sentence=sent.text,
                 )
             )
+            covered.update(c["marker_ids"])
+        fallback_ids += [m.id for m in in_sent
+                         if m.id not in covered and m.id not in fallback_ids]
+        add_fallback(fallback_ids)
     return claims
+
+
+_CJK_CHAR = re.compile(r"[一-鿿]")
+_WORD = re.compile(r"[A-Za-z0-9]+")
+
+
+def _claim_too_short(text: str) -> bool:
+    """Reject fragment claims the small model likes to emit — e.g.
+    'Following earlier work' — they carry no checkable proposition."""
+    cjk = len(_CJK_CHAR.findall(text))
+    words = len(_WORD.findall(text))
+    if cjk and cjk >= words:
+        return cjk < 8
+    return words < 4
