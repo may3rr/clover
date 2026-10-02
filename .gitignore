@@ -8,3 +8,4 @@ app/out/
 app/dist/
 *.sqlite
 .DS_Store
+backend/benchmarks/.cache/
