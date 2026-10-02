@@ -2,10 +2,12 @@ import type { Report, RefCheck } from '../types/report'
 import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
+import { ChevronLeftIcon } from '../components/Icons'
 
 interface Props {
   item: ListItem
   report: Report
+  backLabel: string
   onBack: () => void
 }
 
@@ -13,26 +15,40 @@ const VERDICT: Record<string, { label: string; cls: string }> = {
   supported: { label: '支持', cls: 'sem-ok' },
   partial: { label: '部分支持', cls: 'sem-medium' },
   unsupported: { label: '不支持', cls: 'sem-high' },
-  undetermined: { label: '无法判断', cls: 'font-normal' },
+  undetermined: { label: '无法判断', cls: 'secondary' },
 }
 
-export default function Detail({ item, report, onBack }: Props) {
+export default function Detail({ item, report, backLabel, onBack }: Props) {
   return (
-    <div className="detail-in" key={item.id}>
-      <button
-        className="link-accent font-normal"
-        style={{ padding: '8px 8px 16px' }}
-        onClick={onBack}
-        autoFocus
-      >
-        返回
-      </button>
-      {item.kind === 'revision' ? (
-        <RevisionDetail item={item} />
-      ) : (
-        <FindingDetail item={item} report={report} />
-      )}
-      <DetailLines detail={item.detail} />
+    <div className="detail-in flex-1 overflow-y-auto" key={item.id}>
+      <div style={{ padding: '8px 16px 16px' }}>
+        <button
+          className="link-accent flex items-center gap-1"
+          onClick={onBack}
+        >
+          <ChevronLeftIcon size={15} />
+          {backLabel}
+        </button>
+        <div
+          className="font-semibold detail-title"
+          style={{ fontSize: 17, marginTop: 8 }}
+        >
+          {item.title}
+        </div>
+        <div
+          className="flex flex-col"
+          style={{ gap: 12, marginTop: 16 }}
+        >
+          {item.kind === 'group' ? (
+            <ReorderDetail item={item} report={report} />
+          ) : item.kind === 'revision' ? (
+            <RevisionDetail item={item} />
+          ) : (
+            <FindingDetail item={item} report={report} />
+          )}
+          <DetailLines detail={item.detail} />
+        </div>
+      </div>
     </div>
   )
 }
@@ -41,7 +57,7 @@ function DetailLines({ detail }: { detail: string }) {
   const lines = detail.split('\n').filter(Boolean)
   if (!lines.length) return null
   return (
-    <div className="flex flex-col gap-2" style={{ marginTop: 16 }}>
+    <div className="flex flex-col gap-2">
       {lines.map((l, i) => (
         <div key={i} className="font-normal">
           {l}
@@ -52,7 +68,7 @@ function DetailLines({ detail }: { detail: string }) {
 }
 
 function anchoredText(report: Report, item: ListItem): string | null {
-  const a = item.finding?.anchor ?? item.revision?.anchor
+  const a = item.anchors[0]
   if (!a) return null
   const p = (report.paragraphs ?? []).find((x) => x.id === a.paragraph_id)
   if (!p?.text) return null
@@ -62,7 +78,8 @@ function anchoredText(report: Report, item: ListItem): string | null {
 // ------------------------------------------------------------- support
 
 function FindingDetail({ item, report }: { item: ListItem; report: Report }) {
-  if (item.layer === 'support') return <SupportDetail item={item} report={report} />
+  if (item.layer === 'support')
+    return <SupportDetail item={item} report={report} />
   if (item.layer === 'authenticity')
     return <AuthenticityDetail item={item} report={report} />
   if (item.layer === 'distribution')
@@ -75,10 +92,9 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
   const verdict = VERDICT[s.label ?? 'undetermined']
   return (
     <>
-      <div className="font-semibold">{item.title}</div>
       {s.sentence && (
-        <div className="detail-block" style={{ marginTop: 16 }}>
-          <div className="font-semibold" style={{ marginBottom: 8 }}>
+        <div className="card">
+          <div className="t13 secondary" style={{ marginBottom: 8 }}>
             你的论文写道
           </div>
           <div className="font-normal">
@@ -97,8 +113,8 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
         </div>
       )}
       {s.excerpt && (
-        <div className="detail-block" style={{ marginTop: 24 }}>
-          <div className="font-semibold" style={{ marginBottom: 8 }}>
+        <div className="card">
+          <div className="t13 secondary" style={{ marginBottom: 8 }}>
             被引文献原文
           </div>
           {s.sourceTitle && (
@@ -113,21 +129,18 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
               label={s.label}
             />
           </div>
-          <div className="font-normal" style={{ marginTop: 8 }}>
+          <div className="t13 secondary" style={{ marginTop: 8 }}>
             {s.sourceKind === 'fulltext' ? '依据开放全文' : '依据摘要'}
           </div>
         </div>
       )}
-      {s.rationale && (
-        <div className="font-normal" style={{ marginTop: 16 }}>
-          {s.rationale}
-        </div>
-      )}
-      <div
-        className={`font-semibold ${verdict.cls}`}
-        style={{ marginTop: 8 }}
-      >
-        {verdict.label}
+      <div>
+        <span className={`font-semibold ${verdict.cls}`}>{verdict.label}</span>
+        {s.rationale && (
+          <span className="font-normal" style={{ marginLeft: 8 }}>
+            {s.rationale}
+          </span>
+        )}
       </div>
     </>
   )
@@ -156,7 +169,7 @@ function ExcerptWithEvidence({
   return (
     <>
       {text.slice(0, span[0])}
-      <span className={cls}>{text.slice(span[0], span[1])}</span>
+      <span className={`hl ${cls}`}>{text.slice(span[0], span[1])}</span>
       {text.slice(span[1])}
     </>
   )
@@ -179,7 +192,7 @@ function AuthenticityDetail({
   )
   const matched = check?.matched as Record<string, unknown> | undefined
 
-  type Row = [string, string, string | null, boolean] // label, yours, theirs, mismatch
+  type Row = [string, string, string | null, boolean]
   const theirs = (k: string): string | null => {
     if (!matched) return null
     const v = matched[k]
@@ -187,8 +200,7 @@ function AuthenticityDetail({
     if (Array.isArray(v)) return v.slice(0, 4).join(', ')
     return String(v)
   }
-  const flag = (k: string) =>
-    (check?.issues ?? []).some((i) => i.includes(k))
+  const flag = (k: string) => (check?.issues ?? []).some((i) => i.includes(k))
 
   const rows: Row[] = [
     ['标题', ref?.title ?? '', theirs('title'), flag('标题')],
@@ -212,18 +224,17 @@ function AuthenticityDetail({
 
   return (
     <>
-      <div className="font-semibold">{item.title}</div>
-      <div className="flex gap-4" style={{ marginTop: 16 }}>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold" style={{ marginBottom: 8 }}>
+      <div className="flex gap-2">
+        <div className="card flex-1 min-w-0" style={{ padding: 12 }}>
+          <div className="t13 secondary" style={{ marginBottom: 8 }}>
             你写的
           </div>
           {rows.map(([label, yours, _t, bad]) => (
             <FieldRow key={label} label={label} value={yours} bad={bad} />
           ))}
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="font-semibold" style={{ marginBottom: 8 }}>
+        <div className="card flex-1 min-w-0" style={{ padding: 12 }}>
+          <div className="t13 secondary" style={{ marginBottom: 8 }}>
             {check?.status === 'not_found' || !matched
               ? '数据库中查到的'
               : `数据库中查到的（${srcName}）`}
@@ -242,7 +253,6 @@ function AuthenticityDetail({
       {doiUrl && (
         <button
           className="link-accent font-normal"
-          style={{ marginTop: 8 }}
           onClick={() => window.citecheck.openExternal(doiUrl)}
         >
           {doiUrl}
@@ -263,10 +273,11 @@ function FieldRow({
 }) {
   return (
     <div style={{ marginBottom: 4 }}>
-      <div className="font-normal">{label}</div>
+      <div className="t13 secondary">{label}</div>
       <div
         className="font-normal"
         style={{
+          fontSize: 13,
           background: bad ? 'var(--high-tint)' : 'transparent',
           borderRadius: 4,
           padding: '1px 4px',
@@ -290,7 +301,7 @@ function DistributionDetail({
 }) {
   const d = report.distribution
   const secs = d ? comparedSections(d) : []
-  const only = item.finding?.anchor?.paragraph_id
+  const only = item.anchors[0]?.paragraph_id
   const shown = only
     ? secs.filter((s) => {
         const sec = (report.sections ?? []).find((x) => x.id === s.section_id)
@@ -300,13 +311,8 @@ function DistributionDetail({
   const rows = shown.length ? shown : secs
   return (
     <>
-      <div className="font-semibold">{item.title}</div>
-      {d?.note && (
-        <div className="font-normal" style={{ marginTop: 8 }}>
-          {d.note}
-        </div>
-      )}
-      <div className="flex flex-col gap-6" style={{ marginTop: 16 }}>
+      {d?.note && <div className="t13 secondary">{d.note}</div>}
+      <div className="card flex flex-col" style={{ gap: 16 }}>
         {rows.map((s) => (
           <DistRow key={s.section_id} s={s} />
         ))}
@@ -315,7 +321,7 @@ function DistributionDetail({
   )
 }
 
-function DistRow({ s }: { s: NonNullable<Report['distribution']> extends never ? never : import('../types/report').SectionDist }) {
+function DistRow({ s }: { s: import('../types/report').SectionDist }) {
   const share = barGeom(s.share ?? 0, s.bench_share ?? null)
   const density = barGeom(s.density ?? 0, s.bench_density ?? null)
   const comparable = s.density_flag !== 'na'
@@ -328,7 +334,6 @@ function DistRow({ s }: { s: NonNullable<Report['distribution']> extends never ?
         label="本文"
         frac={share.valueFrac}
         valueLabel={`${((s.share ?? 0) * 100).toFixed(1)}%`}
-        track="share"
         geom={share}
       />
       {comparable && (
@@ -336,12 +341,11 @@ function DistRow({ s }: { s: NonNullable<Report['distribution']> extends never ?
           label="密度"
           frac={density.valueFrac}
           valueLabel={`${(s.density ?? 0).toFixed(1)} /千词`}
-          track="density"
           geom={density}
         />
       )}
       {!comparable && (
-        <div className="font-normal" style={{ marginTop: 4 }}>
+        <div className="t13 secondary" style={{ marginTop: 4 }}>
           密度不可比（语言不同）
         </div>
       )}
@@ -358,7 +362,6 @@ function BarRow({
   label: string
   frac: number
   valueLabel: string
-  track: string
   geom: { q1: number; q3: number; median: number }
 }) {
   return (
@@ -366,7 +369,12 @@ function BarRow({
       <div className="flex items-center gap-2">
         <div
           className="relative"
-          style={{ flex: 1, height: 8, background: 'var(--bg-subtle)', borderRadius: 4 }}
+          style={{
+            flex: 1,
+            height: 8,
+            background: 'var(--fill)',
+            borderRadius: 4,
+          }}
         >
           <div
             style={{
@@ -380,14 +388,19 @@ function BarRow({
             }}
           />
         </div>
-        <span className="font-normal" style={{ minWidth: 64 }}>
+        <span className="t13 secondary" style={{ minWidth: 88 }}>
           {label} {valueLabel}
         </span>
       </div>
       <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
         <div
           className="relative"
-          style={{ flex: 1, height: 8, background: 'var(--bg-subtle)', borderRadius: 4 }}
+          style={{
+            flex: 1,
+            height: 8,
+            background: 'var(--fill)',
+            borderRadius: 4,
+          }}
         >
           <div
             style={{
@@ -411,7 +424,7 @@ function BarRow({
             }}
           />
         </div>
-        <span className="font-normal" style={{ minWidth: 64 }}>
+        <span className="t13 secondary" style={{ minWidth: 88 }}>
           领域常见范围
         </span>
       </div>
@@ -423,15 +436,14 @@ function BarRow({
 
 function NormsDetail({ item, report }: { item: ListItem; report: Report }) {
   const text = anchoredText(report, item)
+  if (!text) return null
   return (
-    <>
-      <div className="font-semibold">{item.title}</div>
-      {text && (
-        <div className="detail-block font-normal" style={{ marginTop: 16 }}>
-          {text}
-        </div>
-      )}
-    </>
+    <div className="card">
+      <div className="t13 secondary" style={{ marginBottom: 8 }}>
+        原文
+      </div>
+      <div className="font-normal">{text}</div>
+    </div>
   )
 }
 
@@ -440,44 +452,106 @@ function RevisionDetail({ item }: { item: ListItem }) {
   if (!r) return null
   return (
     <>
-      <div className="font-semibold">{item.title}</div>
-      <div className="flex flex-col gap-3" style={{ marginTop: 16 }}>
-        <div>
-          <div className="font-normal" style={{ marginBottom: 4 }}>
-            原文
-          </div>
-          <div
-            className="font-normal"
-            style={{
-              background: 'var(--high-tint)',
-              borderRadius: 4,
-              padding: '2px 6px',
-              wordBreak: 'break-word',
-            }}
-          >
-            {r.old}
-          </div>
+      <div className="card">
+        <div className="t13 secondary" style={{ marginBottom: 8 }}>
+          原文
         </div>
-        <div>
-          <div className="font-normal" style={{ marginBottom: 4 }}>
-            修订为
-          </div>
-          <div
-            className="font-normal"
-            style={{
-              background: 'var(--ok-tint)',
-              borderRadius: 4,
-              padding: '2px 6px',
-              wordBreak: 'break-word',
-            }}
-          >
-            {r.new}
-          </div>
+        <div
+          className="font-normal"
+          style={{
+            background: 'var(--high-tint)',
+            borderRadius: 4,
+            padding: '2px 6px',
+            wordBreak: 'break-word',
+          }}
+        >
+          {r.old}
         </div>
-        {r.reason && <div className="font-normal">{r.reason}</div>}
-        <div className="font-normal">
-          导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。
+      </div>
+      <div className="card">
+        <div className="t13 secondary" style={{ marginBottom: 8 }}>
+          修订为
         </div>
+        <div
+          className="font-normal"
+          style={{
+            background: 'var(--ok-tint)',
+            borderRadius: 4,
+            padding: '2px 6px',
+            wordBreak: 'break-word',
+          }}
+        >
+          {r.new}
+        </div>
+        {r.reason && (
+          <div className="t13 secondary" style={{ marginTop: 8 }}>
+            {r.reason}
+          </div>
+        )}
+      </div>
+      <div className="t13 secondary">
+        导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。
+      </div>
+    </>
+  )
+}
+
+// ------------------------------------------- collapsed reorder group
+
+/** first bracketed/dotted number in a revision's old/new text */
+function leadNumber(s: string | undefined): string {
+  const m = (s ?? '').match(/\d+/)
+  return m ? m[0] : '—'
+}
+
+function ReorderDetail({
+  item,
+  report,
+}: {
+  item: ListItem
+  report: Report
+}) {
+  const refs = (item.revisions ?? []).filter((r) => r.kind === 'ref_reorder')
+  const titleOf = (anchorPara: string | undefined) => {
+    const ref = (report.references ?? []).find(
+      (r) => r.paragraph_id === anchorPara
+    )
+    return ref?.title ?? ''
+  }
+  return (
+    <>
+      <div className="card">
+        <div className="t13 secondary" style={{ marginBottom: 8 }}>
+          编号变化
+        </div>
+        <div className="flex flex-col" style={{ gap: 4 }}>
+          {refs.map((r) => {
+            const title = titleOf(r.anchor?.paragraph_id)
+            return (
+              <div key={r.id} className="flex items-baseline gap-2">
+                <span
+                  className="t13 secondary"
+                  style={{ minWidth: 28, textAlign: 'right' }}
+                >
+                  {leadNumber(r.old)}
+                </span>
+                <span
+                  className="t13 font-semibold"
+                  style={{ minWidth: 28 }}
+                >
+                  {leadNumber(r.new)}
+                </span>
+                <span className="t13 secondary clamp-2 min-w-0">{title}</span>
+              </div>
+            )
+          })}
+          {!refs.length && (
+            <div className="t13 secondary">仅正文编号需要更新。</div>
+          )}
+        </div>
+      </div>
+      <div className="t13 secondary">
+        导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。
       </div>
     </>
   )

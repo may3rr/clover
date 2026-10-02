@@ -163,9 +163,12 @@ ipcMain.on('citecheck:e2e-done', (_e, info: unknown) => {
 const SHOT_STATES = [
   'empty',
   'empty-dragover',
-  'running',
+  'running-shimmer',
+  'running-mid',
+  'running-done',
   'report',
   'report-selected',
+  'report-filter-support',
   'detail-support',
   'detail-authenticity',
   'detail-distribution',
@@ -182,24 +185,66 @@ function shotReady(): Promise<void> {
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
+// Prefer the real window (vibrancy + traffic lights) via screencapture;
+// fall back to capturePage if Screen Recording permission is missing.
+// screencapture occasionally reads the previous frame — capture twice and
+// keep the second when it differs (a one-frame lag then heals itself).
+async function captureOnce(file: string): Promise<boolean> {
+  return new Promise(async (resolve) => {
+    try {
+      const src = win!.getMediaSourceId() // "window:<CGWindowID>:0"
+      const wid = src.split(':')[1]
+      const { execFile } = await import('node:child_process')
+      execFile(
+        '/usr/sbin/screencapture',
+        ['-x', '-o', `-l${wid}`, file],
+        (err) => {
+          resolve(
+            !err && fs.existsSync(file) && fs.statSync(file).size > 10000
+          )
+        }
+      )
+    } catch {
+      resolve(false)
+    }
+  })
+}
+
+async function captureWindow(file: string): Promise<'window' | 'page'> {
+  const tmp = `${file}.tmp.png`
+  const ok1 = await captureOnce(tmp)
+  if (!ok1) {
+    const img = await win!.webContents.capturePage()
+    fs.writeFileSync(file, img.toPNG())
+    return 'page'
+  }
+  await sleep(350)
+  const ok2 = await captureOnce(file)
+  // second pass may differ if the first was a stale frame — keep it
+  if (!ok2) fs.copyFileSync(tmp, file)
+  fs.rmSync(tmp, { force: true })
+  return 'window'
+}
+
 async function runShots() {
   if (!SHOTS_DIR || !win) return
-  await sleep(400) // renderer mounts, subscribes, sends renderer-ready
+  await sleep(600) // renderer mounts, subscribes, sends renderer-ready
   fs.mkdirSync(SHOTS_DIR, { recursive: true })
+  let method: 'window' | 'page' | null = null
   for (const theme of ['light', 'dark'] as const) {
     nativeTheme.themeSource = theme
-    await sleep(250)
+    await sleep(400)
     for (const state of SHOT_STATES) {
       const ready = shotReady()
       win.webContents.send('citecheck:shot-state', state)
       await ready
-      await sleep(60)
-      const img = await win.webContents.capturePage()
+      await sleep(300) // let the 200ms detail/list transitions finish
       const p = path.join(SHOTS_DIR, `${theme}-${state}.png`)
-      fs.writeFileSync(p, img.toPNG())
-      console.log(`shot saved: ${p}`)
+      method = await captureWindow(p)
+      console.log(`shot saved (${method}): ${p}`)
     }
   }
+  console.log(`SHOTS_METHOD ${method}`)
   app.quit()
 }
 
@@ -287,11 +332,21 @@ async function createWindow() {
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: false,
+      // keep compositing while occluded — otherwise screencapture reads a
+      // stale window surface in shot mode (DOM updated, pixels not)
+      backgroundThrottling: false,
     },
   })
 
   if (THEME === 'light' || THEME === 'dark') {
     nativeTheme.themeSource = THEME
+  }
+
+  // surface renderer console in shot/e2e runs
+  if (SHOTS_DIR || E2E_FILE) {
+    win.webContents.on('console-message', (_e, _l, msg) =>
+      console.log(`[renderer] ${msg}`)
+    )
   }
 
   const devUrl = process.env.ELECTRON_RENDERER_URL

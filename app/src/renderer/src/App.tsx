@@ -6,6 +6,8 @@ import Running, { type LayerUI } from './screens/Running'
 import ReportScreen from './screens/ReportScreen'
 import ErrorScreen from './screens/Error'
 import { applyShotState, type ShotCtx } from './lib/shots'
+import { morph } from './lib/vt'
+import type { Outline, SkAnchor } from './lib/outline'
 
 type Screen = 'empty' | 'running' | 'report' | 'error'
 
@@ -18,6 +20,7 @@ export default function App() {
   const [report, setReport] = useState<Report | null>(null)
   const [benchmark, setBenchmark] = useState('arxiv_cs_cl')
   const [jobError, setJobError] = useState<string | null>(null)
+  const [fileName, setFileName] = useState('paper.docx')
   const exportRef = useRef<(() => void) | null>(null)
   const shotState = useRef<ShotCtx>({})
 
@@ -39,6 +42,7 @@ export default function App() {
   const analyze = useCallback(
     async (path: string) => {
       setJobError(null)
+      setFileName(path.split('/').pop() ?? path)
       try {
         const fd = new FormData()
         fd.append('path', path)
@@ -49,8 +53,11 @@ export default function App() {
           return
         }
         const { job_id } = (await r.json()) as { job_id: string }
-        setJobId(job_id)
-        setScreen('running')
+        // the front sheet flies into the first skeleton page
+        morph(() => {
+          setJobId(job_id)
+          setScreen('running')
+        })
       } catch {
         setJobError('无法连接本地服务。请重新打开应用。')
       }
@@ -78,8 +85,12 @@ export default function App() {
       setJobError('读取报告失败。请重新体检。')
       return
     }
-    setReport((await r.json()) as Report)
-    setScreen('report')
+    const rep = (await r.json()) as Report
+    // skeleton page 1 morphs into the reading page, panel into inspector
+    morph(() => {
+      setReport(rep)
+      setScreen('report')
+    })
   }, [jobId])
 
   const onJobFailed = useCallback((error: string) => {
@@ -117,14 +128,24 @@ export default function App() {
       shotState.current.setScreen = setScreen
       shotState.current.setReport = setReport
       shotState.current.setLayers = (l) => setShotLayers(l)
+      shotState.current.setOutline = (o) => setShotOutline(o)
+      shotState.current.setAnchors = (a) => setShotAnchors(a)
       shotState.current.selectItem = (id, open) =>
         setExtSel({ id, open: open !== false })
+      shotState.current.setFilter = (l) => setExtFilter({ layer: l })
       shotState.current.setDrag = (v) => setDragHint(v)
     })
   }, [])
   const [shotLayers, setShotLayers] = useState<LayerUI | null>(null)
+  const [shotOutline, setShotOutline] = useState<Outline | null>(null)
+  const [shotAnchors, setShotAnchors] = useState<
+    Record<string, SkAnchor[]> | null
+  >(null)
   const [dragHint, setDragHint] = useState(false)
   const [extSel, setExtSel] = useState<{ id: string | null; open: boolean } | null>(
+    null
+  )
+  const [extFilter, setExtFilter] = useState<{ layer: string | null } | null>(
     null
   )
 
@@ -159,11 +180,14 @@ export default function App() {
     return (
       <Running
         jobId={jobId}
+        fileName={fileName}
         onDone={onJobDone}
         onFailed={onJobFailed}
         error={jobError}
         onReset={reset}
         overrideLayers={shotLayers}
+        overrideOutline={shotOutline}
+        overrideAnchors={shotAnchors}
       />
     )
   }
@@ -174,7 +198,9 @@ export default function App() {
         report={report}
         jobId={jobId}
         externalSelection={extSel}
+        externalFilter={extFilter}
         registerExport={(fn) => (exportRef.current = fn)}
+        onReset={reset}
         onExported={(_path) => {
           if (window.citecheck.e2eFile && !e2eExportDone.current) {
             e2eExportDone.current = true

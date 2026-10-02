@@ -1,14 +1,30 @@
 import type { Report } from '../types/report'
 import type { LayerUI } from '../screens/Running'
 import { buildItems } from './items'
+import {
+  anchorsFromReport,
+  outlineFromReport,
+  type Outline,
+  type SkAnchor,
+} from './outline'
 
 export interface ShotCtx {
   report?: Report
   setScreen?: (s: 'empty' | 'running' | 'report' | 'error') => void
   setReport?: (r: Report | null) => void
   setLayers?: (l: LayerUI) => void
+  setOutline?: (o: Outline | null) => void
+  setAnchors?: (a: Record<string, SkAnchor[]>) => void
   selectItem?: (id: string | null, open?: boolean) => void
+  setFilter?: (layer: string | null) => void
   setDrag?: (v: boolean) => void
+}
+
+const ALL_DONE: LayerUI = {
+  authenticity: { status: 'done', findings: 3 },
+  support: { status: 'done', findings: 11 },
+  distribution: { status: 'done', findings: 7 },
+  norms: { status: 'done', findings: 1 },
 }
 
 /** Debug-only state driver for `npm run shots` (CITECHECK_SHOTS). */
@@ -16,10 +32,13 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   const report = ctx.report
   ctx.setDrag?.(false)
   ctx.selectItem?.(null)
+  ctx.setFilter?.(null)
 
   const items = report ? buildItems(report) : []
   const firstOf = (pred: (i: (typeof items)[0]) => boolean) =>
     items.find(pred)?.id ?? null
+  const outline = report ? outlineFromReport(report) : null
+  const anchors = report ? anchorsFromReport(report) : {}
 
   switch (state) {
     case 'empty':
@@ -29,14 +48,39 @@ export function applyShotState(state: string, ctx: ShotCtx) {
       ctx.setScreen?.('empty')
       ctx.setDrag?.(true)
       return
-    case 'running':
+    case 'running-shimmer':
+      // before "parsed" — placeholder pages + wave
       ctx.setScreen?.('running')
+      ctx.setOutline?.(null)
+      ctx.setAnchors?.({})
+      ctx.setLayers?.({
+        authenticity: { status: 'running', findings: 0 },
+        support: { status: 'waiting', findings: 0 },
+        distribution: { status: 'waiting', findings: 0 },
+        norms: { status: 'waiting', findings: 0 },
+      })
+      return
+    case 'running':
+    case 'running-mid':
+      ctx.setScreen?.('running')
+      ctx.setOutline?.(outline)
+      // two layers landed — their anchors are already lit
+      ctx.setAnchors?.({
+        authenticity: anchors['authenticity'] ?? [],
+        distribution: anchors['distribution'] ?? [],
+      })
       ctx.setLayers?.({
         authenticity: { status: 'done', findings: 3 },
         support: { status: 'running', findings: 0 },
         distribution: { status: 'done', findings: 7 },
         norms: { status: 'waiting', findings: 0 },
       })
+      return
+    case 'running-done':
+      ctx.setScreen?.('running')
+      ctx.setOutline?.(outline)
+      ctx.setAnchors?.(anchors)
+      ctx.setLayers?.(ALL_DONE)
       return
     case 'report':
       ctx.setReport?.(report ?? null)
@@ -53,6 +97,12 @@ export function applyShotState(state: string, ctx: ShotCtx) {
       ctx.selectItem?.(id, false) // selected in list + paper, detail closed
       return
     }
+    case 'report-filter-support': {
+      ctx.setReport?.(report ?? null)
+      ctx.setScreen?.('report')
+      ctx.setFilter?.('support')
+      return
+    }
     case 'detail-support':
     case 'detail-authenticity':
     case 'detail-distribution':
@@ -62,16 +112,21 @@ export function applyShotState(state: string, ctx: ShotCtx) {
       const layer = state.replace('detail-', '')
       const id =
         firstOf((i) => i.kind === 'finding' && i.layer === layer) ??
-        // the sample report has no norms finding — a revision row is the
-        // same norms surface
-        (layer === 'norms' ? firstOf((i) => i.kind === 'revision') : null)
+        // the sample report has no norms finding — the collapsed reorder
+        // group is the same norms surface
+        (layer === 'norms' ? firstOf((i) => i.kind === 'group') : null)
       ctx.selectItem?.(id)
       return
     }
     case 'detail-revision': {
       ctx.setReport?.(report ?? null)
       ctx.setScreen?.('report')
-      ctx.selectItem?.(firstOf((i) => i.kind === 'revision'))
+      // no individual typo revisions in the sample — the collapsed
+      // reorder group carries the revision detail UI
+      ctx.selectItem?.(
+        firstOf((i) => i.kind === 'revision') ??
+          firstOf((i) => i.kind === 'group')
+      )
       return
     }
   }

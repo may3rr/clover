@@ -13,9 +13,23 @@ import {
   pickItem,
   type ListItem,
 } from '../lib/items'
-import { segmentsForParagraph, HL_CLASS } from '../lib/highlight'
+import {
+  segmentsForParagraph,
+  HL_CLASS,
+  HL_SELECTED_CLASS,
+} from '../lib/highlight'
 import { apiFetch } from '../lib/api'
+import { morph } from '../lib/vt'
 import Detail from './Detail'
+import {
+  LayerTile,
+  DocTextFillIcon,
+  PlusFillIcon,
+  ArrowUpDocFillIcon,
+  PageIcon,
+  SealCheckFillIcon,
+  SealOkIllustration,
+} from '../components/Icons'
 
 const LAYER_NAMES: Record<string, string> = {
   authenticity: '文献真实性',
@@ -23,25 +37,29 @@ const LAYER_NAMES: Record<string, string> = {
   distribution: '引用分布',
   norms: '格式规范',
 }
+const LAYER_ORDER = ['authenticity', 'support', 'distribution', 'norms']
 
 interface Props {
   report: Report
   jobId: string
-  /** shot/E2E driver: selection applied after mount via effect */
   externalSelection?: { id: string | null; open: boolean } | null
+  externalFilter?: { layer: string | null } | null
   registerExport: (fn: () => void) => void
   onExported: (path: string | null) => void
+  onReset: () => void
 }
 
 export default function ReportScreen({
   report,
   jobId,
   externalSelection,
+  externalFilter,
   registerExport,
   onExported,
+  onReset,
 }: Props) {
   const items = useMemo(() => buildItems(report), [report])
-  const [filter, setFilter] = useState<string | null>(null) // layer or null=all
+  const [filter, setFilter] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
@@ -91,30 +109,58 @@ export default function ReportScreen({
     registerExport(doExport)
   }, [doExport, registerExport])
 
-  // E2E: export fires itself once the report is on screen
+  // E2E: open a support detail briefly, then export fires itself
   useEffect(() => {
-    if (window.citecheck.e2eFile) doExport()
+    if (!window.citecheck.e2eFile) return
+    const first = items.find(
+      (i) => i.kind === 'finding' && i.layer === 'support'
+    )
+    if (first) select(first.id, true)
+    const t = setTimeout(doExport, 1800)
+    return () => clearTimeout(t)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // ------------------------------------------------------ selection nav
   const select = useCallback(
     (id: string | null, openDetail: boolean) => {
-      setSelectedId(id)
-      setDetailId(openDetail ? id : null)
-      if (id) {
-        // scroll its paper segments into view
-        requestAnimationFrame(() => {
-          const el = segRefs.current.get(id)?.[0]
-          el?.scrollIntoView({ block: 'center' })
+      // list → detail morphs via a View Transition (skipped when reduced)
+      if (openDetail) {
+        morph(() => {
+          setSelectedId(id)
+          setDetailId(id)
         })
+      } else {
+        setSelectedId(id)
+        setDetailId(null)
+      }
+      if (id) {
+        // after the commit: scroll the highlighted paper segment into view
+        // and keep the selected list row visible
+        setTimeout(() => {
+          segRefs.current.get(id)?.[0]?.scrollIntoView({ block: 'center' })
+          document
+            .querySelector('.list-row.sel')
+            ?.scrollIntoView({ block: 'nearest' })
+        }, 0)
       }
     },
     []
   )
+
+  const closeDetail = useCallback(() => {
+    morph(() => setDetailId(null))
+  }, [])
+
   useEffect(() => {
-    if (externalSelection) select(externalSelection.id, externalSelection.open)
+    if (externalSelection) {
+      select(externalSelection.id, externalSelection.open)
+    }
   }, [externalSelection, select])
+
+  useEffect(() => {
+    if (externalFilter) setFilter(externalFilter.layer)
+  }, [externalFilter])
 
   // --------------------------------------------------------------- keys
   useEffect(() => {
@@ -130,157 +176,220 @@ export default function ReportScreen({
         )
         if (next) select(next, detailId !== null)
       } else if (e.key === 'Enter') {
-        if (selectedId) setDetailId(selectedId)
+        if (selectedId) select(selectedId, true)
       } else if (e.key === 'Escape') {
-        setDetailId(null)
+        closeDetail()
       }
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [shown, selectedId, detailId, select])
+  }, [shown, selectedId, detailId, select, closeDetail])
 
   const cloudCalls = report.meta?.llm_calls?.cloud ?? 0
+  const filterName = filter ? LAYER_NAMES[filter] : '全部问题'
+  const fileName = report.document.filename ?? report.document.title ?? '论文'
 
   return (
-    <div className="flex h-full">
-      {/* ---------- left: vibrancy sidebar ---------- */}
-      <aside
-        className="flex flex-col"
-        style={{ width: 240, paddingTop: 52, paddingLeft: 16, paddingRight: 8 }}
-      >
-        <div
-          className="font-semibold clamp-2"
-          style={{ fontSize: 15, lineHeight: 1.35, marginBottom: 24 }}
-          title={report.document.title ?? ''}
-        >
-          {report.document.title ?? '未命名论文'}
+    <div className="relative h-full overflow-hidden">
+      {/* ---------- flush sidebar pane (vibrancy) ---------- */}
+      <aside className="glass-sidebar flex flex-col" style={{ paddingTop: 52 }}>
+        <div className="group-label" style={{ fontWeight: 600 }}>
+          检查结果
         </div>
-        <nav className="flex flex-col gap-1">
-          <SidebarRow
+        <nav className="flex flex-col" style={{ padding: '0 8px' }}>
+          <SideRow
+            icon={<LayerTile size={20} />}
             label="全部问题"
             count={items.length}
             active={filter === null}
             onClick={() => setFilter(null)}
           />
-          {Object.entries(LAYER_NAMES).map(([key, name]) => (
-            <SidebarRow
+          {LAYER_ORDER.map((key) => (
+            <SideRow
               key={key}
-              label={name}
+              icon={<LayerTile layer={key} size={20} />}
+              label={LAYER_NAMES[key]}
               count={counts[key] ?? 0}
               active={filter === key}
               onClick={() => setFilter(key)}
             />
           ))}
         </nav>
+        <div className="group-label" style={{ fontWeight: 600, marginTop: 16 }}>
+          论文
+        </div>
+        <div className="flex flex-col" style={{ padding: '0 8px' }}>
+          <div
+            className="side-row"
+            style={{ cursor: 'default' }}
+            title={fileName}
+          >
+            <LayerTile
+              size={20}
+              icon={<DocTextFillIcon size={12} />}
+            />
+            <span
+              className="font-normal min-w-0"
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {fileName}
+            </span>
+          </div>
+          <button className="side-row" onClick={onReset}>
+            <LayerTile size={20} icon={<PlusFillIcon size={12} />} />
+            <span className="font-normal">检查另一篇</span>
+          </button>
+        </div>
         <div className="flex-1" />
-        <div className="font-normal" style={{ paddingBottom: 16 }}>
+        <div className="t13 secondary" style={{ padding: '0 20px 16px' }}>
           <div>全文在本机解析</div>
           <div>云端复核 {cloudCalls} 次</div>
         </div>
       </aside>
 
-      {/* ---------- center + right ---------- */}
-      <div className="flex-1 flex flex-col min-w-0" style={{ background: 'var(--bg)' }}>
+      {/* ---------- content between sidebar and inspector ---------- */}
+      <div
+        className="flex flex-col h-full"
+        style={{ marginLeft: 240, marginRight: 380, background: 'var(--bg)' }}
+      >
         <div
-          className="drag-strip flex items-center justify-end gap-3"
-          style={{ height: 52, paddingRight: 16, flex: 'none' }}
+          className="drag-strip flex items-center justify-between"
+          style={{ height: 52, flex: 'none', padding: '0 24px' }}
         >
-          {exported && (
-            <span className="font-normal">已导出到 {exported}</span>
-          )}
-          {exportErr && <span className="font-normal">{exportErr}</span>}
-          <button className="pill-accent" onClick={doExport} disabled={exporting}>
-            {exporting ? '正在导出' : '导出到 Word'}
-          </button>
-        </div>
-        <div className="flex flex-1 min-h-0">
-          {/* ---------- center: paper ---------- */}
-          <main className="paper flex-1 overflow-y-auto" style={{ padding: '0 24px 48px' }}>
-            <div style={{ maxWidth: 680, margin: '0 auto' }}>
-              <PaperTitle report={report} />
-              <PaperBody
-                report={report}
-                items={items}
-                selectedId={selectedId}
-                segRefs={segRefs}
-                onPick={(ids) => {
-                  const covering = items.filter((i) => ids.includes(i.id))
-                  const it = pickItem(covering, (x) =>
-                    x.kind === 'finding'
-                      ? x.finding?.anchor?.end ?? x.start
-                      : x.revision?.anchor?.end ?? x.start
-                  )
-                  if (it) select(it.id, true)
-                }}
-              />
-            </div>
-          </main>
-          {/* ---------- right: list / detail ---------- */}
-          <aside
-            className="overflow-y-auto"
-            style={{ width: 380, flex: 'none', padding: '0 16px 16px' }}
-          >
-            {detail ? (
-              <Detail
-                item={detail}
-                report={report}
-                onBack={() => setDetailId(null)}
-              />
-            ) : (
-              <ItemList
-                items={shown}
-                selectedId={selectedId}
-                onSelect={(id) => select(id, true)}
-              />
+          <div className="font-semibold">{filterName}</div>
+          <div className="flex items-center gap-3">
+            {exported && (
+              <span className="t13 secondary">已导出到 {exported}</span>
             )}
-          </aside>
+            {exportErr && <span className="t13 secondary">{exportErr}</span>}
+            <button
+              className="pill-accent"
+              onClick={doExport}
+              disabled={exporting}
+            >
+              {exporting ? (
+                <svg
+                  className="spinner"
+                  width="13"
+                  height="13"
+                  viewBox="0 0 14 14"
+                  aria-hidden
+                >
+                  <circle
+                    cx="7"
+                    cy="7"
+                    r="5.5"
+                    fill="none"
+                    stroke="white"
+                    strokeOpacity={0.4}
+                    strokeWidth="2"
+                  />
+                  <path
+                    d="M 7 1.5 A 5.5 5.5 0 0 1 12.5 7"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              ) : (
+                <ArrowUpDocFillIcon size={15} color="white" />
+              )}
+              {exporting ? '正在导出' : '导出到 Word'}
+            </button>
+          </div>
         </div>
+        <main
+          className="paper flex-1 overflow-y-auto"
+          style={{
+            padding: '0 24px 48px',
+            background: 'var(--bg)',
+            viewTransitionName: 'cc-paper',
+          }}
+        >
+          <div style={{ maxWidth: 680, margin: '0 auto' }}>
+            <PaperBody
+              report={report}
+              items={items}
+              filter={filter}
+              selectedId={selectedId}
+              segRefs={segRefs}
+              onPick={(ids) => {
+                const covering = items.filter((i) => ids.includes(i.id))
+                const it = pickItem(covering)
+                if (it) select(it.id, true)
+              }}
+            />
+          </div>
+        </main>
       </div>
+
+      {/* ---------- inspector ---------- */}
+      <aside
+        className="inspector"
+        style={{ viewTransitionName: 'cc-panel' }}
+      >
+        {detail ? (
+          <Detail
+            item={detail}
+            report={report}
+            backLabel={filterName}
+            onBack={closeDetail}
+          />
+        ) : (
+          <InspectorList
+            items={shown}
+            grouped={filter === null}
+            selectedId={selectedId}
+            onSelect={(id) => select(id, true)}
+          />
+        )}
+      </aside>
     </div>
   )
 }
 
-function SidebarRow({
+function SideRow({
+  icon,
   label,
   count,
   active,
   onClick,
 }: {
+  icon: React.ReactNode
   label: string
-  count: number
-  active: boolean
-  onClick: () => void
+  count?: number
+  active?: boolean
+  onClick?: () => void
 }) {
   return (
     <button
-      className={`sidebar-row flex justify-between items-center text-left ${active ? 'row-selected' : ''}`}
-      style={{ fontWeight: active ? 600 : 400, width: '100%' }}
+      className={`side-row ${active ? 'sel' : ''}`}
+      style={{ fontWeight: active ? 600 : 400 }}
       onClick={onClick}
     >
-      <span>{label}</span>
-      <span>{count}</span>
+      {icon}
+      <span className="flex-1 text-left">{label}</span>
+      {count !== undefined && <span className="t13 secondary">{count}</span>}
     </button>
-  )
-}
-
-function PaperTitle({ report }: { report: Report }) {
-  if (!report.document.title) return null
-  return (
-    <div style={{ fontWeight: 700, marginBottom: 24 }}>
-      {report.document.title}
-    </div>
   )
 }
 
 function PaperBody({
   report,
   items,
+  filter,
   selectedId,
   segRefs,
   onPick,
 }: {
   report: Report
   items: ListItem[]
+  filter: string | null
   selectedId: string | null
   segRefs: React.MutableRefObject<Map<string, HTMLElement[]>>
   onPick: (itemIds: string[]) => void
@@ -294,41 +403,112 @@ function PaperBody({
       ),
     [report.sections]
   )
-  const byPara = useMemo(() => {
-    const m = new Map<string, ListItem[]>()
-    for (const i of items) {
-      if (!i.paragraphId) continue
-      m.set(i.paragraphId, [...(m.get(i.paragraphId) ?? []), i])
-    }
-    return m
-  }, [items])
+  const refParaIds = useMemo(
+    () =>
+      new Set(
+        (report.references ?? [])
+          .map((r) => r.paragraph_id)
+          .filter(Boolean) as string[]
+      ),
+    [report.references]
+  )
+  // visible highlights: only the active filter; low + renumber-group items
+  // only paint once selected
+  const visible = useMemo(
+    () =>
+      items.filter((i) => {
+        if (filter && i.layer !== filter) return false
+        if (i.id === selectedId) return true
+        if (i.kind === 'group' || i.severity === 'low') return false
+        return true
+      }),
+    [items, filter, selectedId]
+  )
+  const title = (report.document.title ?? '').trim()
+  const nMarkers = (report.markers ?? []).length
+  const nRefs = (report.references ?? []).length
+  const nHigh = items.filter((i) => i.severity === 'high').length
+  const nMedium = items.filter(
+    (i) => i.severity === 'medium' || i.severity === 'low'
+  ).length
 
   return (
     <>
+      {/* Notion-style page header */}
+      <div className="rise-in">
+        <PageIcon />
+        <div
+          className="t32"
+          style={{ fontWeight: 700, marginTop: 12, lineHeight: 1.25 }}
+        >
+          {title}
+        </div>
+        <div style={{ marginTop: 24 }}>
+          {(
+            [
+              ['文件', report.document.filename ?? '—'],
+              ['引用标记', `${nMarkers} 处`],
+              ['参考文献', `${nRefs} 条`],
+              [
+                '对标领域',
+                report.distribution?.benchmark_name ?? '—',
+              ],
+              [
+                '检查用时',
+                `${Math.round(report.meta?.duration_s ?? 0)} 秒`,
+              ],
+            ] as [string, string][]
+          ).map(([label, value]) => (
+            <div key={label} className="prop-row">
+              <span className="prop-label">{label}</span>
+              <span className="prop-value font-normal">{value}</span>
+            </div>
+          ))}
+        </div>
+        <div className="callout" style={{ marginTop: 24, marginBottom: 40 }}>
+          <SealCheckFillIcon size={20} color="var(--accent)" />
+          <div className="font-normal">
+            发现{' '}
+            <span className="font-semibold sem-high">{nHigh}</span>{' '}
+            条严重问题，
+            <span className="font-semibold sem-medium">{nMedium}</span>{' '}
+            条需要注意，导出后会以批注和修订出现在 Word 里。
+          </div>
+        </div>
+      </div>
       {(report.paragraphs ?? []).map((p) => {
+        const ptext = p.text ?? ''
+        if (title && ptext.trim() === title) return null // shown once above
         const isHeading = headingIds.has(p.id ?? '')
-        const segs = segmentsForParagraph(p.text ?? '', byPara.get(p.id ?? '') ?? [])
+        const isRef = refParaIds.has(p.id ?? '')
+        const segs = segmentsForParagraph(ptext, p.id ?? '', visible, selectedId)
         return (
           <p
             key={p.id}
+            className={isRef ? 'paper-refs' : undefined}
             style={{
               fontWeight: isHeading ? 600 : 400,
+              fontSize: isHeading ? 20 : undefined,
               margin: 0,
+              marginTop: isHeading ? 32 : 0,
               marginBottom: 16,
             }}
           >
             {segs.map((s, i) => {
               if (s.severity === null) return <span key={i}>{s.text}</span>
-              const isSel = s.itemIds.includes(selectedId ?? '')
+              const cls = s.selected
+                ? HL_SELECTED_CLASS[s.severity]
+                : HL_CLASS[s.severity]
               return (
                 <span
                   key={i}
-                  className={isSel ? 'hl-selected' : HL_CLASS[s.severity]}
+                  className={`hl ${cls}`}
                   ref={(el) => {
                     if (!el) return
                     for (const id of s.itemIds) {
                       const arr = segRefs.current.get(id) ?? []
-                      if (!arr.includes(el)) segRefs.current.set(id, [...arr, el])
+                      if (!arr.includes(el))
+                        segRefs.current.set(id, [...arr, el])
                     }
                   }}
                   onClick={() => onPick(s.itemIds)}
@@ -347,48 +527,86 @@ function PaperBody({
   )
 }
 
-function ItemList({
+function InspectorList({
   items,
+  grouped,
   selectedId,
   onSelect,
 }: {
   items: ListItem[]
+  grouped: boolean
   selectedId: string | null
   onSelect: (id: string) => void
 }) {
+  const groups = useMemo(() => {
+    if (!grouped) return null
+    const out: { layer: string; items: ListItem[] }[] = []
+    for (const key of LAYER_ORDER) {
+      const l = items.filter((i) => i.layer === key)
+      if (l.length) out.push({ layer: key, items: l })
+    }
+    return out
+  }, [items, grouped])
+
+  let rowIdx = 0
+  const row = (i: ListItem) => {
+    // staggered entrance — max 12 rows animate, the rest are instant
+    const delay = Math.min(rowIdx++, 12) * 20
+    return (
+      <button
+        key={i.id}
+        className={`list-row row-in ${i.id === selectedId ? 'sel' : ''}`}
+        style={{ animationDelay: `${delay}ms` }}
+        onClick={() => onSelect(i.id)}
+      >
+        <div className="flex items-start gap-2">
+          <LayerTile layer={i.layer} size={22} />
+          <div className="min-w-0">
+            <div
+              className={`font-semibold${i.id === selectedId ? ' row-title-sel' : ''}`}
+            >
+              {i.title}
+            </div>
+            {firstLine(i.detail) && (
+              <div className="t13 secondary clamp-2">{firstLine(i.detail)}</div>
+            )}
+          </div>
+        </div>
+      </button>
+    )
+  }
+
   return (
     <>
-      <div className="font-semibold" style={{ padding: '8px 8px 16px' }}>
+      <div
+        className="font-semibold"
+        style={{ fontSize: 17, padding: '14px 16px', flex: 'none', height: 52 }}
+      >
         {items.length} 个问题
       </div>
-      <div className="flex flex-col gap-1">
-        {items.map((i) => (
-          <button
-            key={i.id}
-            className="text-left"
-            style={{
-              borderRadius: 12,
-              padding: '8px 12px',
-              background:
-                i.id === selectedId ? 'var(--bg-subtle)' : 'transparent',
-              width: '100%',
-            }}
-            onClick={() => onSelect(i.id)}
+      <div
+        className="flex-1 overflow-y-auto flex flex-col gap-1"
+        style={{ padding: '0 8px 8px' }}
+      >
+        {items.length === 0 && (
+          <div
+            className="flex flex-col items-center secondary"
+            style={{ padding: '32px 12px', gap: 12 }}
           >
-            <div className="flex items-start gap-2">
-              <span
-                className={`dot ${i.severity === 'rev' ? 'dot-rev' : `dot-${i.severity}`}`}
-                style={{ marginTop: 7 }}
-              />
-              <div className="min-w-0">
-                <div className="font-semibold">{i.title}</div>
-                {firstLine(i.detail) && (
-                  <div className="font-normal clamp-2">{firstLine(i.detail)}</div>
-                )}
+            <SealOkIllustration size={40} />
+            <div className="t13">这一类没有发现问题。</div>
+          </div>
+        )}
+        {groups
+          ? groups.map((g) => (
+              <div key={g.layer}>
+                <div className="group-label">
+                  {LAYER_NAMES[g.layer]} {g.items.length}
+                </div>
+                {g.items.map(row)}
               </div>
-            </div>
-          </button>
-        ))}
+            ))
+          : items.map(row)}
       </div>
     </>
   )

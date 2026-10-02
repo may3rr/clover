@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global base rules — AGENTS §6. Hex values live in tokens.css only;
-   the color-mix() tints below reuse the declared variables. */
+/* Global base rules — AGENTS §6. Color values live in tokens.css only. */
 
 html,
 body,
@@ -11,12 +10,18 @@ body,
   height: 100%;
 }
 
+/* transparent root: window vibrancy shows through the flush sidebar pane;
+   every other region paints its own background */
+html,
+body {
+  background: transparent;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
     'PingFang SC', system-ui, sans-serif;
   font-size: 15px;
   color: var(--text);
-  background: var(--bg);
   -webkit-font-smoothing: antialiased;
   user-select: none;
   margin: 0;
@@ -79,6 +84,27 @@ select {
   font-size: 17px;
   line-height: 1.7;
 }
+.paper-refs {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* type scale helpers */
+.t13 {
+  font-size: 13px;
+}
+.t20 {
+  font-size: 20px;
+}
+.t26 {
+  font-size: 26px;
+}
+.t32 {
+  font-size: 32px;
+}
+.secondary {
+  color: var(--text-secondary);
+}
 
 /* draggable toolbar strip */
 .drag-strip {
@@ -91,9 +117,9 @@ select {
   -webkit-app-region: no-drag;
 }
 
-/* quiet pill controls */
+/* capsule controls */
 .pill {
-  background: var(--bg-subtle);
+  background: var(--fill);
   border-radius: 980px;
   padding: 8px 24px;
   font-weight: 500;
@@ -102,19 +128,21 @@ select {
   background: var(--accent);
   color: white;
   border-radius: 980px;
-  padding: 8px 24px;
+  height: 30px;
+  padding: 0 14px;
   font-weight: 500;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
-/* one allowed literal: white on accent (same in both themes) */
-
 .pill-quiet {
-  background: var(--bg-subtle);
+  background: var(--fill);
   border-radius: 980px;
   padding: 4px 16px;
 }
 
-/* small native-style indeterminate spinner — 14px accent arc drawn as
-   an SVG circle (CSS borders are banned, AGENTS §6.3) */
+/* small native-style indeterminate spinner — accent arc drawn as SVG */
 .spinner {
   animation: cc-spin 0.8s linear infinite;
 }
@@ -124,40 +152,114 @@ select {
   }
 }
 
-/* highlight tints (severity -> token) */
-.hl-high {
-  background: var(--high-tint);
-  border-radius: 4px;
-}
-.hl-medium {
-  background: var(--medium-tint);
-  border-radius: 4px;
-}
-.hl-low {
-  background: var(--bg-subtle);
-  border-radius: 4px;
-}
-.hl-rev {
-  background: var(--ok-tint);
-  border-radius: 4px;
-}
-.hl-selected {
-  background: color-mix(in srgb, var(--accent) 28%, transparent);
-  border-radius: 4px;
+/* flush left pane — native vibrancy shows through; the 1px separator is
+   the only line besides the focus ring */
+.glass-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 240px;
+  background: var(--sidebar-tint);
+  box-shadow: 1px 0 0 var(--separator);
+  overflow: hidden;
 }
 
-.row-selected {
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  border-radius: 4px;
+/* flush right pane — --bg-subtle reads better against the hairline and
+   keeps the inset-grouped card look */
+.inspector {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  background: var(--bg-subtle);
+  box-shadow: -1px 0 0 var(--separator);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-.detail-block {
-  background: var(--bg-subtle);
+/* white cards inside the inspector (Settings inset-grouped look) */
+.card {
+  background: var(--bg);
   border-radius: 12px;
   padding: 16px;
 }
 
-/* detail slide/fade — 200ms ease-out, per §6.4 */
+/* sidebar rows */
+.side-row {
+  height: 32px;
+  border-radius: 8px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+}
+.side-row:hover {
+  background: var(--fill);
+}
+.side-row.sel {
+  background: var(--fill-strong);
+}
+
+/* inspector list rows — selected is a white card on grey */
+.list-row {
+  border-radius: 10px;
+  padding: 10px 12px;
+  width: 100%;
+  text-align: left;
+}
+.list-row:hover {
+  background: var(--fill);
+}
+.list-row.sel {
+  background: var(--bg);
+}
+
+/* group labels (13px secondary) */
+.group-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+}
+
+/* highlight tints — padded inline marks, clone across line breaks */
+.hl {
+  border-radius: 4px;
+  padding: 0 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.hl-high {
+  background: var(--high-tint);
+}
+.hl-medium {
+  background: var(--medium-tint);
+}
+.hl-low {
+  background: var(--low-tint);
+}
+.hl-rev {
+  background: var(--ok-tint);
+}
+/* selected segment: stronger version of the same semantic color */
+.hl-sel-high {
+  background: color-mix(in srgb, var(--high) 30%, transparent);
+}
+.hl-sel-medium {
+  background: color-mix(in srgb, var(--medium) 30%, transparent);
+}
+.hl-sel-low {
+  background: color-mix(in srgb, var(--text-secondary) 45%, transparent);
+}
+.hl-sel-rev {
+  background: color-mix(in srgb, var(--ok) 30%, transparent);
+}
+
+/* detail slide/fade — ends fully opaque */
 @keyframes cc-detail-in {
   from {
     opacity: 0;
@@ -169,7 +271,8 @@ select {
   }
 }
 .detail-in {
-  animation: cc-detail-in 200ms ease-out;
+  opacity: 1;
+  animation: cc-detail-in 240ms var(--ease);
 }
 
 /* 2-line clamp for list rows */
@@ -180,7 +283,7 @@ select {
   overflow: hidden;
 }
 
-/* dots */
+/* severity dots */
 .dot {
   width: 8px;
   height: 8px;
@@ -194,27 +297,305 @@ select {
   background: var(--medium);
 }
 .dot-low {
-  background: var(--bg-subtle);
+  background: var(--low);
 }
 .dot-rev {
   background: var(--ok);
-}
-
-.sidebar-row {
-  border-radius: 4px;
-  padding: 4px 8px;
 }
 
 .link-accent {
   color: var(--accent);
 }
 
+/* semantic text — the readable variants, never the vivid graphic colors */
 .sem-high {
-  color: var(--high);
+  color: var(--high-text);
 }
 .sem-medium {
-  color: var(--medium);
+  color: var(--medium-text);
 }
 .sem-ok {
-  color: var(--ok);
+  color: var(--ok-text);
+}
+
+/* ============================================================ tiles */
+/* colored rounded-square layer icon (macOS Settings / Notion look) */
+.tile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  flex: none;
+}
+
+/* ======================================================== skeleton */
+/* page thumbnails on the running screen */
+.sk-row {
+  display: flex;
+  gap: 12px;
+}
+.sk-page {
+  width: 124px;
+  height: 170px;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+  box-shadow: var(--glass-edge); /* page edge — the one allowed ring */
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+}
+@keyframes cc-sk-pop {
+  50% {
+    transform: scale(1.02);
+  }
+}
+.sk-page.sk-pop {
+  animation: cc-sk-pop 300ms var(--ease);
+}
+@keyframes cc-bar-in {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.sk-bar {
+  position: relative;
+  height: 3px;
+  border-radius: 1.5px;
+  background: var(--fill-strong);
+  transform-origin: left;
+  animation: cc-bar-in 240ms var(--ease) both;
+  flex: none;
+}
+.sk-bar.short {
+  width: 58%;
+}
+.sk-bar.ref {
+  width: 72%;
+}
+.sk-head {
+  height: 11px;
+  display: flex;
+  align-items: center;
+  flex: none;
+  animation: cc-bar-in 240ms var(--ease) both;
+}
+.sk-head-title {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1;
+  transform: scale(0.72);
+  transform-origin: left;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100px;
+  text-overflow: ellipsis;
+}
+/* layer anchors light the bar in the severity tint */
+.sk-sev-high {
+  background: var(--high-tint);
+}
+.sk-sev-medium {
+  background: var(--medium-tint);
+}
+.sk-sev-low {
+  background: var(--low-tint);
+}
+/* citation markers: accent dots on the bars */
+.sk-dot {
+  position: absolute;
+  top: -0.5px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+@keyframes cc-dot-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+.sk-dot.sk-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: cc-dot-pulse 400ms var(--ease);
+}
+/* AFFiNE-style shimmer wave over the pre-parse placeholder */
+.sk-shimmer .sk-bar {
+  animation: none;
+  opacity: 0.6;
+}
+.sk-shimmer {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+.sk-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--shimmer),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: cc-shimmer 1.6s linear infinite;
+}
+@keyframes cc-shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ======================================================= illustrations */
+.papers {
+  animation: cc-float 6s ease-in-out infinite;
+}
+@keyframes cc-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.papers .sheet {
+  transition: transform 200ms var(--ease);
+  transform-origin: 50% 80%;
+}
+.papers.fan .sheet-b {
+  transform: rotate(-4deg);
+}
+.papers.fan .sheet-c {
+  transform: rotate(4deg);
+}
+.papers.fan .sheet-a {
+  transform: scale(1.04);
+}
+.sheet-edge {
+  stroke: var(--hairline);
+  stroke-width: 0.5;
+}
+
+/* ============================================================ motion */
+/* buttons press at 0.97 */
+.pill-accent,
+.pill,
+.pill-quiet {
+  transition: transform 160ms var(--ease);
+}
+.pill-accent:active,
+.pill:active,
+.pill-quiet:active {
+  transform: scale(0.97);
+}
+/* row hover fades --fill in over 120ms */
+.list-row,
+.side-row {
+  transition: background 120ms var(--ease);
+}
+
+/* checkmark draw (stroke-dashoffset, 240ms) */
+.check-draw {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: cc-draw 240ms var(--ease) forwards;
+}
+@keyframes cc-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* report entrance: blocks rise 8px + fade; list rows stagger */
+@keyframes cc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise-in {
+  animation: cc-rise 240ms var(--ease) both;
+}
+.row-in {
+  animation: cc-rise 160ms var(--ease) both;
+}
+@keyframes cc-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* highlights fade in after the rows */
+.hl {
+  animation: cc-fade 240ms var(--ease) 260ms both;
+}
+
+/* properties block (Notion page header) */
+.prop-row {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  border-radius: 6px;
+  padding: 0 8px;
+  margin: 0 -8px;
+}
+.prop-row:hover {
+  background: var(--fill);
+}
+.prop-label {
+  width: 96px;
+  flex: none;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+.prop-value {
+  font-size: 15px;
+}
+
+/* summary callout (Notion callout) */
+.callout {
+  background: var(--bg-subtle);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* view transitions: soft crossfade, 360ms */
+::view-transition-group(*) {
+  animation-duration: 360ms;
+}
+.detail-title {
+  view-transition-name: cc-detail-title;
+}
+.row-title-sel {
+  view-transition-name: cc-detail-title;
 }

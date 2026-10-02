@@ -19,6 +19,9 @@ function item(
     severity,
     title: id,
     detail: '',
+    anchors: paragraphId
+      ? [{ paragraph_id: paragraphId, start, end }]
+      : [],
     paragraphId,
     start,
     finding: {
@@ -38,13 +41,13 @@ describe('segmentsForParagraph', () => {
   const text = 'abcdefghij' // len 10
 
   it('returns one plain segment with no items', () => {
-    expect(segmentsForParagraph(text, [])).toEqual([
-      { start: 0, end: 10, text, severity: null, itemIds: [] },
+    expect(segmentsForParagraph(text, 'p1', [])).toEqual([
+      { start: 0, end: 10, text, severity: null, selected: false, itemIds: [] },
     ])
   })
 
   it('splits at anchor bounds', () => {
-    const segs = segmentsForParagraph(text, [
+    const segs = segmentsForParagraph(text, 'p1', [
       item('f1', 'p1', 2, 5, 'medium'),
     ])
     expect(segs.map((s) => [s.start, s.end, s.severity])).toEqual([
@@ -54,8 +57,16 @@ describe('segmentsForParagraph', () => {
     ])
   })
 
+  it('ignores anchors on other paragraphs', () => {
+    const segs = segmentsForParagraph(text, 'p1', [
+      item('f1', 'p2', 2, 5, 'high'),
+    ])
+    expect(segs).toHaveLength(1)
+    expect(segs[0].severity).toBeNull()
+  })
+
   it('overlap takes the highest severity and keeps both ids', () => {
-    const segs = segmentsForParagraph(text, [
+    const segs = segmentsForParagraph(text, 'p1', [
       item('f1', 'p1', 0, 6, 'low'),
       item('f2', 'p1', 3, 8, 'high'),
     ])
@@ -68,15 +79,28 @@ describe('segmentsForParagraph', () => {
     expect(head?.severity).toBe('low')
   })
 
+  it('marks segments covering the selected item', () => {
+    const segs = segmentsForParagraph(
+      text,
+      'p1',
+      [item('f1', 'p1', 0, 6, 'low'), item('f2', 'p1', 3, 8, 'high')],
+      'f1'
+    )
+    expect(segs.find((s) => s.start === 0)?.selected).toBe(true)
+    expect(segs.find((s) => s.start === 6)?.selected).toBe(false)
+  })
+
   it('zero-length anchor expands to the whole paragraph', () => {
-    const segs = segmentsForParagraph(text, [item('f1', 'p1', 4, 4, 'low')])
+    const segs = segmentsForParagraph(text, 'p1', [
+      item('f1', 'p1', 4, 4, 'low'),
+    ])
     expect(segs).toHaveLength(1)
     expect(segs[0].severity).toBe('low')
     expect(segs[0].end).toBe(10)
   })
 
   it('clamps out-of-range anchors', () => {
-    const segs = segmentsForParagraph(text, [
+    const segs = segmentsForParagraph(text, 'p1', [
       item('f1', 'p1', 8, 99, 'medium'),
     ])
     expect(segs[1].end).toBe(10)
@@ -112,6 +136,35 @@ describe('buildItems ordering', () => {
   })
 })
 
+describe('buildItems reorder collapse', () => {
+  const report = {
+    paragraphs: [
+      { id: 'p1', text: 'a' },
+      { id: 'p9', text: 'refs' },
+    ],
+    findings: [],
+    revisions: [
+      { id: 'm1', kind: 'marker_renumber', anchor: { paragraph_id: 'p1', start: 0, end: 3 }, old: '[2]', new: '[1]', reason: '' },
+      { id: 'm2', kind: 'marker_renumber', anchor: { paragraph_id: 'p1', start: 5, end: 8 }, old: '[4]', new: '[2]', reason: '' },
+      { id: 'r1', kind: 'ref_reorder', anchor: { paragraph_id: 'p9', start: 0, end: 2 }, old: '2.', new: '1.', reason: '', move_after: '__start__' },
+      { id: 'v1', kind: 'typo', anchor: { paragraph_id: 'p1', start: 10, end: 11 }, old: 'x', new: 'y', reason: '' },
+    ],
+  } as unknown as Report
+
+  it('collapses marker_renumber + ref_reorder into one norms item', () => {
+    const items = buildItems(report)
+    const group = items.find((i) => i.kind === 'group')
+    expect(group).toBeTruthy()
+    expect(group!.layer).toBe('norms')
+    expect(group!.title).toBe('按首次引用顺序重排参考文献')
+    expect(group!.detail).toContain('2 处正文编号')
+    expect(group!.detail).toContain('1 条参考文献')
+    expect(group!.anchors).toHaveLength(3)
+    // typo revisions stay individual
+    expect(items.filter((i) => i.kind === 'revision')).toHaveLength(1)
+  })
+})
+
 describe('moveSelection', () => {
   const items = [
     { id: 'a' }, { id: 'b' }, { id: 'c' },
@@ -139,7 +192,7 @@ describe('pickItem', () => {
     const a = item('a', 'p', 0, 9, 'medium')
     const b = item('b', 'p', 0, 9, 'high')
     const c = item('c', 'p', 0, 4, 'high')
-    expect(pickItem([a, b, c], (i) => i.finding!.anchor!.end)?.id).toBe('c')
+    expect(pickItem([a, b, c])?.id).toBe('c')
   })
 })
 
@@ -199,6 +252,7 @@ describe('supportForFinding', () => {
     const rev = {
       id: 'v1', kind: 'revision', layer: 'norms', severity: 'rev',
       title: '', detail: '', paragraphId: 'p1', start: 0,
+      anchors: [{ paragraph_id: 'p1', start: 0, end: 1 }],
       revision: { id: 'v1', kind: 'typo', anchor: { paragraph_id: 'p1', start: 0, end: 1 }, old: 'a', new: 'b', reason: '' } as Revision,
     } as ListItem
     expect(supportForFinding(report, rev).claim).toBeNull()

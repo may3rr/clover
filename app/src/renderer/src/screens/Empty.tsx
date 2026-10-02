@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { apiFetch } from '../lib/api'
+import { PapersIllustration, ChevronDownIcon } from '../components/Icons'
 
 interface Props {
   benchmark: string
@@ -65,42 +66,59 @@ export default function Empty({
       }}
       onDragLeave={() => setDrag(false)}
       onDrop={onDrop}
-      data-testid="empty-screen"
-      data-drag={active ? '1' : '0'}
     >
-      <div className="flex flex-col items-center gap-4" style={{ maxWidth: 420 }}>
+      <div className="flex flex-col items-center" style={{ maxWidth: 460 }}>
+        {/* morphs into skeleton page 1 on drop */}
+        <span style={{ viewTransitionName: 'cc-paper' }}>
+          <PapersIllustration size={160} active={active} />
+        </span>
         <button
-          className="font-semibold"
-          style={{ fontSize: 15 }}
+          className="t26"
+          style={{ fontWeight: 600, marginTop: 16 }}
           onClick={onOpenDialog}
-          autoFocus
         >
           把论文拖到这里
         </button>
-        <div className="font-normal" style={{ fontSize: 15 }}>
+        <div className="secondary" style={{ marginTop: 8 }}>
           支持英文论文的 .docx 文件。全文在本机解析，不会上传。
         </div>
         {(err || dropError) && (
-          <div className="font-normal" style={{ fontSize: 15 }}>
+          <div className="font-normal" style={{ marginTop: 12 }}>
             {err ?? dropError}
           </div>
         )}
-        <select
-          className="pill-quiet font-normal"
-          style={{ fontSize: 15, marginTop: 8 }}
-          value={benchmark}
-          onChange={(e) => setBenchmark(e.target.value)}
-          aria-label="对标领域"
+        <div
+          className="flex items-center gap-3"
+          style={{ marginTop: 24 }}
         >
-          {benches.length === 0 && (
-            <option value="arxiv_cs_cl">arXiv 计算语言学</option>
-          )}
-          {benches.map((b) => (
-            <option key={b.id} value={b.id}>
-              {b.name}
-            </option>
-          ))}
-        </select>
+          <button className="pill-accent" onClick={onOpenDialog}>
+            选择文件
+          </button>
+          <label className="pill-quiet flex items-center gap-1">
+            <select
+              className="font-normal"
+              style={{
+                appearance: 'none',
+                background: 'transparent',
+                border: 'none',
+                padding: 0,
+              }}
+              value={benchmark}
+              onChange={(e) => setBenchmark(e.target.value)}
+              aria-label="对标领域"
+            >
+              {benches.length === 0 && (
+                <option value="arxiv_cs_cl">arXiv 计算语言学</option>
+              )}
+              {benches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDownIcon size={13} color="var(--text-secondary)" />
+          </label>
+        </div>
       </div>
     </div>
   )
