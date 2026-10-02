@@ -16,8 +16,8 @@ _LABEL_RE = re.compile(r"^\s*[\[\(（【]?(\d{1,3})[\]\)）】]?[\.、]?\s+")
 _CJK_RE = re.compile(r"[一-鿿]")
 _TYPE_TAG_RE = re.compile(r"\[[JMDPCRNSZOA](/[A-Z]{1,2})?\]")
 
-_EN_NAME = re.compile(r"^[A-Z][A-Za-z'’\-]*(?:\s+[A-Z]\.?)*$")
-_EN_INITIAL = re.compile(r"^[A-Z](?:\.-?[A-Z]\.?)*\.?$")
+_EN_NAME = re.compile(r"^[^\W\d_][^\W\d_'’\-]*(?:\s+[^\W\d_]\.?)*$")
+_EN_INITIAL = re.compile(r"^[^\W\d_](?:\.-?\s?[^\W\d_]\.?)*\.?$")
 _ZH_NAME = re.compile(r"^[一-鿿]{2,4}$")
 
 
@@ -40,7 +40,7 @@ def _looks_like_author_list(chunk: str) -> bool:
         return False
     if re.search(r"et\s+al|等", c):
         return True
-    parts = re.split(r"[,，、;；]\s*|\s+and\s+|\s*&\s*", c)
+    parts = re.split(r"[,，、;；]\s*(?:&\s*)?|\s+and\s+|\s*&\s*", c)
     parts = [p.strip() for p in parts if p.strip()]
     if not parts:
         return False
@@ -53,7 +53,7 @@ def _looks_like_author_list(chunk: str) -> bool:
 
 def _split_en_apa_authors(part: str) -> list[str]:
     """'Devlin, J., Chang, M.-W., & Lee, K.' -> ['Devlin, J.', ...]."""
-    tokens = [t.strip() for t in re.split(r"\s*,\s*|\s+and\s+|\s*&\s*", part) if t.strip()]
+    tokens = [t.strip() for t in re.split(r"\s*,\s*(?:&\s*)?|\s+and\s+|\s*&\s*", part) if t.strip()]
     out: list[str] = []
     i = 0
     while i < len(tokens):
