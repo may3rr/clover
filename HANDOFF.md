@@ -21,7 +21,8 @@
 | T6 | pipeline 编排 + FastAPI SSE 服务；分阶段核验、源熔断器、计时埋点、并发 6→12 |
 | T10 | docx 导出：批注挂 findings、修订挂 revisions，LibreOffice 验证过 |
 | T7–T9 | Electron 壳（hiddenInset + vibrancy + 中文菜单）、三屏（拖入/骨架检查中/三栏报告页）、Notion 式报告页、详情对照视图、键盘导航、真实窗口截图与 E2E |
-| T12 | **token 用量统计（本次新增）**：每次真实调用和缓存命中写入 SQLite `llm_usage` 表（时间/供应商/模型/任务/输入输出 token/是否缓存），按 天+供应商+模型 聚合；查看用 `backend/scripts/usage_stats.py`（支持 `--by-task`、`--day`）。展示部分还没做 |
+| T12 | **token 用量统计**：每次真实调用和缓存命中写入 SQLite `llm_usage` 表（时间/供应商/模型/任务/输入输出 token/是否缓存），按 天+供应商+模型 聚合；查看用 `backend/scripts/usage_stats.py`（支持 `--by-task`、`--day`） |
+| T14 | **账户与设置界面**：左下角头像+名字（Empty 屏和报告侧栏都有）点开设置屏——macOS 设置式左导航 + 分组卡片：账户（头像图片或姓名首字+色板，经原生图片选择器）、批注署名（导出的 Word 批注带用户自己的名字和缩写，有预览）、模型（读写 config.toml 的各任务模型 + .env 的 API Key + "拉取模型列表"）、用量与费用（llm_usage 加了 doc 列按论文聚合，按 config.py 里内置的百炼价格表估算费用）。后端新增 `/prefs`、`/usage`、`/config`、`/models` 四个端点；截图状态加了 `settings-*` 四个 |
 
 ### 模型选型（已写入 backend/config.toml）
 
@@ -65,9 +66,10 @@
 - [ ]  Word/WPS 人工验收导出文件（PLAN.md 提交前清单要求）
 - [ ] 录 2 分钟 Demo 视频（收尾镜头：Word 中接受全部修订，文献顺序编号归位）
 - [ ] 项目方案文档（痛点、原则、架构、检出率实测、规划）
+- [ ] Onboarding：头像/名字目前走设置屏；用户说过要把这一步挪到首次启动的 onboarding 里（参考 `/Users/jackielyu/Coding/tmall-latex/demo/onboarding.html`），**先没改逻辑**
 - [ ] （已决定不做）中文文献核验——只做英文，中文列为未来工作
 - [ ] （可选）S2 API key 提升 Semantic Scholar 覆盖率
-- [ ] （可选）token 统计的界面展示——目前只有 `scripts/usage_stats.py` 命令行查看
+- [ ] ~~（可选）token 统计的界面展示~~——已在设置屏"用量与费用"里做了（T14）
 
 ## 关键路径与命令
 
