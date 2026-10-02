@@ -1,0 +1,63 @@
+{
+  "citation_style": "numeric",
+  "managed_by": "zotero",
+  "reference_count": 6,
+  "sections": [
+    {
+      "title": "1 Introduction",
+      "canonical": "intro"
+    },
+    {
+      "title": "2 Related Work",
+      "canonical": "related"
+    },
+    {
+      "title": "3 Method",
+      "canonical": "method"
+    },
+    {
+      "title": "References",
+      "canonical": "other"
+    }
+  ],
+  "markers": [
+    {
+      "raw": "[1]",
+      "ref_ids": [
+        "r1"
+      ]
+    },
+    {
+      "raw": "[2]",
+      "ref_ids": [
+        "r2"
+      ]
+    },
+    {
+      "raw": "[3], [4]",
+      "ref_ids": [
+        "r3",
+        "r4"
+      ]
+    },
+    {
+      "raw": "[5]",
+      "ref_ids": [
+        "r5"
+      ]
+    },
+    {
+      "raw": "[6]",
+      "ref_ids": [
+        "r6"
+      ]
+    },
+    {
+      "raw": "[2]",
+      "ref_ids": [
+        "r2"
+      ]
+    }
+  ],
+  "filename": "zotero_numeric.docx"
+}
