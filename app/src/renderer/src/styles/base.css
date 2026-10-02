@@ -1,0 +1,220 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global base rules — AGENTS §6. Hex values live in tokens.css only;
+   the color-mix() tints below reuse the declared variables. */
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    'PingFang SC', system-ui, sans-serif;
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* no italics anywhere — including any UA-styled semantics */
+*,
+*::before,
+*::after {
+  font-style: normal !important;
+  font-synthesis: none;
+}
+em,
+i,
+cite,
+dfn,
+var,
+address {
+  font-style: normal;
+}
+
+/* the paper is selectable; chrome is not */
+.paper,
+.paper * {
+  user-select: text;
+}
+
+/* visible keyboard focus — the only allowed outline */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+button {
+  cursor: default;
+  font: inherit;
+  color: inherit;
+  background: none;
+  padding: 0;
+}
+
+select {
+  font: inherit;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* 17px / 1.7 reading surface */
+.paper {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+/* draggable toolbar strip */
+.drag-strip {
+  -webkit-app-region: drag;
+}
+.drag-strip button,
+.drag-strip a,
+.drag-strip select,
+.drag-strip [role='button'] {
+  -webkit-app-region: no-drag;
+}
+
+/* quiet pill controls */
+.pill {
+  background: var(--bg-subtle);
+  border-radius: 980px;
+  padding: 8px 24px;
+  font-weight: 500;
+}
+.pill-accent {
+  background: var(--accent);
+  color: white;
+  border-radius: 980px;
+  padding: 8px 24px;
+  font-weight: 500;
+}
+/* one allowed literal: white on accent (same in both themes) */
+
+.pill-quiet {
+  background: var(--bg-subtle);
+  border-radius: 980px;
+  padding: 4px 16px;
+}
+
+/* small native-style indeterminate spinner — 14px accent arc drawn as
+   an SVG circle (CSS borders are banned, AGENTS §6.3) */
+.spinner {
+  animation: cc-spin 0.8s linear infinite;
+}
+@keyframes cc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* highlight tints (severity -> token) */
+.hl-high {
+  background: var(--high-tint);
+  border-radius: 4px;
+}
+.hl-medium {
+  background: var(--medium-tint);
+  border-radius: 4px;
+}
+.hl-low {
+  background: var(--bg-subtle);
+  border-radius: 4px;
+}
+.hl-rev {
+  background: var(--ok-tint);
+  border-radius: 4px;
+}
+.hl-selected {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  border-radius: 4px;
+}
+
+.row-selected {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  border-radius: 4px;
+}
+
+.detail-block {
+  background: var(--bg-subtle);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+/* detail slide/fade — 200ms ease-out, per §6.4 */
+@keyframes cc-detail-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.detail-in {
+  animation: cc-detail-in 200ms ease-out;
+}
+
+/* 2-line clamp for list rows */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* dots */
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+}
+.dot-high {
+  background: var(--high);
+}
+.dot-medium {
+  background: var(--medium);
+}
+.dot-low {
+  background: var(--bg-subtle);
+}
+.dot-rev {
+  background: var(--ok);
+}
+
+.sidebar-row {
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+.link-accent {
+  color: var(--accent);
+}
+
+.sem-high {
+  color: var(--high);
+}
+.sem-medium {
+  color: var(--medium);
+}
+.sem-ok {
+  color: var(--ok);
+}

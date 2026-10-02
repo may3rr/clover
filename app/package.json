@@ -1,0 +1,57 @@
+{
+  "name": "citecheck",
+  "productName": "引用体检",
+  "version": "0.1.0",
+  "description": "Academic citation health check — docx in, Word comments + tracked changes out.",
+  "main": "./out/main/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "gen:types": "node scripts/gen-types.mjs",
+    "lint:design": "node scripts/lint-design.mjs",
+    "test": "vitest run",
+    "shots": "node scripts/shots.mjs",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "build": {
+    "appId": "com.citecheck.app",
+    "productName": "引用体检",
+    "mac": {
+      "category": "public.app-category.productivity"
+    },
+    "fileAssociations": [
+      {
+        "ext": "docx",
+        "name": "Word Document",
+        "role": "Viewer"
+      }
+    ],
+    "directories": {
+      "output": "release"
+    }
+  },
+  "devDependencies": {
+    "@swc/core": "1.16.2",
+    "@types/node": "26.6.2",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "@vitejs/plugin-react": "5.2.0",
+    "autoprefixer": "10.6.1",
+    "electron": "44.4.5",
+    "electron-builder": "26.16.1",
+    "electron-vite": "5.0.0",
+    "json-schema-to-typescript": "16.0.0",
+    "postcss": "8.5.28",
+    "tailwindcss": "3.4.19",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vitest": "4.1.11"
+  }
+}
