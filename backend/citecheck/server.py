@@ -145,15 +145,18 @@ async def events(job_id: str):
         return job
 
     async def gen():
-        for ev in job.events:
-            yield {"event": ev["type"], "data": json.dumps(ev, ensure_ascii=False)}
-            if ev["type"] in {"done", "failed"}:
-                return
+        # job.events is the replay log; the queue is only a wakeup signal
+        # for new events (its payloads are ignored to avoid duplicates).
+        idx = 0
         while True:
-            ev = await job.queue.get()
-            yield {"event": ev["type"], "data": json.dumps(ev, ensure_ascii=False)}
-            if ev["type"] in {"done", "failed"}:
-                return
+            while idx < len(job.events):
+                ev = job.events[idx]
+                idx += 1
+                yield {"event": ev["type"],
+                       "data": json.dumps(ev, ensure_ascii=False)}
+                if ev["type"] in {"done", "failed"}:
+                    return
+            await job.queue.get()
 
     return EventSourceResponse(gen())
 
