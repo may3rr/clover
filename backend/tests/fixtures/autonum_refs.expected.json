@@ -1,0 +1,46 @@
+{
+  "filename": "autonum_refs.docx",
+  "citation_style": "numeric",
+  "managed_by": null,
+  "reference_count": 4,
+  "sections": [
+    {
+      "title": "1. Introduction",
+      "canonical": "intro"
+    },
+    {
+      "title": "2. Method",
+      "canonical": "method"
+    },
+    {
+      "title": "3. References",
+      "canonical": "other"
+    }
+  ],
+  "markers": [
+    {
+      "raw": "[1]",
+      "ref_ids": [
+        "r1"
+      ]
+    },
+    {
+      "raw": "[2]",
+      "ref_ids": [
+        "r2"
+      ]
+    },
+    {
+      "raw": "[3]",
+      "ref_ids": [
+        "r3"
+      ]
+    },
+    {
+      "raw": "[4]",
+      "ref_ids": [
+        "r4"
+      ]
+    }
+  ]
+}

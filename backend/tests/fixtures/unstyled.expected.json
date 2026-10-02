@@ -1,0 +1,27 @@
+{
+  "filename": "unstyled.docx",
+  "citation_style": "numeric",
+  "managed_by": null,
+  "reference_count": 3,
+  "sections": [],
+  "markers": [
+    {
+      "raw": "[1]",
+      "ref_ids": [
+        "r1"
+      ]
+    },
+    {
+      "raw": "[2]",
+      "ref_ids": [
+        "r2"
+      ]
+    },
+    {
+      "raw": "[3]",
+      "ref_ids": [
+        "r3"
+      ]
+    }
+  ]
+}

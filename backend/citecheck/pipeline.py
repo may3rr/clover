@@ -27,8 +27,9 @@ from .distribution.layer import run_distribution
 from .lint.norms import check_norms
 from .lint.reorder import plan_reorder
 from .lint.typos import check_typos
-from .llm.client import stats_scope
-from .parse.parser import ParsedDocument, parse_docx
+from .llm.client import doc_scope, stats_scope
+from .parse.bibguess import guess_bibliography_start
+from .parse.parser import ParsedDocument, apply_bibliography_start, parse_docx
 from .refs.sources import RetrievalClient
 from .refs.verify import verify_references
 from .schema import (
@@ -157,11 +158,26 @@ async def run_pipeline(
         send({"type": "failed", "error": PARSE_ERROR})
         raise PipelineError(PARSE_ERROR) from e
 
+    # last resort for the bibliography: no heading, no ZOTERO_BIBL field,
+    # no trailing numbered run -> ask the cheap model where the list
+    # starts and accept only a deterministically-verifiable span (T1e)
+    if not parsed.references and parsed.paragraphs:
+        try:
+            start = await guess_bibliography_start(parsed)
+        except Exception as e:  # noqa: BLE001 — guessing is optional
+            log.warning("bibliography boundary guess failed: %s", e)
+            start = None
+        if start is not None:
+            added = await asyncio.to_thread(
+                apply_bibliography_start, parsed, start)
+            log.info("llm bibliography boundary -> %d references", added)
+
     para_by_id = {p.id: p for p in parsed.paragraphs}
     t_parsed = time.monotonic()
     send({"type": "parsed", "outline": _outline(parsed)})
 
-    with stats_scope() as stats:
+    doc_label = parsed.document.filename or Path(path).name
+    with stats_scope() as stats, doc_scope(doc_label):
         own_retrieval = retrieval is None
         cache = cache or Cache(get_settings().cache_path)
         retrieval = retrieval or RetrievalClient(cache=cache)

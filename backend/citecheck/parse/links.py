@@ -1,11 +1,15 @@
 """Link detected markers to reference-list entries.
 
 - numeric / superscript: expand numbers and ranges, resolve by the
-  entry's visible label, falling back to list position;
+  entry's visible label, falling back to list position — POSITION means
+  position among ``origin == "list"`` entries only (footnote-promoted
+  references never occupy the numbered list);
 - author_year: match (first-author surname, year) with rapidfuzz, using
   the a/b suffix to disambiguate same-author-same-year entries;
 - zotero / endnote: match the field's structured item data (title, then
-  author+year) against the entries.
+  author+year) against the entries;
+- footnote markers are NOT resolved here — the parser links them by
+  note id (they know exactly which note body they point at).
 """
 
 from __future__ import annotations
@@ -82,8 +86,8 @@ def author_year_items(raw: str) -> list[tuple[str, str, str | None]]:
 
 
 def _number_resolver(references: list[Reference]):
-    by_label = {r.label: r for r in references if r.label}
-    ordered = list(references)
+    ordered = [r for r in references if r.origin == "list"]
+    by_label = {r.label: r for r in ordered if r.label}
 
     def resolve_number(n: int) -> str | None:
         ref = by_label.get(str(n))
@@ -106,7 +110,7 @@ def link_markers(
     markers: list[DetectedMarker], references: list[Reference]
 ) -> list[list[str]]:
     """Return ref_id lists parallel to ``markers``."""
-    ordered = list(references)
+    ordered = list(references)  # author-year / field matching: all entries
     surnames = [_norm(_ref_first_surname(r)) for r in ordered]
     resolve_number = _number_resolver(references)
 

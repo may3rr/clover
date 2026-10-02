@@ -53,7 +53,8 @@
                 "endnote",
                 "superscript",
                 "numeric",
-                "author_year"
+                "author_year",
+                "footnote"
               ],
               "type": "string"
             },
@@ -451,6 +452,13 @@
           },
           "title": "Issues",
           "type": "array"
+        },
+        "answered": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Answered",
+          "type": "array"
         }
       },
       "required": [
@@ -558,6 +566,15 @@
           ],
           "default": null,
           "title": "Label"
+        },
+        "origin": {
+          "default": "list",
+          "enum": [
+            "list",
+            "footnote"
+          ],
+          "title": "Origin",
+          "type": "string"
         }
       },
       "required": [
@@ -592,6 +609,11 @@
             "type": "object"
           },
           "title": "Token Usage",
+          "type": "object"
+        },
+        "timings": {
+          "additionalProperties": true,
+          "title": "Timings",
           "type": "object"
         }
       },

@@ -232,8 +232,11 @@ async def run_distribution(
 
     # ---- findings --------------------------------------------------------
     findings: list[Finding] = []
+    # no citations at all -> distribution numbers are meaningless; the
+    # norms layer already reports the empty state explicitly
+    no_citations = not parsed.markers and not parsed.references
     for sd in dist_sections:
-        if sd.canonical == "other":
+        if sd.canonical == "other" or no_citations:
             continue
         sec = sec_by_id[sd.section_id]
         hp = sec.heading_paragraph_id
@@ -273,6 +276,8 @@ async def run_distribution(
             ))
 
     for pid, s, e, n in stacked:
+        if no_citations:
+            break
         findings.append(Finding(
             id="", layer="distribution", severity="medium",
             anchor=Anchor(paragraph_id=pid, start=s, end=e),
@@ -289,7 +294,7 @@ async def run_distribution(
         if s.canonical in {"intro", "related", "discussion"}
     }
     for p in parsed.paragraphs:
-        if p.section_id not in cue_secs:
+        if no_citations or p.section_id not in cue_secs:
             continue
         ms = markers_by_para.get(p.id, [])
         for sent in split_sentences(p.text):

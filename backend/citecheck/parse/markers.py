@@ -23,7 +23,9 @@ from lxml import etree
 
 from . import docx_xml as dx
 
-MarkerKind = Literal["zotero", "endnote", "superscript", "numeric", "author_year"]
+MarkerKind = Literal[
+    "zotero", "endnote", "superscript", "numeric", "author_year", "footnote"
+]
 
 SUPERSCRIPT_RE = re.compile(
     r"^\s*[\[\(【（［]?\d[\d,，、;；\-–—~～\s]*[\]\)】）］]?\s*$"
@@ -78,11 +80,15 @@ def _extract_json(instr: str) -> dict | None:
 
 
 def _field_markers(
-    p: etree._Element, segments: list[dx.Segment]
+    p: etree._Element,
+    segments: list[dx.Segment],
+    prefix: str = "",
+    note_marks: list[str] | None = None,
 ) -> tuple[list[DetectedMarker], str | None]:
     out: list[DetectedMarker] = []
     managed: str | None = None
-    fields = dx.paragraph_fields(p) + dx.fldsimple_fields(p, segments)
+    fields = dx.paragraph_fields(p, prefix=prefix, note_marks=note_marks) + \
+        dx.fldsimple_fields(p, segments)
     for f in fields:
         if f.span is None:
             continue
@@ -156,16 +162,23 @@ def _regex_markers(
 
 
 def detect_markers(
-    p: etree._Element, text: str, segments: list[dx.Segment]
+    p: etree._Element,
+    text: str,
+    segments: list[dx.Segment],
+    *,
+    prefix: str = "",
+    note_marks: list[str] | None = None,
 ) -> tuple[list[DetectedMarker], str | None]:
     """Detect citation markers in one paragraph.
 
     Returns ``(markers, managed_by)`` where managed_by is "zotero"/"endnote"
     if a field-code marker was seen. Markers carry absolute offsets into
     ``text``; ``raw`` is filled with the visible text span.
+    ``prefix``/``note_marks`` must be the same values that produced
+    ``text``/``segments`` so field spans stay aligned.
     """
     managed: str | None = None
-    detected, managed = _field_markers(p, segments)
+    detected, managed = _field_markers(p, segments, prefix, note_marks)
 
     covered = [False] * len(text)
 

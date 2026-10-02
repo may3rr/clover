@@ -699,9 +699,320 @@ def make_numeric_unordered_en():
     })
 
 
+# --------------------------------------------------------- torture cases
+
+
+def _rewrite_zip(path: Path, updates: dict[str, bytes]):
+    """Rewrite a saved docx replacing/adding zip members in place."""
+    with zipfile.ZipFile(path) as zf:
+        names = zf.namelist()
+        blobs = {n: zf.read(n) for n in names}
+    blobs.update(updates)
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for n in names:
+            zf.writestr(n, blobs[n])
+        for n in blobs:
+            if n not in names:
+                zf.writestr(n, blobs[n])
+
+
+def _add_numbering_defs(path: Path, defs: list[str]):
+    """Append <w:abstractNum>/<w:num> fragments to word/numbering.xml."""
+    with zipfile.ZipFile(path) as zf:
+        xml = zf.read("word/numbering.xml").decode("utf-8")
+    # abstractNum elements must precede the w:num children
+    nums = [d for d in defs if d.startswith("<w:num ")]
+    abstracts = [d for d in defs if d.startswith("<w:abstractNum ")]
+    insert_at = xml.find("<w:num ")
+    xml = xml[:insert_at] + "".join(abstracts) + xml[insert_at:]
+    xml = xml.replace("</w:numbering>", "".join(nums) + "</w:numbering>")
+    _rewrite_zip(path, {"word/numbering.xml": xml.encode("utf-8")})
+
+
+def set_numpr(p, num_id: int, ilvl: int = 0):
+    ppr = p._p.get_or_add_pPr()
+    numpr = etree.fromstring(
+        f'<w:numPr {ns}><w:ilvl w:val="{ilvl}"/><w:numId w:val="{num_id}"/>'
+        f"</w:numPr>")
+    # numPr belongs right after pStyle in CT_PPr order
+    pstyle = ppr.find(qn("pStyle"))
+    if pstyle is not None:
+        pstyle.addnext(numpr)
+    else:
+        ppr.insert(0, numpr)
+
+
+AUTONUM_HEADS_NUM = 90   # headings "N. Title"
+AUTONUM_REFS_NUM = 91    # refs "[n] Entry"
+
+NUMBERING_DEFS = [
+    f'<w:abstractNum {ns} w:abstractNumId="90">'
+    '<w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/>'
+    '<w:lvlText w:val="%1."/><w:lvlJc w:val="left"/><w:suff w:val="space"/>'
+    '<w:pPr><w:ind w:left="360" w:hanging="360"/></w:pPr></w:lvl>'
+    "</w:abstractNum>",
+    f'<w:abstractNum {ns} w:abstractNumId="91">'
+    '<w:lvl w:ilvl="0"><w:start w:val="1"/><w:numFmt w:val="decimal"/>'
+    '<w:lvlText w:val="[%1]"/><w:lvlJc w:val="left"/><w:suff w:val="space"/>'
+    '<w:pPr><w:ind w:left="480" w:hanging="480"/></w:pPr></w:lvl>'
+    "</w:abstractNum>",
+    f'<w:num {ns} w:numId="{AUTONUM_HEADS_NUM}">'
+    '<w:abstractNumId w:val="90"/></w:num>',
+    f'<w:num {ns} w:numId="{AUTONUM_REFS_NUM}">'
+    '<w:abstractNumId w:val="91"/></w:num>',
+]
+
+
+def make_autonum_refs_doc():
+    """Torture (a): bibliography + headings rendered by auto-numbering.
+
+    No literal "[n]" in the reference paragraphs, no heading styles —
+    the labels exist only as numbering definitions. After virtual-label
+    resolution the doc must behave exactly like numeric_en."""
+    doc = Document()
+    doc.add_paragraph("Auto-Numbered Citation Study", style="Title")
+    doc.add_paragraph("A manuscript whose numbers come from Word lists.")
+
+    h = add_para(doc, [("Introduction", {})])
+    set_numpr(h, AUTONUM_HEADS_NUM)
+    add_para(doc, [
+        ("The Transformer ", {}), ("[1]", {}),
+        (" replaced recurrence with attention alone, and dense passage "
+         "retrieval ", {}), ("[2]", {}),
+        (" later outperformed lexical baselines on open-domain question "
+         "answering.", {}),
+    ])
+
+    h = add_para(doc, [("Method", {})])
+    set_numpr(h, AUTONUM_HEADS_NUM)
+    add_para(doc, [
+        ("We combine retrieval-augmented generation ", {}), ("[3]", {}),
+        (" with a hallucination survey taxonomy ", {}), ("[4]", {}),
+        (" to score each citation.", {}),
+    ])
+
+    h = add_para(doc, [("References", {})])
+    set_numpr(h, AUTONUM_HEADS_NUM)
+    auto_refs = [
+        "Vaswani A, Shazeer N, Parmar N, et al. Attention is all you "
+        "need. Advances in Neural Information Processing Systems. "
+        "2017;30:5998-6008.",
+        "Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval for "
+        "open-domain question answering. Proceedings of EMNLP. "
+        "2020:6769-6781.",
+        "Lewis P, Perez E, Piktus A, et al. Retrieval-augmented "
+        "generation for knowledge-intensive NLP tasks. Advances in "
+        "Neural Information Processing Systems. 2020;33:9459-9474.",
+        "Ji Z, Lee N, Frieske R, et al. Survey of hallucination in "
+        "natural language generation. ACM Computing Surveys. "
+        "2023;55(12):1-38.",
+    ]
+    for raw in auto_refs:
+        p = add_para(doc, [(raw, {})])
+        set_numpr(p, AUTONUM_REFS_NUM)
+
+    path = HERE / "autonum_refs.docx"
+    doc.save(path)
+    _add_numbering_defs(path, NUMBERING_DEFS)
+    with zipfile.ZipFile(path) as zf:
+        assert "word/document.xml" in zf.namelist()
+    expected = {
+        "filename": "autonum_refs.docx",
+        "citation_style": "numeric",
+        "managed_by": None,
+        "reference_count": 4,
+        "sections": [
+            {"title": "1. Introduction", "canonical": "intro"},
+            {"title": "2. Method", "canonical": "method"},
+            {"title": "3. References", "canonical": "other"},
+        ],
+        "markers": [
+            {"raw": "[1]", "ref_ids": ["r1"]},
+            {"raw": "[2]", "ref_ids": ["r2"]},
+            {"raw": "[3]", "ref_ids": ["r3"]},
+            {"raw": "[4]", "ref_ids": ["r4"]},
+        ],
+    }
+    (HERE / "autonum_refs.expected.json").write_text(
+        json.dumps(expected, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+    print(f"wrote autonum_refs.docx ({len(expected['markers'])} markers, "
+          f"{expected['reference_count']} refs)")
+
+
+FOOTNOTE_DEFS_RELS = (
+    '<Relationship xmlns="http://schemas.openxmlformats.org/package/2006/'
+    'relationships" Id="rIdFootnotes" Type="http://schemas.openxmlformats.'
+    'org/officeDocument/2006/relationships/footnotes" '
+    'Target="footnotes.xml"/>')
+
+
+def _add_footnotes_part(path: Path, notes: list[str]):
+    """Inject word/footnotes.xml; notes[i] gets w:id = i+2 (0,1 reserved
+    for separators per Word convention)."""
+    sep = (
+        f'<w:footnote {ns} w:type="separator" w:id="-1"/>'
+        f'<w:footnote {ns} w:type="continuationSeparator" w:id="0"/>')
+    body = ""
+    for i, text in enumerate(notes):
+        nid = i + 1
+        body += (
+            f'<w:footnote {ns} w:id="{nid}"><w:p>'
+            f'<w:r><w:footnoteRef/></w:r>'
+            f'<w:r><w:t xml:space="preserve"> {_esc(text)}</w:t></w:r>'
+            f"</w:p></w:footnote>")
+    fn_xml = ('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+              f'<w:footnotes {ns}>{sep}{body}</w:footnotes>')
+    with zipfile.ZipFile(path) as zf:
+        ct = zf.read("[Content_Types].xml").decode()
+        rels = zf.read("word/_rels/document.xml.rels").decode()
+    ct = ct.replace(
+        "</Types>",
+        '<Override PartName="/word/footnotes.xml" ContentType="application/'
+        'vnd.openxmlformats-officedocument.wordprocessingml.footnotes+xml"/>'
+        "</Types>")
+    rels = rels.replace("</Relationships>", FOOTNOTE_DEFS_RELS +
+                        "</Relationships>")
+    _rewrite_zip(path, {
+        "[Content_Types].xml": ct.encode(),
+        "word/_rels/document.xml.rels": rels.encode(),
+        "word/footnotes.xml": fn_xml.encode(),
+    })
+
+
+def add_footnote_ref(p, note_id: int):
+    """Append a superscript-looking footnoteReference run to ``p``."""
+    r = etree.fromstring(
+        f'<w:r {ns}><w:rPr><w:rStyle w:val="FootnoteReference"/>'
+        f'<w:vertAlign w:val="superscript"/></w:rPr>'
+        f'<w:footnoteReference w:id="{note_id}"/></w:r>')
+    p._p.append(r)
+
+
+def make_footnote_cites_doc():
+    """Torture (b): all citations are real Word footnotes.
+
+    Markers render as superscript marks; the "bibliography" lives in
+    footnotes.xml. One note is commentary and must produce a marker with
+    no linked reference."""
+    doc = Document()
+    doc.add_paragraph("Footnote-Cited Study", style="Title")
+
+    h = add_heading(doc, "1 Introduction")
+    p = add_para(doc, [("Transformers reshaped sequence modelling", {})])
+    add_footnote_ref(p, 1)
+    p._p.append(etree.fromstring(
+        f'<w:r {ns}><w:t xml:space="preserve">, and dense passage '
+        f'retrieval extended open-domain QA</w:t></w:r>'))
+    add_footnote_ref(p, 2)
+    p._p.append(etree.fromstring(
+        f'<w:r {ns}><w:t xml:space="preserve">. We thank the '
+        f'anonymous reviewers</w:t></w:r>'))
+    add_footnote_ref(p, 3)
+    p._p.append(etree.fromstring(
+        f'<w:r {ns}><w:t xml:space="preserve">.</w:t></w:r>'))
+
+    add_heading(doc, "2 Method")
+    p = add_para(doc, [("We follow the retrieval-augmented recipe", {})])
+    add_footnote_ref(p, 4)
+    p._p.append(etree.fromstring(
+        f'<w:r {ns}><w:t xml:space="preserve"> and the hallucination '
+        f'survey taxonomy</w:t></w:r>'))
+    add_footnote_ref(p, 5)
+    p._p.append(etree.fromstring(
+        f'<w:r {ns}><w:t xml:space="preserve">.</w:t></w:r>'))
+
+    notes = [
+        "Vaswani A, Shazeer N, Parmar N, et al. Attention is all you "
+        "need. Advances in Neural Information Processing Systems. "
+        "2017;30:5998-6008.",
+        "Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval "
+        "for open-domain question answering. Proceedings of EMNLP. "
+        "2020:6769-6781.",
+        "We thank the anonymous reviewers for helpful comments.",
+        "Lewis P, Perez E, Piktus A, et al. Retrieval-augmented "
+        "generation for knowledge-intensive NLP tasks. Advances in "
+        "Neural Information Processing Systems. 2020;33:9459-9474.",
+        "Ji Z, Lee N, Frieske R, et al. Survey of hallucination in "
+        "natural language generation. ACM Computing Surveys. "
+        "2023;55(12):1-38.",
+    ]
+    path = HERE / "footnote_cites.docx"
+    doc.save(path)
+    _add_footnotes_part(path, notes)
+    with zipfile.ZipFile(path) as zf:
+        assert "word/footnotes.xml" in zf.namelist()
+    expected = {
+        "filename": "footnote_cites.docx",
+        "citation_style": "numeric",
+        "managed_by": None,
+        "reference_count": 4,
+        "sections": [
+            {"title": "1 Introduction", "canonical": "intro"},
+            {"title": "2 Method", "canonical": "method"},
+        ],
+        "markers": [
+            {"raw": "1", "ref_ids": ["r1"]},
+            {"raw": "2", "ref_ids": ["r2"]},
+            {"raw": "3", "ref_ids": []},   # commentary note, not a source
+            {"raw": "4", "ref_ids": ["r3"]},
+            {"raw": "5", "ref_ids": ["r4"]},
+        ],
+    }
+    (HERE / "footnote_cites.expected.json").write_text(
+        json.dumps(expected, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+    print(f"wrote footnote_cites.docx ({len(expected['markers'])} markers, "
+          f"{expected['reference_count']} refs)")
+
+
+def make_unstyled_doc():
+    """Torture (c): no styles at all — every paragraph is Normal. The
+    bibliography has literal labels and is found by the trailing-run
+    detector only."""
+    doc = Document()
+    doc.add_paragraph("Completely Unstyled Manuscript")
+    doc.add_paragraph("We study how citations behave when nothing is "
+                      "styled. Attention-based models [1] dominate NLP, "
+                      "and dense retrieval [2] complements them.")
+    doc.add_paragraph("Hallucination surveys [3] catalogue the failure "
+                      "modes we target.")
+    doc.add_paragraph("References")
+    for raw in [
+        "1. Vaswani A, Shazeer N, Parmar N, et al. Attention is all you "
+        "need. NeurIPS. 2017.",
+        "2. Karpukhin V, Oguz B, Min S, et al. Dense passage retrieval "
+        "for open-domain question answering. EMNLP. 2020.",
+        "3. Ji Z, Lee N, Frieske R, et al. Survey of hallucination in "
+        "natural language generation. ACM Computing Surveys. 2023.",
+    ]:
+        doc.add_paragraph(raw)
+    expected = {
+        "filename": "unstyled.docx",
+        "citation_style": "numeric",
+        "managed_by": None,
+        "reference_count": 3,
+        "sections": [],
+        "markers": [
+            {"raw": "[1]", "ref_ids": ["r1"]},
+            {"raw": "[2]", "ref_ids": ["r2"]},
+            {"raw": "[3]", "ref_ids": ["r3"]},
+        ],
+    }
+    path = HERE / "unstyled.docx"
+    doc.save(path)
+    (HERE / "unstyled.expected.json").write_text(
+        json.dumps(expected, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8")
+    print("wrote unstyled.docx (3 markers, 3 refs)")
+
+
 if __name__ == "__main__":
     make_numeric_en()
     make_authoryear_en()
     make_gbt_zh()
     make_zotero_numeric()
     make_numeric_unordered_en()
+    make_autonum_refs_doc()
+    make_footnote_cites_doc()
+    make_unstyled_doc()

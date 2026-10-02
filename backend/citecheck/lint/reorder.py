@@ -68,15 +68,23 @@ def _lis_indices(seq: list[int]) -> list[int]:
     return out[::-1]
 
 
-def _label_digits_span(text: str) -> tuple[int, int] | None:
-    """(start, end) of the digit run inside a leading reference label."""
+def _label_digits_span(
+    text: str, auto_label: str | None = None
+) -> tuple[int, int] | None:
+    """(start, end) of the digit run inside a leading LITERAL reference
+    label. When the paragraph's leading label is virtual (auto-numbering
+    renders it — ``auto_label``), the match must start past the virtual
+    prefix; virtual digits are Word-managed and never rewritten."""
     m = _LABEL_HEAD.match(text)
     if not m:
         return None
     d = re.search(r"\d+", m.group(0))
     if not d:
         return None
-    return m.start() + d.start(), m.start() + d.end()
+    s, e = m.start() + d.start(), m.start() + d.end()
+    if auto_label and s < len(auto_label):
+        return None
+    return s, e
 
 
 def _runs(nums: list[int]) -> list[list[int]]:
@@ -116,8 +124,10 @@ def _move_revisions(
     target: list[str],
     new_num: dict[str, int] | None,
     para_text: dict[str, str],
+    auto_labels: dict[str, str] | None = None,
 ) -> list[Revision]:
     """LIS split + ref_reorder revisions for one target order."""
+    auto_labels = auto_labels or {}
     old_pos = {r.id: i for i, r in enumerate(refs)}
     ref_by_id = {r.id: r for r in refs}
     seq = [old_pos[rid] for rid in target]
@@ -126,7 +136,8 @@ def _move_revisions(
     for k, rid in enumerate(target):
         ref = ref_by_id[rid]
         text = para_text.get(ref.paragraph_id or "", ref.raw)
-        span = _label_digits_span(text)
+        span = _label_digits_span(
+            text, auto_labels.get(ref.paragraph_id or ""))
         if rid in keep:
             if new_num and span and ref.label and text[span[0]:span[1]] != str(new_num[rid]):
                 revs.append(Revision(
@@ -177,17 +188,22 @@ def _author_year_order(refs: list[Reference]) -> list[str] | None:
 
 def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
     """Revisions to bring the reference list and markers into order."""
-    refs = parsed.references
+    # only bibliography-block entries participate; footnote-promoted
+    # references are anchored at their citing paragraph and must never
+    # move or renumber (their mark text is virtual)
+    refs = [r for r in parsed.references if r.origin == "list"]
     if not refs or parsed.document.managed_by:
         return []
+    list_ids = {r.id for r in refs}
     para_text = {p.id: p.text for p in parsed.paragraphs}
+    auto_labels = parsed.auto_labels
     revs: list[Revision] = []
 
     if parsed.document.citation_style == "author_year":
         target = _author_year_order(refs)
         if target is None:
             return []
-        revs += _move_revisions(refs, target, None, para_text)
+        revs += _move_revisions(refs, target, None, para_text, auto_labels)
         return revs
 
     if parsed.document.citation_style != "numeric":
@@ -197,14 +213,14 @@ def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
     target: list[str] = []
     for m in parsed.markers:
         for rid in m.ref_ids:
-            if rid not in target:
+            if rid in list_ids and rid not in target:
                 target.append(rid)
     target += [r.id for r in refs if r.id not in target]
     if [r.id for r in refs] == target:
         return []
 
     new_num = {rid: i + 1 for i, rid in enumerate(target)}
-    revs += _move_revisions(refs, target, new_num, para_text)
+    revs += _move_revisions(refs, target, new_num, para_text, auto_labels)
 
     for m in parsed.markers:
         if m.kind not in {"numeric", "superscript"}:
@@ -214,7 +230,10 @@ def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
             continue  # missing-entry markers are norms findings, not edits
         if len(m.ref_ids) != len(nums_old):
             continue
-        new_nums = sorted({new_num[rid] for rid in m.ref_ids})
+        new_nums = sorted({new_num[rid] for rid in m.ref_ids
+                           if rid in new_num})
+        if not new_nums:
+            continue
         new_raw = _format_marker(m.raw, new_nums)
         if new_raw != m.raw:
             revs.append(Revision(

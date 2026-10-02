@@ -29,6 +29,9 @@ from pathlib import Path
 from lxml import etree
 
 from ..parse import docx_xml as dx
+from ..parse import headings as hd
+from ..parse import notes as nt
+from ..parse.numbering import load_numbering, paragraph_prefixes
 from ..parse.parser import parse_docx
 from ..schema import Report
 from .simulate import simulate, simulated_texts
@@ -39,6 +42,9 @@ W = dx.qn
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
 AUTHOR = "引用体检"
 INITIALS = "体检"
+# per-export overrides, set by export_report(author=..., initials=...)
+_author = AUTHOR
+_initials = INITIALS
 
 _TEXT_TAGS = dx._TEXT_TAGS
 W_T, W_R, W_P = dx.W_T, dx.W_R, dx.W_P
@@ -123,9 +129,14 @@ def _split_run(run: etree._Element, offset: int) -> etree._Element:
     return new_run
 
 
-def _split_paragraph(p: etree._Element, boundaries: set[int]) -> None:
-    """Split runs at every boundary offset (one pass, rPr preserved)."""
-    _, segs = dx.paragraph_text_map(p)
+def _split_paragraph(
+    p: etree._Element, boundaries: set[int],
+    prefix: str = "", marks: list[str] | None = None,
+) -> None:
+    """Split runs at every boundary offset (one pass, rPr preserved).
+    ``prefix``/``marks`` are the paragraph's virtual text (numbering
+    label / note marks) so boundary offsets stay in report space."""
+    _, segs = dx.paragraph_text_map(p, prefix=prefix, note_marks=marks)
     groups: list[list] = []  # [run, start, end]
     for s in segs:
         if groups and groups[-1][0] is s.run:
@@ -141,10 +152,11 @@ def _split_paragraph(p: etree._Element, boundaries: set[int]) -> None:
 
 
 def _anchor_runs(
-    p: etree._Element, start: int, end: int
+    p: etree._Element, start: int, end: int,
+    prefix: str = "", marks: list[str] | None = None,
 ) -> list[etree._Element]:
     """Run elements fully inside [start, end) of the paragraph text."""
-    _, segs = dx.paragraph_text_map(p)
+    _, segs = dx.paragraph_text_map(p, prefix=prefix, note_marks=marks)
     runs: list[etree._Element] = []
     for s in segs:
         if s.run is not None and s.start >= start and s.end <= end:
@@ -189,7 +201,7 @@ class _Ids:
 def _track(tag: str, ids: _Ids, date: str) -> etree._Element:
     el = etree.Element(dx.qn(tag))
     el.set(W_ID, ids.wid())
-    el.set(W_AUTHOR, AUTHOR)
+    el.set(W_AUTHOR, _author)
     el.set(W_DATE, date)
     return el
 
@@ -266,11 +278,16 @@ def _wrap_para_runs(p: etree._Element, tag: str, ids: _Ids,
             _retag_del_text(wrap)
 
 
-def _replace_range(p: etree._Element, start: int, end: int,
-                   new_text: str) -> None:
-    """Replace paragraph text [start, end) with new_text in place."""
-    text, segs = dx.paragraph_text_map(p)
-    covering = [s for s in segs if s.end > start and s.start < end]
+def _replace_range(
+    p: etree._Element, start: int, end: int, new_text: str,
+    prefix: str = "", marks: list[str] | None = None,
+) -> None:
+    """Replace paragraph text [start, end) with new_text in place.
+    Virtual segments (auto-numbering label, note marks) carry no real
+    text node — a range covering only virtual text is a no-op."""
+    text, segs = dx.paragraph_text_map(p, prefix=prefix, note_marks=marks)
+    covering = [s for s in segs
+                if s.node is not None and s.end > start and s.start < end]
     if not covering:
         return
     first, last = covering[0], covering[-1]
@@ -306,8 +323,8 @@ def _diff_span(old: str, new: str) -> tuple[int, int, str]:
 def _comment_el(cid: int, title: str, detail: str, date: str) -> etree._Element:
     c = etree.Element(dx.qn("comment"))
     c.set(W_ID, str(cid))
-    c.set(W_AUTHOR, AUTHOR)
-    c.set(W_INITIALS, INITIALS)
+    c.set(W_AUTHOR, _author)
+    c.set(W_INITIALS, _initials)
     c.set(W_DATE, date)
     for line in [title] + [ln for ln in detail.splitlines() if ln.strip()]:
         p = etree.SubElement(c, W_P)
@@ -396,8 +413,15 @@ def _has_comment_ref_style(styles_root: etree._Element | None) -> bool:
 
 
 def export_report(
-    src_path: str | Path, report: Report, out_path: str | Path | None = None
+    src_path: str | Path,
+    report: Report,
+    out_path: str | Path | None = None,
+    author: str | None = None,
+    initials: str | None = None,
 ) -> Path:
+    global _author, _initials
+    _author = author or AUTHOR
+    _initials = initials or INITIALS
     src = Path(src_path)
     out = Path(out_path) if out_path else _default_out(src)
     date = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -420,6 +444,24 @@ def export_report(
 
     p_by_id = {pid: p for pid, p in dx.iter_paragraphs(doc_root)}
     para_len = {p.id: len(p.text) for p in report.paragraphs}
+
+    # virtual text rules (auto-numbering labels, note marks) — report
+    # anchors live in this space, so every offset mapping below must
+    # replay the same rules the parser used
+    _pids_in_order = [pid for pid, _p in dx.iter_paragraphs(doc_root)]
+    _p_elems = [p_by_id[pid] for pid in _pids_in_order]
+    _numbering = load_numbering(
+        etree.fromstring(blobs["word/numbering.xml"])
+        if "word/numbering.xml" in blobs else None)
+    _prefixes = paragraph_prefixes(
+        _p_elems, _numbering, hd.load_styles(styles_root))
+    _marks, _ = nt.paragraph_note_refs(_p_elems)
+    vrules: dict[str, tuple[str, list[str]]] = {
+        pid: (_prefixes[i], _marks[i]) for i, pid in enumerate(_pids_in_order)
+    }
+
+    def _vr(pid: str) -> tuple[str, list[str]]:
+        return vrules.get(pid, ("", []))
 
     # ---- resolve finding anchors ---------------------------------------
     # anchor None -> first section heading, else first non-empty paragraph
@@ -444,6 +486,10 @@ def export_report(
     inline = [r for r in report.revisions
               if not (r.kind == "ref_reorder" and r.move_after is not None)]
 
+    first_ref_pid = next(
+        (r.paragraph_id for r in report.references
+         if r.origin == "list" and r.paragraph_id), None)
+
     # ---- step 1: split runs at every anchor boundary --------------------
     boundaries: dict[str, set[int]] = {}
     for r in inline:
@@ -455,7 +501,7 @@ def export_report(
     for pid, bs in boundaries.items():
         p = p_by_id.get(pid)
         if p is not None:
-            _split_paragraph(p, bs)
+            _split_paragraph(p, bs, *_vr(pid))
 
     # ---- step 2: resolve anchors to run lists (before any wrapping) -----
     resolved_inline: list[tuple[list[etree._Element], object]] = []
@@ -471,13 +517,15 @@ def export_report(
                         r.anchor.paragraph_id)
             continue
         applied_spans[r.anchor.paragraph_id].append(span)
-        runs = _anchor_runs(p, r.anchor.start, r.anchor.end)
+        runs = _anchor_runs(p, r.anchor.start, r.anchor.end,
+                            *_vr(r.anchor.paragraph_id))
         resolved_inline.append((runs, r, p))
 
     resolved_findings: list[tuple[str, int, int, list[etree._Element]]] = []
     for f in report.findings:
         pid, s, e = _finding_target(f)
-        runs = _anchor_runs(p_by_id[pid], s, e) if pid in p_by_id else []
+        runs = (_anchor_runs(p_by_id[pid], s, e, *_vr(pid))
+                if pid in p_by_id else [])
         resolved_findings.append((pid, s, e, runs))
 
     ids = _Ids(doc_root, comments_root)
@@ -489,8 +537,10 @@ def export_report(
         if not runs:
             # pure insertion at a point: insert an ins after the run whose
             # text ends at the anchor offset
-            _, segs = dx.paragraph_text_map(p)
-            prev = [s for s in segs if s.end <= r.anchor.start]
+            _, segs = dx.paragraph_text_map(
+                p, *_vr(r.anchor.paragraph_id))
+            prev = [s for s in segs
+                    if s.run is not None and s.end <= r.anchor.start]
             if not prev:
                 continue
             ins = _track("ins", ids, date)
@@ -505,8 +555,6 @@ def export_report(
     # ---- step 4: paragraph moves -----------------------------------------
     current_elem: dict[str, etree._Element] = {}   # pid -> current element
     copy_of: dict[str, etree._Element] = {}
-    first_ref_pid = next(
-        (r.paragraph_id for r in report.references if r.paragraph_id), None)
     for rev in moves:
         pid = rev.anchor.paragraph_id
         orig = p_by_id.get(pid)
@@ -515,7 +563,7 @@ def export_report(
         copy_p = deepcopy(orig)
         a, b, repl = _diff_span(rev.old, rev.new)
         if repl or a < b:
-            _replace_range(copy_p, a, b, repl)
+            _replace_range(copy_p, a, b, repl, *_vr(pid))
         # original: delete all runs + paragraph mark
         _wrap_para_runs(orig, "del", ids, date)
         _para_mark(orig, "del", ids, date)
@@ -549,7 +597,7 @@ def export_report(
         target_p = p_by_id.get(pid)
         if pid in copy_of:
             target_p = copy_of[pid]
-            target_runs = _anchor_runs(target_p, s, e)
+            target_runs = _anchor_runs(target_p, s, e, *_vr(pid))
         if target_p is None:
             continue
         _place_comment(target_p, target_runs, cid, ids, date,
@@ -642,16 +690,20 @@ def _self_check(src: Path, out_root: etree._Element, out: Path,
                     standalone=True)
             zout.writestr(n, data)
     acc = parse_docx(tmp)
+    # only bibliography-list entries are reordered — footnote-promoted
+    # refs (origin="footnote") stay anchored to their citing paragraphs
+    list_ids = {r.id for r in report.references if r.origin == "list"}
     orig_text = {r.id: _strip_label(r.raw) for r in report.references}
     acc_text = {r.id: _strip_label(r.raw) for r in acc.references}
     first_seen: list[str] = []
     for m in report.markers:
         for rid in m.ref_ids:
-            if rid not in first_seen:
+            if rid in list_ids and rid not in first_seen:
                 first_seen.append(rid)
-    first_seen += [r.id for r in report.references if r.id not in first_seen]
+    first_seen += [r.id for r in report.references
+                   if r.id in list_ids and r.id not in first_seen]
     expected = [orig_text[i] for i in first_seen]
-    actual = [acc_text[r.id] for r in acc.references]
+    actual = [acc_text[r.id] for r in acc.references if r.origin == "list"]
     if actual != expected:
         raise RuntimeError(
             f"自检失败：接受全部修订后参考文献顺序错误 {actual} != {expected}")

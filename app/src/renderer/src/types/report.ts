@@ -20,7 +20,7 @@ export type ParagraphId = string;
 export type Start = number;
 export type End = number;
 export type Raw = string;
-export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year") | null;
+export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year" | "footnote") | null;
 export type RefIds = string[];
 export type Markers = CitationMarker[];
 export type Id3 = string;
@@ -33,6 +33,7 @@ export type Doi = string | null;
 export type Lang = "en" | "zh" | "other";
 export type ParagraphId1 = string | null;
 export type Label = string | null;
+export type Origin = "list" | "footnote";
 export type References = Reference[];
 export type RefId = string;
 export type Status = "verified" | "mismatch" | "not_found" | "unverifiable";
@@ -40,6 +41,7 @@ export type Matched = {
   [k: string]: unknown | undefined;
 } | null;
 export type Issues = string[];
+export type Answered = string[];
 export type RefChecks = RefCheck[];
 export type Id4 = string;
 export type ParagraphId2 = string;
@@ -160,12 +162,14 @@ export interface Reference {
   lang?: Lang;
   paragraph_id?: ParagraphId1;
   label?: Label;
+  origin?: Origin;
 }
 export interface RefCheck {
   ref_id: RefId;
   status: Status;
   matched?: Matched;
   issues?: Issues;
+  answered?: Answered;
 }
 export interface Claim {
   id: Id4;
@@ -255,6 +259,7 @@ export interface ReportMeta {
   layers?: Layers;
   duration_s?: DurationS;
   token_usage?: TokenUsage;
+  timings?: Timings;
 }
 export interface LLMCalls {
   local?: Local;
@@ -274,4 +279,7 @@ export interface TokenUsage {
         [k: string]: number | undefined;
       }
     | undefined;
+}
+export interface Timings {
+  [k: string]: unknown | undefined;
 }

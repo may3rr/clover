@@ -36,7 +36,9 @@ class Paragraph(BaseModel):
     char_offset: int
 
 
-MarkerKind = Literal["zotero", "endnote", "superscript", "numeric", "author_year"]
+MarkerKind = Literal[
+    "zotero", "endnote", "superscript", "numeric", "author_year", "footnote"
+]
 
 
 class CitationMarker(BaseModel):
@@ -75,6 +77,11 @@ class Reference(BaseModel):
     lang: RefLang = "other"
     paragraph_id: str | None = None
     label: str | None = None
+    # "list" = an entry in the bibliography block; "footnote" = promoted
+    # from a footnote/endnote body (paragraph_id then points at the
+    # paragraph that cites it). Positional algorithms (reorder, numeric
+    # fallback resolution) must ignore non-"list" entries.
+    origin: Literal["list", "footnote"] = "list"
 
 
 RefStatus = Literal["verified", "mismatch", "not_found", "unverifiable"]

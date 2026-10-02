@@ -90,6 +90,8 @@ class StyleInfo:
     name: str
     outline_lvl: int | None
     based_on: str | None
+    num_id: int | None = None
+    ilvl: int | None = None
 
 
 def load_styles(styles_root: etree._Element | None) -> dict[str, StyleInfo]:
@@ -102,16 +104,34 @@ def load_styles(styles_root: etree._Element | None) -> dict[str, StyleInfo]:
         if not sid:
             continue
         name_el = st.find(dx.qn("name"))
-        ol_el = st.find(f"{dx.qn('pPr')}/{dx.qn('outlineLvl')}")
+        ppr = st.find(dx.qn("pPr"))
+        ol_el = ppr.find(dx.qn("outlineLvl")) if ppr is not None else None
         bo_el = st.find(dx.qn("basedOn"))
         try:
             ol = int(ol_el.get(dx.W_VAL)) if ol_el is not None else None
         except ValueError:
             ol = None
+        num_id = ilvl = None
+        numpr = ppr.find(dx.W_NUMPR) if ppr is not None else None
+        if numpr is not None:
+            nid = numpr.find(dx.W_NUMID)
+            if nid is not None:
+                try:
+                    num_id = int(nid.get(dx.W_VAL) or "0")
+                except ValueError:
+                    num_id = 0
+            ilv = numpr.find(dx.W_ILVL)
+            if ilv is not None:
+                try:
+                    ilvl = int(ilv.get(dx.W_VAL) or "0")
+                except ValueError:
+                    ilvl = 0
         styles[sid] = StyleInfo(
             name=(name_el.get(dx.W_VAL) or "") if name_el is not None else "",
             outline_lvl=ol,
             based_on=bo_el.get(dx.W_VAL) if bo_el is not None else None,
+            num_id=num_id,
+            ilvl=ilvl,
         )
     return styles
 

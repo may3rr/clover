@@ -1,0 +1,46 @@
+{
+  "filename": "footnote_cites.docx",
+  "citation_style": "numeric",
+  "managed_by": null,
+  "reference_count": 4,
+  "sections": [
+    {
+      "title": "1 Introduction",
+      "canonical": "intro"
+    },
+    {
+      "title": "2 Method",
+      "canonical": "method"
+    }
+  ],
+  "markers": [
+    {
+      "raw": "1",
+      "ref_ids": [
+        "r1"
+      ]
+    },
+    {
+      "raw": "2",
+      "ref_ids": [
+        "r2"
+      ]
+    },
+    {
+      "raw": "3",
+      "ref_ids": []
+    },
+    {
+      "raw": "4",
+      "ref_ids": [
+        "r3"
+      ]
+    },
+    {
+      "raw": "5",
+      "ref_ids": [
+        "r4"
+      ]
+    }
+  ]
+}

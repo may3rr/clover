@@ -13,7 +13,12 @@ Text rules for a paragraph's visible text:
   ``w:moveFrom`` (incl. ``w:delText``) is excluded;
 - field instruction text (``w:instrText``) is excluded, but field result
   runs — the runs between ``separate`` and ``end`` fldChars, and the runs
-  inside ``w:fldSimple`` — are included as normal text.
+  inside ``w:fldSimple`` — are included as normal text;
+- OPTIONAL virtual text may be prepended/interleaved: the auto-numbering
+  label (``prefix``) and footnote/endnote reference marks
+  (``note_marks``). Both exist only in Word's rendering, not in the XML;
+  callers that map offsets back to runs (export) must pass the same
+  values so coordinates stay consistent.
 """
 
 from __future__ import annotations
@@ -50,9 +55,15 @@ W_OUTLINELVL = qn("outlineLvl")
 W_VAL = qn("val")
 W_FLDCHARTYPE = qn("fldCharType")
 W_INSTR_ATTR = qn("instr")
+W_FOOTNOTEREF = qn("footnoteReference")
+W_ENDNOTEREF = qn("endnoteReference")
+W_NUMPR = qn("numPr")
+W_NUMID = qn("numId")
+W_ILVL = qn("ilvl")
 
 _TEXT_TAGS = {W_T, W_TAB, W_BR, W_CR}
 _SKIP_SUBTREES = {W_DEL, W_MOVEFROM}
+_NOTE_REF_TAGS = {W_FOOTNOTEREF, W_ENDNOTEREF}
 
 
 def _render(el: etree._Element) -> str:
@@ -85,17 +96,23 @@ def _iter_nodes(el: etree._Element, run: etree._Element | None = None):
 class Segment:
     """One contiguous piece of paragraph text produced by one XML node.
 
-    ``node`` is the text-bearing element (w:t / w:tab / w:br / w:cr),
-    ``run`` is its enclosing w:r (or None), ``start`` is the offset of this
-    segment inside the paragraph's text, and ``end`` is ``start + len(text)``.
-    Export code uses (node, run, start, end) to split runs at anchor
-    boundaries without recomputing offsets.
+    ``node`` is the text-bearing element (w:t / w:tab / w:br / w:cr) —
+    ``None`` for VIRTUAL text that Word renders without storing it in
+    document.xml: auto-numbering labels (``virtual == "autonum"``) and
+    footnote/endnote reference marks (``virtual == "note"``). Virtual
+    segments let downstream layers work on the same text the reader
+    sees; export code must skip them when resolving anchors to runs.
+    ``run`` is the enclosing w:r (or None), ``start`` is the offset of
+    this segment inside the paragraph's text, and ``end`` is
+    ``start + len(text)``. Export code uses (node, run, start, end) to
+    split runs at anchor boundaries without recomputing offsets.
     """
 
-    node: etree._Element
+    node: etree._Element | None
     run: etree._Element | None
     start: int
     text: str
+    virtual: str | None = None  # None | "autonum" | "note"
 
     @property
     def end(self) -> int:
@@ -128,15 +145,37 @@ def iter_paragraphs(root: etree._Element) -> Iterator[tuple[str, etree._Element]
         yield f"p{i}", p
 
 
-def paragraph_text_map(p: etree._Element) -> tuple[str, list[Segment]]:
+def paragraph_text_map(
+    p: etree._Element,
+    *,
+    prefix: str = "",
+    note_marks: list[str] | None = None,
+) -> tuple[str, list[Segment]]:
     """Return ``(text, segments)`` for a w:p element.
 
     ``text`` is the paragraph's visible text under the module-level rules;
     ``segments`` maps that text back to XML nodes and runs, in order.
+
+    ``prefix`` is the paragraph's auto-numbering label (from
+    word/numbering.xml via ``numbering.paragraph_prefixes``) — emitted as
+    one virtual "autonum" segment at offset 0 so every later offset
+    already accounts for it.
+
+    ``note_marks`` is the ordered list of display marks ("1", "2", "iv")
+    for the footnoteReference/endnoteReference elements in this
+    paragraph (see ``notes.paragraph_note_marks``); each is emitted as a
+    virtual "note" segment where the reference element stands.
     """
     parts: list[str] = []
     segments: list[Segment] = []
     cursor = 0
+    if prefix:
+        segments.append(
+            Segment(node=None, run=None, start=0, text=prefix,
+                    virtual="autonum"))
+        parts.append(prefix)
+        cursor = len(prefix)
+    marks = iter(note_marks or [])
     for el, run in _iter_nodes(p):
         if el.tag in _TEXT_TAGS:
             s = _render(el)
@@ -144,6 +183,13 @@ def paragraph_text_map(p: etree._Element) -> tuple[str, list[Segment]]:
                 segments.append(Segment(node=el, run=run, start=cursor, text=s))
                 parts.append(s)
                 cursor += len(s)
+        elif el.tag in _NOTE_REF_TAGS:
+            m = next(marks, "")
+            if m:
+                segments.append(Segment(node=None, run=None, start=cursor,
+                                        text=m, virtual="note"))
+                parts.append(m)
+                cursor += len(m)
     return "".join(parts), segments
 
 
@@ -154,14 +200,21 @@ class _FieldCtx:
     result_end: int | None = None
 
 
-def paragraph_fields(p: etree._Element) -> list[FieldResult]:
+def paragraph_fields(
+    p: etree._Element,
+    *,
+    prefix: str = "",
+    note_marks: list[str] | None = None,
+) -> list[FieldResult]:
     """Complex fields (fldChar begin/instrText/separate/result/end) in a
     paragraph. ``instrText`` never contributes to paragraph text, so the
-    spans line up with ``paragraph_text_map`` offsets.
+    spans line up with ``paragraph_text_map`` offsets — as long as the
+    same ``prefix`` / ``note_marks`` are passed.
     """
     fields: list[FieldResult] = []
     stack: list[_FieldCtx] = []
-    cursor = 0
+    cursor = len(prefix)
+    marks = iter(note_marks or [])
     for el, _run in _iter_nodes(p):
         tag = el.tag
         if tag == W_FLDCHAR:
@@ -181,6 +234,8 @@ def paragraph_fields(p: etree._Element) -> list[FieldResult]:
                 stack[-1].instr += el.text or ""
         elif tag in _TEXT_TAGS:
             cursor += len(_render(el))
+        elif tag in _NOTE_REF_TAGS:
+            cursor += len(next(marks, ""))
     return fields
 
 

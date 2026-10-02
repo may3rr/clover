@@ -1,3 +1,3 @@
-from .parser import ParsedDocument, parse_docx
+from .parser import ParsedDocument, apply_bibliography_start, parse_docx
 
-__all__ = ["parse_docx", "ParsedDocument"]
+__all__ = ["parse_docx", "ParsedDocument", "apply_bibliography_start"]

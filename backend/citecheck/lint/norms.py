@@ -40,6 +40,19 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
     para_len = {p.id: len(p.text) for p in parsed.paragraphs}
     refs = parsed.references
 
+    # ---- degraded honesty: nothing citable was found -------------------
+    # Never emit an all-clean report for a citation-free document.
+    if not parsed.markers and not refs:
+        findings.append(Finding(
+            id="", layer="norms", severity="medium", anchor=None,
+            title="没有在这篇文档中找到引用标记和参考文献列表",
+            detail="依据：正文未发现 [n]、（作者，年份）、上标或脚注形式的"
+                   "引用标记，也未识别到参考文献列表。\n"
+                   "建议：确认这份文件是否为待检论文；若引用由其他工具管理，"
+                   "请先在文档中将引用转换为普通文本后重新体检。",
+            refs=[],
+        ))
+
     # ---- uncited references ------------------------------------------
     cited: set[str] = set()
     for m in parsed.markers:

@@ -14,7 +14,8 @@ import pytest
 from citecheck.parse import parse_docx
 
 FIXTURES = Path(__file__).parent / "fixtures"
-NAMES = ["numeric_en", "authoryear_en", "gbt_zh", "zotero_numeric"]
+NAMES = ["numeric_en", "authoryear_en", "gbt_zh", "zotero_numeric",
+         "autonum_refs", "footnote_cites", "unstyled"]
 
 
 @pytest.fixture(params=NAMES, ids=NAMES, scope="module")
@@ -76,7 +77,8 @@ def test_document_meta(parsed):
 
 def test_no_markers_inside_reference_list(parsed):
     name, doc, _ = parsed
-    ref_paras = {r.paragraph_id for r in doc.references}
+    ref_paras = {r.paragraph_id for r in doc.references
+                 if r.origin == "list"}
     for m in doc.markers:
         assert m.paragraph_id not in ref_paras, name
 
@@ -86,7 +88,12 @@ def test_references_have_paragraph_anchors(parsed):
     para_text = {p.id: p.text for p in doc.paragraphs}
     for r in doc.references:
         assert r.paragraph_id in para_text, name
-        assert r.raw == para_text[r.paragraph_id].strip(), name
+        if r.origin == "list":
+            assert r.raw == para_text[r.paragraph_id].strip(), name
+        else:
+            # footnote-promoted entries anchor at the citing paragraph
+            assert r.origin == "footnote"
+            assert para_text[r.paragraph_id], name
 
 
 def test_zotero_managed_by():
