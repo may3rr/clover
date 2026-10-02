@@ -146,3 +146,58 @@ async def test_all_sources_down_unverifiable(tmp_path, paras, monkeypatch):
     assert "检索服务暂不可用" in check[0].issues[0]
     assert findings[0].severity == "low"
     assert "暂时无法核验" in findings[0].title
+
+
+# ---------------------------------------------------------------- T2 fix
+# Same-title false positives: a different work sharing the title must not
+# produce a mismatch finding. Recorded responses live in
+# fixtures/http/same_title_cases.json; the S2 author-query entry was
+# reconstructed (S2 429'd during re-recording) with the real NeurIPS 2020
+# record — same payload shape S2 returns.
+
+SAME_TITLE = json.loads(
+    (FIXTURES / "http" / "same_title_cases.json").read_text())
+
+RAWS2 = {
+    "vaswani": RAWS["vaswani"],
+    "brown": "[3] Brown TB, Mann B, Ryder N, et al. Language models are "
+    "few-shot learners. Advances in Neural Information Processing "
+    "Systems. 2020;33:1877-1901.",
+}
+
+
+@pytest.fixture
+def same_title_client(tmp_path, monkeypatch):
+    cache = Cache(tmp_path / "http.sqlite")
+    for k, v in SAME_TITLE.items():
+        cache.set(k, v)
+    client = RetrievalClient(cache=cache)
+
+    async def fail_transport(*a, **kw):
+        raise httpx.ConnectError("offline")
+
+    monkeypatch.setattr(client._client, "get", fail_transport)
+    return client
+
+
+@pytest.mark.asyncio
+async def test_same_title_author_search_rescues(same_title_client, paras):
+    """Brown 2020: the broad title search hits a 2026 same-titled work by
+    Malakar; the targeted title+surname pass finds the real record."""
+    global paras_fixture
+    paras_fixture = paras
+    check, findings = await _verify(RAWS2["brown"], same_title_client)
+    assert check.status == "verified", check.issues
+    assert findings == []
+
+
+@pytest.mark.asyncio
+async def test_same_title_wrong_author_gone(same_title_client, paras):
+    """Vaswani 2017: even when no source surfaces the 2017 record, the
+    author-targeted pass replaces the wrong-author match (Mineault) with
+    a Vaswani record — no bogus 首作者不一致 finding."""
+    global paras_fixture
+    paras_fixture = paras
+    check, findings = await _verify(RAWS2["vaswani"], same_title_client)
+    assert not any("首作者不一致" in i for i in check.issues)
+    assert check.matched and "Vaswani" in check.matched["authors"][0]

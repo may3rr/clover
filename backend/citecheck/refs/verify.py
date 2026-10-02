@@ -123,6 +123,35 @@ async def _title_hits(ref: Reference, client: RetrievalClient) -> tuple[list[dic
     return hits, responded
 
 
+async def _author_hits(
+    ref: Reference, client: RetrievalClient
+) -> list[dict]:
+    """Targeted last pass: a different work sharing the same title can
+    displace the real record in broad title search (e.g. 'Attention is
+    all you need' -> Mineault 2021). Search title + first-author surname
+    to pull the real record back into the candidate pool."""
+    surname = _ref_surname(ref)
+    if not (ref.title and surname):
+        return []
+    calls = [
+        client.crossref_search(ref.title, author=surname),
+        client.openalex_search(f"{ref.title} {surname}"),
+        client.s2_search(f"{ref.title} {surname}"),
+    ]
+    if ref.year:
+        calls += [
+            client.crossref_search(ref.title, year=ref.year, author=surname),
+            client.openalex_search(f"{ref.title} {surname}", year=ref.year),
+            client.s2_search(f"{ref.title} {surname}", year=ref.year),
+        ]
+    results = await asyncio.gather(*calls)
+    hits: list[dict] = []
+    for r in results:
+        if r.ok:
+            hits += r.data or []
+    return hits
+
+
 def _evaluate(ref: Reference, hit: dict) -> list[str]:
     """Field-level issues for a title-matched hit; empty = verified."""
     issues: list[str] = []
@@ -200,16 +229,36 @@ async def _verify_one(
     # 3. best hit: among title matches (>=92) prefer the one whose fields
     # agree — a 2025 paper can share the title with the 2017 original.
     want_title = ref.title or ref.raw[:120]
-    title_matches: list[tuple[float, dict, list[str]]] = []
+
+    def _title_matches(pool: list[dict]) -> list[tuple[float, dict, list[str]]]:
+        out = []
+        for h in pool:
+            if not h.get("title"):
+                continue
+            score = fuzz.token_sort_ratio(_norm(want_title), _norm(h["title"]))
+            if score >= _TITLE_MIN:
+                out.append((score, h, _evaluate(ref, h)))
+        out.sort(key=lambda t: (len(t[2]), -t[0]))
+        return out
+
     doi_hit: dict | None = None
     for h in hits:
-        if not h.get("title"):
-            continue
         if ref.doi and h.get("doi") and ref.doi.lower() == str(h["doi"]).lower():
             doi_hit = h
-        score = fuzz.token_sort_ratio(_norm(want_title), _norm(h["title"]))
-        if score >= _TITLE_MIN:
-            title_matches.append((score, h, _evaluate(ref, h)))
+    title_matches = _title_matches(hits)
+
+    # targeted pass: when the best title-matched record disagrees on the
+    # first author or year, a same-titled different work may be hiding the
+    # real record — search title + surname before concluding mismatch.
+    if title_matches and any(
+        "首作者" in i or "年份" in i for i in title_matches[0][2]
+    ):
+        extra = await _author_hits(ref, client)
+        if extra:
+            hits += extra
+            retried = _title_matches(hits)
+            if retried and len(retried[0][2]) < len(title_matches[0][2]):
+                title_matches = retried
 
     issues: list[str] = []
     matched: dict | None = None

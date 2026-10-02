@@ -102,6 +102,10 @@ def _norm_hit(source: str, raw: dict) -> dict:
         hit["venue"] = venue[0] if venue else None
         hit["doi"] = raw.get("DOI")
         hit["url"] = raw.get("URL")
+        # Crossref deposits arXiv preprints as 10.48550/arXiv.<id> with the
+        # deposit date — the encoded id gives the real preprint year
+        if hit["doi"] and str(hit["doi"]).startswith("10.48550/arXiv."):
+            hit["arxiv_id"] = str(hit["doi"]).split("arXiv.", 1)[-1]
     elif source == "openalex":
         hit["title"] = raw.get("title") or raw.get("display_name")
         hit["authors"] = [
@@ -217,19 +221,26 @@ class RetrievalClient:
         return r
 
     async def crossref_search(
-        self, query: str, rows: int = 5, year: int | None = None
+        self, query: str, rows: int = 5, year: int | None = None,
+        author: str | None = None,
     ) -> SourceResult:
         params: dict = {
             "query.bibliographic": query, "rows": rows, "mailto": self._mailto
         }
+        if author:
+            params["query.author"] = author
         if year:
             params["filter"] = (
                 f"from-pub-date:{year - 1}-01-01,until-pub-date:{year + 1}-12-31"
             )
-        r = await self._get(
-            f"{CROSSREF}/works", params,
-            make_key("crossref", "search", query, year) if year else make_key("crossref", "search", query),
+        key = (
+            make_key("crossref", "search", query, year, author)
+            if author
+            else make_key("crossref", "search", query, year)
+            if year
+            else make_key("crossref", "search", query)
         )
+        r = await self._get(f"{CROSSREF}/works", params, key)
         if r.ok and r.data:
             items = r.data.get("message", {}).get("items", [])
             return SourceResult(ok=True, data=[_norm_hit("crossref", w) for w in items])
