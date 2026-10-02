@@ -253,7 +253,7 @@ async def test_router_fallback_counters(monkeypatch):
     async def bad_local(messages, max_tokens=1024):
         raise RuntimeError("unavailable")
 
-    async def good_cloud(model, messages):
+    async def good_cloud(model, messages, task):
         return '{"claims": []}'
 
     monkeypatch.setattr(local, "generate_or_raise", bad_local)

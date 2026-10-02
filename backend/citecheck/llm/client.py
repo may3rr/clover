@@ -13,6 +13,7 @@ import logging
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypeVar
+from urllib.parse import urlparse
 
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ValidationError
@@ -84,6 +85,33 @@ def _record_usage(model: str, usage: Any) -> None:
     u["completion"] += getattr(usage, "completion_tokens", 0) or 0
 
 
+def _provider_for(route: str) -> str:
+    if route == "local":
+        return "mlx-local"
+    host = urlparse(get_settings().llm.cloud.base_url).hostname or "cloud"
+    if "dashscope" in host or "aliyun" in host:
+        return "dashscope"
+    return host
+
+
+def _model_for(route: str, task_model: str) -> str:
+    if route == "local":
+        return get_settings().llm.local.model
+    return task_model
+
+
+def _log_usage(route: str, task: str, model: str, prompt: int, completion: int,
+               cached: bool = False) -> None:
+    """Persist one call (or cache hit) into the llm_usage table. Never
+    allowed to break the request path."""
+    try:
+        _get_cache().record_usage(
+            _provider_for(route), model, task, prompt, completion, cached
+        )
+    except Exception as e:  # noqa: BLE001 — stats must never break calls
+        log.debug("usage log write failed: %s", e)
+
+
 def _err_desc(e: BaseException) -> str:
     """Compact error description for logs — status and provider error code
     (e.g. AllocationQuota.FreeTierOnly); never prompt content or keys."""
@@ -142,7 +170,7 @@ def _ensure_json_word(messages: list[dict]) -> list[dict]:
     return [{"role": "system", "content": "只输出 JSON。"}] + messages
 
 
-async def _cloud_call(model: str, messages: list[dict]) -> str:
+async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
     client, sem = _get_cloud()
     settings = get_settings()
     try:
@@ -158,7 +186,22 @@ async def _cloud_call(model: str, messages: list[dict]) -> str:
         log.warning("cloud call failed model=%s: %s", model, _err_desc(e))
         raise
     _record_usage(model, resp.usage)
+    _log_usage(
+        "cloud", task, model,
+        getattr(resp.usage, "prompt_tokens", 0) or 0,
+        getattr(resp.usage, "completion_tokens", 0) or 0,
+    )
     return resp.choices[0].message.content or ""
+
+
+async def _local_call(messages: list[dict], task: str) -> str:
+    raw = await local.generate_or_raise(messages)  # raises on failure
+    usage = local.last_usage() or {}
+    _log_usage(
+        "local", task, get_settings().llm.local.model,
+        usage.get("prompt", 0), usage.get("completion", 0),
+    )
+    return raw
 
 
 def _validate(schema: type[T], text: str) -> T:
@@ -166,14 +209,14 @@ def _validate(schema: type[T], text: str) -> T:
 
 
 async def _attempt(
-    schema: type[T], model: str, messages: list[dict], route: str
+    schema: type[T], model: str, messages: list[dict], route: str, task: str
 ) -> tuple[T | None, str | None]:
     """One generation + validation; on invalid output retry once with the
     error appended. Returns (value, raw_text)."""
     if route == "local":
-        raw = await local.generate_or_raise(messages)  # raises on failure
+        raw = await _local_call(messages, task)  # raises on failure
     else:
-        raw = await _cloud_call(model, messages)
+        raw = await _cloud_call(model, messages, task)
     try:
         return _validate(schema, raw), raw
     except (ValidationError, json.JSONDecodeError, TypeError) as e:
@@ -186,9 +229,9 @@ async def _attempt(
             },
         ]
         if route == "local":
-            raw2 = await local.generate_or_raise(retry)
+            raw2 = await _local_call(retry, task)
         else:
-            raw2 = await _cloud_call(model, retry)
+            raw2 = await _cloud_call(model, retry, task)
         try:
             return _validate(schema, raw2), raw2
         except (ValidationError, json.JSONDecodeError, TypeError):
@@ -214,18 +257,21 @@ async def chat_json(
 
     cached = _get_cache().get(key)
     if cached is not None:
-        _count(cached.get("route", "cloud"))
+        cached_route = cached.get("route", "cloud")
+        _count(cached_route)
+        _log_usage(cached_route, task, _model_for(cached_route, model), 0, 0,
+                   cached=True)
         try:
             value = schema.model_validate(cached["value"])
         except (ValidationError, KeyError):
             value = None
-        return LLMResult(value=value, route=cached.get("route", "cloud"), cached=True)
+        return LLMResult(value=value, route=cached_route, cached=True)
 
     order = route_order(task, settings) if route == "auto" else [route]
     last_error: Exception | None = None
     for r in order:
         try:
-            value, _raw = await _attempt(schema, model, messages, r)
+            value, _raw = await _attempt(schema, model, messages, r, task)
         except Exception as e:  # noqa: BLE001 — route failure -> next route
             log.warning("llm %s route failed for task %s: %s", r, task,
                         _err_desc(e))

@@ -38,7 +38,7 @@ def test_route_order():
 async def test_cloud_success_and_cache(monkeypatch):
     calls = []
 
-    async def fake_cloud(model, messages):
+    async def fake_cloud(model, messages, task):
         calls.append(messages)
         return '{"label": "ok", "n": 1}'
 
@@ -57,7 +57,7 @@ async def test_local_fallback_to_cloud(monkeypatch):
     async def bad_local(messages, max_tokens=1024):
         raise RuntimeError("local down")
 
-    async def fake_cloud(model, messages):
+    async def fake_cloud(model, messages, task):
         return '{"label": "cloud"}'
 
     monkeypatch.setattr(local, "generate_or_raise", bad_local)
@@ -74,7 +74,7 @@ async def test_local_fallback_to_cloud(monkeypatch):
 async def test_retry_once_on_invalid_json(monkeypatch):
     seen = []
 
-    async def flaky_cloud(model, messages):
+    async def flaky_cloud(model, messages, task):
         seen.append(len(messages))
         if len(seen) == 1:
             return "not json"
@@ -88,9 +88,25 @@ async def test_retry_once_on_invalid_json(monkeypatch):
 
 @pytest.mark.asyncio
 async def test_invalid_twice_returns_none(monkeypatch):
-    async def bad_cloud(model, messages):
+    async def bad_cloud(model, messages, task):
         return "still not json"
 
     monkeypatch.setattr(llm, "_cloud_call", bad_cloud)
     r = await llm.chat_json("judge", [{"role": "user", "content": "x"}], Out)
     assert r.value is None
+
+
+@pytest.mark.asyncio
+async def test_usage_log_records_cache_hits(monkeypatch):
+    """Cache hits persist a llm_usage row (0 tokens, cached=1)."""
+    async def fake_cloud(model, messages, task):
+        return '{"label": "ok"}'
+
+    monkeypatch.setattr(llm, "_cloud_call", fake_cloud)
+    await llm.chat_json("judge", [{"role": "user", "content": "hi"}], Out)
+    await llm.chat_json("judge", [{"role": "user", "content": "hi"}], Out)
+    rows = llm._get_cache().usage_summary()
+    assert len(rows) == 1
+    assert rows[0]["calls"] == 1 and rows[0]["cached_calls"] == 1
+    assert rows[0]["provider"] == "dashscope"
+    assert rows[0]["prompt"] == 0 and rows[0]["completion"] == 0

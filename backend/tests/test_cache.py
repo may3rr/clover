@@ -48,3 +48,20 @@ def test_creates_parent_dirs(tmp_path):
     with Cache(p) as cache:
         cache.set("x", 1)
     assert Path(p).exists()
+
+
+def test_usage_log_aggregates(tmp_path):
+    with Cache(tmp_path / "c.sqlite") as c:
+        c.record_usage("dashscope", "qwen3.8-flash", "judge", 100, 20)
+        c.record_usage("dashscope", "qwen3.8-flash", "judge", 50, 10,
+                       cached=True)
+        c.record_usage("dashscope", "qwen3.8-max", "review", 800, 200)
+        c.record_usage("mlx-local", "Qwen3.5-4B", "extract", 300, 40)
+        rows = c.usage_summary()
+    assert len(rows) == 3
+    by_model = {r["model"]: r for r in rows}
+    assert by_model["qwen3.8-flash"]["calls"] == 2
+    assert by_model["qwen3.8-flash"]["cached_calls"] == 1
+    assert by_model["qwen3.8-flash"]["prompt"] == 150
+    assert by_model["qwen3.8-max"]["provider"] == "dashscope"
+    assert by_model["Qwen3.5-4B"]["provider"] == "mlx-local"

@@ -45,6 +45,7 @@ class LocalEngine:
         )
         self._model = None
         self._tokenizer = None
+        self._last_usage: dict[str, int] | None = None
         if hf_endpoint:
             os.environ.setdefault("HF_ENDPOINT", hf_endpoint)
         try:
@@ -80,7 +81,15 @@ class LocalEngine:
                 self._model, self._tokenizer, prompt,
                 max_tokens=max_tokens, temp=0.0,
             )
-        return out if isinstance(out, str) else str(out)
+        out = out if isinstance(out, str) else str(out)
+        try:
+            self._last_usage = {
+                "prompt": len(self._tokenizer.encode(prompt)),
+                "completion": len(self._tokenizer.encode(out)),
+            }
+        except Exception:  # noqa: BLE001 — token counting is best-effort
+            self._last_usage = None
+        return out
 
     async def generate_json(
         self, messages: list[dict], max_tokens: int = 1024
@@ -112,6 +121,12 @@ async def generate_or_raise(
     if out is None:
         raise RuntimeError("local generation failed or timed out")
     return out
+
+
+def last_usage() -> dict[str, int] | None:
+    """Token counts from the most recent local generation, for the usage log."""
+    e = _engine
+    return e._last_usage if e is not None else None
 
 
 def get_engine() -> LocalEngine | None:

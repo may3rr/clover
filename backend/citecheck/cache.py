@@ -10,6 +10,7 @@ import hashlib
 import json
 import sqlite3
 import threading
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -34,6 +35,17 @@ class Cache:
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
         )
+        self._conn.execute(
+            "CREATE TABLE IF NOT EXISTS llm_usage ("
+            "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "ts TEXT NOT NULL, "
+            "provider TEXT NOT NULL, "
+            "model TEXT NOT NULL, "
+            "task TEXT NOT NULL, "
+            "prompt_tokens INTEGER NOT NULL, "
+            "completion_tokens INTEGER NOT NULL, "
+            "cached INTEGER NOT NULL DEFAULT 0)"
+        )
         self._conn.commit()
 
     def get(self, key: str) -> Any | None:
@@ -53,6 +65,53 @@ class Cache:
                 (key, payload),
             )
             self._conn.commit()
+
+    def record_usage(
+        self,
+        provider: str,
+        model: str,
+        task: str,
+        prompt_tokens: int = 0,
+        completion_tokens: int = 0,
+        cached: bool = False,
+    ) -> None:
+        """Append one LLM call to the persistent usage log (llm_usage table).
+
+        Cache hits are recorded with cached=1 and zero tokens so the log
+        doubles as a call audit; real calls carry the provider-reported
+        token counts (or tokenizer estimates for the local route).
+        """
+        with self._lock:
+            self._conn.execute(
+                "INSERT INTO llm_usage (ts, provider, model, task, "
+                "prompt_tokens, completion_tokens, cached) "
+                "VALUES (?,?,?,?,?,?,?)",
+                (
+                    datetime.now().isoformat(timespec="seconds"),
+                    provider,
+                    model,
+                    task,
+                    prompt_tokens,
+                    completion_tokens,
+                    int(cached),
+                ),
+            )
+            self._conn.commit()
+
+    def usage_summary(self) -> list[dict]:
+        """Aggregate the usage log by day + provider + model."""
+        with self._lock:
+            cur = self._conn.execute(
+                "SELECT date(ts) AS day, provider, model, "
+                "COUNT(*) AS calls, SUM(cached) AS cached_calls, "
+                "SUM(prompt_tokens) AS prompt, "
+                "SUM(completion_tokens) AS completion "
+                "FROM llm_usage "
+                "GROUP BY day, provider, model "
+                "ORDER BY day, provider, model"
+            )
+            cols = [c[0] for c in cur.description]
+            return [dict(zip(cols, row)) for row in cur.fetchall()]
 
     def close(self) -> None:
         with self._lock:
