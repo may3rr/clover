@@ -5,7 +5,8 @@
 图层照常产出。authenticity 失败时 support 仍然运行（matched 为空，
 全部 undetermined / source_kind=none）。
 
-emit(dict) 回调收到 {type:"layer", layer, status, findings} 事件；结束
+emit(dict) 回调收到 {type:"layer", layer, status, findings, anchors}
+事件；解析成功后先发 {type:"parsed", outline}（前端骨架图用）；结束
 时 {type:"done"}，或解析失败 / 致命错误时 {type:"failed", error}。
 """
 
@@ -60,6 +61,43 @@ def benchmark_path(benchmark_id: str) -> Path:
     return _DEFAULT_BENCH.parent / f"{benchmark_id}.json"
 
 
+def _outline(parsed: ParsedDocument) -> dict:
+    """Document outline for the running-screen skeleton: section headings,
+    paragraph lengths and citation-marker positions (relative 0..1)."""
+    markers_by_para: dict[str, list[float]] = {}
+    para_len = {p.id: max(len(p.text), 1) for p in parsed.paragraphs}
+    for m in parsed.markers:
+        markers_by_para.setdefault(m.paragraph_id, []).append(
+            round(m.start / para_len.get(m.paragraph_id, 1), 4))
+    paras_by_section: dict[str, list] = {}
+    for p in parsed.paragraphs:
+        paras_by_section.setdefault(p.section_id, []).append(p)
+    heading_ids = {s.heading_paragraph_id for s in parsed.sections}
+    return {
+        "title": parsed.document.title,
+        "sections": [
+            {
+                "id": s.id,
+                "title": s.title,
+                "canonical": s.canonical,
+                # heading paragraphs stay in the list (flagged) so layer
+                # anchors pointing at a section heading still resolve
+                "paragraphs": [
+                    {
+                        "id": p.id,
+                        "length": len(p.text),
+                        "markers": markers_by_para.get(p.id, []),
+                        "heading": p.id in heading_ids,
+                    }
+                    for p in paras_by_section.get(s.id, [])
+                ],
+            }
+            for s in parsed.sections
+        ],
+        "references": len(parsed.references),
+    }
+
+
 async def run_pipeline(
     path: str | Path,
     benchmark_id: str = "arxiv_cs_cl",
@@ -73,7 +111,23 @@ async def run_pipeline(
     meta = ReportMeta()
     meta.layers = {k: LayerStatus() for k in LAYER_ORDER}
 
-    def _layer(layer: str, status: str, n: int = 0, error: str | None = None):
+    def _anchors(findings: list[Finding]) -> list[dict]:
+        out = []
+        for f in findings:
+            if f.anchor is None:
+                continue
+            p = para_by_id.get(f.anchor.paragraph_id)
+            n = max(len(p.text), 1) if p else 1
+            out.append({
+                "paragraph_id": f.anchor.paragraph_id,
+                "start_rel": round(min(f.anchor.start, n) / n, 4),
+                "end_rel": round(min(f.anchor.end, n) / n, 4),
+                "severity": f.severity,
+            })
+        return out
+
+    def _layer(layer: str, status: str, n: int = 0, error: str | None = None,
+               anchors: list[dict] | None = None):
         meta.layers[layer].status = status  # type: ignore[assignment]
         meta.layers[layer].findings = n
         meta.layers[layer].error = error
@@ -81,6 +135,8 @@ async def run_pipeline(
               "findings": n}
         if error:
             ev["error"] = error
+        if anchors:
+            ev["anchors"] = anchors
         send(ev)
 
     # ---- parse (threaded; docx XML work) -------------------------------
@@ -92,6 +148,9 @@ async def run_pipeline(
             _layer(layer, "failed")
         send({"type": "failed", "error": PARSE_ERROR})
         raise PipelineError(PARSE_ERROR) from e
+
+    para_by_id = {p.id: p for p in parsed.paragraphs}
+    send({"type": "parsed", "outline": _outline(parsed)})
 
     with stats_scope() as stats:
         own_retrieval = retrieval is None
@@ -114,7 +173,8 @@ async def run_pipeline(
                     log.warning("authenticity layer failed: %s", e)
                     _layer("authenticity", "failed", error=_short_error(e))
                     return
-                _layer("authenticity", "done", len(auth_findings))
+                _layer("authenticity", "done", len(auth_findings),
+                       anchors=_anchors(auth_findings))
 
             async def _support() -> None:
                 nonlocal claims, support_checks, sup_findings
@@ -127,7 +187,8 @@ async def run_pipeline(
                     log.warning("support layer failed: %s", e)
                     _layer("support", "failed", error=_short_error(e))
                     return
-                _layer("support", "done", len(sup_findings))
+                _layer("support", "done", len(sup_findings),
+                       anchors=_anchors(sup_findings))
 
             async def _auth_then_support() -> None:
                 await _authenticity()
@@ -145,7 +206,8 @@ async def run_pipeline(
                     log.warning("distribution layer failed: %s", e)
                     _layer("distribution", "failed", error=_short_error(e))
                     return
-                _layer("distribution", "done", len(dist_findings))
+                _layer("distribution", "done", len(dist_findings),
+                       anchors=_anchors(dist_findings))
 
             async def _norms() -> None:
                 nonlocal norm_findings, revisions
@@ -160,7 +222,8 @@ async def run_pipeline(
                     log.warning("norms layer failed: %s", e)
                     _layer("norms", "failed", error=_short_error(e))
                     return
-                _layer("norms", "done", len(norm_findings))
+                _layer("norms", "done", len(norm_findings),
+                       anchors=_anchors(norm_findings))
 
             await asyncio.gather(
                 _auth_then_support(), _distribution(), _norms())

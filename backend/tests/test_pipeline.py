@@ -79,8 +79,29 @@ async def test_pipeline_full(tmp_path, monkeypatch):
     await retrieval.close()
 
     assert isinstance(report, Report)
-    assert {e["type"] for e in events} >= {"layer", "done"}
+    assert {e["type"] for e in events} >= {"parsed", "layer", "done"}
     assert events[-1]["type"] == "done"
+    # parsed event carries the skeleton outline and precedes layer events
+    parsed_ev = next(e for e in events if e["type"] == "parsed")
+    assert events.index(parsed_ev) < next(
+        i for i, e in enumerate(events) if e["type"] == "layer")
+    outline = parsed_ev["outline"]
+    assert outline["references"] == len(report.references)
+    para_ids = {p["id"] for s in outline["sections"]
+                for p in s["paragraphs"]}
+    assert para_ids == {p.id for p in report.paragraphs}
+    assert all(0 <= m <= 1 for s in outline["sections"]
+               for p in s["paragraphs"] for m in p["markers"])
+    # layer-done events carry relative anchors for the skeleton
+    done_layers = [e for e in events
+                   if e["type"] == "layer" and e["status"] == "done"]
+    anchored = [a for e in done_layers for a in e.get("anchors", [])]
+    n_anchored = sum(1 for f in report.findings if f.anchor is not None)
+    assert len(anchored) == n_anchored
+    for a in anchored:
+        assert a["paragraph_id"] in para_ids
+        assert 0 <= a["start_rel"] <= a["end_rel"] <= 1
+        assert a["severity"] in {"high", "medium", "low"}
     # every layer ran and finished
     for layer in ("authenticity", "support", "distribution", "norms"):
         assert report.meta.layers[layer].status == "done"
@@ -185,6 +206,7 @@ async def test_server_flow(app_client, tmp_path):
     data_lines = [ln for ln in lines if ln.startswith("data:")]
     types = [json.loads(ln[5:])["type"] for ln in data_lines]
     assert types[-1] == "done" and "layer" in types
+    assert "parsed" in types and types.index("parsed") == 0
 
     r = await client.get(f"/jobs/{job}/report")
     assert r.status_code == 200
