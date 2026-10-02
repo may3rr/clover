@@ -26,6 +26,7 @@ class Section(BaseModel):
     id: str
     title: str
     canonical: CanonicalSection
+    heading_paragraph_id: str | None = None  # None for the leading untitled section
 
 
 class Paragraph(BaseModel):

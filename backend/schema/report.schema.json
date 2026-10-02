@@ -560,6 +560,18 @@
           ],
           "title": "Canonical",
           "type": "string"
+        },
+        "heading_paragraph_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heading Paragraph Id"
         }
       },
       "required": [

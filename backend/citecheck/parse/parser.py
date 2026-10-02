@@ -127,17 +127,18 @@ def parse_docx(path: str | Path) -> ParsedDocument:
     sections: list[Section] = []
     para_section: list[str] = []
 
-    def new_section(title: str, canonical: str) -> Section:
-        s = Section(id=f"s{len(sections)}", title=title, canonical=canonical)
+    def new_section(title: str, canonical: str, heading_pid: str | None) -> Section:
+        s = Section(id=f"s{len(sections)}", title=title, canonical=canonical,
+                    heading_paragraph_id=heading_pid)
         sections.append(s)
         return s
 
     cur: Section | None = None  # leading section created lazily
     for i, t in enumerate(texts):
         if heading_levels[i] == 1:
-            cur = new_section(t.strip(), hd.canonical_for(t))
+            cur = new_section(t.strip(), hd.canonical_for(t), p_ids[i])
         if cur is None:
-            cur = new_section("", "other")  # text before the first heading
+            cur = new_section("", "other", None)  # text before the first heading
         para_section.append(cur.id)
 
     # ---- reference list ----------------------------------------------
