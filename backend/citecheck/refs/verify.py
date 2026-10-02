@@ -95,14 +95,27 @@ async def _gather_hits(
 
 async def _title_hits(ref: Reference, client: RetrievalClient) -> tuple[list[dict], set[str]]:
     query = ref.title or ref.raw[:200]
-    results = await asyncio.gather(
+    calls = [
         client.crossref_search(query),
         client.openalex_search(query),
         client.s2_search(query),
-    )
+    ]
+    # a second, year-filtered pass: canonical records (e.g. the 2017
+    # Transformer paper) can be pushed out of search results by later
+    # same-titled works
+    if ref.year:
+        calls += [
+            client.crossref_search(query, year=ref.year),
+            client.openalex_search(query, year=ref.year),
+            client.s2_search(query, year=ref.year),
+        ]
+        srcs = _SOURCES + _SOURCES
+    else:
+        srcs = _SOURCES
+    results = await asyncio.gather(*calls)
     hits: list[dict] = []
     responded: set[str] = set()
-    for src, r in zip(_SOURCES, results):
+    for src, r in zip(srcs, results):
         if not r.ok:
             continue
         responded.add(src)
@@ -200,6 +213,12 @@ async def _verify_one(
     if title_matches:
         title_matches.sort(key=lambda t: (len(t[2]), -t[0]))
         _score, matched, issues = title_matches[0]
+        # fill abstract/pdf/arxiv from sibling records of the same work so
+        # T3 gets the richest available source text
+        for _s, h, _iss in title_matches[1:]:
+            for k in ("abstract", "pdf_url", "arxiv_id"):
+                if not matched.get(k) and h.get(k):
+                    matched[k] = h[k]
         if (
             ref.doi and matched.get("doi")
             and ref.doi.lower() != str(matched["doi"]).lower()

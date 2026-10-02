@@ -124,6 +124,8 @@ class RetrievalClient:
     async def _get(self, url: str, params: dict, cache_key: str) -> SourceResult:
         if self._cache is not None:
             hit = self._cache.get(cache_key)
+            if isinstance(hit, dict) and "__error__" in hit:
+                return SourceResult(ok=False, error=hit["__error__"])
             if hit is not None:
                 return SourceResult(ok=True, data=hit)
         last_err: str | None = None
@@ -161,11 +163,19 @@ class RetrievalClient:
             return SourceResult(ok=True, data=_norm_hit("crossref", r.data["message"]))
         return r
 
-    async def crossref_search(self, query: str, rows: int = 5) -> SourceResult:
+    async def crossref_search(
+        self, query: str, rows: int = 5, year: int | None = None
+    ) -> SourceResult:
+        params: dict = {
+            "query.bibliographic": query, "rows": rows, "mailto": self._mailto
+        }
+        if year:
+            params["filter"] = (
+                f"from-pub-date:{year - 1}-01-01,until-pub-date:{year + 1}-12-31"
+            )
         r = await self._get(
-            f"{CROSSREF}/works",
-            {"query.bibliographic": query, "rows": rows, "mailto": self._mailto},
-            make_key("crossref", "search", query),
+            f"{CROSSREF}/works", params,
+            make_key("crossref", "search", query, year) if year else make_key("crossref", "search", query),
         )
         if r.ok and r.data:
             items = r.data.get("message", {}).get("items", [])
@@ -173,11 +183,17 @@ class RetrievalClient:
         return r
 
     # -- OpenAlex ------------------------------------------------------
-    async def openalex_search(self, query: str, per_page: int = 5) -> SourceResult:
+    async def openalex_search(
+        self, query: str, per_page: int = 5, year: int | None = None
+    ) -> SourceResult:
+        params: dict = {
+            "search": query, "per-page": per_page, "mailto": self._mailto
+        }
+        if year:
+            params["filter"] = f"publication_year:{year - 1}-{year + 1}"
         r = await self._get(
-            f"{OPENALEX}/works",
-            {"search": query, "per-page": per_page, "mailto": self._mailto},
-            make_key("openalex", "search", query),
+            f"{OPENALEX}/works", params,
+            make_key("openalex", "search", query, year) if year else make_key("openalex", "search", query),
         )
         if r.ok and r.data:
             return SourceResult(
@@ -196,12 +212,16 @@ class RetrievalClient:
         return r
 
     # -- Semantic Scholar ----------------------------------------------
-    async def s2_search(self, query: str, limit: int = 5) -> SourceResult:
+    async def s2_search(
+        self, query: str, limit: int = 5, year: int | None = None
+    ) -> SourceResult:
         fields = "title,authors,year,externalIds,abstract,openAccessPdf,venue,url"
+        params: dict = {"query": query, "limit": limit, "fields": fields}
+        if year:
+            params["year"] = f"{year - 1}-{year + 1}"
         r = await self._get(
-            f"{S2}/graph/v1/paper/search",
-            {"query": query, "limit": limit, "fields": fields},
-            make_key("s2", "search", query),
+            f"{S2}/graph/v1/paper/search", params,
+            make_key("s2", "search", query, year) if year else make_key("s2", "search", query),
         )
         if r.ok and r.data:
             return SourceResult(

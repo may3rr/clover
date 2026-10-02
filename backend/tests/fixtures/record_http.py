@@ -67,6 +67,12 @@ async def main() -> None:
                 r = await client.s2_search(title)
                 if not r.ok:
                     print(f"  s2 failed for {name}: {r.error}")
+                if info["year"]:
+                    await client.crossref_search(title, year=info["year"])
+                    await client.openalex_search(title, year=info["year"])
+                    r = await client.s2_search(title, year=info["year"])
+                    if not r.ok:
+                        print(f"  s2 (year) failed for {name}: {r.error}")
     conn = sqlite3.connect(tmp / "rec.sqlite")
     data = {k: json.loads(v) for k, v in conn.execute("SELECT key, value FROM kv")}
     OUT.parent.mkdir(exist_ok=True)
