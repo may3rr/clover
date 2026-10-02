@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { apiFetch } from '../lib/api'
 import { PapersIllustration, ChevronDownIcon } from '../components/Icons'
+import AccountChip from '../components/AccountChip'
+import type { Prefs } from '../lib/prefs'
 
 interface Props {
   benchmark: string
@@ -9,6 +11,8 @@ interface Props {
   onOpenDialog: () => void
   dropError: string | null
   forceDrag?: boolean
+  prefs: Prefs
+  onOpenSettings: () => void
 }
 
 interface Bench {
@@ -24,6 +28,8 @@ export default function Empty({
   onOpenDialog,
   dropError,
   forceDrag,
+  prefs,
+  onOpenSettings,
 }: Props) {
   const [drag, setDrag] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -119,6 +125,9 @@ export default function Empty({
             <ChevronDownIcon size={13} color="var(--text-secondary)" />
           </label>
         </div>
+      </div>
+      <div className="account-corner">
+        <AccountChip prefs={prefs} onOpen={onOpenSettings} />
       </div>
     </div>
   )

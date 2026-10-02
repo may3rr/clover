@@ -54,6 +54,27 @@ class ModelNames(BaseModel):
     function: str = "qwen3.7-flash"
 
 
+class PriceSettings(BaseModel):
+    """RMB per 1M tokens; used to estimate cost in the usage log."""
+
+    input: float = 0.0
+    output: float = 0.0
+
+
+# Bailian list prices (北京地域原价), 2026-10 — override in config.toml.
+_DEFAULT_PRICES: dict[str, dict[str, float]] = {
+    "qwen3.8-max": {"input": 12.0, "output": 36.0},
+    "qwen3.7-max": {"input": 12.0, "output": 36.0},
+    "qwen3.7-plus": {"input": 2.0, "output": 8.0},
+    "qwen3.8-flash": {"input": 0.8, "output": 2.7},
+    "qwen3.7-flash": {"input": 0.2, "output": 0.8},
+    "qwen3.6-flash": {"input": 1.2, "output": 7.2},
+    "qwen3.5-flash": {"input": 0.2, "output": 2.0},
+    "qwen3.8-27b": {"input": 3.0, "output": 12.0},
+    "qwen-plus": {"input": 0.8, "output": 2.0},
+}
+
+
 class LocalSettings(BaseModel):
     enabled: bool = False
     model: str = "mlx-community/Qwen2.5-3B-Instruct-4bit"
@@ -66,6 +87,11 @@ class LLMSettings(BaseModel):
     cloud: CloudSettings = Field(default_factory=CloudSettings)
     models: ModelNames = Field(default_factory=ModelNames)
     local: LocalSettings = Field(default_factory=LocalSettings)
+    prices: dict[str, PriceSettings] = Field(
+        default_factory=lambda: {
+            k: PriceSettings(**v) for k, v in _DEFAULT_PRICES.items()
+        }
+    )
 
 
 class RetrievalSettings(BaseModel):

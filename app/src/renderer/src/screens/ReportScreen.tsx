@@ -21,7 +21,9 @@ import {
 } from '../lib/highlight'
 import { apiFetch } from '../lib/api'
 import { morph } from '../lib/vt'
+import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
+import AccountChip from '../components/AccountChip'
 import {
   LayerTile,
   DocTextFillIcon,
@@ -49,6 +51,8 @@ interface Props {
   registerExport: (fn: () => void) => void
   onExported: (path: string | null) => void
   onReset: () => void
+  prefs: Prefs
+  onOpenSettings: () => void
 }
 
 export default function ReportScreen({
@@ -59,6 +63,8 @@ export default function ReportScreen({
   registerExport,
   onExported,
   onReset,
+  prefs,
+  onOpenSettings,
 }: Props) {
   const items = useMemo(() => buildItems(report), [report])
   const [filter, setFilter] = useState<string | null>(null)
@@ -248,9 +254,12 @@ export default function ReportScreen({
           </button>
         </div>
         <div className="flex-1" />
-        <div className="t13 secondary" style={{ padding: '0 20px 16px' }}>
+        <div className="t13 secondary" style={{ padding: '0 20px 8px' }}>
           <div>全文在本机解析</div>
           <div>云端复核 {cloudCalls} 次</div>
+        </div>
+        <div style={{ padding: '0 12px 12px' }}>
+          <AccountChip prefs={prefs} onOpen={onOpenSettings} />
         </div>
       </aside>
 

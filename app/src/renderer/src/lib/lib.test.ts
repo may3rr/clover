@@ -1,4 +1,10 @@
 import { describe, it, expect } from 'vitest'
+import {
+  commentAuthor,
+  commentInitials,
+  displayName,
+  DEFAULT_PREFS,
+} from './prefs'
 import { segmentsForParagraph } from './highlight'
 import { buildItems, moveSelection, pickItem, type ListItem } from './items'
 import { supportForFinding } from './claims'
@@ -293,5 +299,27 @@ describe('comparedSections', () => {
     }
     const out = comparedSections(d as never)
     expect(out.map((s) => s.section_id)).toEqual(['s1'])
+  })
+})
+
+describe('prefs display names', () => {
+  it('falls back through name → 引用体检 for the comment author', () => {
+    const p = DEFAULT_PREFS
+    expect(displayName(p)).toBe('设置')
+    expect(commentAuthor(p)).toBe('引用体检')
+    expect(commentAuthor({ ...p, name: '李明' })).toBe('李明')
+    expect(
+      commentAuthor({ ...p, name: '李明', comment_author: '王老师' })
+    ).toBe('王老师')
+  })
+
+  it('derives initials: short names whole, single words first two, else first letters', () => {
+    const p = DEFAULT_PREFS
+    expect(commentInitials({ ...p, name: '李明' })).toBe('李明')
+    expect(commentInitials({ ...p, name: 'Jackie' })).toBe('JA')
+    expect(commentInitials({ ...p, name: 'Li Ming Yuan' })).toBe('LM')
+    expect(
+      commentInitials({ ...p, name: '李明', comment_initials: 'LMY' })
+    ).toBe('LMY')
   })
 })

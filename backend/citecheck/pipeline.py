@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -176,7 +177,10 @@ async def run_pipeline(
     t_parsed = time.monotonic()
     send({"type": "parsed", "outline": _outline(parsed)})
 
-    doc_label = parsed.document.filename or Path(path).name
+    # uploaded files are stored as "<hex>_<name>.docx" — strip the prefix
+    # so usage rows show the document's real name
+    doc_label = (parsed.document.filename or
+                 re.sub(r"^[0-9a-f]{16}_", "", Path(path).name))
     with stats_scope() as stats, doc_scope(doc_label):
         own_retrieval = retrieval is None
         cache = cache or Cache(get_settings().cache_path)

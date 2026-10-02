@@ -128,6 +128,24 @@ ipcMain.handle('citecheck:open-docx', async () => {
   return r.canceled || !r.filePaths.length ? null : r.filePaths[0]
 })
 
+ipcMain.handle('citecheck:pick-avatar', async () => {
+  if (!win) return null
+  const r = await dialog.showOpenDialog(win, {
+    properties: ['openFile'],
+    filters: [{ name: '图片', extensions: ['png', 'jpg', 'jpeg', 'webp'] }],
+  })
+  if (r.canceled || !r.filePaths.length) return null
+  const p = r.filePaths[0]
+  const buf = fs.readFileSync(p)
+  if (buf.length > 8 * 1024 * 1024) return null
+  const mime = p.endsWith('.png')
+    ? 'image/png'
+    : p.endsWith('.webp')
+      ? 'image/webp'
+      : 'image/jpeg'
+  return `data:${mime};base64,${buf.toString('base64')}`
+})
+
 ipcMain.handle('citecheck:reveal', (_e, p: string) => {
   shell.showItemInFolder(p)
 })
@@ -174,6 +192,10 @@ const SHOT_STATES = [
   'detail-distribution',
   'detail-norms',
   'detail-revision',
+  'settings-account',
+  'settings-comments',
+  'settings-model',
+  'settings-usage',
 ]
 
 function shotReady(): Promise<void> {

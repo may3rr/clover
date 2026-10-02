@@ -9,6 +9,8 @@ export interface CitecheckApi {
   /** Absolute path of a dropped File (webUtils.getPathForFile). */
   pathForFile(file: File): string
   openDocxDialog(): Promise<string | null>
+  /** Image picker for the user avatar; returns a data URL or null. */
+  pickAvatar(): Promise<string | null>
   revealInFinder(path: string): void
   openExternal(url: string): void
   /** macOS open-file events; events fired before subscribe are queued. */
@@ -31,6 +33,7 @@ const api: CitecheckApi = {
   getInfo: () => ipcRenderer.invoke('citecheck:info'),
   pathForFile: (file) => webUtils.getPathForFile(file),
   openDocxDialog: () => ipcRenderer.invoke('citecheck:open-docx'),
+  pickAvatar: () => ipcRenderer.invoke('citecheck:pick-avatar'),
   revealInFinder: (p) => ipcRenderer.invoke('citecheck:reveal', p),
   openExternal: (url) => ipcRenderer.invoke('citecheck:open-external', url),
   onOpenFile: (cb) => {

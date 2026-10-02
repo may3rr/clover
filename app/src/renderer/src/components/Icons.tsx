@@ -253,6 +253,27 @@ export function CheckCircleFillIcon({
 
 // chevrons stay stroke-only per the spec
 
+export function PersonFillIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <circle cx="12" cy="7.8" r="4.3" />
+      <path d="M12 13.6c-4.5 0-7.7 2.8-7.7 6.1 0 .9.7 1.8 1.6 1.8h12.2c.9 0 1.6-.9 1.6-1.8 0-3.3-3.2-6.1-7.7-6.1z" />
+    </Fill>
+  )
+}
+
+/** gearshape.fill — 8-lobe rosette with a punched centre hole */
+export function GearshapeFillIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d={`${rosette(12, 12, 10.6, 8.1, 8)}M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z`}
+      />
+    </Fill>
+  )
+}
+
 export function ChevronLeftIcon({ size = 18, color = 'currentColor' }: IconProps) {
   return (
     <svg

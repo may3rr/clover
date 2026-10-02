@@ -5,11 +5,13 @@ import Empty from './screens/Empty'
 import Running, { type LayerUI } from './screens/Running'
 import ReportScreen from './screens/ReportScreen'
 import ErrorScreen from './screens/Error'
+import Settings from './screens/Settings'
 import { applyShotState, type ShotCtx } from './lib/shots'
 import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
+import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
 
-type Screen = 'empty' | 'running' | 'report' | 'error'
+type Screen = 'empty' | 'running' | 'report' | 'error' | 'settings'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('empty')
@@ -23,9 +25,15 @@ export default function App() {
   const [fileName, setFileName] = useState('paper.docx')
   const exportRef = useRef<(() => void) | null>(null)
   const shotState = useRef<ShotCtx>({})
+  const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS)
+  const settingsFrom = useRef<Screen>('empty')
+  const [settingsSection, setSettingsSection] = useState<
+    'account' | 'comments' | 'model' | 'usage'
+  >('account')
 
   // ---------------------------------------------------------------- boot
   useEffect(() => {
+    getPrefs().then(setPrefs)
     getInfo().then((i) => {
       setInfo(i)
       if (i.backendError) setScreen('error')
@@ -134,6 +142,8 @@ export default function App() {
         setExtSel({ id, open: open !== false })
       shotState.current.setFilter = (l) => setExtFilter({ layer: l })
       shotState.current.setDrag = (v) => setDragHint(v)
+      shotState.current.setPrefs = (p) => setPrefs(p)
+      shotState.current.setSettingsSection = (s) => setSettingsSection(s)
     })
   }, [])
   const [shotLayers, setShotLayers] = useState<LayerUI | null>(null)
@@ -174,9 +184,27 @@ export default function App() {
 
   const e2eExportDone = useRef(false)
 
+  const openSettings = useCallback(() => {
+    settingsFrom.current = screen === 'report' ? 'report' : 'empty'
+    morph(() => setScreen('settings'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [screen])
+
   // ---------------------------------------------------------------- view
   if (!info) return <div className="h-full" />
   if (screen === 'error') return <ErrorScreen />
+
+  if (screen === 'settings') {
+    return (
+      <Settings
+        key={settingsSection}
+        initialSection={settingsSection}
+        prefs={prefs}
+        onPrefs={setPrefs}
+        onBack={() => morph(() => setScreen(settingsFrom.current))}
+      />
+    )
+  }
 
   if (screen === 'running' && jobId) {
     return (
@@ -202,6 +230,8 @@ export default function App() {
         externalSelection={extSel}
         externalFilter={extFilter}
         registerExport={(fn) => (exportRef.current = fn)}
+        prefs={prefs}
+        onOpenSettings={openSettings}
         onReset={reset}
         onExported={(_path) => {
           if (window.citecheck.e2eFile && !e2eExportDone.current) {
@@ -221,6 +251,8 @@ export default function App() {
       onOpenDialog={openDialog}
       dropError={jobError}
       forceDrag={dragHint}
+      prefs={prefs}
+      onOpenSettings={openSettings}
     />
   )
 }

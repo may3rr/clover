@@ -45,6 +45,23 @@ class LLMStats:
 
 
 _current_stats: ContextVar[LLMStats | None] = ContextVar("llm_stats", default=None)
+_current_doc: ContextVar[str | None] = ContextVar("llm_doc", default=None)
+
+
+class doc_scope:
+    """Stamp llm_usage rows with the document being processed, so usage
+    can be aggregated per paper. Opened by the pipeline per job."""
+
+    def __init__(self, doc: str) -> None:
+        self.doc = doc
+        self._token = None
+
+    def __enter__(self) -> None:
+        self._token = _current_doc.set(self.doc)
+        return None
+
+    def __exit__(self, *exc: object) -> None:
+        _current_doc.reset(self._token)
 
 
 class stats_scope:
@@ -106,7 +123,8 @@ def _log_usage(route: str, task: str, model: str, prompt: int, completion: int,
     allowed to break the request path."""
     try:
         _get_cache().record_usage(
-            _provider_for(route), model, task, prompt, completion, cached
+            _provider_for(route), model, task, prompt, completion, cached,
+            doc=_current_doc.get(),
         )
     except Exception as e:  # noqa: BLE001 — stats must never break calls
         log.debug("usage log write failed: %s", e)

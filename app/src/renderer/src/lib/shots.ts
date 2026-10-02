@@ -10,7 +10,9 @@ import {
 
 export interface ShotCtx {
   report?: Report
-  setScreen?: (s: 'empty' | 'running' | 'report' | 'error') => void
+  setScreen?: (
+    s: 'empty' | 'running' | 'report' | 'error' | 'settings'
+  ) => void
   setReport?: (r: Report | null) => void
   setLayers?: (l: LayerUI) => void
   setOutline?: (o: Outline | null) => void
@@ -18,6 +20,15 @@ export interface ShotCtx {
   selectItem?: (id: string | null, open?: boolean) => void
   setFilter?: (layer: string | null) => void
   setDrag?: (v: boolean) => void
+  setPrefs?: (p: import('./prefs').Prefs) => void
+  setSettingsSection?: (s: 'account' | 'comments' | 'model' | 'usage') => void
+}
+
+const SAMPLE_PREFS = {
+  name: '李明',
+  avatar: { kind: 'color' as const, color: 'teal', image: null },
+  comment_author: '',
+  comment_initials: '',
 }
 
 const ALL_DONE: LayerUI = {
@@ -33,6 +44,7 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   ctx.setDrag?.(false)
   ctx.selectItem?.(null)
   ctx.setFilter?.(null)
+  ctx.setPrefs?.(SAMPLE_PREFS)
 
   const items = report ? buildItems(report) : []
   const firstOf = (pred: (i: (typeof items)[0]) => boolean) =>
@@ -127,6 +139,20 @@ export function applyShotState(state: string, ctx: ShotCtx) {
         firstOf((i) => i.kind === 'revision') ??
           firstOf((i) => i.kind === 'group')
       )
+      return
+    }
+    case 'settings-account':
+    case 'settings-comments':
+    case 'settings-model':
+    case 'settings-usage': {
+      ctx.setSettingsSection?.(
+        state.replace('settings-', '') as
+          | 'account'
+          | 'comments'
+          | 'model'
+          | 'usage'
+      )
+      ctx.setScreen?.('settings')
       return
     }
   }

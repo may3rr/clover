@@ -46,6 +46,11 @@ class Cache:
             "completion_tokens INTEGER NOT NULL, "
             "cached INTEGER NOT NULL DEFAULT 0)"
         )
+        cols = {r[1] for r in self._conn.execute(
+            "PRAGMA table_info(llm_usage)")}
+        if "doc" not in cols:
+            self._conn.execute(
+                "ALTER TABLE llm_usage ADD COLUMN doc TEXT")
         self._conn.commit()
 
     def get(self, key: str) -> Any | None:
@@ -74,6 +79,7 @@ class Cache:
         prompt_tokens: int = 0,
         completion_tokens: int = 0,
         cached: bool = False,
+        doc: str | None = None,
     ) -> None:
         """Append one LLM call to the persistent usage log (llm_usage table).
 
@@ -84,8 +90,8 @@ class Cache:
         with self._lock:
             self._conn.execute(
                 "INSERT INTO llm_usage (ts, provider, model, task, "
-                "prompt_tokens, completion_tokens, cached) "
-                "VALUES (?,?,?,?,?,?,?)",
+                "prompt_tokens, completion_tokens, cached, doc) "
+                "VALUES (?,?,?,?,?,?,?,?)",
                 (
                     datetime.now().isoformat(timespec="seconds"),
                     provider,
@@ -94,6 +100,7 @@ class Cache:
                     prompt_tokens,
                     completion_tokens,
                     int(cached),
+                    doc,
                 ),
             )
             self._conn.commit()
@@ -109,6 +116,28 @@ class Cache:
                 "FROM llm_usage "
                 "GROUP BY day, provider, model "
                 "ORDER BY day, provider, model"
+            )
+            cols = [c[0] for c in cur.description]
+            return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+    def usage_grouped(self, keys: list[str]) -> list[dict]:
+        """Aggregate llm_usage by an arbitrary whitelist of columns
+        (day/provider/model/task/doc)."""
+        allowed = {"provider", "model", "task", "doc"}
+        exprs = ["date(ts) AS day" if k == "day" else
+                 f"COALESCE({k}, '') AS {k}" for k in keys
+                 if k in allowed or k == "day"]
+        if not exprs:
+            return []
+        group_cols = ", ".join(k if k != "day" else "day" for k in keys)
+        with self._lock:
+            cur = self._conn.execute(
+                f"SELECT {', '.join(exprs)}, "
+                "COUNT(*) AS calls, SUM(cached) AS cached_calls, "
+                "SUM(prompt_tokens) AS prompt, "
+                "SUM(completion_tokens) AS completion "
+                f"FROM llm_usage GROUP BY {group_cols} "
+                f"ORDER BY {group_cols}"
             )
             cols = [c[0] for c in cur.description]
             return [dict(zip(cols, row)) for row in cur.fetchall()]
