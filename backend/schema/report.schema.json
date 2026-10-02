@@ -1,0 +1,753 @@
+{
+  "$defs": {
+    "Anchor": {
+      "properties": {
+        "paragraph_id": {
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "paragraph_id",
+        "start",
+        "end"
+      ],
+      "title": "Anchor",
+      "type": "object"
+    },
+    "CitationMarker": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "paragraph_id": {
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        },
+        "raw": {
+          "title": "Raw",
+          "type": "string"
+        },
+        "ref_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Ref Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "paragraph_id",
+        "start",
+        "end",
+        "raw"
+      ],
+      "title": "CitationMarker",
+      "type": "object"
+    },
+    "Claim": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "paragraph_id": {
+          "title": "Paragraph Id",
+          "type": "string"
+        },
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "marker_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Marker Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "paragraph_id",
+        "start",
+        "end",
+        "text"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "Document": {
+      "properties": {
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "filename": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Filename"
+        },
+        "citation_style": {
+          "default": "unknown",
+          "enum": [
+            "numeric",
+            "author_year",
+            "mixed",
+            "unknown"
+          ],
+          "title": "Citation Style",
+          "type": "string"
+        },
+        "managed_by": {
+          "anyOf": [
+            {
+              "enum": [
+                "zotero",
+                "endnote"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Managed By"
+        },
+        "word_count": {
+          "default": 0,
+          "title": "Word Count",
+          "type": "integer"
+        }
+      },
+      "title": "Document",
+      "type": "object"
+    },
+    "Finding": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "layer": {
+          "enum": [
+            "authenticity",
+            "support",
+            "distribution",
+            "norms"
+          ],
+          "title": "Layer",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "anchor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Anchor"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "detail": {
+          "title": "Detail",
+          "type": "string"
+        },
+        "refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "layer",
+        "severity",
+        "title",
+        "detail"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "LLMCalls": {
+      "properties": {
+        "local": {
+          "default": 0,
+          "title": "Local",
+          "type": "integer"
+        },
+        "cloud": {
+          "default": 0,
+          "title": "Cloud",
+          "type": "integer"
+        }
+      },
+      "title": "LLMCalls",
+      "type": "object"
+    },
+    "LayerStatus": {
+      "properties": {
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "running",
+            "done",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "error": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Error"
+        },
+        "findings": {
+          "default": 0,
+          "title": "Findings",
+          "type": "integer"
+        }
+      },
+      "title": "LayerStatus",
+      "type": "object"
+    },
+    "Paragraph": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "section_id": {
+          "title": "Section Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "char_offset": {
+          "title": "Char Offset",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "section_id",
+        "text",
+        "char_offset"
+      ],
+      "title": "Paragraph",
+      "type": "object"
+    },
+    "RefCheck": {
+      "properties": {
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "verified",
+            "mismatch",
+            "not_found",
+            "unverifiable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "matched": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Matched"
+        },
+        "issues": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Issues",
+          "type": "array"
+        }
+      },
+      "required": [
+        "ref_id",
+        "status"
+      ],
+      "title": "RefCheck",
+      "type": "object"
+    },
+    "Reference": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "raw": {
+          "title": "Raw",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "venue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "lang": {
+          "default": "other",
+          "enum": [
+            "en",
+            "zh",
+            "other"
+          ],
+          "title": "Lang",
+          "type": "string"
+        },
+        "paragraph_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Paragraph Id"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        }
+      },
+      "required": [
+        "id",
+        "raw"
+      ],
+      "title": "Reference",
+      "type": "object"
+    },
+    "ReportMeta": {
+      "properties": {
+        "llm_calls": {
+          "$ref": "#/$defs/LLMCalls"
+        },
+        "layers": {
+          "additionalProperties": {
+            "$ref": "#/$defs/LayerStatus"
+          },
+          "title": "Layers",
+          "type": "object"
+        }
+      },
+      "title": "ReportMeta",
+      "type": "object"
+    },
+    "Revision": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "typo",
+            "ref_reorder",
+            "marker_renumber"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "anchor": {
+          "$ref": "#/$defs/Anchor"
+        },
+        "old": {
+          "title": "Old",
+          "type": "string"
+        },
+        "new": {
+          "title": "New",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "move_after": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Move After"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "anchor",
+        "old",
+        "new",
+        "reason"
+      ],
+      "title": "Revision",
+      "type": "object"
+    },
+    "Section": {
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "canonical": {
+          "enum": [
+            "intro",
+            "related",
+            "method",
+            "experiment",
+            "discussion",
+            "conclusion",
+            "other"
+          ],
+          "title": "Canonical",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "canonical"
+      ],
+      "title": "Section",
+      "type": "object"
+    },
+    "SupportCheck": {
+      "properties": {
+        "claim_id": {
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "label": {
+          "enum": [
+            "supported",
+            "partial",
+            "unsupported",
+            "undetermined"
+          ],
+          "title": "Label",
+          "type": "string"
+        },
+        "evidence": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence"
+        },
+        "source_kind": {
+          "enum": [
+            "abstract",
+            "fulltext",
+            "none"
+          ],
+          "title": "Source Kind",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "source_title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Title"
+        },
+        "source_excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Excerpt"
+        },
+        "evidence_span": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Span"
+        }
+      },
+      "required": [
+        "claim_id",
+        "ref_id",
+        "label",
+        "source_kind",
+        "rationale"
+      ],
+      "title": "SupportCheck",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "document": {
+      "$ref": "#/$defs/Document"
+    },
+    "sections": {
+      "items": {
+        "$ref": "#/$defs/Section"
+      },
+      "title": "Sections",
+      "type": "array"
+    },
+    "paragraphs": {
+      "items": {
+        "$ref": "#/$defs/Paragraph"
+      },
+      "title": "Paragraphs",
+      "type": "array"
+    },
+    "markers": {
+      "items": {
+        "$ref": "#/$defs/CitationMarker"
+      },
+      "title": "Markers",
+      "type": "array"
+    },
+    "references": {
+      "items": {
+        "$ref": "#/$defs/Reference"
+      },
+      "title": "References",
+      "type": "array"
+    },
+    "ref_checks": {
+      "items": {
+        "$ref": "#/$defs/RefCheck"
+      },
+      "title": "Ref Checks",
+      "type": "array"
+    },
+    "claims": {
+      "items": {
+        "$ref": "#/$defs/Claim"
+      },
+      "title": "Claims",
+      "type": "array"
+    },
+    "support_checks": {
+      "items": {
+        "$ref": "#/$defs/SupportCheck"
+      },
+      "title": "Support Checks",
+      "type": "array"
+    },
+    "distribution": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Distribution"
+    },
+    "findings": {
+      "items": {
+        "$ref": "#/$defs/Finding"
+      },
+      "title": "Findings",
+      "type": "array"
+    },
+    "revisions": {
+      "items": {
+        "$ref": "#/$defs/Revision"
+      },
+      "title": "Revisions",
+      "type": "array"
+    },
+    "meta": {
+      "$ref": "#/$defs/ReportMeta"
+    }
+  },
+  "required": [
+    "document"
+  ],
+  "title": "Report",
+  "type": "object"
+}

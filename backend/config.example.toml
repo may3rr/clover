@@ -1,0 +1,31 @@
+# citecheck configuration — copy to config.toml and adjust.
+# Model names are read from here; never hard-code model names in code.
+
+[llm]
+temperature = 0
+
+[llm.cloud]
+base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+timeout = 60
+max_concurrency = 6
+
+[llm.models]
+judge = "qwen-plus"
+extract = "qwen-flash"
+typo = "qwen-plus"
+structure = "qwen-flash"
+function = "qwen-flash"
+
+[llm.local]
+enabled = true
+model = "mlx-community/Qwen2.5-3B-Instruct-4bit"
+hf_endpoint = "https://hf-mirror.com"
+timeout = 20
+
+[retrieval]
+concurrency = 4
+timeout = 15
+retries = 2
+
+[cache]
+path = "~/Library/Application Support/citecheck/cache.sqlite"

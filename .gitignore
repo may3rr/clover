@@ -1,0 +1,10 @@
+.env
+backend/config.toml
+__pycache__/
+*.egg-info
+.pytest_cache/
+node_modules/
+app/out/
+app/dist/
+*.sqlite
+.DS_Store

@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "citecheck"
+version = "0.1.0"
+description = "引用体检 — citation health check for academic docx manuscripts"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "lxml",
+    "python-docx",
+    "httpx",
+    "pydantic>=2",
+    "rapidfuzz",
+    "openai",
+    "pypdf",
+    "pypinyin",
+    "rank-bm25",
+    "sse-starlette",
+    "python-multipart",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-asyncio"]
+local = ["mlx-lm"]
+
+[tool.setuptools.packages.find]
+include = ["citecheck*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "live: tests that hit real network/LLM endpoints (skipped unless CITECHECK_LIVE=1)",
+]
