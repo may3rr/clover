@@ -1,0 +1,48 @@
+{
+  "citation_style": "numeric",
+  "managed_by": null,
+  "reference_count": 6,
+  "sections": [
+    {
+      "title": "1 Introduction",
+      "canonical": "intro"
+    },
+    {
+      "title": "2 Method",
+      "canonical": "method"
+    },
+    {
+      "title": "References",
+      "canonical": "other"
+    }
+  ],
+  "markers": [
+    {
+      "raw": "[5]",
+      "ref_ids": [
+        "r5"
+      ]
+    },
+    {
+      "raw": "[2,4-5]",
+      "ref_ids": [
+        "r2",
+        "r4",
+        "r5"
+      ]
+    },
+    {
+      "raw": "[1]",
+      "ref_ids": [
+        "r1"
+      ]
+    },
+    {
+      "raw": "[6]",
+      "ref_ids": [
+        "r6"
+      ]
+    }
+  ],
+  "filename": "numeric_unordered_en.docx"
+}

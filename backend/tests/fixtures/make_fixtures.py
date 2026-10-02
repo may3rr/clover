@@ -646,8 +646,62 @@ def make_zotero_numeric():
     })
 
 
+def make_numeric_unordered_en():
+    """Reference list ordered alphabetically, cited in a different order.
+
+    First appearance: r5, r2, r4 (marker "[2,4-5]"), r1, r6; r3 (Brown)
+    is never cited and keeps last place.
+    """
+    doc = Document()
+    doc.add_paragraph("Out-of-Order Citation Study", style="Title")
+
+    add_heading(doc, "1 Introduction")
+    add_para(doc, [
+        ("Hallucination surveys ", {}),
+        ("[5]", {}),
+        (" frame the central problem of this study.", {}),
+    ])
+    add_para(doc, [
+        ("Pre-trained encoders and retrieval pipelines ", {}),
+        ("[2,4-5]", {}),
+        (" underpin most modern systems.", {}),
+    ])
+
+    add_heading(doc, "2 Method")
+    add_para(doc, [
+        ("We build on the Transformer encoder ", {}),
+        ("[1]", {}),
+        (" with residual connections ", {}),
+        ("[6]", {}),
+        (" throughout.", {}),
+    ])
+
+    add_heading(doc, "References")
+    for raw in EN_REFS[:6]:
+        add_para(doc, [(raw, {})])
+
+    markers = [
+        {"raw": "[5]", "ref_ids": ["r5"]},
+        {"raw": "[2,4-5]", "ref_ids": ["r2", "r4", "r5"]},
+        {"raw": "[1]", "ref_ids": ["r1"]},
+        {"raw": "[6]", "ref_ids": ["r6"]},
+    ]
+    save(doc, "numeric_unordered_en.docx", {
+        "citation_style": "numeric",
+        "managed_by": None,
+        "reference_count": 6,
+        "sections": [
+            {"title": "1 Introduction", "canonical": "intro"},
+            {"title": "2 Method", "canonical": "method"},
+            {"title": "References", "canonical": "other"},
+        ],
+        "markers": markers,
+    })
+
+
 if __name__ == "__main__":
     make_numeric_en()
     make_authoryear_en()
     make_gbt_zh()
     make_zotero_numeric()
+    make_numeric_unordered_en()

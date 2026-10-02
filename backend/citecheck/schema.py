@@ -36,12 +36,16 @@ class Paragraph(BaseModel):
     char_offset: int
 
 
+MarkerKind = Literal["zotero", "endnote", "superscript", "numeric", "author_year"]
+
+
 class CitationMarker(BaseModel):
     id: str
     paragraph_id: str
     start: int
     end: int
     raw: str
+    kind: MarkerKind | None = None  # how the marker was detected
     ref_ids: list[str] = Field(default_factory=list)
 
 
@@ -133,6 +137,12 @@ class Revision(BaseModel):
     old: str
     new: str
     reason: str
+    # ref_reorder only: paragraph_id of the entry's predecessor in the
+    # target order, or "__start__" when it becomes the first entry. The
+    # exporter processes moved entries in target order and inserts each
+    # copy after the predecessor's current element (the inserted copy when
+    # the predecessor itself moved); "__start__" inserts before the first
+    # original reference paragraph. None = in-place edit, no move.
     move_after: str | None = None
 
 

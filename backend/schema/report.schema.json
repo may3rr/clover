@@ -45,6 +45,25 @@
           "title": "Raw",
           "type": "string"
         },
+        "kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "zotero",
+                "endnote",
+                "superscript",
+                "numeric",
+                "author_year"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Kind"
+        },
         "ref_ids": {
           "items": {
             "type": "string"

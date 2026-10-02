@@ -187,6 +187,7 @@ def parse_docx(path: str | Path) -> ParsedDocument:
             start=m.start,
             end=m.end,
             raw=m.raw,
+            kind=m.kind,
             ref_ids=ref_lists[k],
         )
         for k, (i, m) in enumerate(detected)

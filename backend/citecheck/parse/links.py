@@ -81,13 +81,9 @@ def author_year_items(raw: str) -> list[tuple[str, str, str | None]]:
     return items
 
 
-def link_markers(
-    markers: list[DetectedMarker], references: list[Reference]
-) -> list[list[str]]:
-    """Return ref_id lists parallel to ``markers``."""
+def _number_resolver(references: list[Reference]):
     by_label = {r.label: r for r in references if r.label}
     ordered = list(references)
-    surnames = [_norm(_ref_first_surname(r)) for r in ordered]
 
     def resolve_number(n: int) -> str | None:
         ref = by_label.get(str(n))
@@ -96,6 +92,23 @@ def link_markers(
         if 1 <= n <= len(ordered):
             return ordered[n - 1].id
         return None
+
+    return resolve_number
+
+
+def unresolved_numeric(raw: str, references: list[Reference]) -> list[int]:
+    """Numbers in a marker's raw text that match no reference entry."""
+    resolve = _number_resolver(references)
+    return [n for n in _numeric_items(raw) if resolve(n) is None]
+
+
+def link_markers(
+    markers: list[DetectedMarker], references: list[Reference]
+) -> list[list[str]]:
+    """Return ref_id lists parallel to ``markers``."""
+    ordered = list(references)
+    surnames = [_norm(_ref_first_surname(r)) for r in ordered]
+    resolve_number = _number_resolver(references)
 
     def resolve_author_year(authors_part: str, year: str, suffix: str | None) -> str | None:
         want = _norm(_marker_surname(authors_part))
