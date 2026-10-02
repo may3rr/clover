@@ -161,9 +161,11 @@ export default function App() {
   }, [])
 
   // ------------------------------------------------------------ e2e hook
+  const e2eRan = useRef(false)
   useEffect(() => {
     const f = window.citecheck.e2eFile
-    if (!f) return
+    if (!f || e2eRan.current) return // StrictMode fires effects twice in dev
+    e2eRan.current = true
     getInfo().then(() => {
       analyze(f)
     })

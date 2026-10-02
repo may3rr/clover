@@ -160,6 +160,9 @@ select {
   left: 0;
   bottom: 0;
   width: 240px;
+  /* above the reading area's view-transition stacking context, so the
+     separator hairline isn't overpainted by its opaque background */
+  z-index: 1;
   background: var(--sidebar-tint);
   box-shadow: 1px 0 0 var(--separator);
   overflow: hidden;
@@ -173,6 +176,7 @@ select {
   right: 0;
   bottom: 0;
   width: 380px;
+  z-index: 1;
   background: var(--bg-subtle);
   box-shadow: -1px 0 0 var(--separator);
   overflow: hidden;
