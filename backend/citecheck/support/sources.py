@@ -21,11 +21,13 @@ import httpx
 
 from ..cache import Cache, make_key
 from ..config import get_settings
+from ..refs.sources import abstract_ok
 
 log = logging.getLogger(__name__)
 
 _MAX_PDF_BYTES = 20 * 1024 * 1024
 _EXCERPT_LIMIT = 2000
+_FULLTEXT_EXCERPT_LIMIT = 2500
 
 _arxiv_lock = asyncio.Lock()
 _arxiv_last = 0.0
@@ -52,6 +54,36 @@ def _fix_pdf_text(text: str) -> str:
     text = text.replace("-\n", "")  # de-hyphenate line breaks
     text = re.sub(r"[ \t]*\n[ \t]*", " ", text)  # join hard-wrapped lines
     return re.sub(r"\s{2,}", " ", text).strip()
+
+
+_TAIL_HEADING = re.compile(
+    r"\breferences\b|\bbibliography\b|参考文献", re.I
+)
+
+
+def _drop_reference_tail(text: str) -> str:
+    """Cut the paper's own bibliography: the last References/Bibliography/
+    参考文献 heading sitting in the second half of the document."""
+    half = len(text) // 2
+    last = None
+    for m in _TAIL_HEADING.finditer(text):
+        if m.start() >= half:
+            last = m
+    return text[: last.start()] if last else text
+
+
+_REF_ENTRY_HINT = re.compile(
+    r"arXiv preprint|in proceedings|et al\.?[,，]|\b\d{4}[a-z]?\.\s", re.I
+)
+_YEAR_RE = re.compile(r"(?:19|20)\d{2}")
+
+
+def _looks_like_ref_entry(window: str) -> bool:
+    """Heuristic: a text window that is really a bibliography entry —
+    dense year tokens plus tell-tale phrases."""
+    years = len(_YEAR_RE.findall(window))
+    hints = len(_REF_ENTRY_HINT.findall(window))
+    return years >= 2 or hints >= 2 or (years >= 1 and hints >= 1)
 
 
 async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> str | None:
@@ -87,7 +119,7 @@ async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> 
     except Exception as e:  # noqa: BLE001
         log.warning("pdf parse failed %s: %s", url, e)
         return None
-    text = _fix_pdf_text(text)
+    text = _drop_reference_tail(_fix_pdf_text(text))
     cache.set(key, text)
     return text or None
 
@@ -106,6 +138,10 @@ def _bm25_excerpt(fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT) -> str
     if not sents:
         return fulltext[:limit]
     windows = [" ".join(sents[i : i + 3]) for i in range(len(sents))]
+    # bibliography entries that survived the tail cut are not evidence
+    windows = [w for w in windows if not _looks_like_ref_entry(w)]
+    if not windows:
+        return fulltext[:limit]
     bm25 = BM25Okapi([_tokenize(w) for w in windows])
     scores = bm25.get_scores(_tokenize(claim))
     order = sorted(range(len(windows)), key=lambda i: -scores[i])
@@ -144,6 +180,32 @@ async def _arxiv_summary(arxiv_id: str, client: httpx.AsyncClient, cache: Cache)
     return summary
 
 
+async def _arxiv_title_search(
+    title: str, client: httpx.AsyncClient, cache: Cache
+) -> str | None:
+    """Last-resort abstract: search arXiv by title, take the top entry's
+    summary. Same >=3s process-wide throttle as other arXiv calls."""
+    key = make_key("arxiv_title", title)
+    hit = cache.get(key)
+    if hit is not None:
+        return hit or None
+    await _arxiv_throttle()
+    try:
+        resp = await client.get(
+            "https://export.arxiv.org/api/query",
+            params={"search_query": f'ti:"{title}"', "max_results": 1},
+            timeout=15,
+        )
+        resp.raise_for_status()
+        m = re.search(r"<entry>.*?<summary>(.*?)</summary>", resp.text, re.S)
+        summary = re.sub(r"\s+", " ", m.group(1)).strip() if m else None
+    except httpx.HTTPError as e:
+        log.warning("arxiv title search failed: %s", e)
+        return None
+    cache.set(key, summary or "")
+    return summary
+
+
 def _strip_jats(text: str) -> str:
     return re.sub(r"<[^>]+>", "", text or "")
 
@@ -163,20 +225,39 @@ async def build_source(
     own_client = client is None
     client = client or httpx.AsyncClient(follow_redirects=True)
     try:
-        # 1. open-access full text
+        # gather abstract candidates up front: verified hit first, then
+        # sibling records of the same work, then arXiv (id, then title)
+        candidates = [matched.get("abstract")]
+        candidates += matched.get("extra_abstracts") or []
+        abstract = next(
+            (a for a in candidates if abstract_ok(a)), None
+        )
+        if not abstract and matched.get("arxiv_id"):
+            abstract = await _arxiv_summary(matched["arxiv_id"], client, cache)
+            if not abstract_ok(abstract):
+                abstract = None
+        if not abstract and title:
+            abstract = await _arxiv_title_search(title, client, cache)
+            if not abstract_ok(abstract):
+                abstract = None
+        if abstract:
+            abstract = _strip_jats(abstract)[:_EXCERPT_LIMIT]
+
+        # 1. open-access full text: abstract + top BM25 passages
         pdf_url = matched.get("pdf_url")
         if not pdf_url and matched.get("arxiv_id"):
             pdf_url = f"https://arxiv.org/pdf/{matched['arxiv_id']}"
         if pdf_url:
             fulltext = await _fetch_pdf_text(pdf_url, client, cache)
             if fulltext:
-                return SourceText("fulltext", _bm25_excerpt(fulltext, claim_text), title)
-        # 2. abstract (OpenAlex/S2 already normalized; Crossref JATS; arXiv)
-        abstract = matched.get("abstract")
-        if not abstract and matched.get("arxiv_id"):
-            abstract = await _arxiv_summary(matched["arxiv_id"], client, cache)
+                passages = _bm25_excerpt(fulltext, claim_text,
+                                         _FULLTEXT_EXCERPT_LIMIT)
+                excerpt = (
+                    f"{abstract} {passages}" if abstract else passages
+                )[:_FULLTEXT_EXCERPT_LIMIT]
+                return SourceText("fulltext", excerpt, title)
+        # 2. abstract only
         if abstract:
-            abstract = _strip_jats(abstract)[:_EXCERPT_LIMIT]
             return SourceText("abstract", abstract, title)
         return SourceText("none", None, title)
     finally:

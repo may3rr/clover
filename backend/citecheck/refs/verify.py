@@ -217,11 +217,18 @@ async def _verify_one(
         title_matches.sort(key=lambda t: (len(t[2]), -t[0]))
         _score, matched, issues = title_matches[0]
         # fill abstract/pdf/arxiv from sibling records of the same work so
-        # T3 gets the richest available source text
+        # T3 gets the richest available source text; keep the rest as
+        # fallback abstract candidates
+        extras: list[str] = []
         for _s, h, _iss in title_matches[1:]:
             for k in ("abstract", "pdf_url", "arxiv_id", "alt_year"):
                 if not matched.get(k) and h.get(k):
                     matched[k] = h[k]
+            a = h.get("abstract")
+            if a and a != matched.get("abstract") and a not in extras:
+                extras.append(a)
+        if extras:
+            matched["extra_abstracts"] = extras
         if (
             ref.doi and matched.get("doi")
             and ref.doi.lower() != str(matched["doi"]).lower()

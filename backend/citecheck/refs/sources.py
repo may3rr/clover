@@ -46,6 +46,29 @@ def _arxiv_year(arxiv_id: str | None) -> int | None:
     return 1900 + yy if yy >= 91 else 2000 + yy
 
 
+_META_RE = re.compile(
+    r"proceedings of|in proceedings|\bpp?\.?\s*\d|\bvol\.?\s*\d|\bisbn\b", re.I
+)
+_NAME_GROUP_RE = re.compile(r"[A-Z][A-Za-z\-]+(?: [A-Z][A-Za-z\-]*)+[,.]")
+
+
+def abstract_ok(a: str | None) -> bool:
+    """Quality gate for metadata-source abstracts. Rejects short strings
+    and front-matter junk (author lists, 'Proceedings of …', vol/pages)
+    that sources sometimes deposit in the abstract field."""
+    if not a:
+        return False
+    s = a.strip()
+    if len(s) < 150:
+        return False
+    head = s[:200]
+    if _META_RE.search(head):
+        return False
+    if len(_NAME_GROUP_RE.findall(head)) >= 3:
+        return False
+    return True
+
+
 def _openalex_abstract(work: dict) -> str | None:
     inv = work.get("abstract_inverted_index")
     if not inv:
@@ -123,6 +146,8 @@ def _norm_hit(source: str, raw: dict) -> dict:
         pdf = raw.get("openAccessPdf") or {}
         hit["pdf_url"] = pdf.get("url")
     hit["alt_year"] = _arxiv_year(hit["arxiv_id"])
+    if not abstract_ok(hit["abstract"]):
+        hit["abstract"] = None
     return hit
 
 
