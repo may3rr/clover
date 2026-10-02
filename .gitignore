@@ -9,3 +9,4 @@ app/dist/
 *.sqlite
 .DS_Store
 backend/benchmarks/.cache/
+backend/benchmarks/.build.log
