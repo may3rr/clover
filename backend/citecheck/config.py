@@ -81,6 +81,8 @@ class CacheSettings(BaseModel):
 class Settings(BaseModel):
     dashscope_api_key: str | None = None
     crossref_mailto: str | None = None
+    openalex_api_key: str | None = None
+    s2_api_key: str | None = None
     llm: LLMSettings = Field(default_factory=LLMSettings)
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
     cache: CacheSettings = Field(default_factory=CacheSettings)
@@ -101,6 +103,8 @@ def _load_settings() -> Settings:
     return Settings(
         dashscope_api_key=os.environ.get("DASHSCOPE_API_KEY") or env.get("DASHSCOPE_API_KEY"),
         crossref_mailto=os.environ.get("CROSSREF_MAILTO") or env.get("CROSSREF_MAILTO"),
+        openalex_api_key=os.environ.get("OPENALEX_API_KEY") or env.get("OPENALEX_API_KEY"),
+        s2_api_key=os.environ.get("S2_API_KEY") or env.get("S2_API_KEY"),
         llm=LLMSettings(**data.get("llm", {})),
         retrieval=RetrievalSettings(**data.get("retrieval", {})),
         cache=CacheSettings(**data.get("cache", {})),

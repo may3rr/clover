@@ -21,7 +21,7 @@ import httpx
 
 from ..cache import Cache, make_key
 from ..config import get_settings
-from ..refs.sources import abstract_ok
+from ..refs.sources import abstract_ok, arxiv_throttle as _arxiv_throttle
 
 log = logging.getLogger(__name__)
 
@@ -29,25 +29,12 @@ _MAX_PDF_BYTES = 20 * 1024 * 1024
 _EXCERPT_LIMIT = 2000
 _FULLTEXT_EXCERPT_LIMIT = 2500
 
-_arxiv_lock = asyncio.Lock()
-_arxiv_last = 0.0
-
 
 @dataclass
 class SourceText:
     kind: str  # abstract | fulltext | none
     excerpt: str | None
     title: str | None
-
-
-async def _arxiv_throttle() -> None:
-    """Process-wide >=3s spacing between arXiv API calls."""
-    global _arxiv_last
-    async with _arxiv_lock:
-        wait = 3.0 - (time.monotonic() - _arxiv_last)
-        if wait > 0:
-            await asyncio.sleep(wait)
-        _arxiv_last = time.monotonic()
 
 
 def _fix_pdf_text(text: str) -> str:
@@ -73,17 +60,28 @@ def _drop_reference_tail(text: str) -> str:
 
 
 _REF_ENTRY_HINT = re.compile(
-    r"arXiv preprint|in proceedings|et al\.?[,，]|\b\d{4}[a-z]?\.\s", re.I
+    r"arXiv preprint|in proceedings|advances in neural information|"
+    r"\bneurips\b|\biclr\b|\bicml\b|et al\.?[,，]|\b\d{4}[a-z]?\.\s", re.I
 )
 _YEAR_RE = re.compile(r"(?:19|20)\d{2}")
+# a run of "Firstname Lastname," entries is a reference list, not prose
+_NAME_RUN_RE = re.compile(r"[A-Z][a-zA-Z'\-]+ [A-Z][a-zA-Z'\-]+,")
+# bare 4-6 digit page numbers between entries ("… 2019. 6779 Yankai Lin, …")
+_PAGE_NUM_RE = re.compile(r"(?<![\d.])\b\d{4,5}\b(?=\s+[A-Z][a-z])")
 
 
 def _looks_like_ref_entry(window: str) -> bool:
     """Heuristic: a text window that is really a bibliography entry —
-    dense year tokens plus tell-tale phrases."""
+    dense year tokens, venue phrases, author-name runs, page numbers."""
     years = len(_YEAR_RE.findall(window))
     hints = len(_REF_ENTRY_HINT.findall(window))
-    return years >= 2 or hints >= 2 or (years >= 1 and hints >= 1)
+    names = len(_NAME_RUN_RE.findall(window))
+    pages = len(_PAGE_NUM_RE.findall(window))
+    if years >= 2 or hints >= 2 or (years >= 1 and hints >= 1):
+        return True
+    if names >= 2 and (pages >= 1 or hints >= 1 or years >= 1):
+        return True
+    return names >= 3 and pages >= 1
 
 
 async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> str | None:

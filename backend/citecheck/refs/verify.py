@@ -1,9 +1,14 @@
 """真实性核验：每条参考文献是否真的存在、字段是否一致。
 
+A title-matched record that disagrees on BOTH first author AND year is a
+different work that happens to share the title — it is dropped from the
+candidate pool entirely instead of producing a mismatch.
+
 Status semantics (PLAN T2):
 - verified: title、首作者、年份都对上；
-- mismatch: 找到了这篇文献，但作者/年份/DOI 有出入；
-- not_found: 英文文献，三个源都真正响应且都没有匹配；
+- mismatch: 某条标题匹配记录至少一个字段对得上但其余有出入，或显式
+  DOI 解析到了别的文献；
+- not_found: 英文文献，四个源都真正响应且都没有可用匹配；
 - unverifiable: 中文文献查不到，或任一源不可用导致无法完成核验。
 
 A source that errored/timed out is "unavailable", never "no hit".
@@ -26,7 +31,7 @@ log = logging.getLogger(__name__)
 
 _TITLE_MIN = 92.0
 _SURNAME_MIN = 85.0
-_SOURCES = ("crossref", "openalex", "s2")
+_SOURCES = ("crossref", "openalex", "s2", "arxiv")
 
 _CJK = re.compile(r"[一-鿿]")
 
@@ -99,17 +104,19 @@ async def _title_hits(ref: Reference, client: RetrievalClient) -> tuple[list[dic
         client.crossref_search(query),
         client.openalex_search(query),
         client.s2_search(query),
+        client.arxiv_search(query),
     ]
     # a second, year-filtered pass: canonical records (e.g. the 2017
     # Transformer paper) can be pushed out of search results by later
-    # same-titled works
+    # same-titled works. arXiv has no year filter — the preprint may
+    # predate the cited venue year anyway.
     if ref.year:
         calls += [
             client.crossref_search(query, year=ref.year),
             client.openalex_search(query, year=ref.year),
             client.s2_search(query, year=ref.year),
         ]
-        srcs = _SOURCES + _SOURCES
+        srcs = _SOURCES + _SOURCES[:3]
     else:
         srcs = _SOURCES
     results = await asyncio.gather(*calls)
@@ -137,6 +144,7 @@ async def _author_hits(
         client.crossref_search(ref.title, author=surname),
         client.openalex_search(f"{ref.title} {surname}"),
         client.s2_search(f"{ref.title} {surname}"),
+        client.arxiv_search(ref.title, author=surname),
     ]
     if ref.year:
         calls += [
@@ -152,9 +160,15 @@ async def _author_hits(
     return hits
 
 
-def _evaluate(ref: Reference, hit: dict) -> list[str]:
-    """Field-level issues for a title-matched hit; empty = verified."""
+def _evaluate(
+    ref: Reference, hit: dict
+) -> tuple[list[str], bool, bool]:
+    """Field-level issues for a title-matched hit; empty issues = verified.
+    Returns (issues, author_differs, year_differs) — 'differs' is only
+    True when both sides have the field and they disagree."""
     issues: list[str] = []
+    author_diff = False
+    year_diff = False
     ref_surname = _ref_surname(ref)
     hit_surname = _hit_surname(hit)
     # CJK vs latin surname comparison is unreliable (pinyin order varies);
@@ -167,20 +181,28 @@ def _evaluate(ref: Reference, hit: dict) -> list[str]:
         else:
             ok = fuzz.ratio(_norm(ref_surname), _norm(hit_surname)) >= _SURNAME_MIN
         if not ok:
+            author_diff = True
             issues.append(
                 f"首作者不一致：文中写 {ref.authors[0]}，数据库记录为 {hit['authors'][0]}"
             )
     if ref.year and hit.get("year"):
         # a reprint's record year can postdate the work; the arXiv version's
-        # year (alt_year) is an acceptable match too
+        # year (alt_year) is an acceptable match too. An arXiv preprint may
+        # be up to 2 years EARLIER than the cited (venue) year.
+        is_arxiv = hit.get("source") == "arxiv"
         years = [y for y in (hit["year"], hit.get("alt_year")) if y]
-        if all(abs(int(y) - ref.year) > 1 for y in years):
+        if is_arxiv:
+            ok = any(ref.year - 2 <= int(y) <= ref.year + 1 for y in years)
+        else:
+            ok = any(abs(int(y) - ref.year) <= 1 for y in years)
+        if not ok:
+            year_diff = True
             issues.append(
                 f"年份不一致：文中写 {ref.year}，数据库记录为 {hit['year']}"
             )
     if ref.doi and hit.get("doi") and ref.doi.lower() != str(hit["doi"]).lower():
         issues.append(f"DOI 不一致：文中写 {ref.doi}，数据库记录为 {hit['doi']}")
-    return issues
+    return issues, author_diff, year_diff
 
 
 def _finding(ref: Reference, check: RefCheck, para_len: int) -> Finding:
@@ -189,7 +211,7 @@ def _finding(ref: Reference, check: RefCheck, para_len: int) -> Finding:
         return Finding(
             id="", layer="authenticity", severity="high", anchor=anchor,
             title="未能在数据库中找到这篇文献",
-            detail="依据：Crossref、OpenAlex、Semantic Scholar 均未检索到标题或作者相符的记录。\n"
+            detail="依据：Crossref、OpenAlex、Semantic Scholar、arXiv 均未检索到标题或作者相符的记录。\n"
                    "建议：核对文献的作者、年份、标题和 DOI，确认是否误引或编造。",
             refs=[ref.id],
         )
@@ -236,8 +258,19 @@ async def _verify_one(
             if not h.get("title"):
                 continue
             score = fuzz.token_sort_ratio(_norm(want_title), _norm(h["title"]))
-            if score >= _TITLE_MIN:
-                out.append((score, h, _evaluate(ref, h)))
+            if score < _TITLE_MIN:
+                continue
+            issues, author_diff, year_diff = _evaluate(ref, h)
+            # A record disagreeing on BOTH first author and year is a
+            # different work sharing the title — drop it from the pool.
+            # A shared DOI overrides: same work, messy metadata.
+            doi_same = bool(
+                ref.doi and h.get("doi")
+                and ref.doi.lower() == str(h["doi"]).lower()
+            )
+            if author_diff and year_diff and not doi_same:
+                continue
+            out.append((score, h, issues))
         out.sort(key=lambda t: (len(t[2]), -t[0]))
         return out
 
@@ -297,7 +330,7 @@ async def _verify_one(
         matched = None
         if len(responded) >= len(_SOURCES) and ref.lang == "en":
             status = "not_found"
-            issues = ["三个数据库均未检索到相符文献"]
+            issues = ["四个数据库均未检索到相符文献"]
         else:
             status = "unverifiable"
             missing = [s for s in _SOURCES if s not in responded]

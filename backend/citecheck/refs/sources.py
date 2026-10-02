@@ -1,4 +1,4 @@
-"""Async retrieval clients for Crossref / OpenAlex / Semantic Scholar.
+"""Async retrieval clients for Crossref / OpenAlex / Semantic Scholar / arXiv.
 
 Every response is cached by (source, query). A source that errored or
 timed out reports ``ok=False`` — verify.py treats that as "unavailable",
@@ -10,6 +10,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import time
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Any
 
@@ -23,6 +25,21 @@ log = logging.getLogger(__name__)
 CROSSREF = "https://api.crossref.org"
 OPENALEX = "https://api.openalex.org"
 S2 = "https://api.semanticscholar.org"
+ARXIV_API = "https://export.arxiv.org/api/query"
+
+_arxiv_lock = asyncio.Lock()
+_arxiv_last = 0.0
+
+
+async def arxiv_throttle() -> None:
+    """Process-wide >=3s spacing between arXiv API calls (politeness rule;
+    shared by verification and support-source lookups)."""
+    global _arxiv_last
+    async with _arxiv_lock:
+        wait = 3.0 - (time.monotonic() - _arxiv_last)
+        if wait > 0:
+            await asyncio.sleep(wait)
+        _arxiv_last = time.monotonic()
 
 
 @dataclass
@@ -155,6 +172,47 @@ def _norm_hit(source: str, raw: dict) -> dict:
     return hit
 
 
+_ATOM = "http://www.w3.org/2005/Atom"
+_ARXIV_NS = "http://arxiv.org/schemas/atom"
+_WS = re.compile(r"\s+")
+
+
+def parse_arxiv_feed(xml_text: str) -> list[dict]:
+    """Parse an arXiv API Atom feed into normalized hit dicts."""
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError:
+        return []
+    hits: list[dict] = []
+    for e in root.findall(f"{{{_ATOM}}}entry"):
+        idu = e.findtext(f"{{{_ATOM}}}id") or ""
+        arxiv_id = re.sub(r"v\d+$", "", idu.rsplit("/", 1)[-1]) or None
+        title = _WS.sub(" ", e.findtext(f"{{{_ATOM}}}title") or "").strip()
+        published = e.findtext(f"{{{_ATOM}}}published") or ""
+        year = int(published[:4]) if published[:4].isdigit() else None
+        authors = [
+            _WS.sub(" ", (a.findtext(f"{{{_ATOM}}}name") or "")).strip()
+            for a in e.findall(f"{{{_ATOM}}}author")
+        ]
+        summary = _WS.sub(
+            " ", e.findtext(f"{{{_ATOM}}}summary") or "").strip()
+        doi = e.findtext(f"{{{_ARXIV_NS}}}doi")
+        hit: dict = {"source": "arxiv", "title": title or None,
+                     "authors": authors, "year": year, "venue": "arXiv",
+                     "doi": doi or None, "url": idu or None,
+                     "abstract": summary or None,
+                     "pdf_url": f"https://arxiv.org/pdf/{arxiv_id}"
+                     if arxiv_id else None,
+                     "arxiv_id": arxiv_id, "alt_year": year}
+        if not abstract_ok(hit["abstract"]):
+            hit["abstract"] = None
+        hits.append(hit)
+    return hits
+
+
+_openalex_budget_warned = False
+
+
 class RetrievalClient:
     def __init__(self, cache: Cache | None = None):
         s = get_settings()
@@ -162,6 +220,8 @@ class RetrievalClient:
         self._timeout = s.retrieval.timeout
         self._retries = s.retrieval.retries
         self._mailto = s.crossref_mailto
+        self._openalex_key = s.openalex_api_key
+        self._s2_key = s.s2_api_key
         self._cache = cache
         self._client = httpx.AsyncClient(
             timeout=self._timeout,
@@ -178,7 +238,10 @@ class RetrievalClient:
     async def __aexit__(self, *exc: object) -> None:
         await self.close()
 
-    async def _get(self, url: str, params: dict, cache_key: str) -> SourceResult:
+    async def _get(
+        self, url: str, params: dict, cache_key: str,
+        headers: dict | None = None,
+    ) -> SourceResult:
         if self._cache is not None:
             hit = self._cache.get(cache_key)
             if isinstance(hit, dict) and "__error__" in hit:
@@ -189,8 +252,23 @@ class RetrievalClient:
         for attempt in range(self._retries + 1):
             try:
                 async with self._sem:
-                    resp = await self._client.get(url, params=params)
+                    resp = await self._client.get(
+                        url, params=params, headers=headers)
                 if resp.status_code == 429:
+                    global _openalex_budget_warned
+                    if (
+                        not _openalex_budget_warned
+                        and "Insufficient budget" in resp.text
+                    ):
+                        _openalex_budget_warned = True
+                        log.warning(
+                            "OpenAlex rejected the request: %s — the shared "
+                            "per-IP budget is spent; treating OpenAlex as "
+                            "unavailable. Set OPENALEX_API_KEY in "
+                            "backend/.env to keep it working.",
+                            resp.text.strip()[:160])
+                        return SourceResult(
+                            ok=False, error="openalex budget exhausted")
                     await asyncio.sleep(2**attempt)
                     last_err = "429"
                     continue
@@ -247,12 +325,17 @@ class RetrievalClient:
         return r
 
     # -- OpenAlex ------------------------------------------------------
+    def _openalex_params(self, params: dict) -> dict:
+        params = dict(params)
+        params["mailto"] = self._mailto
+        if self._openalex_key:
+            params["api_key"] = self._openalex_key
+        return params
+
     async def openalex_search(
         self, query: str, per_page: int = 5, year: int | None = None
     ) -> SourceResult:
-        params: dict = {
-            "search": query, "per-page": per_page, "mailto": self._mailto
-        }
+        params = self._openalex_params({"search": query, "per-page": per_page})
         if year:
             params["filter"] = f"publication_year:{year - 1}-{year + 1}"
         r = await self._get(
@@ -268,7 +351,7 @@ class RetrievalClient:
     async def openalex_doi(self, doi: str) -> SourceResult:
         r = await self._get(
             f"{OPENALEX}/works/doi:{doi}",
-            {"mailto": self._mailto},
+            self._openalex_params({}),
             make_key("openalex", "doi", doi.lower()),
         )
         if r.ok and r.data:
@@ -283,12 +366,68 @@ class RetrievalClient:
         params: dict = {"query": query, "limit": limit, "fields": fields}
         if year:
             params["year"] = f"{year - 1}-{year + 1}"
+        headers = {"x-api-key": self._s2_key} if self._s2_key else None
         r = await self._get(
             f"{S2}/graph/v1/paper/search", params,
             make_key("s2", "search", query, year) if year else make_key("s2", "search", query),
+            headers=headers,
         )
         if r.ok and r.data:
             return SourceResult(
                 ok=True, data=[_norm_hit("s2", w) for w in r.data.get("data", [])]
             )
         return r
+
+    # -- arXiv ----------------------------------------------------------
+    async def _arxiv_query(
+        self, search_query: str, max_results: int
+    ) -> SourceResult:
+        """One raw arXiv API call. The Atom body is cached as
+        {"xml": ...} so fixtures/tests can seed recorded feeds."""
+        key = make_key("arxiv", "xml", search_query, max_results)
+        if self._cache is not None:
+            hit = self._cache.get(key)
+            if isinstance(hit, dict) and "__error__" in hit:
+                return SourceResult(ok=False, error=hit["__error__"])
+            if isinstance(hit, dict) and "xml" in hit:
+                return SourceResult(ok=True, data=hit["xml"])
+        await arxiv_throttle()
+        try:
+            async with self._sem:
+                resp = await self._client.get(
+                    ARXIV_API,
+                    params={"search_query": search_query,
+                            "max_results": max_results},
+                )
+            if resp.status_code == 429 or resp.status_code >= 500:
+                return SourceResult(ok=False, error=f"HTTP {resp.status_code}")
+            resp.raise_for_status()
+            xml_text = resp.text
+        except httpx.HTTPError as e:
+            return SourceResult(ok=False, error=str(e))
+        if self._cache is not None:
+            self._cache.set(key, {"xml": xml_text})
+        return SourceResult(ok=True, data=xml_text)
+
+    async def arxiv_search(
+        self, title: str, author: str | None = None, max_results: int = 5
+    ) -> SourceResult:
+        """Title search on arXiv: exact ti:"phrase" first, then a looser
+        ANDed ti:word query when the phrase finds nothing."""
+        q = f'ti:"{title}"'
+        if author:
+            q += f' AND au:"{author}"'
+        r = await self._arxiv_query(q, max_results)
+        if not r.ok:
+            return r
+        hits = parse_arxiv_feed(r.data)
+        if not hits and not author:
+            words = [w for w in re.findall(r"[A-Za-z0-9]+", title)
+                     if len(w) > 2][:8]
+            if len(words) > 1:
+                q2 = " AND ".join(f"ti:{w}" for w in words)
+                r2 = await self._arxiv_query(q2, max_results)
+                if not r2.ok:
+                    return r2
+                hits = parse_arxiv_feed(r2.data)
+        return SourceResult(ok=True, data=hits)

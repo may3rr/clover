@@ -1,0 +1,5268 @@
+{
+ "1df0dbaf3b64c84970e7b16eb46b5b355ddf4449ebf819ef05d2071b824265cd": {
+  "xml": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/1fm35j83gcBLxoFLsPZyi95HC94</id>\n  <title>arXiv Query: search_query=ti:\"Attention is all you need\"&amp;id_list=&amp;start=0&amp;max_results=5</title>\n  <updated>2026-10-02T13:54:22Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=ti:%22Attention+is+all+you+need%22&amp;start=0&amp;max_results=5&amp;id_list=\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>\n  <opensearch:totalResults>36</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>http://arxiv.org/abs/1706.03762v7</id>\n    <title>Attention Is All You Need</title>\n    <updated>2023-08-02T00:41:18Z</updated>\n    <link href=\"https://arxiv.org/abs/1706.03762v7\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/1706.03762v7\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2017-06-12T17:57:34Z</published>\n    <arxiv:comment>15 pages, 5 figures</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Ashish Vaswani</name>\n    </author>\n    <author>\n      <name>Noam Shazeer</name>\n    </author>\n    <author>\n      <name>Niki Parmar</name>\n    </author>\n    <author>\n      <name>Jakob Uszkoreit</name>\n    </author>\n    <author>\n      <name>Llion Jones</name>\n    </author>\n    <author>\n      <name>Aidan N. Gomez</name>\n    </author>\n    <author>\n      <name>Lukasz Kaiser</name>\n    </author>\n    <author>\n      <name>Illia Polosukhin</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2104.04692v3</id>\n    <title>Not All Attention Is All You Need</title>\n    <updated>2021-06-01T03:09:39Z</updated>\n    <link href=\"https://arxiv.org/abs/2104.04692v3\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2104.04692v3\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Beyond the success story of pre-trained language models (PrLMs) in recent natural language processing, they are susceptible to over-fitting due to unusual large model size. To this end, dropout serves as a therapy. However, existing methods like random-based, knowledge-based and search-based dropout are more general but less effective onto self-attention based models, which are broadly chosen as the fundamental architecture of PrLMs. In this paper, we propose a novel dropout method named AttendOut to let self-attention empowered PrLMs capable of more robust task-specific tuning. We demonstrate that state-of-the-art models with elaborate training design may achieve much stronger results. We verify the universality of our approach on extensive natural language processing tasks.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2021-04-10T06:24:52Z</published>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Hongqiu Wu</name>\n    </author>\n    <author>\n      <name>Hai Zhao</name>\n    </author>\n    <author>\n      <name>Min Zhang</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2501.05730v1</id>\n    <title>Element-wise Attention Is All You Need</title>\n    <updated>2025-01-10T05:54:04Z</updated>\n    <link href=\"https://arxiv.org/abs/2501.05730v1\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2501.05730v1\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>The self-attention (SA) mechanism has demonstrated superior performance across various domains, yet it suffers from substantial complexity during both training and inference. The next-generation architecture, aiming at retaining the competitive performance of SA while achieving low-cost inference and efficient long-sequence training, primarily focuses on three approaches: linear attention, linear RNNs, and state space models. Although these approaches achieve reduced complexity than SA, they all have built-in performance degradation factors, such as diminished âspikinessâ and compression of historical information. In contrast to these approaches, we propose a novel element-wise attention mechanism, which uses the element-wise squared Euclidean distance, instead of the dot product operation, to compute similarity and approximates the quadratic complexity term $\\exp(q_{ic}k_{jc})$ with a Taylor polynomial. This design achieves remarkable efficiency: during training, the element-wise attention has a complexity of $\\mathcal{O}(tLD)$, making long-sequence training both computationally and memory efficient, where $L$ is the sequence length, $D$ is the feature dimension, and $t$ is the highest order of the polynomial; during inference, it can be reformulated as recurrent neural networks, achieving a inference complexity of $\\mathcal{O}(tD)$. Furthermore, the element-wise attention circumvents the performance degradation factors present in these approaches and achieves performance comparable to SA in both causal and non-causal forms.</summary>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.AI\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2025-01-10T05:54:04Z</published>\n    <arxiv:primary_category term=\"cs.LG\"/>\n    <author>\n      <name>Guoxin Feng</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2501.06425v7</id>\n    <title>Tensor Product Attention Is All You Need</title>\n    <updated>2026-01-11T23:01:33Z</updated>\n    <link href=\"https://arxiv.org/abs/2501.06425v7\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2501.06425v7\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Scaling language models to handle longer input sequences typically necessitates large key-value (KV) caches, resulting in substantial memory overhead during inference. In this paper, we propose Tensor Product Attention (TPA), a novel attention mechanism that uses tensor decompositions to represent queries, keys, and values compactly, substantially shrinking the KV cache size at inference time. By factorizing these representations into contextual low-rank components and seamlessly integrating with Rotary Position Embedding (RoPE), TPA achieves improved model quality alongside memory efficiency. Based on TPA, we introduce the Tensor ProducT ATTenTion Transformer (T6), a new model architecture for sequence modeling. Through extensive empirical evaluation on language modeling tasks, we demonstrate that T6 surpasses or matches the performance of standard Transformer baselines including Multi-Head Attention (MHA), Multi-Query Attention (MQA), Grouped-Query Attention (GQA), and Multi-Head Latent Attention (MLA) across various metrics, including perplexity and a range of established evaluation benchmarks. Notably, TPA's memory efficiency and computational efficiency at decoding stage enables processing longer sequences under fixed resource constraints, addressing a critical scalability challenge in modern language models. Project Page: https://github.com/tensorgi/TPA.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.AI\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2025-01-11T03:37:10Z</published>\n    <arxiv:comment>Published in NeurIPS 2025 (Spotlight); Project Page: https://github.com/tensorgi/TPA</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Yifan Zhang</name>\n    </author>\n    <author>\n      <name>Yifeng Liu</name>\n    </author>\n    <author>\n      <name>Huizhuo Yuan</name>\n    </author>\n    <author>\n      <name>Zhen Qin</name>\n    </author>\n    <author>\n      <name>Yang Yuan</name>\n    </author>\n    <author>\n      <name>Quanquan Gu</name>\n    </author>\n    <author>\n      <name>Andrew Chi-Chih Yao</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2010.13154v2</id>\n    <title>Attention is All You Need in Speech Separation</title>\n    <updated>2021-03-08T21:24:43Z</updated>\n    <link href=\"https://arxiv.org/abs/2010.13154v2\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2010.13154v2\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Recurrent Neural Networks (RNNs) have long been the dominant architecture in sequence-to-sequence learning. RNNs, however, are inherently sequential models that do not allow parallelization of their computations. Transformers are emerging as a natural alternative to standard RNNs, replacing recurrent computations with a multi-head attention mechanism. In this paper, we propose the SepFormer, a novel RNN-free Transformer-based neural network for speech separation. The SepFormer learns short and long-term dependencies with a multi-scale approach that employs transformers. The proposed model achieves state-of-the-art (SOTA) performance on the standard WSJ0-2/3mix datasets. It reaches an SI-SNRi of 22.3 dB on WSJ0-2mix and an SI-SNRi of 19.5 dB on WSJ0-3mix. The SepFormer inherits the parallelization advantages of Transformers and achieves a competitive performance even when downsampling the encoded representation by a factor of 8. It is thus significantly faster and it is less memory-demanding than the latest speech separation systems with comparable performance.</summary>\n    <category term=\"eess.AS\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.SD\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"eess.SP\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2020-10-25T16:28:54Z</published>\n    <arxiv:comment>Accepted to ICASSP 2021</arxiv:comment>\n    <arxiv:primary_category term=\"eess.AS\"/>\n    <author>\n      <name>Cem Subakan</name>\n    </author>\n    <author>\n      <name>Mirco Ravanelli</name>\n    </author>\n    <author>\n      <name>Samuele Cornell</name>\n    </author>\n    <author>\n      <name>Mirko Bronzi</name>\n    </author>\n    <author>\n      <name>Jianyuan Zhong</name>\n    </author>\n  </entry>\n</feed>\n"
+ },
+ "e79b5d94503eb76c0a4267386d787862df5efacd637d4d7c09060a0d2c630057": {
+  "xml": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/wd+tkYXtXtd+RHgg2RGFQgE17ew</id>\n  <title>arXiv Query: search_query=ti:\"Attention is all you need\" AND au:\"Vaswani\"&amp;id_list=&amp;start=0&amp;max_results=5</title>\n  <updated>2026-10-02T13:54:24Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=ti:%22Attention+is+all+you+need%22+AND+au:%22Vaswani%22&amp;start=0&amp;max_results=5&amp;id_list=\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>\n  <opensearch:totalResults>1</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>http://arxiv.org/abs/1706.03762v7</id>\n    <title>Attention Is All You Need</title>\n    <updated>2023-08-02T00:41:18Z</updated>\n    <link href=\"https://arxiv.org/abs/1706.03762v7\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/1706.03762v7\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2017-06-12T17:57:34Z</published>\n    <arxiv:comment>15 pages, 5 figures</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Ashish Vaswani</name>\n    </author>\n    <author>\n      <name>Noam Shazeer</name>\n    </author>\n    <author>\n      <name>Niki Parmar</name>\n    </author>\n    <author>\n      <name>Jakob Uszkoreit</name>\n    </author>\n    <author>\n      <name>Llion Jones</name>\n    </author>\n    <author>\n      <name>Aidan N. Gomez</name>\n    </author>\n    <author>\n      <name>Lukasz Kaiser</name>\n    </author>\n    <author>\n      <name>Illia Polosukhin</name>\n    </author>\n  </entry>\n</feed>\n"
+ },
+ "a4b82a8dcfa64035d60df15335a69da5d6145c103d642a058c0a2a38bced2e28": {
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+   "facets": {},
+   "total-results": 1243708,
+   "items": [
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        26
+       ]
+      ],
+      "date-time": "2026-08-26T23:35:33Z",
+      "timestamp": 1787787333381,
+      "version": "build-2784847793"
+     },
+     "publisher-location": "Cham",
+     "reference-count": 67,
+     "publisher": "Springer Nature Switzerland",
+     "isbn-type": [
+      {
+       "value": "9783031842993",
+       "type": "print"
+      },
+      {
+       "value": "9783031843006",
+       "type": "electronic"
+      }
+     ],
+     "license": [
+      {
+       "start": {
+        "date-parts": [
+         [
+          2025,
+          1,
+          1
+         ]
+        ],
+        "date-time": "2025-01-01T00:00:00Z",
+        "timestamp": 1735689600000
+       },
+       "content-version": "tdm",
+       "delay-in-days": 0,
+       "URL": "https://www.springernature.com/gp/researchers/text-and-data-mining"
+      },
+      {
+       "start": {
+        "date-parts": [
+         [
+          2025,
+          1,
+          1
+         ]
+        ],
+        "date-time": "2025-01-01T00:00:00Z",
+        "timestamp": 1735689600000
+       },
+       "content-version": "vor",
+       "delay-in-days": 0,
+       "URL": "https://www.springernature.com/gp/researchers/text-and-data-mining"
+      }
+     ],
+     "content-domain": {
+      "domain": [
+       "link.springer.com"
+      ],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2025
+       ]
+      ]
+     },
+     "DOI": "10.1007/978-3-031-84300-6_13",
+     "type": "book-chapter",
+     "created": {
+      "date-parts": [
+       [
+        2025,
+        7,
+        15
+       ]
+      ],
+      "date-time": "2025-07-15T14:47:13Z",
+      "timestamp": 1752590833000
+     },
+     "page": "297-314",
+     "update-policy": "https://doi.org/10.1007/springer_crossmark_policy",
+     "source": "Crossref",
+     "is-referenced-by-count": 55,
+     "title": [
+      "Is Attention All You Need?"
+     ],
+     "prefix": "10.1007",
+     "author": [
+      {
+       "ORCID": "https://orcid.org/0000-0001-5519-842X",
+       "authenticated-orcid": false,
+       "given": "Patrick",
+       "family": "Mineault",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "297",
+     "published-online": {
+      "date-parts": [
+       [
+        2025,
+        7,
+        16
+       ]
+      ]
+     },
+     "reference": [
+      {
+       "key": "13_CR1",
+       "doi-asserted-by": "publisher",
+       "first-page": "4190",
+       "DOI": "10.18653/v1/2020.acl-main.385",
+       "volume-title": "Proceedings of the 58th annual meeting of the association for computational linguistics. Presented at the ACL 2020",
+       "author": "S Abnar",
+       "year": "2020",
+       "unstructured": "Abnar, S., & Zuidema, W. (2020). Quantifying Attention flow in transformers. In Proceedings of the 58th annual meeting of the association for computational linguistics. Presented at the ACL 2020 (pp. 4190–4197). Association for Computational Linguistics. https://doi.org/10.18653/v1/2020.acl-main.385"
+      },
+      {
+       "key": "13_CR2",
+       "unstructured": "Ba, J., Mnih, V., & Kavukcuoglu, K. (2015). Multiple object recognition with visual attention."
+      },
+      {
+       "key": "13_CR3",
+       "volume-title": "Memory",
+       "author": "A Baddeley",
+       "year": "2009",
+       "unstructured": "Baddeley, A., Eysenck, M. W., & Anderson, M. C. (2009). Memory. Psychology Press."
+      },
+      {
+       "key": "13_CR4",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. https://doi.org/10.48550/arXiv.1409.0473.",
+       "DOI": "10.48550/arXiv.1409.0473"
+      },
+      {
+       "key": "13_CR5",
+       "unstructured": "Berrios, W., & Deza, A. (2022). Joint rotational invariance and adversarial training of a dual-stream Transformer yields state of the art Brain-Score for Area V4."
+      },
+      {
+       "key": "13_CR6",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Bowers, J. S., Malhotra, G., Dujmović, M., Montero, M. L., Tsvetkov, C., Biscione, V., Puebla, G., Adolfi, F. G., Hummel, J., Heaton, R. F., Evans, B., Mitchell, J., & Blything, R. (2022). Deep problems with neural network models of human vision. https://doi.org/10.31234/osf.io/5zf4s.",
+       "DOI": "10.31234/osf.io/5zf4s"
+      },
+      {
+       "key": "13_CR7",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Brendel, W., & Bethge, M. (2019). Approximating CNNs with bag-of-local-features models works surprisingly well on ImageNet. https://doi.org/10.48550/arXiv.1904.00760.",
+       "DOI": "10.48550/arXiv.1904.00760"
+      },
+      {
+       "key": "13_CR8",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Brown, T. B., Mann, B., Ryder, N., Subbiah, M., Kaplan, J., Dhariwal, P., Neelakantan, A., Shyam, P., Sastry, G., Askell, A., Agarwal, S., Herbert-Voss, A., Krueger, G., Henighan, T., Child, R., Ramesh, A., Ziegler, D. M., Wu, J., Winter, C., Hesse, C., Chen, M., Sigler, E., Litwin, M., Gray, S., Chess, B., Clark, J., Berner, C., McCandlish, S., Radford, A., Sutskever, I., Amodei, D. (2020). Language models are few-shot learners. https://doi.org/10.48550/arXiv.2005.14165.",
+       "DOI": "10.48550/arXiv.2005.14165"
+      },
+      {
+       "key": "13_CR9",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Chefer, H., Gur, S., & Wolf, L. (2020). Transformer interpretability beyond Attention visualization.",
+       "DOI": "10.1109/CVPR46437.2021.00084"
+      },
+      {
+       "key": "13_CR10",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Cheng, J., Dong, L., & Lapata, M., (2016). Long short-term memory-networks for machine reading.",
+       "DOI": "10.18653/v1/D16-1053"
+      },
+      {
+       "key": "13_CR11",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Dehghani, M., Djolonga, J., Mustafa, B., Padlewski, P., Heek, J., Gilmer, J., Steiner, A., Caron, M., Geirhos, R., Alabdulmohsin, I., Jenatton, R., Beyer, L., Tschannen, M., Arnab, A., Wang, X., Riquelme, C., Minderer, M., Puigcerver, J., Evci, U., Kumar, M., van Steenkiste, S., Elsayed, G. F., Mahendran, A., Yu, F., Oliver, A., Huot, F., Bastings, J., Collier, M. P., Gritsenko, A., Birodkar, V., Vasconcelos, C., Tay, Y., Mensink, T., Kolesnikov, A., Pavetić, F., Tran, D., Kipf, T., Lučić, M., Zhai, X., Keysers, D., Harmsen, J., & Houlsby, N. (2023). Scaling vision transformers to 22 billion parameters. https://doi.org/10.48550/arXiv.2302.05442.",
+       "DOI": "10.48550/arXiv.2302.05442"
+      },
+      {
+       "key": "13_CR12",
+       "doi-asserted-by": "publisher",
+       "first-page": "288",
+       "DOI": "10.1007/s10955-017-1806-y",
+       "volume": "168",
+       "author": "M Demircigil",
+       "year": "2017",
+       "unstructured": "Demircigil, M., Heusel, J., Löwe, M., Upgang, S., & Vermet, F. (2017). On a model of associative memory with huge storage capacity. Journal of Statistical Physics, 168, 288–299. https://doi.org/10.1007/s10955-017-1806-y",
+       "journal-title": "Journal of Statistical Physics"
+      },
+      {
+       "key": "13_CR13",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Devlin, J., Chang, M.-W., Lee, K., & Toutanova, K. (2019). BERT: Pre-training of deep bidirectional transformers for language understanding. https://doi.org/10.48550/arXiv.1810.04805",
+       "DOI": "10.48550/arXiv.1810.04805"
+      },
+      {
+       "key": "13_CR14",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., Dehghani, M., Minderer, M., Heigold, G., Gelly, S., Uszkoreit, J., & Houlsby, N. (2020). An image is worth 16x16 words: Transformers for image recognition at scale. https://doi.org/10.48550/arXiv.2010.11929.",
+       "DOI": "10.48550/arXiv.2010.11929"
+      },
+      {
+       "key": "13_CR15",
+       "doi-asserted-by": "publisher",
+       "first-page": "1504",
+       "DOI": "10.1038/nn.4656",
+       "volume": "20",
+       "author": "RA Epstein",
+       "year": "2017",
+       "unstructured": "Epstein, R. A., Patai, E. Z., Julian, J. B., & Spiers, H. J. (2017). The cognitive map in humans: Spatial navigation and beyond. Nature Neuroscience, 20, 1504–1513. https://doi.org/10.1038/nn.4656",
+       "journal-title": "Nature Neuroscience"
+      },
+      {
+       "key": "13_CR16",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Feldman, J. A., & Ballard, D. H. (1982). Connectionist models and their properties. Cognitive Science, 6(3), 205–254.",
+       "DOI": "10.1207/s15516709cog0603_1"
+      },
+      {
+       "key": "13_CR17",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Folli, V., Leonetti, M., & Ruocco, G. (2017). On the maximum storage capacity of the Hopfield model. Frontiers in Computational Neuroscience, 10.",
+       "DOI": "10.3389/fncom.2016.00144"
+      },
+      {
+       "key": "13_CR18",
+       "doi-asserted-by": "publisher",
+       "first-page": "193",
+       "DOI": "10.1007/BF00344251",
+       "volume": "36",
+       "author": "K Fukushima",
+       "year": "1980",
+       "unstructured": "Fukushima, K. (1980). Neocognitron: A self-organizing neural network model for a mechanism of pattern recognition unaffected by shift in position. Biological Cybernetics, 36, 193–202.",
+       "journal-title": "Biological Cybernetics"
+      },
+      {
+       "key": "13_CR19",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Gatys, L. A., Ecker, A. S., Bethge, M. (2015). A neural algorithm of artistic style. ArXiv150806576 Cs Q-Bio.",
+       "DOI": "10.1167/16.12.326"
+      },
+      {
+       "key": "13_CR20",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Geirhos, R., Rubisch, P., Michaelis, C., Bethge, M., Wichmann, F. A., & Brendel, W. (2018). ImageNet-trained CNNs are biased towards texture; increasing shape bias improves accuracy and robustness. https://doi.org/10.48550/arXiv.1811.12231.",
+       "DOI": "10.48550/arXiv.1811.12231"
+      },
+      {
+       "key": "13_CR21",
+       "unstructured": "Geirhos, R., Narayanappa, K., Mitzkus, B., Thieringer, T., Bethge, M., Wichmann, F. A., & Brendel, W. (2021). Partial success in closing the gap between human and machine vision."
+      },
+      {
+       "key": "13_CR22",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Graves, A. (2013). Generating sequences with recurrent neural networks. https://doi.org/10.48550/arXiv.1308.0850.",
+       "DOI": "10.48550/arXiv.1308.0850"
+      },
+      {
+       "key": "13_CR23",
+       "doi-asserted-by": "publisher",
+       "first-page": "369",
+       "DOI": "10.1145/1143844.1143891",
+       "volume-title": "Proceedings of the 23rd international conference on machine learning, ICML ’06",
+       "author": "A Graves",
+       "year": "2006",
+       "unstructured": "Graves, A., Fernández, S., Gomez, F., & Schmidhuber, J. (2006). Connectionist temporal classification: Labelling unsegmented sequence data with recurrent neural networks. In Proceedings of the 23rd international conference on machine learning, ICML ’06 (pp. 369–376). Association for Computing Machinery. https://doi.org/10.1145/1143844.1143891"
+      },
+      {
+       "key": "13_CR24",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Graves, A., Wayne, G., & Danihelka, I. (2014). Neural turing machines. https://doi.org/10.48550/arXiv.1410.5401.",
+       "DOI": "10.48550/arXiv.1410.5401"
+      },
+      {
+       "key": "13_CR25",
+       "unstructured": "Greff, K., van Steenkiste, S., & Schmidhuber, J. (2020). On the binding problem in artificial neural networks."
+      },
+      {
+       "key": "13_CR26",
+       "doi-asserted-by": "publisher",
+       "first-page": "245",
+       "DOI": "10.1016/j.neuron.2017.06.011",
+       "volume": "95",
+       "author": "D Hassabis",
+       "year": "2017",
+       "unstructured": "Hassabis, D., Kumaran, D., Summerfield, C., & Botvinick, M. (2017). Neuroscience-inspired artificial intelligence. Neuron, 95, 245–258. https://doi.org/10.1016/j.neuron.2017.06.011",
+       "journal-title": "Neuron"
+      },
+      {
+       "key": "13_CR27",
+       "doi-asserted-by": "publisher",
+       "first-page": "188",
+       "DOI": "10.1016/j.tics.2005.02.009",
+       "volume": "9",
+       "author": "M Hayhoe",
+       "year": "2005",
+       "unstructured": "Hayhoe, M., & Ballard, D. (2005). Eye movements in natural behavior. Trends in Cognitive Sciences, 9, 188–194. https://doi.org/10.1016/j.tics.2005.02.009",
+       "journal-title": "Trends in Cognitive Sciences"
+      },
+      {
+       "key": "13_CR28",
+       "doi-asserted-by": "publisher",
+       "first-page": "2554",
+       "DOI": "10.1073/pnas.79.8.2554",
+       "volume": "79",
+       "author": "JJ Hopfield",
+       "year": "1982",
+       "unstructured": "Hopfield, J. J. (1982). Neural networks and physical systems with emergent collective computational abilities. Proceedings of the National Academy of Sciences, 79, 2554–2558.",
+       "journal-title": "Proceedings of the National Academy of Sciences"
+      },
+      {
+       "key": "13_CR29",
+       "doi-asserted-by": "publisher",
+       "first-page": "574",
+       "DOI": "10.1113/jphysiol.1959.sp006308",
+       "volume": "148",
+       "author": "DH Hubel",
+       "year": "1959",
+       "unstructured": "Hubel, D. H., & Wiesel, T. N. (1959). Receptive fields of single neurones in the cat’s striate cortex. The Journal of Physiology, 148, 574–591.",
+       "journal-title": "The Journal of Physiology"
+      },
+      {
+       "key": "13_CR30",
+       "doi-asserted-by": "publisher",
+       "first-page": "1254",
+       "DOI": "10.1109/34.730558",
+       "volume": "20",
+       "author": "L Itti",
+       "year": "1998",
+       "unstructured": "Itti, L., Koch, C., & Niebur, E. (1998). A model of saliency-based visual attention for rapid scene analysis. IEEE Transactions on Pattern Analysis and Machine Intelligence, 20, 1254–1259. https://doi.org/10.1109/34.730558",
+       "journal-title": "IEEE Transactions on Pattern Analysis and Machine Intelligence"
+      },
+      {
+       "key": "13_CR31",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Jaegle, A., Borgeaud, S., Alayrac, J.-B., Doersch, C., Ionescu, C., Ding, D., Koppula, S., Zoran, D., Brock, A., Shelhamer, E., Hénaff, O., Botvinick, M. M., Zisserman, A., Vinyals, O., & Carreira, J. (2022). Perceiver IO: A general architecture for structured inputs & outputs. https://doi.org/10.48550/arXiv.2107.14795.",
+       "DOI": "10.48550/arXiv.2107.14795"
+      },
+      {
+       "key": "13_CR32",
+       "doi-asserted-by": "publisher",
+       "DOI": "10.1037/10538-000",
+       "volume-title": "The principles of psychology",
+       "author": "W James",
+       "year": "1890",
+       "unstructured": "James, W. (1890). The principles of psychology (Vol. I). Henry Holt and Co. https://doi.org/10.1037/10538-000"
+      },
+      {
+       "key": "13_CR33",
+       "unstructured": "Kaiser, Ł., & Sutskever, I. (2016). Neural GPUs learn algorithms."
+      },
+      {
+       "key": "13_CR34",
+       "unstructured": "Karpathy, A. (2014). What I learned from competing against a ConvNet on ImageNet [WWW document]. Andrej Karpathy Blog. http://karpathy.github.io/2014/09/02/what-i-learned-from-competing-against-a-convnet-on-imagenet/. Accessed 6 Feb 2023."
+      },
+      {
+       "key": "13_CR35",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Kaznatcheev, A., & Kording, K. P. (2022). Nothing makes sense in deep learning, except in the light of evolution. https://doi.org/10.48550/arXiv.2205.10320.",
+       "DOI": "10.48550/arXiv.2205.10320"
+      },
+      {
+       "key": "13_CR36",
+       "doi-asserted-by": "publisher",
+       "DOI": "10.1371/journal.pcbi.1003915",
+       "volume": "10",
+       "author": "S-M Khaligh-Razavi",
+       "year": "2014",
+       "unstructured": "Khaligh-Razavi, S.-M., & Kriegeskorte, N. (2014). Deep supervised, but not unsupervised, models may explain IT cortical representation. PLoS Computational Biology, 10, e1003915.",
+       "journal-title": "PLoS Computational Biology"
+      },
+      {
+       "key": "13_CR37",
+       "first-page": "219",
+       "volume": "4",
+       "author": "C Koch",
+       "year": "1985",
+       "unstructured": "Koch, C., & Ullman, S. (1985). Shifts in selective visual attention: Towards the underlying neural circuitry. Human Neurobiology, 4, 219–227.",
+       "journal-title": "Human Neurobiology"
+      },
+      {
+       "key": "13_CR38",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Kozachkov, L., Kastanenka, K. V., & Krotov, D. (2022). Building transformers from neurons and astrocytes. https://doi.org/10.1101/2022.10.12.511910.",
+       "DOI": "10.1101/2022.10.12.511910"
+      },
+      {
+       "key": "13_CR39",
+       "volume-title": "Advances in neural information processing systems",
+       "author": "A Krizhevsky",
+       "year": "2012",
+       "unstructured": "Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). ImageNet classification with deep convolutional neural networks. In F. Pereira, C. J. Burges, L. Bottou, & K. Q. Weinberger (Eds.), Advances in neural information processing systems. Curran Associates, Inc."
+      },
+      {
+       "key": "13_CR40",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Krotov, D., & Hopfield, J. J. (2016). Dense associative memory for pattern recognition. https://doi.org/10.48550/arXiv.1606.01164.",
+       "DOI": "10.48550/arXiv.1606.01164"
+      },
+      {
+       "key": "13_CR41",
+       "volume-title": "Advances in neural information processing systems",
+       "author": "H Larochelle",
+       "year": "2010",
+       "unstructured": "Larochelle, H., & Hinton, G. E. (2010). Learning to combine foveal glimpses with a third-order Boltzmann machine. In Advances in neural information processing systems. Curran Associates, Inc."
+      },
+      {
+       "key": "13_CR42",
+       "doi-asserted-by": "publisher",
+       "first-page": "541",
+       "DOI": "10.1162/neco.1989.1.4.541",
+       "volume": "1",
+       "author": "Y LeCun",
+       "year": "1989",
+       "unstructured": "LeCun, Y., Boser, B., Denker, J. S., Henderson, D., Howard, R. E., Hubbard, W., & Jackel, L. D. (1989). Backpropagation applied to handwritten zip code recognition. Neural Computation, 1, 541–551.",
+       "journal-title": "Neural Computation"
+      },
+      {
+       "key": "13_CR43",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Lindsay, G. W. (2020). Attention in psychology, neuroscience, and machine learning. Frontiers in Computational Neuroscience, 14.",
+       "DOI": "10.3389/fncom.2020.00029"
+      },
+      {
+       "key": "13_CR44",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Liu, Y., Ott, M., Goyal, N., Du, J., Joshi, M., Chen, D., Levy, O., Lewis, M., Zettlemoyer, L., & Stoyanov, V. (2019). RoBERTa: A robustly optimized BERT Pretraining approach. https://doi.org/10.48550/arXiv.1907.11692.",
+       "DOI": "10.48550/arXiv.1907.11692"
+      },
+      {
+       "key": "13_CR45",
+       "first-page": "4722",
+       "volume-title": "Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)",
+       "author": "N Liu",
+       "year": "2021",
+       "unstructured": "Liu, N., Zhang, N., Wan, K., Shao, L., & Han, J. (2021). Visual saliency transformer. In Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV) (pp. 4722–4732)."
+      },
+      {
+       "key": "13_CR46",
+       "unstructured": "Mikolov, T., Chen, K., Corrado, G. & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781."
+      },
+      {
+       "key": "13_CR47",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Mnih, V., Heess, N., Graves, A., & Kavukcuoglu, K. (2014). Recurrent models of visual attention. https://doi.org/10.48550/arXiv.1406.6247.",
+       "DOI": "10.48550/arXiv.1406.6247"
+      },
+      {
+       "key": "13_CR48",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Mondal, S., Yang, Z., Ahn, S., Samaras, D., Zelinsky, G., & Hoai, M. (2023). Gazeformer: Scalable, effective and fast prediction of goal-directed human attention. https://doi.org/10.48550/arXiv.2303.15274.",
+       "DOI": "10.48550/arXiv.2303.15274"
+      },
+      {
+       "key": "13_CR49",
+       "doi-asserted-by": "publisher",
+       "first-page": "2190",
+       "DOI": "10.1523/JNEUROSCI.14-04-02190.1994",
+       "volume": "14",
+       "author": "BC Motter",
+       "year": "1994",
+       "unstructured": "Motter, B. C. (1994). Neural correlates of feature selective memory and pop-out in extrastriate area V4. Journal of Neuroscience: The Official Journal of the Society for Neuroscience, 14, 2190–2199. https://doi.org/10.1523/JNEUROSCI.14-04-02190.1994",
+       "journal-title": "Journal of Neuroscience: The Official Journal of the Society for Neuroscience"
+      },
+      {
+       "key": "13_CR50",
+       "doi-asserted-by": "publisher",
+       "first-page": "535",
+       "DOI": "10.1016/j.tics.2021.03.018",
+       "volume": "25",
+       "author": "Neuromatch Academy (NMA)",
+       "year": "2021",
+       "unstructured": "Neuromatch Academy (NMA). (2021). Neuromatch academy: Teaching computational neuroscience with global accessibility. Trends in Cognitive Sciences, 25, 535–538. https://doi.org/10.1016/j.tics.2021.03.018",
+       "journal-title": "Trends in Cognitive Sciences"
+      },
+      {
+       "key": "13_CR51",
+       "doi-asserted-by": "publisher",
+       "first-page": "4700",
+       "DOI": "10.1523/JNEUROSCI.13-11-04700.1993",
+       "volume": "13",
+       "author": "BA Olshausen",
+       "year": "1993",
+       "unstructured": "Olshausen, B. A., Anderson, C. H., & Van Essen, D. C. (1993). A neurobiological model of visual attention and invariant pattern recognition based on dynamic routing of information. The Journal of Neuroscience, 13, 4700.",
+       "journal-title": "The Journal of Neuroscience"
+      },
+      {
+       "key": "13_CR52",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Pierzchlewicz, P. A., Willeke, K. F., Nix, A. F., Elumalai, P., Restivo, K., Shinn, T., Nealley, C., Rodriguez, G., Patel, S., Franke, K., Tolias, A. S., & Sinz, F. H. (2023). Energy guided diffusion for generating neurally exciting images. https://doi.org/10.1101/2023.05.18.541176.",
+       "DOI": "10.1101/2023.05.18.541176"
+      },
+      {
+       "key": "13_CR53",
+       "doi-asserted-by": "publisher",
+       "first-page": "303",
+       "DOI": "10.1038/s41583-020-0301-7",
+       "volume": "21",
+       "author": "P Poirazi",
+       "year": "2020",
+       "unstructured": "Poirazi, P., & Papoutsi, A. (2020). Illuminating dendritic function with computational models. Nature Reviews. Neuroscience, 21, 303–321. https://doi.org/10.1038/s41583-020-0301-7",
+       "journal-title": "Nature Reviews. Neuroscience"
+      },
+      {
+       "key": "13_CR54",
+       "doi-asserted-by": "publisher",
+       "first-page": "160",
+       "DOI": "10.1037/0096-3445.109.2.160",
+       "volume": "109",
+       "author": "MI Posner",
+       "year": "1980",
+       "unstructured": "Posner, M. I., Snyder, C. R., & Davidson, B. J. (1980). Attention and the detection of signals. Journal of Experimental Psychology. General, 109, 160–174. https://doi.org/10.1037/0096-3445.109.2.160",
+       "journal-title": "Journal of Experimental Psychology. General"
+      },
+      {
+       "key": "13_CR55",
+       "unstructured": "Ramsauer, H., Schäfl, B., Lehner, J., Seidl, P., Widrich, M., Adler, T., Gruber, L., Holzleitner, M., Pavlović, M., Sandve, G. K., Greiff, V., Kreil, D., Kopp, M., Klambauer, G., Brandstetter, J., & Hochreiter, S. (2021). Hopfield networks is all you need."
+      },
+      {
+       "key": "13_CR56",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Schlag, I., Irie, K., & Schmidhuber, J. (2021). Linear transformers are secretly fast weight programmers. https://doi.org/10.48550/arXiv.2102.11174.",
+       "DOI": "10.48550/arXiv.2102.11174"
+      },
+      {
+       "key": "13_CR57",
+       "doi-asserted-by": "publisher",
+       "first-page": "131",
+       "DOI": "10.1162/neco.1992.4.1.131",
+       "volume": "4",
+       "author": "J Schmidhuber",
+       "year": "1992",
+       "unstructured": "Schmidhuber, J. (1992). Learning to control fast-weight memories: An alternative to dynamic recurrent networks. Neural Computation, 4, 131–139. https://doi.org/10.1162/neco.1992.4.1.131",
+       "journal-title": "Neural Computation"
+      },
+      {
+       "key": "13_CR58",
+       "first-page": "1467",
+       "volume-title": "Proceedings of the 16th international conference on neural information processing systems, NIPS’03",
+       "author": "N Sprague",
+       "year": "2003",
+       "unstructured": "Sprague, N., & Ballard, D. (2003). Eye movements for reward maximization. In Proceedings of the 16th international conference on neural information processing systems, NIPS’03 (pp. 1467–1474). MIT Press."
+      },
+      {
+       "key": "13_CR59",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Sukhbaatar, S., Szlam, A., Weston, J., & Fergus, R. (2015). End-to-end memory networks https://doi.org/10.48550/arXiv.1503.08895.",
+       "DOI": "10.48550/arXiv.1503.08895"
+      },
+      {
+       "key": "13_CR60",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Tuli, S., Dasgupta, I., Grant, E., & Griffiths, T. L. (2021). Are convolutional neural networks or transformers more like human vision? https://doi.org/10.48550/arXiv.2105.07197.",
+       "DOI": "10.48550/arXiv.2105.07197"
+      },
+      {
+       "key": "13_CR61",
+       "unstructured": "Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.N., Kaiser, L., & Polosukhin, I. (2017). Attention is all you need."
+      },
+      {
+       "key": "13_CR62",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Veličković, P., Cucurull, G., Casanova, A., Romero, A., Liò, P., & Bengio, Y. (2018). Graph attention networks. https://doi.org/10.48550/arXiv.1710.10903",
+       "DOI": "10.48550/arXiv.1710.10903"
+      },
+      {
+       "key": "13_CR63",
+       "doi-asserted-by": "publisher",
+       "first-page": "1249",
+       "DOI": "10.1016/j.cell.2020.10.024",
+       "volume": "183",
+       "author": "JCR Whittington",
+       "year": "2020",
+       "unstructured": "Whittington, J. C. R., Muller, T. H., Mark, S., Chen, G., Barry, C., Burgess, N., & Behrens, T. E. J. (2020). The Tolman-Eichenbaum machine: Unifying space and relational memory through generalization in the hippocampal formation. Cell, 183, 1249–1263.e23. https://doi.org/10.1016/j.cell.2020.10.024",
+       "journal-title": "Cell"
+      },
+      {
+       "key": "13_CR64",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Whittington, J. C. R., McCaffary, D., Bakermans, J. J. W., & Behrens, T. E. J. (2022). How to build a cognitive map: Insights from models of the hippocampal formation. https://doi.org/10.48550/arXiv.2202.01682.",
+       "DOI": "10.48550/arXiv.2202.01682"
+      },
+      {
+       "key": "13_CR65",
+       "unstructured": "Xu, K., Ba, J., Kiros, R., Cho, K., Courville, A., Salakhutdinov, R., Zemel, R., & Bengio, Y. (2016). Show, attend and tell: Neural image caption generation with visual attention."
+      },
+      {
+       "key": "13_CR66",
+       "doi-asserted-by": "publisher",
+       "first-page": "8619",
+       "DOI": "10.1073/pnas.1403112111",
+       "volume": "111",
+       "author": "DL Yamins",
+       "year": "2014",
+       "unstructured": "Yamins, D. L., Hong, H., Cadieu, C. F., Solomon, E. A., Seibert, D., & DiCarlo, J. J. (2014). Performance-optimized hierarchical models predict neural responses in higher visual cortex. Proceedings of the National Academy of Sciences, 111, 8619–8624.",
+       "journal-title": "Proceedings of the National Academy of Sciences"
+      },
+      {
+       "key": "13_CR67",
+       "doi-asserted-by": "publisher",
+       "unstructured": "Zador, A., Richards, B., Ölveczky, B., Escola, S., Bengio, Y., Boahen, K., Botvinick, M., Chklovskii, D., Churchland, A., Clopath, C., DiCarlo, J., Ganguli, S., Hawkins, J., Koerding, K., Koulakov, A., LeCun, Y., Lillicrap, T., Marblestone, A., Olshausen, B., Pouget, A., Savin, C., Sejnowski, T., Simoncelli, E., Solla, S., Sussillo, D., Tolias, A. S., & Tsao, D. (2022). Toward next-generation artificial intelligence: Catalyzing the NeuroAI revolution. https://doi.org/10.48550/arXiv.2210.08340.",
+       "DOI": "10.48550/arXiv.2210.08340"
+      }
+     ],
+     "container-title": [
+      "From Human Attention to Computational Attention"
+     ],
+     "language": "en",
+     "link": [
+      {
+       "URL": "https://link.springer.com/content/pdf/10.1007/978-3-031-84300-6_13",
+       "content-type": "unspecified",
+       "content-version": "vor",
+       "intended-application": "similarity-checking"
+      }
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        7,
+        30
+       ]
+      ],
+      "date-time": "2026-07-30T20:06:41Z",
+      "timestamp": 1785442001000
+     },
+     "score": 33.270218,
+     "resource": {
+      "primary": {
+       "URL": "https://link.springer.com/10.1007/978-3-031-84300-6_13"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2025
+       ]
+      ]
+     },
+     "ISBN": [
+      "9783031842993",
+      "9783031843006"
+     ],
+     "references-count": 67,
+     "URL": "https://doi.org/10.1007/978-3-031-84300-6_13",
+     "published": {
+      "date-parts": [
+       [
+        2025
+       ]
+      ]
+     },
+     "assertion": [
+      {
+       "value": "16 July 2025",
+       "order": 1,
+       "name": "first_online",
+       "label": "First Online",
+       "group": {
+        "name": "ChapterHistory",
+        "label": "Chapter History"
+       }
+      }
+     ]
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        14
+       ]
+      ],
+      "date-time": "2026-08-14T15:36:02Z",
+      "timestamp": 1786721762595,
+      "version": "build-2736575974"
+     },
+     "posted": {
+      "date-parts": [
+       [
+        2024
+       ]
+      ]
+     },
+     "group-title": "SSRN",
+     "reference-count": 31,
+     "publisher": "Elsevier BV",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "abstract": "<jats:p>This study discusses the parameters that define the value of artificial intelligence (AI) tokens based on user interaction, their pricing mechanism, and their correlation with the predicted value thus evaluating AI token valuation based on user engagement, pricing, and website visits. This study tests hypotheses that examine the factors that influence the value of AI tokens. Using data from ten AI tokens, the study employs correlation and regression analyses to examine these relationships. The results show that monthly active users (MAU) and website visits significantly predict valuation, while pricing shows a marginal effect. This research provides insights for stakeholders in understanding economic factors affecting AI token values, emphasizing user engagement and pricing strategies.&amp;nbsp;</jats:p>",
+     "DOI": "10.2139/ssrn.4993784",
+     "type": "posted-content",
+     "created": {
+      "date-parts": [
+       [
+        2024,
+        12,
+        19
+       ]
+      ],
+      "date-time": "2024-12-19T12:55:32Z",
+      "timestamp": 1734612932000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "Attention Is All You Need: An Analysis Of The Valuation Of Artificial Intelligence Tokens"
+     ],
+     "prefix": "10.2139",
+     "author": [
+      {
+       "ORCID": "https://orcid.org/0000-0002-8470-5723",
+       "authenticated-orcid": true,
+       "given": "Mfon",
+       "family": "Akpan",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "78",
+     "reference": [
+      {
+       "issue": "2",
+       "key": "ref1",
+       "doi-asserted-by": "crossref",
+       "first-page": "31",
+       "DOI": "10.1257/jep.33.2.31",
+       "article-title": "Artificial intelligence: The ambiguous labor market impact of automating prediction",
+       "volume": "33",
+       "author": "A Agrawal",
+       "year": "2019",
+       "journal-title": "Journal of Economic Perspectives"
+      },
+      {
+       "key": "ref2",
+       "author": "I Ahmed",
+       "year": "2024",
+       "journal-title": "ChatGPT versus bard: A comparative study. Engineering Reports. Advance online publication"
+      },
+      {
+       "issue": "3",
+       "key": "ref3",
+       "first-page": "34",
+       "article-title": "The Elon Musk effect: How community initiative spending impacts earned social media valuation",
+       "volume": "12",
+       "author": "M Akpan",
+       "year": "2022",
+       "journal-title": "Risk Governance and Control: Financial Markets & Institutions"
+      },
+      {
+       "key": "ref4",
+       "article-title": "From data to decisions: Enhancing financial forecasts with LSTM for AI token prices",
+       "author": "R Ali",
+       "year": "2024",
+       "journal-title": "Journal of Economic Studies. Advance online publication"
+      },
+      {
+       "key": "ref5",
+       "author": "Pbc Anthropic",
+       "journal-title": "Anthropic API: Pricing"
+      },
+      {
+       "issue": "1",
+       "key": "ref6",
+       "doi-asserted-by": "crossref",
+       "first-page": "170",
+       "DOI": "10.1016/j.jbusres.2021.04.028",
+       "article-title": "Enhancing user engagement: The role of gamification in mobile apps",
+       "volume": "132",
+       "author": "P Bitri�n",
+       "year": "2021",
+       "journal-title": "Journal of Business Research"
+      },
+      {
+       "key": "ref7",
+       "article-title": "Artificial intelligence, for real",
+       "author": "E Brynjolfsson",
+       "year": "2017",
+       "journal-title": "OpenCopilot -Products, competitors, financials, employees, headquarters locations"
+      },
+      {
+       "key": "ref8",
+       "author": "A Choudhry",
+       "year": "2024",
+       "journal-title": "Deep dive into AI: Analyzing \"attention is all you need"
+      },
+      {
+       "key": "ref9",
+       "author": "G Deng",
+       "year": "2024",
+       "journal-title": "MasterKey: Automated jailbreaking of large language model chatbots. Network and Distributed System Security (NDSS) Symposium 2024"
+      },
+      {
+       "issue": "2",
+       "key": "ref10",
+       "doi-asserted-by": "crossref",
+       "first-page": "248",
+       "DOI": "10.1016/j.jacr.2023.11.011",
+       "article-title": "Economic and environmental costs of cloud technologies for medical imaging and radiology artificial intelligence",
+       "volume": "21",
+       "author": "F X Doo",
+       "year": "2023",
+       "journal-title": "Journal of the American College of Radiology"
+      },
+      {
+       "issue": "9",
+       "key": "ref11",
+       "doi-asserted-by": "crossref",
+       "first-page": "1322",
+       "DOI": "10.1093/cid/ciad407",
+       "article-title": "ChatGPT, GPT-4, and other large language models: The next revolution for clinical microbiology?",
+       "volume": "77",
+       "author": "A Egli",
+       "year": "2023",
+       "journal-title": "Clinical Infectious Diseases"
+      },
+      {
+       "issue": "2",
+       "key": "ref12",
+       "doi-asserted-by": "crossref",
+       "first-page": "964",
+       "DOI": "10.1109/JIOT.2021.3119639",
+       "article-title": "Blockchain for edge of things: Applications, opportunities, and challenges",
+       "volume": "9",
+       "author": "T R Gadekallu",
+       "year": "2022",
+       "journal-title": "IEEE Internet of Things Journal"
+      },
+      {
+       "key": "ref13",
+       "first-page": "89",
+       "article-title": "Artificial intelligence-based tokens: Fresh evidence of connectedness with artificial intelligence-based equities",
+       "author": "F Jare�o",
+       "year": "2023",
+       "journal-title": "International Review of Financial Analysis"
+      },
+      {
+       "issue": "4",
+       "key": "ref14",
+       "doi-asserted-by": "crossref",
+       "first-page": "577",
+       "DOI": "10.1016/j.bushor.2018.03.007",
+       "article-title": "Artificial intelligence and the future of work: Human-AI symbiosis in organisational decision making",
+       "volume": "61",
+       "author": "M H Jarrahi",
+       "year": "2018",
+       "journal-title": "Business Horizons"
+      },
+      {
+       "issue": "5",
+       "key": "ref15",
+       "article-title": "Multifaceted role of social media in healthcare: Opportunities, challenges, and the need for quality control",
+       "volume": "15",
+       "author": "M Jeyaraman",
+       "year": "2023",
+       "journal-title": "Cureus"
+      },
+      {
+       "issue": "3",
+       "key": "ref16",
+       "first-page": "424",
+       "article-title": "Network externalities, competition, and compatibility",
+       "volume": "75",
+       "author": "M L Katz",
+       "year": "1985",
+       "journal-title": "The American Economic Review"
+      },
+      {
+       "key": "ref17",
+       "author": "G Lawton",
+       "year": "2023",
+       "journal-title": "Transformer model"
+      },
+      {
+       "key": "ref18",
+       "author": "Techtarget"
+      },
+      {
+       "issue": "4",
+       "key": "ref19",
+       "doi-asserted-by": "crossref",
+       "first-page": "456",
+       "DOI": "10.1287/isre.1070.0154",
+       "article-title": "Self-selection and information role of online product reviews",
+       "volume": "19",
+       "author": "X Li",
+       "year": "2008",
+       "journal-title": "Information Systems Research"
+      },
+      {
+       "key": "ref20",
+       "author": "M A Liedke",
+       "year": "2024",
+       "journal-title": "35+ OpenAI & ChatGPT statistics and trends 2024. Website Rating"
+      },
+      {
+       "issue": "16",
+       "key": "ref21",
+       "doi-asserted-by": "crossref",
+       "first-page": "25403",
+       "DOI": "10.1007/s11042-023-14366-5",
+       "article-title": "Proxies to the monthly active user number of geo AR mobile games -Online search volume as a proposal",
+       "volume": "82",
+       "author": "H X Liu",
+       "year": "2023",
+       "journal-title": "Multimedia Tools and Applications"
+      },
+      {
+       "key": "ref22",
+       "author": "Y Liu",
+       "year": "2019",
+       "journal-title": "Cryptocurrency valuation: An explainable AI approach"
+      },
+      {
+       "key": "ref23",
+       "doi-asserted-by": "crossref",
+       "first-page": "785",
+       "DOI": "10.1007/978-3-031-37717-4_51",
+       "article-title": "Cryptocurrency valuation: An explainable AI approach",
+       "volume": "711",
+       "author": "Y Liu",
+       "year": "2023",
+       "journal-title": "Intelligent computing: Proceedings of the 2023 Computing Conference"
+      },
+      {
+       "key": "ref24",
+       "author": "V Mahajan",
+       "year": "2024",
+       "journal-title": "80+ important Claude statistics to know in 2024. Notta"
+      },
+      {
+       "issue": "12",
+       "key": "ref25",
+       "doi-asserted-by": "crossref",
+       "DOI": "10.3390/fi15120382",
+       "article-title": "Review of blockchain tokens creation and valuation",
+       "volume": "15",
+       "author": "O Marin",
+       "year": "2023",
+       "journal-title": "Future Internet"
+      },
+      {
+       "key": "ref26",
+       "first-page": "1735",
+       "article-title": "Artificial intelligence and economic development: An evolutionary investigation and systematic review",
+       "volume": "15",
+       "author": "Y Qin",
+       "year": "2023",
+       "journal-title": "Journal of the Knowledge Economy"
+      },
+      {
+       "key": "ref27",
+       "article-title": "17 Google Gemini statistics (2024 users & traffic)",
+       "author": "R Shewale",
+       "year": "2024",
+       "journal-title": "DemandSage"
+      },
+      {
+       "key": "ref28",
+       "first-page": "5998",
+       "article-title": "Attention is all you need",
+       "author": "A Vaswani",
+       "year": "2017",
+       "journal-title": "Advances in neural information processing systems 30"
+      },
+      {
+       "issue": "6",
+       "key": "ref29",
+       "doi-asserted-by": "crossref",
+       "first-page": "1006",
+       "DOI": "10.1177/10963480231180940",
+       "article-title": "Keep it #Unreal: Exploring Instagram users' engagement with virtual influencers in tourism contexts",
+       "volume": "48",
+       "author": "L Xie-Carson",
+       "year": "2023",
+       "journal-title": "Journal of Hospitality & Tourism Research"
+      },
+      {
+       "issue": "4",
+       "key": "ref30",
+       "doi-asserted-by": "crossref",
+       "first-page": "917",
+       "DOI": "10.1108/IJOEM-04-2022-995",
+       "article-title": "Guest editorial: Impact of artificial intelligence on business strategy in emerging A conceptual framework and future research directions",
+       "volume": "17",
+       "author": "X Zhou",
+       "year": "2022",
+       "journal-title": "International Journal of Emerging Markets"
+      },
+      {
+       "key": "ref31",
+       "doi-asserted-by": "crossref",
+       "first-page": "27",
+       "DOI": "10.1016/B978-0-323-90118-5.00002-3",
+       "article-title": "The basics of natural language processing",
+       "author": "C Zhu",
+       "year": "2021",
+       "journal-title": "Machine reading comprehension"
+      }
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        14
+       ]
+      ],
+      "date-time": "2026-08-14T15:04:09Z",
+      "timestamp": 1786719849000
+     },
+     "score": 31.469633,
+     "resource": {
+      "primary": {
+       "URL": "https://www.ssrn.com/abstract=4993784"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2024
+       ]
+      ]
+     },
+     "references-count": 31,
+     "URL": "https://doi.org/10.2139/ssrn.4993784",
+     "published": {
+      "date-parts": [
+       [
+        2024
+       ]
+      ]
+     },
+     "subtype": "preprint"
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        1,
+        21
+       ]
+      ],
+      "date-time": "2026-01-21T07:23:30Z",
+      "timestamp": 1768980210384,
+      "version": "3.49.0"
+     },
+     "posted": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "group-title": "SSRN",
+     "reference-count": 0,
+     "publisher": "Elsevier BV",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "DOI": "10.2139/ssrn.5967774",
+     "type": "posted-content",
+     "created": {
+      "date-parts": [
+       [
+        2026,
+        1,
+        20
+       ]
+      ],
+      "date-time": "2026-01-20T18:45:25Z",
+      "timestamp": 1768934725000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "Attention is All You Need... Unless You Are a CISO: The Inherent Incompatibility Between Transformer Architectures and Zero-Trust Environments"
+     ],
+     "prefix": "10.2139",
+     "author": [
+      {
+       "given": "Giuseppe",
+       "family": "Canale",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "78",
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        1,
+        20
+       ]
+      ],
+      "date-time": "2026-01-20T18:45:26Z",
+      "timestamp": 1768934726000
+     },
+     "score": 31.183455,
+     "resource": {
+      "primary": {
+       "URL": "https://www.ssrn.com/abstract=5967774"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.2139/ssrn.5967774",
+     "published": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "subtype": "preprint"
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        2
+       ]
+      ],
+      "date-time": "2026-09-02T04:46:36Z",
+      "timestamp": 1788324396309,
+      "version": "build-2803163510"
+     },
+     "edition-number": "1",
+     "reference-count": 0,
+     "publisher": "Bloomsbury Methuen Drama",
+     "isbn-type": [
+      {
+       "value": "9781350101272",
+       "type": "electronic"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     },
+     "DOI": "10.5040/9781350101272.00000005",
+     "type": "other",
+     "created": {
+      "date-parts": [
+       [
+        2020,
+        6,
+        15
+       ]
+      ],
+      "date-time": "2020-06-15T09:03:41Z",
+      "timestamp": 1592211821000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 14,
+     "title": [
+      "All You Need Is LSD"
+     ],
+     "prefix": "10.5040",
+     "author": [
+      {
+       "given": "Leo",
+       "family": "Butler",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "2984",
+     "container-title": [
+      "All You Need Is LSD"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2025,
+        1,
+        24
+       ]
+      ],
+      "date-time": "2025-01-24T05:15:51Z",
+      "timestamp": 1737695751000
+     },
+     "score": 31.10373,
+     "resource": {
+      "primary": {
+       "URL": "https://www.dramaonlinelibrary.com/playtext-overview?docid=do-9781350101272&tocid=do-9781350101272-div-00000005"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     },
+     "ISBN": [
+      "9781350101272"
+     ],
+     "references-count": 0,
+     "URL": "https://doi.org/10.5040/9781350101272.00000005",
+     "published": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        2
+       ]
+      ],
+      "date-time": "2026-08-02T19:47:46Z",
+      "timestamp": 1785700066176,
+      "version": "3.56.0"
+     },
+     "posted": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "group-title": "SSRN",
+     "reference-count": 0,
+     "publisher": "Elsevier BV",
+     "license": [
+      {
+       "start": {
+        "date-parts": [
+         [
+          2026,
+          1,
+          1
+         ]
+        ],
+        "date-time": "2026-01-01T00:00:00Z",
+        "timestamp": 1767225600000
+       },
+       "content-version": "unspecified",
+       "delay-in-days": 0,
+       "URL": "https://www.uspto.gov/ip-policy/copyright-policy/copyright-basics"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "abstract": "<jats:p>Generative artificial intelligence (AI) tools are now routinely used by university students, and diagnostic instruments increasingly attempt to identify at-risk use. We study a cohort with a documented AI-use history-curricular exposure to AI-resistant pedagogy and roughly five years of continuous AI access since 2021-and empirically test six theoreticallygrounded hypotheses, one per subscale of a 17-item, six-subscale diagnostic survey (Pedagogical Attitudes/PA, Behavioural Over-Reliance/OR, AI Literacy/LIT, Educational Engagement/DIS, Academic Integrity Awareness/INT, AI Competency/COM) administered to N = 413 students. Grounded respectively in instructional-design, cognitive-offloading, self-regulated-learning, self-efficacy, institutional-socialisation, and deliberate-practice theory, the hypotheses predict a well-rounded low-risk profile on five subscales alongside a high-risk profile on OR. Four of six were fully supported: PA skewed strongly Aligned (H1), OR skewed strongly toward over-reliance (H2, 29.2% High-risk, the largest tail of any subscale), DIS skewed toward engagement (H4), and COM skewed strongly toward high competency (H6, 77.1% Low-risk). Two were partially supported: LIT (H3) and INT (H5) each showed a small High-risk tail but a Moderate, not Low-risk, modal band. Critically, LIT and COM showed no protective association with OR (r =-0.04 and r = 0.06 respectively; χ 2 = 0.01, p = 0.922 among respondents Low-risk on both), and a 11.0% subgroup that is simultaneously literate, competent, and over-reliant is also significantly more disengaged (p &amp;lt; .001) despite holding more AI-resistant attitudes (p &amp;lt; .001) than the rest of the sample-a knowledge-behaviour gap, not efficient use. A composite risk-profile taxonomy operationalises this pattern across ten mutually exclusive profiles, cross-validated by both an existing item and the new COM subscale. We discuss three implications: over-reliance requires targeted behavioural intervention (AI-resistance and AI-resilience education) rather than further literacy training; generic AI-skill instruction likely has diminishing returns for the majority of this cohort; and the joint hypothesis pattern is most consistent with AI use oriented toward completing assignments rather than toward genuine learning.</jats:p>",
+     "DOI": "10.2139/ssrn.7137418",
+     "type": "posted-content",
+     "created": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        2
+       ]
+      ],
+      "date-time": "2026-08-02T19:03:35Z",
+      "timestamp": 1785697415000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "Year 2026: Attention to AI Over-Reliance is All You Need in AI Education!"
+     ],
+     "prefix": "10.2139",
+     "author": [
+      {
+       "ORCID": "https://orcid.org/0000-0003-2123-9347",
+       "authenticated-orcid": true,
+       "given": "Tee Hui",
+       "family": "Teo",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "78",
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        2
+       ]
+      ],
+      "date-time": "2026-08-02T19:03:35Z",
+      "timestamp": 1785697415000
+     },
+     "score": 31.036734,
+     "resource": {
+      "primary": {
+       "URL": "https://www.ssrn.com/abstract=7137418"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.2139/ssrn.7137418",
+     "published": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "subtype": "preprint"
+    }
+   ],
+   "items-per-page": 5,
+   "query": {
+    "start-index": 0,
+    "search-terms": null
+   }
+  }
+ },
+ "3a752086f8fbb660ca21f3c18c550806061dc025190d6beab704fce2e771d906": {
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+   "facets": {},
+   "total-results": 129377,
+   "items": [
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        2
+       ]
+      ],
+      "date-time": "2026-09-02T04:46:36Z",
+      "timestamp": 1788324396309,
+      "version": "build-2803163510"
+     },
+     "edition-number": "1",
+     "reference-count": 0,
+     "publisher": "Bloomsbury Methuen Drama",
+     "isbn-type": [
+      {
+       "value": "9781350101272",
+       "type": "electronic"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     },
+     "DOI": "10.5040/9781350101272.00000005",
+     "type": "other",
+     "created": {
+      "date-parts": [
+       [
+        2020,
+        6,
+        15
+       ]
+      ],
+      "date-time": "2020-06-15T09:03:41Z",
+      "timestamp": 1592211821000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 14,
+     "title": [
+      "All You Need Is LSD"
+     ],
+     "prefix": "10.5040",
+     "author": [
+      {
+       "given": "Leo",
+       "family": "Butler",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "2984",
+     "container-title": [
+      "All You Need Is LSD"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2025,
+        1,
+        24
+       ]
+      ],
+      "date-time": "2025-01-24T05:15:51Z",
+      "timestamp": 1737695751000
+     },
+     "score": 31.10373,
+     "resource": {
+      "primary": {
+       "URL": "https://www.dramaonlinelibrary.com/playtext-overview?docid=do-9781350101272&tocid=do-9781350101272-div-00000005"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     },
+     "ISBN": [
+      "9781350101272"
+     ],
+     "references-count": 0,
+     "URL": "https://doi.org/10.5040/9781350101272.00000005",
+     "published": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2022,
+        8,
+        3
+       ]
+      ],
+      "date-time": "2022-08-03T04:44:27Z",
+      "timestamp": 1659501867833
+     },
+     "reference-count": 0,
+     "publisher": "Oxford University Press",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2018,
+        2,
+        15
+       ]
+      ]
+     },
+     "abstract": "<p>In this chapter, Maureen Sie argues that our nature as loving beings can explain our nature as moral beings. Because love and morality seem to be similar phenomena in many ways, she distinguishes several kinds of loves and explains how they relate to different moral dimensions of our existence, taking as her starting point C. S. Lewis’s work on the subject and renaming his fourth kind of love “kindness.” She argues that recent findings in affective neuroscience suggest that this fourth kind is a natural kind of love. She discusses the dynamics of Lewis’s account, showing that each of the loves that he distinguishes requires the fourth love (kindness) to keep them from taking a nasty turn. She concludes by explaining why this kind of love actually fits the naturalist picture well if the recent finding that oxytocin is involved in our trusting interactions with strangers is correct.</p>",
+     "DOI": "10.1093/oso/9780190460723.003.0003",
+     "type": "book",
+     "created": {
+      "date-parts": [
+       [
+        2018,
+        2,
+        15
+       ]
+      ],
+      "date-time": "2018-02-15T07:25:21Z",
+      "timestamp": 1518679521000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "All You Need Is Love(s)"
+     ],
+     "prefix": "10.1093",
+     "author": [
+      {
+       "given": "Maureen",
+       "family": "Sie",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "286",
+     "container-title": [
+      "Oxford Scholarship Online"
+     ],
+     "original-title": [
+      "All You Need Is Love(s)"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2022,
+        8,
+        3
+       ]
+      ],
+      "date-time": "2022-08-03T01:10:10Z",
+      "timestamp": 1659489010000
+     },
+     "score": 29.038563,
+     "resource": {
+      "primary": {
+       "URL": "https://academic.oup.com/book/12253/chapter/161743192"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2018,
+        2,
+        15
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.1093/oso/9780190460723.003.0003",
+     "published": {
+      "date-parts": [
+       [
+        2018,
+        2,
+        15
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2023,
+        1,
+        5
+       ]
+      ],
+      "date-time": "2023-01-05T05:50:32Z",
+      "timestamp": 1672897832890
+     },
+     "reference-count": 0,
+     "publisher": "Springer Science and Business Media LLC",
+     "issue": "1",
+     "license": [
+      {
+       "start": {
+        "date-parts": [
+         [
+          2016,
+          1,
+          8
+         ]
+        ],
+        "date-time": "2016-01-08T00:00:00Z",
+        "timestamp": 1452211200000
+       },
+       "content-version": "tdm",
+       "delay-in-days": 0,
+       "URL": "https://www.springernature.com/gp/researchers/text-and-data-mining"
+      },
+      {
+       "start": {
+        "date-parts": [
+         [
+          2016,
+          1,
+          8
+         ]
+        ],
+        "date-time": "2016-01-08T00:00:00Z",
+        "timestamp": 1452211200000
+       },
+       "content-version": "vor",
+       "delay-in-days": 0,
+       "URL": "https://www.springernature.com/gp/researchers/text-and-data-mining"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "short-container-title": [
+      "BDJ Team"
+     ],
+     "DOI": "10.1038/bdjteam.2016.20",
+     "type": "journal-article",
+     "created": {
+      "date-parts": [
+       [
+        2016,
+        1,
+        7
+       ]
+      ],
+      "date-time": "2016-01-07T15:51:54Z",
+      "timestamp": 1452181914000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "All you need for all you do!"
+     ],
+     "prefix": "10.1038",
+     "volume": "3",
+     "member": "297",
+     "published-online": {
+      "date-parts": [
+       [
+        2016,
+        1,
+        8
+       ]
+      ]
+     },
+     "container-title": [
+      "BDJ Team"
+     ],
+     "language": "en",
+     "link": [
+      {
+       "URL": "https://www.nature.com/articles/bdjteam201620.pdf",
+       "content-type": "application/pdf",
+       "content-version": "vor",
+       "intended-application": "text-mining"
+      },
+      {
+       "URL": "https://www.nature.com/articles/bdjteam201620",
+       "content-type": "text/html",
+       "content-version": "vor",
+       "intended-application": "text-mining"
+      },
+      {
+       "URL": "https://www.nature.com/articles/bdjteam201620.pdf",
+       "content-type": "application/pdf",
+       "content-version": "vor",
+       "intended-application": "similarity-checking"
+      }
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2023,
+        1,
+        4
+       ]
+      ],
+      "date-time": "2023-01-04T08:58:26Z",
+      "timestamp": 1672822706000
+     },
+     "score": 28.222517,
+     "resource": {
+      "primary": {
+       "URL": "https://www.nature.com/articles/bdjteam201620"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2016,
+        1,
+        8
+       ]
+      ]
+     },
+     "references-count": 0,
+     "journal-issue": {
+      "issue": "1",
+      "published-online": {
+       "date-parts": [
+        [
+         2016,
+         1
+        ]
+       ]
+      }
+     },
+     "alternative-id": [
+      "BFbdjteam201620"
+     ],
+     "URL": "https://doi.org/10.1038/bdjteam.2016.20",
+     "ISSN": [
+      "2054-7617"
+     ],
+     "issn-type": [
+      {
+       "value": "2054-7617",
+       "type": "electronic"
+      }
+     ],
+     "published": {
+      "date-parts": [
+       [
+        2016,
+        1,
+        8
+       ]
+      ]
+     },
+     "article-number": "16020"
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2025,
+        1,
+        25
+       ]
+      ],
+      "date-time": "2025-01-25T05:12:11Z",
+      "timestamp": 1737781931674,
+      "version": "3.33.0"
+     },
+     "edition-number": "1",
+     "reference-count": 0,
+     "publisher": "Bloomsbury Methuen Drama",
+     "isbn-type": [
+      {
+       "value": "9781350101272",
+       "type": "electronic"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     },
+     "DOI": "10.5040/9781350101272",
+     "type": "book",
+     "created": {
+      "date-parts": [
+       [
+        2025,
+        1,
+        24
+       ]
+      ],
+      "date-time": "2025-01-24T10:15:31Z",
+      "timestamp": 1737713731000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "All You Need Is LSD"
+     ],
+     "prefix": "10.5040",
+     "author": [
+      {
+       "given": "Leo",
+       "family": "Butler",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "2984",
+     "deposited": {
+      "date-parts": [
+       [
+        2025,
+        1,
+        24
+       ]
+      ],
+      "date-time": "2025-01-24T10:15:50Z",
+      "timestamp": 1737713750000
+     },
+     "score": 26.53178,
+     "resource": {
+      "primary": {
+       "URL": "https://www.dramaonlinelibrary.com/playtext?docid=do-9781350101272"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     },
+     "ISBN": [
+      "9781350101272"
+     ],
+     "references-count": 0,
+     "URL": "https://doi.org/10.5040/9781350101272",
+     "published": {
+      "date-parts": [
+       [
+        2018
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        1,
+        13
+       ]
+      ],
+      "date-time": "2026-01-13T20:06:34Z",
+      "timestamp": 1768334794989,
+      "version": "3.49.0"
+     },
+     "description": "Happy Valentine's Day to all of our readers! This year Health Affairs joined fellow health policy wonks on Twitter &ndash; always a passionate and witty bunch &ndash; in proclaiming our love for the trending #healthpolicyvalentines. Check out the Storify of our favorite Health Affairs tweets/mentions.",
+     "reference-count": 0,
+     "publisher": "Health Affairs Publishing, LLC",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2016,
+        2,
+        14
+       ]
+      ]
+     },
+     "DOI": "10.1377/forefront.20160214.053171",
+     "type": "dataset",
+     "created": {
+      "date-parts": [
+       [
+        2022,
+        3,
+        9
+       ]
+      ],
+      "date-time": "2022-03-09T09:58:41Z",
+      "timestamp": 1646819921000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "All You Need Are Some Health Policy Valentines"
+     ],
+     "prefix": "10.1377",
+     "member": "102",
+     "container-title": [
+      "Forefront Group"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2022,
+        3,
+        9
+       ]
+      ],
+      "date-time": "2022-03-09T11:23:58Z",
+      "timestamp": 1646825038000
+     },
+     "score": 26.136118,
+     "resource": {
+      "primary": {
+       "URL": "http://www.healthaffairs.org/do/10.1377/forefront.20160214.053171/full/"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2016,
+        2,
+        14
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.1377/forefront.20160214.053171",
+     "published": {
+      "date-parts": [
+       [
+        2016,
+        2,
+        14
+       ]
+      ]
+     }
+    }
+   ],
+   "items-per-page": 5,
+   "query": {
+    "start-index": 0,
+    "search-terms": null
+   }
+  }
+ },
+ "b875315a07426df6862a462d765585f525a465dad9e1cb46b9ba8cfa1f5daf32": {
+  "xml": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/d+Yg6szemXCb7jDTilaTqumyI+A</id>\n  <title>arXiv Query: search_query=ti:\"Language models are few-shot learners\"&amp;id_list=&amp;start=0&amp;max_results=5</title>\n  <updated>2026-10-02T13:55:06Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=ti:%22Language+models+are+few-shot+learners%22&amp;start=0&amp;max_results=5&amp;id_list=\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>\n  <opensearch:totalResults>9</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>http://arxiv.org/abs/2005.14165v4</id>\n    <title>Language Models are Few-Shot Learners</title>\n    <updated>2020-07-22T19:47:17Z</updated>\n    <link href=\"https://arxiv.org/abs/2005.14165v4\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2005.14165v4\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2020-05-28T17:29:03Z</published>\n    <arxiv:comment>40+32 pages</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Tom B. Brown</name>\n    </author>\n    <author>\n      <name>Benjamin Mann</name>\n    </author>\n    <author>\n      <name>Nick Ryder</name>\n    </author>\n    <author>\n      <name>Melanie Subbiah</name>\n    </author>\n    <author>\n      <name>Jared Kaplan</name>\n    </author>\n    <author>\n      <name>Prafulla Dhariwal</name>\n    </author>\n    <author>\n      <name>Arvind Neelakantan</name>\n    </author>\n    <author>\n      <name>Pranav Shyam</name>\n    </author>\n    <author>\n      <name>Girish Sastry</name>\n    </author>\n    <author>\n      <name>Amanda Askell</name>\n    </author>\n    <author>\n      <name>Sandhini Agarwal</name>\n    </author>\n    <author>\n      <name>Ariel Herbert-Voss</name>\n    </author>\n    <author>\n      <name>Gretchen Krueger</name>\n    </author>\n    <author>\n      <name>Tom Henighan</name>\n    </author>\n    <author>\n      <name>Rewon Child</name>\n    </author>\n    <author>\n      <name>Aditya Ramesh</name>\n    </author>\n    <author>\n      <name>Daniel M. Ziegler</name>\n    </author>\n    <author>\n      <name>Jeffrey Wu</name>\n    </author>\n    <author>\n      <name>Clemens Winter</name>\n    </author>\n    <author>\n      <name>Christopher Hesse</name>\n    </author>\n    <author>\n      <name>Mark Chen</name>\n    </author>\n    <author>\n      <name>Eric Sigler</name>\n    </author>\n    <author>\n      <name>Mateusz Litwin</name>\n    </author>\n    <author>\n      <name>Scott Gray</name>\n    </author>\n    <author>\n      <name>Benjamin Chess</name>\n    </author>\n    <author>\n      <name>Jack Clark</name>\n    </author>\n    <author>\n      <name>Christopher Berner</name>\n    </author>\n    <author>\n      <name>Sam McCandlish</name>\n    </author>\n    <author>\n      <name>Alec Radford</name>\n    </author>\n    <author>\n      <name>Ilya Sutskever</name>\n    </author>\n    <author>\n      <name>Dario Amodei</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2302.12692v4</id>\n    <title>Language Models are Few-shot Learners for Prognostic Prediction</title>\n    <updated>2023-05-04T18:04:49Z</updated>\n    <link href=\"https://arxiv.org/abs/2302.12692v4\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2302.12692v4\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Clinical prediction is an essential task in the healthcare industry. However, the recent success of transformers, on which large language models are built, has not been extended to this domain. In this research, we explore the use of transformers and language models in prognostic prediction for immunotherapy using real-world patients' clinical data and molecular profiles. This paper investigates the potential of transformers to improve clinical prediction compared to conventional machine learning approaches and addresses the challenge of few-shot learning in predicting rare disease areas. The study benchmarks the efficacy of baselines and language models on prognostic prediction across multiple cancer types and investigates the impact of different pretrained language models under few-shot regimes. The results demonstrate significant improvements in accuracy and highlight the potential of NLP in clinical research to improve early detection and intervention for different diseases.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.AI\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"q-bio.QM\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2023-02-24T15:35:36Z</published>\n    <arxiv:comment>7 pages, 5 figures, 5 tables</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Zekai Chen</name>\n    </author>\n    <author>\n      <name>Mariann Micsinai Balan</name>\n    </author>\n    <author>\n      <name>Kevin Brown</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2012.15723v2</id>\n    <title>Making Pre-trained Language Models Better Few-shot Learners</title>\n    <updated>2021-06-02T12:41:36Z</updated>\n    <link href=\"https://arxiv.org/abs/2012.15723v2\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2012.15723v2\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>The recent GPT-3 model (Brown et al., 2020) achieves remarkable few-shot performance solely by leveraging a natural-language prompt and a few task demonstrations as input context. Inspired by their findings, we study few-shot learning in a more practical scenario, where we use smaller language models for which fine-tuning is computationally efficient. We present LM-BFF--better few-shot fine-tuning of language models--a suite of simple and complementary techniques for fine-tuning language models on a small number of annotated examples. Our approach includes (1) prompt-based fine-tuning together with a novel pipeline for automating prompt generation; and (2) a refined strategy for dynamically and selectively incorporating demonstrations into each context. Finally, we present a systematic evaluation for analyzing few-shot performance on a range of NLP tasks, including classification and regression. Our experiments demonstrate that our methods combine to dramatically outperform standard fine-tuning procedures in this low resource setting, achieving up to 30% absolute improvement, and 11% on average across all tasks. Our approach makes minimal assumptions on task resources and domain expertise, and hence constitutes a strong task-agnostic method for few-shot learning.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2020-12-31T17:21:26Z</published>\n    <arxiv:comment>Accepted to ACL 2021. The code is publicly available at https://github.com/princeton-nlp/LM-BFF</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Tianyu Gao</name>\n    </author>\n    <author>\n      <name>Adam Fisch</name>\n    </author>\n    <author>\n      <name>Danqi Chen</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2209.01975v1</id>\n    <title>Selective Annotation Makes Language Models Better Few-Shot Learners</title>\n    <updated>2022-09-05T14:01:15Z</updated>\n    <link href=\"https://arxiv.org/abs/2209.01975v1\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2209.01975v1\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Many recent approaches to natural language tasks are built on the remarkable abilities of large language models. Large language models can perform in-context learning, where they learn a new task from a few task demonstrations, without any parameter updates. This work examines the implications of in-context learning for the creation of datasets for new natural language tasks. Departing from recent in-context learning methods, we formulate an annotation-efficient, two-step framework: selective annotation that chooses a pool of examples to annotate from unlabeled data in advance, followed by prompt retrieval that retrieves task examples from the annotated pool at test time. Based on this framework, we propose an unsupervised, graph-based selective annotation method, voke-k, to select diverse, representative examples to annotate. Extensive experiments on 10 datasets (covering classification, commonsense reasoning, dialogue, and text/code generation) demonstrate that our selective annotation method improves the task performance by a large margin. On average, vote-k achieves a 12.9%/11.4% relative gain under an annotation budget of 18/100, as compared to randomly selecting examples to annotate. Compared to state-of-the-art supervised finetuning approaches, it yields similar performance with 10-100x less annotation cost across 10 tasks. We further analyze the effectiveness of our framework in various scenarios: language models with varying sizes, alternative selective annotation methods, and cases where there is a test data domain shift. We hope that our studies will serve as a basis for data annotations as large language models are increasingly applied to new tasks. Our code is available at https://github.com/HKUNLP/icl-selective-annotation.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2022-09-05T14:01:15Z</published>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Hongjin Su</name>\n    </author>\n    <author>\n      <name>Jungo Kasai</name>\n    </author>\n    <author>\n      <name>Chen Henry Wu</name>\n    </author>\n    <author>\n      <name>Weijia Shi</name>\n    </author>\n    <author>\n      <name>Tianlu Wang</name>\n    </author>\n    <author>\n      <name>Jiayi Xin</name>\n    </author>\n    <author>\n      <name>Rui Zhang</name>\n    </author>\n    <author>\n      <name>Mari Ostendorf</name>\n    </author>\n    <author>\n      <name>Luke Zettlemoyer</name>\n    </author>\n    <author>\n      <name>Noah A. Smith</name>\n    </author>\n    <author>\n      <name>Tao Yu</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2512.23808v1</id>\n    <title>MiMo-Audio: Audio Language Models are Few-Shot Learners</title>\n    <updated>2025-12-29T19:06:05Z</updated>\n    <link href=\"https://arxiv.org/abs/2512.23808v1\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2512.23808v1\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Existing audio language models typically rely on task-specific fine-tuning to accomplish particular audio tasks. In contrast, humans are able to generalize to new audio tasks with only a few examples or simple instructions. GPT-3 has shown that scaling next-token prediction pretraining enables strong generalization capabilities in text, and we believe this paradigm is equally applicable to the audio domain. By scaling MiMo-Audio's pretraining data to over one hundred million of hours, we observe the emergence of few-shot learning capabilities across a diverse set of audio tasks. We develop a systematic evaluation of these capabilities and find that MiMo-Audio-7B-Base achieves SOTA performance on both speech intelligence and audio understanding benchmarks among open-source models. Beyond standard metrics, MiMo-Audio-7B-Base generalizes to tasks absent from its training data, such as voice conversion, style transfer, and speech editing. MiMo-Audio-7B-Base also demonstrates powerful speech continuation capabilities, capable of generating highly realistic talk shows, recitations, livestreaming and debates. At the post-training stage, we curate a diverse instruction-tuning corpus and introduce thinking mechanisms into both audio understanding and generation. MiMo-Audio-7B-Instruct achieves open-source SOTA on audio understanding benchmarks (MMSU, MMAU, MMAR, MMAU-Pro), spoken dialogue benchmarks (Big Bench Audio, MultiChallenge Audio) and instruct-TTS evaluations, approaching or surpassing closed-source models. Model checkpoints and full evaluation suite are available at https://github.com/XiaomiMiMo/MiMo-Audio.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.SD\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"eess.AS\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2025-12-29T19:06:05Z</published>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Xiaomi LLM-Core Team</name>\n    </author>\n    <author>\n      <name> :</name>\n    </author>\n    <author>\n      <name>Dong Zhang</name>\n    </author>\n    <author>\n      <name>Gang Wang</name>\n    </author>\n    <author>\n      <name>Jinlong Xue</name>\n    </author>\n    <author>\n      <name>Kai Fang</name>\n    </author>\n    <author>\n      <name>Liang Zhao</name>\n    </author>\n    <author>\n      <name>Rui Ma</name>\n    </author>\n    <author>\n      <name>Shuhuai Ren</name>\n    </author>\n    <author>\n      <name>Shuo Liu</name>\n    </author>\n    <author>\n      <name>Tao Guo</name>\n    </author>\n    <author>\n      <name>Weiji Zhuang</name>\n    </author>\n    <author>\n      <name>Xin Zhang</name>\n    </author>\n    <author>\n      <name>Xingchen Song</name>\n    </author>\n    <author>\n      <name>Yihan Yan</name>\n    </author>\n    <author>\n      <name>Yongzhe He</name>\n    </author>\n    <author>\n      <name> Cici</name>\n    </author>\n    <author>\n      <name>Bowen Shen</name>\n    </author>\n    <author>\n      <name>Chengxuan Zhu</name>\n    </author>\n    <author>\n      <name>Chong Ma</name>\n    </author>\n    <author>\n      <name>Chun Chen</name>\n    </author>\n    <author>\n      <name>Heyu Chen</name>\n    </author>\n    <author>\n      <name>Jiawei Li</name>\n    </author>\n    <author>\n      <name>Lei Li</name>\n    </author>\n    <author>\n      <name>Menghang Zhu</name>\n    </author>\n    <author>\n      <name>Peidian Li</name>\n    </author>\n    <author>\n      <name>Qiying Wang</name>\n    </author>\n    <author>\n      <name>Sirui Deng</name>\n    </author>\n    <author>\n      <name>Weimin Xiong</name>\n    </author>\n    <author>\n      <name>Wenshan Huang</name>\n    </author>\n    <author>\n      <name>Wenyu Yang</name>\n    </author>\n    <author>\n      <name>Yilin Jiang</name>\n    </author>\n    <author>\n      <name>Yixin Yang</name>\n    </author>\n    <author>\n      <name>Yuanyuan Tian</name>\n    </author>\n    <author>\n      <name>Yue Ma</name>\n    </author>\n    <author>\n      <name>Yue Yu</name>\n    </author>\n    <author>\n      <name>Zihan Zhang</name>\n    </author>\n    <author>\n      <name>Zihao Yue</name>\n    </author>\n    <author>\n      <name>Bangjun Xiao</name>\n    </author>\n    <author>\n      <name>Bingquan Xia</name>\n    </author>\n    <author>\n      <name>Bofei Gao</name>\n    </author>\n    <author>\n      <name>Bowen Ye</name>\n    </author>\n    <author>\n      <name>Can Cai</name>\n    </author>\n    <author>\n      <name>Chang Liu</name>\n    </author>\n    <author>\n      <name>Chenhong He</name>\n    </author>\n    <author>\n      <name>Chunan Li</name>\n    </author>\n    <author>\n      <name>Dawei Zhu</name>\n    </author>\n    <author>\n      <name>Duo Zhang</name>\n    </author>\n    <author>\n      <name>Fengyuan Shi</name>\n    </author>\n    <author>\n      <name>Guoan Wang</name>\n    </author>\n    <author>\n      <name>Hailin Zhang</name>\n    </author>\n    <author>\n      <name>Hanglong Lv</name>\n    </author>\n    <author>\n      <name>Hanyu Li</name>\n    </author>\n    <author>\n      <name>Hao Tian</name>\n    </author>\n    <author>\n      <name>Heng Qu</name>\n    </author>\n    <author>\n      <name>Hongshen Xu</name>\n    </author>\n    <author>\n      <name>Houbin Zhang</name>\n    </author>\n    <author>\n      <name>Huaqiu Liu</name>\n    </author>\n    <author>\n      <name>Jiangshan Duo</name>\n    </author>\n    <author>\n      <name>Jianguang Zuo</name>\n    </author>\n    <author>\n      <name>Jianyu Wei</name>\n    </author>\n    <author>\n      <name>Jiebao Xiao</name>\n    </author>\n    <author>\n      <name>Jinhao Dong</name>\n    </author>\n    <author>\n      <name>Jun Shi</name>\n    </author>\n    <author>\n      <name>Junhao Hu</name>\n    </author>\n    <author>\n      <name>Kainan Bao</name>\n    </author>\n    <author>\n      <name>Kang Zhou</name>\n    </author>\n    <author>\n      <name>Linghao Zhang</name>\n    </author>\n    <author>\n      <name>Meng Chen</name>\n    </author>\n    <author>\n      <name>Nuo Chen</name>\n    </author>\n    <author>\n      <name>Peng Zhang</name>\n    </author>\n    <author>\n      <name>Qianli Chen</name>\n    </author>\n    <author>\n      <name>Qiantong Wang</name>\n    </author>\n    <author>\n      <name>Rang Li</name>\n    </author>\n    <author>\n      <name>Shaohui Liu</name>\n    </author>\n    <author>\n      <name>Shengfan Wang</name>\n    </author>\n    <author>\n      <name>Shicheng Li</name>\n    </author>\n    <author>\n      <name>Shihua Yu</name>\n    </author>\n    <author>\n      <name>Shijie Cao</name>\n    </author>\n    <author>\n      <name>Shimao Chen</name>\n    </author>\n    <author>\n      <name>Shuhao Gu</name>\n    </author>\n    <author>\n      <name>Weikun Wang</name>\n    </author>\n    <author>\n      <name>Wenhan Ma</name>\n    </author>\n    <author>\n      <name>Xiangwei Deng</name>\n    </author>\n    <author>\n      <name>Xing Yong</name>\n    </author>\n    <author>\n      <name>Xing Zhang</name>\n    </author>\n    <author>\n      <name>Xu Wang</name>\n    </author>\n    <author>\n      <name>Yifan Song</name>\n    </author>\n    <author>\n      <name>Yihao Zhao</name>\n    </author>\n    <author>\n      <name>Yingbo Zhao</name>\n    </author>\n    <author>\n      <name>Yizhao Gao</name>\n    </author>\n    <author>\n      <name>Yu Cheng</name>\n    </author>\n    <author>\n      <name>Yu Tu</name>\n    </author>\n    <author>\n      <name>Yudong Wang</name>\n    </author>\n    <author>\n      <name>Zhaojun Huang</name>\n    </author>\n    <author>\n      <name>Zhengju Tang</name>\n    </author>\n    <author>\n      <name>Zhenru Lin</name>\n    </author>\n    <author>\n      <name>Zhichao Song</name>\n    </author>\n    <author>\n      <name>Zhipeng Xu</name>\n    </author>\n    <author>\n      <name>Zhixian Zheng</name>\n    </author>\n    <author>\n      <name>Zihan Jiang</name>\n    </author>\n  </entry>\n</feed>\n"
+ },
+ "67592aad959a62ff72c44e78e1578f6b342b1509e836f2d699e607c49e7fbee5": {
+  "xml": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/xWfq4TqgEHiyhiQtSFL+OaFJC7Y</id>\n  <title>arXiv Query: search_query=ti:\"Language models are few-shot learners\" AND au:\"Brown\"&amp;id_list=&amp;start=0&amp;max_results=5</title>\n  <updated>2026-10-02T13:55:09Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=ti:%22Language+models+are+few-shot+learners%22+AND+au:%22Brown%22&amp;start=0&amp;max_results=5&amp;id_list=\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>\n  <opensearch:totalResults>2</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>http://arxiv.org/abs/2005.14165v4</id>\n    <title>Language Models are Few-Shot Learners</title>\n    <updated>2020-07-22T19:47:17Z</updated>\n    <link href=\"https://arxiv.org/abs/2005.14165v4\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2005.14165v4\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. By contrast, humans can generally perform a new language task from only a few examples or from simple instructions - something which current NLP systems still largely struggle to do. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches. Specifically, we train GPT-3, an autoregressive language model with 175 billion parameters, 10x more than any previous non-sparse language model, and test its performance in the few-shot setting. For all tasks, GPT-3 is applied without any gradient updates or fine-tuning, with tasks and few-shot demonstrations specified purely via text interaction with the model. GPT-3 achieves strong performance on many NLP datasets, including translation, question-answering, and cloze tasks, as well as several tasks that require on-the-fly reasoning or domain adaptation, such as unscrambling words, using a novel word in a sentence, or performing 3-digit arithmetic. At the same time, we also identify some datasets where GPT-3's few-shot learning still struggles, as well as some datasets where GPT-3 faces methodological issues related to training on large web corpora. Finally, we find that GPT-3 can generate samples of news articles which human evaluators have difficulty distinguishing from articles written by humans. We discuss broader societal impacts of this finding and of GPT-3 in general.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2020-05-28T17:29:03Z</published>\n    <arxiv:comment>40+32 pages</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Tom B. Brown</name>\n    </author>\n    <author>\n      <name>Benjamin Mann</name>\n    </author>\n    <author>\n      <name>Nick Ryder</name>\n    </author>\n    <author>\n      <name>Melanie Subbiah</name>\n    </author>\n    <author>\n      <name>Jared Kaplan</name>\n    </author>\n    <author>\n      <name>Prafulla Dhariwal</name>\n    </author>\n    <author>\n      <name>Arvind Neelakantan</name>\n    </author>\n    <author>\n      <name>Pranav Shyam</name>\n    </author>\n    <author>\n      <name>Girish Sastry</name>\n    </author>\n    <author>\n      <name>Amanda Askell</name>\n    </author>\n    <author>\n      <name>Sandhini Agarwal</name>\n    </author>\n    <author>\n      <name>Ariel Herbert-Voss</name>\n    </author>\n    <author>\n      <name>Gretchen Krueger</name>\n    </author>\n    <author>\n      <name>Tom Henighan</name>\n    </author>\n    <author>\n      <name>Rewon Child</name>\n    </author>\n    <author>\n      <name>Aditya Ramesh</name>\n    </author>\n    <author>\n      <name>Daniel M. Ziegler</name>\n    </author>\n    <author>\n      <name>Jeffrey Wu</name>\n    </author>\n    <author>\n      <name>Clemens Winter</name>\n    </author>\n    <author>\n      <name>Christopher Hesse</name>\n    </author>\n    <author>\n      <name>Mark Chen</name>\n    </author>\n    <author>\n      <name>Eric Sigler</name>\n    </author>\n    <author>\n      <name>Mateusz Litwin</name>\n    </author>\n    <author>\n      <name>Scott Gray</name>\n    </author>\n    <author>\n      <name>Benjamin Chess</name>\n    </author>\n    <author>\n      <name>Jack Clark</name>\n    </author>\n    <author>\n      <name>Christopher Berner</name>\n    </author>\n    <author>\n      <name>Sam McCandlish</name>\n    </author>\n    <author>\n      <name>Alec Radford</name>\n    </author>\n    <author>\n      <name>Ilya Sutskever</name>\n    </author>\n    <author>\n      <name>Dario Amodei</name>\n    </author>\n  </entry>\n  <entry>\n    <id>http://arxiv.org/abs/2302.12692v4</id>\n    <title>Language Models are Few-shot Learners for Prognostic Prediction</title>\n    <updated>2023-05-04T18:04:49Z</updated>\n    <link href=\"https://arxiv.org/abs/2302.12692v4\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/2302.12692v4\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>Clinical prediction is an essential task in the healthcare industry. However, the recent success of transformers, on which large language models are built, has not been extended to this domain. In this research, we explore the use of transformers and language models in prognostic prediction for immunotherapy using real-world patients' clinical data and molecular profiles. This paper investigates the potential of transformers to improve clinical prediction compared to conventional machine learning approaches and addresses the challenge of few-shot learning in predicting rare disease areas. The study benchmarks the efficacy of baselines and language models on prognostic prediction across multiple cancer types and investigates the impact of different pretrained language models under few-shot regimes. The results demonstrate significant improvements in accuracy and highlight the potential of NLP in clinical research to improve early detection and intervention for different diseases.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.AI\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"cs.LG\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <category term=\"q-bio.QM\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2023-02-24T15:35:36Z</published>\n    <arxiv:comment>7 pages, 5 figures, 5 tables</arxiv:comment>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Zekai Chen</name>\n    </author>\n    <author>\n      <name>Mariann Micsinai Balan</name>\n    </author>\n    <author>\n      <name>Kevin Brown</name>\n    </author>\n  </entry>\n</feed>\n"
+ },
+ "99ddd30aed1362fc6793830e1780458cdde5e2a4a04c0ec82e3067118101f7f8": {
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+   "facets": {},
+   "total-results": 2593160,
+   "items": [
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        20
+       ]
+      ],
+      "date-time": "2026-08-20T14:40:25Z",
+      "timestamp": 1787236825416,
+      "version": "build-2736575974"
+     },
+     "edition-number": "1",
+     "reference-count": 0,
+     "publisher": "Swami Vivekananda University",
+     "isbn-type": [
+      {
+       "value": "9788199778009",
+       "type": "print"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "DOI": "10.65525/svup.9788199778009.2026.224-230",
+     "type": "book-chapter",
+     "created": {
+      "date-parts": [
+       [
+        2026,
+        6,
+        18
+       ]
+      ],
+      "date-time": "2026-06-18T11:59:47Z",
+      "timestamp": 1781783987000
+     },
+     "page": "224-230",
+     "source": "Crossref",
+     "is-referenced-by-count": 2,
+     "title": [
+      "Language Models are Few-Shot Learners"
+     ],
+     "prefix": "10.65525",
+     "author": [
+      {
+       "given": "Sourav",
+       "family": "Malakar",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "55035",
+     "published-online": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "container-title": [
+      "Neural Horizons The Uncharted Future of Deep Learning"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        6,
+        18
+       ]
+      ],
+      "date-time": "2026-06-18T11:59:52Z",
+      "timestamp": 1781783992000
+     },
+     "score": 40.002014,
+     "resource": {
+      "primary": {
+       "URL": "https://swamivivekanandauniversitypress.com/index.php/svup/article/view/574"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     },
+     "ISBN": [
+      "9788199778009"
+     ],
+     "references-count": 0,
+     "URL": "https://doi.org/10.65525/svup.9788199778009.2026.224-230",
+     "published": {
+      "date-parts": [
+       [
+        2026
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        28
+       ]
+      ],
+      "date-time": "2026-08-28T13:53:56Z",
+      "timestamp": 1787925236256,
+      "version": "build-2784847793"
+     },
+     "publisher-location": "ISCA",
+     "reference-count": 0,
+     "publisher": "ISCA",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "DOI": "10.21437/interspeech.2023-1082",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2023,
+        8,
+        14
+       ]
+      ],
+      "date-time": "2023-08-14T08:22:20Z",
+      "timestamp": 1692001340000
+     },
+     "page": "276-280",
+     "source": "Crossref",
+     "is-referenced-by-count": 17,
+     "title": [
+      "Adapting Language-Audio Models as Few-Shot Audio Learners"
+     ],
+     "prefix": "10.21437",
+     "author": [
+      {
+       "given": "Jinhua",
+       "family": "Liang",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Xubo",
+       "family": "Liu",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Haohe",
+       "family": "Liu",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Huy",
+       "family": "Phan",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Emmanouil",
+       "family": "Benetos",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Mark D.",
+       "family": "Plumbley",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Wenwu",
+       "family": "Wang",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "8866",
+     "published-online": {
+      "date-parts": [
+       [
+        2023,
+        8,
+        20
+       ]
+      ]
+     },
+     "event": {
+      "name": "INTERSPEECH 2023",
+      "acronym": "interspeech_2023"
+     },
+     "container-title": [
+      "INTERSPEECH 2023"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2024,
+        1,
+        16
+       ]
+      ],
+      "date-time": "2024-01-16T10:15:49Z",
+      "timestamp": 1705400149000
+     },
+     "score": 35.36605,
+     "resource": {
+      "primary": {
+       "URL": "https://www.isca-archive.org/interspeech_2023/liang23c_interspeech.html"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2023,
+        8,
+        20
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.21437/interspeech.2023-1082",
+     "published": {
+      "date-parts": [
+       [
+        2023,
+        8,
+        20
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        10,
+        2
+       ]
+      ],
+      "date-time": "2026-10-02T10:20:30Z",
+      "timestamp": 1790936430970,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2022
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/2022.emnlp-main.90",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2023,
+        8,
+        4
+       ]
+      ],
+      "date-time": "2023-08-04T16:21:02Z",
+      "timestamp": 1691166062000
+     },
+     "page": "1384-1403",
+     "source": "Crossref",
+     "is-referenced-by-count": 85,
+     "title": [
+      "Language Models of Code are Few-Shot Commonsense Learners"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Aman",
+       "family": "Madaan",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Shuyan",
+       "family": "Zhou",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Uri",
+       "family": "Alon",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Yiming",
+       "family": "Yang",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Graham",
+       "family": "Neubig",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing",
+      "location": "Abu Dhabi, United Arab Emirates",
+      "start": {
+       "date-parts": [
+        [
+         2022,
+         12
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2022,
+         12
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        1,
+        31
+       ]
+      ],
+      "date-time": "2026-01-31T18:34:52Z",
+      "timestamp": 1769884492000
+     },
+     "score": 35.084053,
+     "resource": {
+      "primary": {
+       "URL": "https://aclanthology.org/2022.emnlp-main.90"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2022
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/2022.emnlp-main.90",
+     "published": {
+      "date-parts": [
+       [
+        2022
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        28
+       ]
+      ],
+      "date-time": "2026-09-28T16:05:08Z",
+      "timestamp": 1790611508707,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/2021.mrl-1.1",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        12,
+        28
+       ]
+      ],
+      "date-time": "2021-12-28T17:24:05Z",
+      "timestamp": 1640712245000
+     },
+     "page": "1-15",
+     "source": "Crossref",
+     "is-referenced-by-count": 62,
+     "title": [
+      "Language Models are Few-shot Multilingual Learners"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Genta Indra",
+       "family": "Winata",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Andrea",
+       "family": "Madotto",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Zhaojiang",
+       "family": "Lin",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Rosanne",
+       "family": "Liu",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Jason",
+       "family": "Yosinski",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Pascale",
+       "family": "Fung",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 1st Workshop on Multilingual Representation Learning",
+      "location": "Punta Cana, Dominican Republic",
+      "start": {
+       "date-parts": [
+        [
+         2021,
+         11
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2021,
+         11
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 1st Workshop on Multilingual Representation Learning"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2021,
+        12,
+        28
+       ]
+      ],
+      "date-time": "2021-12-28T17:30:49Z",
+      "timestamp": 1640712649000
+     },
+     "score": 33.99399,
+     "resource": {
+      "primary": {
+       "URL": "https://aclanthology.org/2021.mrl-1.1"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/2021.mrl-1.1",
+     "published": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        2,
+        26
+       ]
+      ],
+      "date-time": "2026-02-26T17:37:10Z",
+      "timestamp": 1772127430046,
+      "version": "3.50.1"
+     },
+     "description": "Supplemental Information for 10.1021/acs.jcim.5c02299",
+     "reference-count": 0,
+     "publisher": "American Chemical Society (ACS)",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "DOI": "10.1021/acs.jcim.5c02299.s001",
+     "type": "component",
+     "created": {
+      "date-parts": [
+       [
+        2025,
+        12,
+        26
+       ]
+      ],
+      "date-time": "2025-12-26T03:20:22Z",
+      "timestamp": 1766719222000
+     },
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "MaterialBrain: High-Performance Material Synthesis Extraction via HumanAI-Curated Few-Shot Large Language Models"
+     ],
+     "prefix": "10.1021",
+     "member": "316",
+     "deposited": {
+      "date-parts": [
+       [
+        2026,
+        1,
+        12
+       ]
+      ],
+      "date-time": "2026-01-12T09:11:56Z",
+      "timestamp": 1768209116000
+     },
+     "score": 33.966972,
+     "resource": {
+      "primary": {
+       "URL": "https://pubs.acs.org/doi/suppl/10.1021/acs.jcim.5c02299/suppl_file/ci5c02299_si_001.pdf"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        null
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.1021/acs.jcim.5c02299.s001",
+     "relation": {
+      "is-component-of": [
+       {
+        "id-type": "doi",
+        "id": "10.1021/acs.jcim.5c02299",
+        "asserted-by": "object"
+       }
+      ]
+     }
+    }
+   ],
+   "items-per-page": 5,
+   "query": {
+    "start-index": 0,
+    "search-terms": null
+   }
+  }
+ },
+ "d3472874545fd50aec6ea818606b30452abc662128c76d0797ed20b9d476f8c6": {
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+   "facets": {},
+   "total-results": 336530,
+   "items": [
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        28
+       ]
+      ],
+      "date-time": "2026-09-28T16:05:08Z",
+      "timestamp": 1790611508707,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/2021.mrl-1.1",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        12,
+        28
+       ]
+      ],
+      "date-time": "2021-12-28T17:24:05Z",
+      "timestamp": 1640712245000
+     },
+     "page": "1-15",
+     "source": "Crossref",
+     "is-referenced-by-count": 62,
+     "title": [
+      "Language Models are Few-shot Multilingual Learners"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Genta Indra",
+       "family": "Winata",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Andrea",
+       "family": "Madotto",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Zhaojiang",
+       "family": "Lin",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Rosanne",
+       "family": "Liu",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Jason",
+       "family": "Yosinski",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Pascale",
+       "family": "Fung",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 1st Workshop on Multilingual Representation Learning",
+      "location": "Punta Cana, Dominican Republic",
+      "start": {
+       "date-parts": [
+        [
+         2021,
+         11
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2021,
+         11
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 1st Workshop on Multilingual Representation Learning"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2021,
+        12,
+        28
+       ]
+      ],
+      "date-time": "2021-12-28T17:30:49Z",
+      "timestamp": 1640712649000
+     },
+     "score": 33.99399,
+     "resource": {
+      "primary": {
+       "URL": "https://aclanthology.org/2021.mrl-1.1"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/2021.mrl-1.1",
+     "published": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        30
+       ]
+      ],
+      "date-time": "2026-09-30T23:17:01Z",
+      "timestamp": 1790810221741,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/2021.naacl-main.185",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        6,
+        13
+       ]
+      ],
+      "date-time": "2021-06-13T01:24:51Z",
+      "timestamp": 1623547491000
+     },
+     "page": "2339-2352",
+     "source": "Crossref",
+     "is-referenced-by-count": 302,
+     "title": [
+      "It’s Not Just Size That Matters: Small Language Models Are Also Few-Shot Learners"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Timo",
+       "family": "Schick",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Hinrich",
+       "family": "Schütze",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies",
+      "location": "Online",
+      "start": {
+       "date-parts": [
+        [
+         2021,
+         6
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2021,
+         6
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 2021 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2022,
+        1,
+        4
+       ]
+      ],
+      "date-time": "2022-01-04T16:56:43Z",
+      "timestamp": 1641315403000
+     },
+     "score": 32.788322,
+     "resource": {
+      "primary": {
+       "URL": "https://aclanthology.org/2021.naacl-main.185"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/2021.naacl-main.185",
+     "published": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        10,
+        1
+       ]
+      ],
+      "date-time": "2026-10-01T19:43:31Z",
+      "timestamp": 1790883811343,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/2021.acl-long.295",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        7,
+        26
+       ]
+      ],
+      "date-time": "2021-07-26T21:42:51Z",
+      "timestamp": 1627335771000
+     },
+     "page": "3816-3830",
+     "source": "Crossref",
+     "is-referenced-by-count": 671,
+     "title": [
+      "Making Pre-trained Language Models Better Few-shot Learners"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Tianyu",
+       "family": "Gao",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Adam",
+       "family": "Fisch",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Danqi",
+       "family": "Chen",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)",
+      "location": "Online",
+      "start": {
+       "date-parts": [
+        [
+         2021,
+         8
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2021,
+         8
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2021,
+        7,
+        26
+       ]
+      ],
+      "date-time": "2021-07-26T21:44:55Z",
+      "timestamp": 1627335895000
+     },
+     "score": 31.483377,
+     "resource": {
+      "primary": {
+       "URL": "https://aclanthology.org/2021.acl-long.295"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/2021.acl-long.295",
+     "published": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        6,
+        22
+       ]
+      ],
+      "date-time": "2026-06-22T18:14:52Z",
+      "timestamp": 1782152092045,
+      "version": "3.54.5"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/2021.emnlp-main.734",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        12,
+        17
+       ]
+      ],
+      "date-time": "2021-12-17T03:56:42Z",
+      "timestamp": 1639713402000
+     },
+     "page": "9312-9318",
+     "source": "Crossref",
+     "is-referenced-by-count": 10,
+     "title": [
+      "Language Models are Few-Shot Butlers"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Vincent",
+       "family": "Micheli",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Francois",
+       "family": "Fleuret",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+      "location": "Online and Punta Cana, Dominican Republic",
+      "start": {
+       "date-parts": [
+        [
+         2021,
+         11
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2021,
+         11
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2021,
+        12,
+        17
+       ]
+      ],
+      "date-time": "2021-12-17T04:01:52Z",
+      "timestamp": 1639713712000
+     },
+     "score": 30.689495,
+     "resource": {
+      "primary": {
+       "URL": "https://aclanthology.org/2021.emnlp-main.734"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/2021.emnlp-main.734",
+     "published": {
+      "date-parts": [
+       [
+        2021
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        10,
+        2
+       ]
+      ],
+      "date-time": "2026-10-02T13:15:48Z",
+      "timestamp": 1790946948163,
+      "version": "4.1.0"
+     },
+     "publisher-location": "New York, NY, USA",
+     "reference-count": 27,
+     "publisher": "ACM",
+     "license": [
+      {
+       "start": {
+        "date-parts": [
+         [
+          2021,
+          5,
+          8
+         ]
+        ],
+        "date-time": "2021-05-08T00:00:00Z",
+        "timestamp": 1620432000000
+       },
+       "content-version": "vor",
+       "delay-in-days": 0,
+       "URL": "https://www.acm.org/publications/policies/copyright_policy#Background"
+      }
+     ],
+     "content-domain": {
+      "domain": [
+       "dl.acm.org"
+      ],
+      "crossmark-restriction": true
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2021,
+        5,
+        8
+       ]
+      ]
+     },
+     "DOI": "10.1145/3411763.3451760",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        5,
+        7
+       ]
+      ],
+      "date-time": "2021-05-07T20:36:14Z",
+      "timestamp": 1620419774000
+     },
+     "page": "1-7",
+     "update-policy": "https://doi.org/10.1145/crossmark-policy",
+     "source": "Crossref",
+     "is-referenced-by-count": 732,
+     "title": [
+      "Prompt Programming for Large Language Models: Beyond the Few-Shot Paradigm"
+     ],
+     "prefix": "10.1145",
+     "author": [
+      {
+       "given": "Laria",
+       "family": "Reynolds",
+       "sequence": "first",
+       "affiliation": [
+        {
+         "name": "University of Michigan, United States"
+        }
+       ],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Kyle",
+       "family": "McDonell",
+       "sequence": "additional",
+       "affiliation": [
+        {
+         "name": "KNC Neural Calculus, United States"
+        }
+       ],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "320",
+     "published-online": {
+      "date-parts": [
+       [
+        2021,
+        5,
+        8
+       ]
+      ]
+     },
+     "reference": [
+      {
+       "key": "e_1_3_2_1_1_1",
+       "doi-asserted-by": "publisher",
+       "DOI": "10.3115/v1/W14-3302"
+      },
+      {
+       "key": "e_1_3_2_1_2_1",
+       "unstructured": "Gwern Branwen. 2020. GPT-3 Creative Fiction. (2020)."
+      },
+      {
+       "key": "e_1_3_2_1_3_1",
+       "unstructured": "Tom B Brown Benjamin Mann Nick Ryder Melanie Subbiah Jared Kaplan Prafulla Dhariwal Arvind Neelakantan Pranav Shyam Girish Sastry Amanda Askell 2020. Language models are few-shot learners. arXiv preprint arXiv:2005.14165(2020)."
+      },
+      {
+       "key": "e_1_3_2_1_4_1",
+       "unstructured": "Marc-Alexandre Côté Ákos Kádár Xingdi Yuan Ben Kybartas Tavian Barnes Emery Fine James Moore Ruo Yu Tao Matthew Hausknecht Layla El Asri Mahmoud Adada Wendy Tay and Adam Trischler. 2019. TextWorld: A Learning Environment for Text-based Games. (2019). arxiv:1806.11532 [cs.LG]"
+      },
+      {
+       "key": "e_1_3_2_1_5_1",
+       "volume-title": "Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805(2018).",
+       "author": "Devlin Jacob",
+       "year": "2018",
+       "unstructured": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2018. Bert: Pre-training of deep bidirectional transformers for language understanding. arXiv preprint arXiv:1810.04805(2018)."
+      },
+      {
+       "key": "e_1_3_2_1_6_1",
+       "unstructured": "Angela Fan Mike Lewis and Yann Dauphin. 2018. Hierarchical Neural Story Generation. arxiv:1805.04833 [cs.CL]"
+      },
+      {
+       "key": "e_1_3_2_1_7_1",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Zhe Gan Yu Cheng Ahmed El Kholy Linjie Li Jingjing Liu and Jianfeng Gao. 2019. Multi-step Reasoning via Recurrent Dual Attention for Visual Dialog. https://arxiv.org/abs/1902.00579",
+       "DOI": "10.18653/v1/P19-1648"
+      },
+      {
+       "key": "e_1_3_2_1_8_1",
+       "volume-title": "Building AGI Using Language Models. leogao.dev",
+       "author": "Gao Leo",
+       "year": "2020",
+       "unstructured": "Leo Gao. 2020. Building AGI Using Language Models. leogao.dev (2020). https://bit.ly/3rViLGk"
+      },
+      {
+       "key": "e_1_3_2_1_9_1",
+       "unstructured": "Tianyu Gao Adam Fisch and Danqi Chen. 2020. Making Pre-trained Language Models Better Few-shot Learners. arxiv:2012.15723 [cs.CL]"
+      },
+      {
+       "key": "e_1_3_2_1_10_1",
+       "unstructured": "Dan Hendrycks Collin Burns Steven Basart Andy Zou Mantas Mazeika Dawn Song and Jacob Steinhardt. 2020. Measuring massive multitask language understanding. (2020). https://arxiv.org/abs/2009.03300"
+      },
+      {
+       "key": "e_1_3_2_1_11_1",
+       "unstructured": "Ari Holtzman Jan Buys Li Du Maxwell Forbes and Yejin Choi. 2020. The Curious Case of Neural Text Degeneration. arxiv:1904.09751 [cs.CL]"
+      },
+      {
+       "key": "e_1_3_2_1_12_1",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Jeremy Howard and Sebastian Ruder. 2018. Universal language model fine-tuning for text classification. (2018). https://arxiv.org/abs/1801.06146",
+       "DOI": "10.18653/v1/P18-1031"
+      },
+      {
+       "key": "e_1_3_2_1_13_1",
+       "unstructured": "KaryoKleptid. 2020. Seems to work. https://bit.ly/37dA1hY"
+      },
+      {
+       "key": "e_1_3_2_1_14_1",
+       "unstructured": "KaryoKleptid. 2020. Teaching GPT-3 to do a brute force ’for loop’ checking answers. https://bit.ly/2N7khX1"
+      },
+      {
+       "key": "e_1_3_2_1_15_1",
+       "volume-title": "CTRL: A Conditional Transformer Language Model for Controllable Generation. CoRR abs/1909.05858(2019)",
+       "author": "Keskar Nitish Shirish",
+       "year": "2019",
+       "unstructured": "Nitish Shirish Keskar, Bryan McCann, Lav R. Varshney, Caiming Xiong, and Richard Socher. 2019. CTRL: A Conditional Transformer Language Model for Controllable Generation. CoRR abs/1909.05858(2019). http://arxiv.org/abs/1909.05858"
+      },
+      {
+       "key": "e_1_3_2_1_16_1",
+       "doi-asserted-by": "crossref",
+       "unstructured": "Ben Krause Akhilesh Deepak Gotmare Bryan McCann Nitish Shirish Keskar Shafiq Joty Richard Socher and Nazneen Fatema Rajani. 2020. GeDi: Generative Discriminator Guided Sequence Generation. arXiv preprint arXiv:2009.06367(2020).",
+       "DOI": "10.18653/v1/2021.findings-emnlp.424"
+      },
+      {
+       "key": "e_1_3_2_1_17_1",
+       "unstructured": "Xiang Lisa Li and Percy Liang. 2021. Prefix-Tuning: Optimizing Continuous Prompts for Generation. arXiv preprint arXiv:2101.00190(2021)."
+      },
+      {
+       "key": "e_1_3_2_1_18_1",
+       "unstructured": "Jiangming Liu and Matt Gardner. 2020. Multi-Step Inference for Reasoning Over Paragraphs. arXiv preprint arXiv:2004.02995(2020)."
+      },
+      {
+       "key": "e_1_3_2_1_19_1",
+       "doi-asserted-by": "publisher",
+       "DOI": "10.18653/v1/W18-6319"
+      },
+      {
+       "key": "e_1_3_2_1_20_1",
+       "unstructured": "Zachary Robertson. 2020. You Can Probably Amplify GPT3 Directly. https://bit.ly/3tXT7Cw"
+      },
+      {
+       "key": "e_1_3_2_1_21_1",
+       "unstructured": "Arram Sabeti. 2020. GPT-3: Using Fiction to Demonstrate How Prompts Impact Output Quality. https://bit.ly/3jP3TWW"
+      },
+      {
+       "key": "e_1_3_2_1_22_1",
+       "volume-title": "Eric Wallace, and Sameer Singh.",
+       "author": "Shin Taylor",
+       "year": "2020",
+       "unstructured": "Taylor Shin, Yasaman Razeghi, Robert L. Logan IV au2, Eric Wallace, and Sameer Singh. 2020. AutoPrompt: Eliciting Knowledge from Language Models with Automatically Generated Prompts. arxiv:2010.15980 [cs.CL]"
+      },
+      {
+       "key": "e_1_3_2_1_23_1",
+       "unstructured": "Latitude Team. 2020. World Creation by Analogy. https://bit.ly/2N4vXK0"
+      },
+      {
+       "key": "e_1_3_2_1_24_1",
+       "unstructured": "Lilian Wang. 2021. Controllable Neural Text Generation. (2021). https://bit.ly/3pl2eKa"
+      },
+      {
+       "key": "e_1_3_2_1_25_1",
+       "unstructured": "Qinyuan Ye and Xiang Ren. 2021. Zero-shot Learning by Generating Task-specific Adapters. arxiv:2101.00420 [cs.CL]"
+      },
+      {
+       "key": "e_1_3_2_1_26_1",
+       "doi-asserted-by": "publisher",
+       "DOI": "10.18653/v1/2020.acl-main.601"
+      },
+      {
+       "key": "e_1_3_2_1_27_1",
+       "volume-title": "lesswrong.com",
+       "author": "Yudkowsky Eliezer",
+       "year": "2007",
+       "unstructured": "Eliezer Yudkowsky. 2007. Rationalization. lesswrong.com (2007). https://bit.ly/3pmYt6I"
+      }
+     ],
+     "event": {
+      "name": "CHI '21: CHI Conference on Human Factors in Computing Systems",
+      "location": "Yokohama Japan",
+      "acronym": "CHI '21",
+      "sponsor": [
+       "SIGCHI ACM Special Interest Group on Computer-Human Interaction"
+      ]
+     },
+     "container-title": [
+      "Extended Abstracts of the 2021 CHI Conference on Human Factors in Computing Systems"
+     ],
+     "link": [
+      {
+       "URL": "https://dl.acm.org/doi/10.1145/3411763.3451760",
+       "content-type": "unspecified",
+       "content-version": "vor",
+       "intended-application": "text-mining"
+      },
+      {
+       "URL": "https://dl.acm.org/doi/pdf/10.1145/3411763.3451760",
+       "content-type": "unspecified",
+       "content-version": "vor",
+       "intended-application": "similarity-checking"
+      }
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2025,
+        6,
+        17
+       ]
+      ],
+      "date-time": "2025-06-17T17:28:21Z",
+      "timestamp": 1750181301000
+     },
+     "score": 26.239285,
+     "resource": {
+      "primary": {
+       "URL": "https://dl.acm.org/doi/10.1145/3411763.3451760"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2021,
+        5,
+        8
+       ]
+      ]
+     },
+     "references-count": 27,
+     "alternative-id": [
+      "10.1145/3411763.3451760",
+      "10.1145/3411763"
+     ],
+     "URL": "https://doi.org/10.1145/3411763.3451760",
+     "published": {
+      "date-parts": [
+       [
+        2021,
+        5,
+        8
+       ]
+      ]
+     },
+     "assertion": [
+      {
+       "value": "2021-05-08",
+       "order": 3,
+       "name": "published",
+       "label": "Published",
+       "group": {
+        "name": "publication_history",
+        "label": "Publication History"
+       }
+      }
+     ]
+    }
+   ],
+   "items-per-page": 5,
+   "query": {
+    "start-index": 0,
+    "search-terms": null
+   }
+  }
+ },
+ "00d81696b30b9a49a31102720e945b6629e8474dae542bd400c96387f7ae26ae": {
+  "xml": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/aJdwmQrv+89S6x5m3Q5EOZtrOkE</id>\n  <title>arXiv Query: search_query=ti:\"Efficient estimation of word representations in vector space\"&amp;id_list=&amp;start=0&amp;max_results=5</title>\n  <updated>2026-10-02T13:55:12Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=ti:%22Efficient+estimation+of+word+representations+in+vector+space%22&amp;start=0&amp;max_results=5&amp;id_list=\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>\n  <opensearch:totalResults>1</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>http://arxiv.org/abs/1301.3781v3</id>\n    <title>Efficient Estimation of Word Representations in Vector Space</title>\n    <updated>2013-09-07T00:30:40Z</updated>\n    <link href=\"https://arxiv.org/abs/1301.3781v3\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/1301.3781v3\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>We propose two novel model architectures for computing continuous vector representations of words from very large data sets. The quality of these representations is measured in a word similarity task, and the results are compared to the previously best performing techniques based on different types of neural networks. We observe large improvements in accuracy at much lower computational cost, i.e. it takes less than a day to learn high quality word vectors from a 1.6 billion words data set. Furthermore, we show that these vectors provide state-of-the-art performance on our test set for measuring syntactic and semantic word similarities.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2013-01-16T18:24:43Z</published>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Tomas Mikolov</name>\n    </author>\n    <author>\n      <name>Kai Chen</name>\n    </author>\n    <author>\n      <name>Greg Corrado</name>\n    </author>\n    <author>\n      <name>Jeffrey Dean</name>\n    </author>\n  </entry>\n</feed>\n"
+ },
+ "ae7ffbf2e24bdb03a28700ee46916d4807e34a506bf31216f1859aad68768923": {
+  "xml": "<?xml version='1.0' encoding='UTF-8'?>\n<feed xmlns:opensearch=\"http://a9.com/-/spec/opensearch/1.1/\" xmlns:arxiv=\"http://arxiv.org/schemas/atom\" xmlns=\"http://www.w3.org/2005/Atom\">\n  <id>https://arxiv.org/api/78HYnkxq2NLQhh5DxMGaUnMnoLI</id>\n  <title>arXiv Query: search_query=ti:\"Efficient estimation of word representations in vector space\" AND au:\"Mikolov\"&amp;id_list=&amp;start=0&amp;max_results=5</title>\n  <updated>2026-10-02T13:55:15Z</updated>\n  <link href=\"https://arxiv.org/api/query?search_query=ti:%22Efficient+estimation+of+word+representations+in+vector+space%22+AND+au:%22Mikolov%22&amp;start=0&amp;max_results=5&amp;id_list=\" type=\"application/atom+xml\"/>\n  <opensearch:itemsPerPage>5</opensearch:itemsPerPage>\n  <opensearch:totalResults>1</opensearch:totalResults>\n  <opensearch:startIndex>0</opensearch:startIndex>\n  <entry>\n    <id>http://arxiv.org/abs/1301.3781v3</id>\n    <title>Efficient Estimation of Word Representations in Vector Space</title>\n    <updated>2013-09-07T00:30:40Z</updated>\n    <link href=\"https://arxiv.org/abs/1301.3781v3\" rel=\"alternate\" type=\"text/html\"/>\n    <link href=\"https://arxiv.org/pdf/1301.3781v3\" rel=\"related\" type=\"application/pdf\" title=\"pdf\"/>\n    <summary>We propose two novel model architectures for computing continuous vector representations of words from very large data sets. The quality of these representations is measured in a word similarity task, and the results are compared to the previously best performing techniques based on different types of neural networks. We observe large improvements in accuracy at much lower computational cost, i.e. it takes less than a day to learn high quality word vectors from a 1.6 billion words data set. Furthermore, we show that these vectors provide state-of-the-art performance on our test set for measuring syntactic and semantic word similarities.</summary>\n    <category term=\"cs.CL\" scheme=\"http://arxiv.org/schemas/atom\"/>\n    <published>2013-01-16T18:24:43Z</published>\n    <arxiv:primary_category term=\"cs.CL\"/>\n    <author>\n      <name>Tomas Mikolov</name>\n    </author>\n    <author>\n      <name>Kai Chen</name>\n    </author>\n    <author>\n      <name>Greg Corrado</name>\n    </author>\n    <author>\n      <name>Jeffrey Dean</name>\n    </author>\n  </entry>\n</feed>\n"
+ },
+ "1c7781620f9c371316b21e7298f63376dfd370d431049438a9416d7c04e97898": {
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+   "facets": {},
+   "total-results": 2720545,
+   "items": [
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        8,
+        29
+       ]
+      ],
+      "date-time": "2026-08-29T15:48:22Z",
+      "timestamp": 1788018502396,
+      "version": "build-2784847793"
+     },
+     "reference-count": 0,
+     "publisher": "Nepal Journals Online (JOL)",
+     "issue": "1",
+     "license": [
+      {
+       "start": {
+        "date-parts": [
+         [
+          2020,
+          3,
+          31
+         ]
+        ],
+        "date-time": "2020-03-31T00:00:00Z",
+        "timestamp": 1585612800000
+       },
+       "content-version": "unspecified",
+       "delay-in-days": 0,
+       "URL": "http://creativecommons.org/licenses/by-nc-nd/4.0"
+      }
+     ],
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "short-container-title": [
+      "Jnl Innov. Engin. Educ."
+     ],
+     "abstract": "<jats:p>Word representation is a means of representing a word as mathematical entities that can be read, reasoned and manipulated by computational models. The representation is required for input to any new modern data models and in many cases, the accuracy of a model depends on it. In this paper, we analyze various methods of calculating vector space for Nepali words and postulate a word to vector model based on the Skip-gram model with NCE loss capturing syntactic and semantic word relationships.\r\nThis is an attempt to implement a paper by Mikolov on Nepali words.</jats:p>",
+     "DOI": "10.3126/jiee.v3i1.34327",
+     "type": "journal-article",
+     "created": {
+      "date-parts": [
+       [
+        2021,
+        1,
+        15
+       ]
+      ],
+      "date-time": "2021-01-15T12:09:45Z",
+      "timestamp": 1610712585000
+     },
+     "page": "71-77",
+     "source": "Crossref",
+     "is-referenced-by-count": 62,
+     "title": [
+      "Efficient Estimation of Nepali Word Representations in Vector Space"
+     ],
+     "prefix": "10.3126",
+     "volume": "3",
+     "author": [
+      {
+       "given": "Janardan",
+       "family": "Bhatta",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Dipesh",
+       "family": "Shrestha",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Santosh",
+       "family": "Nepal",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Saurav",
+       "family": "Pandey",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Shekhar",
+       "family": "Koirala",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1670",
+     "published-online": {
+      "date-parts": [
+       [
+        2020,
+        3,
+        31
+       ]
+      ]
+     },
+     "container-title": [
+      "Journal of Innovations in Engineering Education"
+     ],
+     "link": [
+      {
+       "URL": "https://www.nepjol.info/index.php/jiee/article/download/34327/26997",
+       "content-type": "application/pdf",
+       "content-version": "vor",
+       "intended-application": "text-mining"
+      },
+      {
+       "URL": "https://www.nepjol.info/index.php/jiee/article/download/34327/26997",
+       "content-type": "unspecified",
+       "content-version": "vor",
+       "intended-application": "similarity-checking"
+      }
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2021,
+        1,
+        15
+       ]
+      ],
+      "date-time": "2021-01-15T12:09:56Z",
+      "timestamp": 1610712596000
+     },
+     "score": 36.43637,
+     "resource": {
+      "primary": {
+       "URL": "https://www.nepjol.info/index.php/jiee/article/view/34327"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2020,
+        3,
+        31
+       ]
+      ]
+     },
+     "references-count": 0,
+     "journal-issue": {
+      "issue": "1",
+      "published-online": {
+       "date-parts": [
+        [
+         2021,
+         1,
+         15
+        ]
+       ]
+      }
+     },
+     "URL": "https://doi.org/10.3126/jiee.v3i1.34327",
+     "ISSN": [
+      "2594-343X"
+     ],
+     "issn-type": [
+      {
+       "value": "2594-343X",
+       "type": "print"
+      }
+     ],
+     "published": {
+      "date-parts": [
+       [
+        2020,
+        3,
+        31
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2024,
+        9,
+        8
+       ]
+      ],
+      "date-time": "2024-09-08T02:40:39Z",
+      "timestamp": 1725763239078
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2019
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/w19-2001",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2019,
+        7,
+        21
+       ]
+      ],
+      "date-time": "2019-07-21T17:37:52Z",
+      "timestamp": 1563730672000
+     },
+     "page": "1-7",
+     "source": "Crossref",
+     "is-referenced-by-count": 6,
+     "title": [
+      "Neural Vector Conceptualization for Word Vector Space Interpretation"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Robert",
+       "family": "Schwarzenberg",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      },
+      {
+       "given": "Lisa",
+       "family": "Raithel",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      },
+      {
+       "given": "David",
+       "family": "Harbecke",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 3rd Workshop on Evaluating Vector Space Representations for",
+      "start": {
+       "date-parts": [
+        [
+         2019,
+         6
+        ]
+       ]
+      },
+      "location": "Minneapolis, USA",
+      "end": {
+       "date-parts": [
+        [
+         2019,
+         6
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 3rd Workshop on Evaluating Vector Space Representations for"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2019,
+        7,
+        21
+       ]
+      ],
+      "date-time": "2019-07-21T17:37:53Z",
+      "timestamp": 1563730673000
+     },
+     "score": 34.151928,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/W19-2001"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2019
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/w19-2001",
+     "published": {
+      "date-parts": [
+       [
+        2019
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        24
+       ]
+      ],
+      "date-time": "2026-09-24T11:01:36Z",
+      "timestamp": 1790247696573,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/w16-2508",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2016,
+        8,
+        13
+       ]
+      ],
+      "date-time": "2016-08-13T15:58:16Z",
+      "timestamp": 1471103896000
+     },
+     "page": "43-50",
+     "source": "Crossref",
+     "is-referenced-by-count": 22,
+     "title": [
+      "Find the word that does not belong: A Framework for an Intrinsic\n            Evaluation of Word Vector Representations"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "José",
+       "family": "Camacho-Collados",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Roberto",
+       "family": "Navigli",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 1st Workshop on Evaluating Vector-Space\n          Representations for NLP",
+      "location": "Berlin, Germany",
+      "start": {
+       "date-parts": [
+        [
+         2016,
+         8
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2016,
+         8
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 1st Workshop on Evaluating Vector-Space\n          Representations for NLP"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2016,
+        12,
+        30
+       ]
+      ],
+      "date-time": "2016-12-30T08:06:42Z",
+      "timestamp": 1483085202000
+     },
+     "score": 33.513626,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/W16-2508"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/w16-2508",
+     "published": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2024,
+        9,
+        7
+       ]
+      ],
+      "date-time": "2024-09-07T22:23:26Z",
+      "timestamp": 1725747806540
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/w16-2520",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2016,
+        8,
+        13
+       ]
+      ],
+      "date-time": "2016-08-13T15:58:16Z",
+      "timestamp": 1471103896000
+     },
+     "page": "111-115",
+     "source": "Crossref",
+     "is-referenced-by-count": 3,
+     "title": [
+      "Correlation-based Intrinsic Evaluation of Word Vector Representations"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Yulia",
+       "family": "Tsvetkov",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      },
+      {
+       "given": "Manaal",
+       "family": "Faruqui",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      },
+      {
+       "given": "Chris",
+       "family": "Dyer",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 1st Workshop on Evaluating Vector-Space\n          Representations for NLP",
+      "start": {
+       "date-parts": [
+        [
+         2016,
+         8
+        ]
+       ]
+      },
+      "location": "Berlin, Germany",
+      "end": {
+       "date-parts": [
+        [
+         2016,
+         8
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 1st Workshop on Evaluating Vector-Space\n          Representations for NLP"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2016,
+        12,
+        30
+       ]
+      ],
+      "date-time": "2016-12-30T08:06:46Z",
+      "timestamp": 1483085206000
+     },
+     "score": 33.338287,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/W16-2520"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/w16-2520",
+     "published": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2024,
+        9,
+        5
+       ]
+      ],
+      "date-time": "2024-09-05T16:54:16Z",
+      "timestamp": 1725555256538
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     },
+     "DOI": "10.18653/v1/w16-2517",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2016,
+        8,
+        13
+       ]
+      ],
+      "date-time": "2016-08-13T15:58:16Z",
+      "timestamp": 1471103896000
+     },
+     "page": "94-98",
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "Evaluating Informal-Domain Word Representations With UrbanDictionary"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Naomi",
+       "family": "Saphra",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 1st Workshop on Evaluating Vector-Space\n          Representations for NLP",
+      "start": {
+       "date-parts": [
+        [
+         2016,
+         8
+        ]
+       ]
+      },
+      "location": "Berlin, Germany",
+      "end": {
+       "date-parts": [
+        [
+         2016,
+         8
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 1st Workshop on Evaluating Vector-Space\n          Representations for NLP"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2016,
+        12,
+        30
+       ]
+      ],
+      "date-time": "2016-12-30T08:06:44Z",
+      "timestamp": 1483085204000
+     },
+     "score": 32.711334,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/W16-2517"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.18653/v1/w16-2517",
+     "published": {
+      "date-parts": [
+       [
+        2016
+       ]
+      ]
+     }
+    }
+   ],
+   "items-per-page": 5,
+   "query": {
+    "start-index": 0,
+    "search-terms": null
+   }
+  }
+ },
+ "e25fd8cbe76860c7e2dd4bd4c6eb93be6d406ad6be4f14cce256865c335b441c": {
+  "status": "ok",
+  "message-type": "work-list",
+  "message-version": "1.0.0",
+  "message": {
+   "facets": {},
+   "total-results": 217677,
+   "items": [
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        30
+       ]
+      ],
+      "date-time": "2026-09-30T21:07:01Z",
+      "timestamp": 1790802421513,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     },
+     "DOI": "10.3115/v1/d14-1113",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2015,
+        6,
+        17
+       ]
+      ],
+      "date-time": "2015-06-17T07:07:54Z",
+      "timestamp": 1434524874000
+     },
+     "page": "1059-1069",
+     "source": "Crossref",
+     "is-referenced-by-count": 124,
+     "title": [
+      "Efficient Non-parametric Estimation of Multiple Embeddings per Word in Vector Space"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Arvind",
+       "family": "Neelakantan",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Jeevan",
+       "family": "Shankar",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Alexandre",
+       "family": "Passos",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Andrew",
+       "family": "McCallum",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)",
+      "location": "Doha, Qatar",
+      "start": {
+       "date-parts": [
+        [
+         2014,
+         10
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2014,
+         10
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2015,
+        10,
+        26
+       ]
+      ],
+      "date-time": "2015-10-26T20:45:21Z",
+      "timestamp": 1445892321000
+     },
+     "score": 29.358406,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/D14-1113"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.3115/v1/d14-1113",
+     "published": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        27
+       ]
+      ],
+      "date-time": "2026-09-27T14:47:17Z",
+      "timestamp": 1790520437651,
+      "version": "4.1.0"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     },
+     "DOI": "10.3115/v1/e14-1049",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2015,
+        6,
+        17
+       ]
+      ],
+      "date-time": "2015-06-17T07:08:27Z",
+      "timestamp": 1434524907000
+     },
+     "page": "462-471",
+     "source": "Crossref",
+     "is-referenced-by-count": 181,
+     "title": [
+      "Improving Vector Space Word Representations Using Multilingual Correlation"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Manaal",
+       "family": "Faruqui",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Chris",
+       "family": "Dyer",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 14th Conference of the European Chapter of the Association for Computational Linguistics",
+      "location": "Gothenburg, Sweden",
+      "start": {
+       "date-parts": [
+        [
+         2014,
+         4
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2014,
+         4
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 14th Conference of the European Chapter of the Association for Computational Linguistics"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2015,
+        10,
+        26
+       ]
+      ],
+      "date-time": "2015-10-26T20:51:01Z",
+      "timestamp": 1445892661000
+     },
+     "score": 27.740383,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/E14-1049"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.3115/v1/e14-1049",
+     "published": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        6
+       ]
+      ],
+      "date-time": "2026-09-06T23:41:58Z",
+      "timestamp": 1788738118067,
+      "version": "build-2803163510"
+     },
+     "publisher-location": "Stroudsburg, PA, USA",
+     "reference-count": 0,
+     "publisher": "Association for Computational Linguistics",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "published-print": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     },
+     "DOI": "10.3115/v1/d14-1152",
+     "type": "proceedings-article",
+     "created": {
+      "date-parts": [
+       [
+        2015,
+        6,
+        17
+       ]
+      ],
+      "date-time": "2015-06-17T07:07:54Z",
+      "timestamp": 1434524874000
+     },
+     "page": "1453-1458",
+     "source": "Crossref",
+     "is-referenced-by-count": 20,
+     "title": [
+      "Financial Keyword Expansion via Continuous Word Vector Representations"
+     ],
+     "prefix": "10.18653",
+     "author": [
+      {
+       "given": "Ming-Feng",
+       "family": "Tsai",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Chuan-Ju",
+       "family": "Wang",
+       "sequence": "additional",
+       "affiliation": [],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "1643",
+     "event": {
+      "name": "Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)",
+      "location": "Doha, Qatar",
+      "start": {
+       "date-parts": [
+        [
+         2014,
+         10
+        ]
+       ]
+      },
+      "end": {
+       "date-parts": [
+        [
+         2014,
+         10
+        ]
+       ]
+      }
+     },
+     "container-title": [
+      "Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)"
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2015,
+        10,
+        26
+       ]
+      ],
+      "date-time": "2015-10-26T20:45:41Z",
+      "timestamp": 1445892341000
+     },
+     "score": 22.245882,
+     "resource": {
+      "primary": {
+       "URL": "http://aclweb.org/anthology/D14-1152"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     },
+     "references-count": 0,
+     "URL": "https://doi.org/10.3115/v1/d14-1152",
+     "published": {
+      "date-parts": [
+       [
+        2014
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2026,
+        9,
+        18
+       ]
+      ],
+      "date-time": "2026-09-18T01:37:07Z",
+      "timestamp": 1789695427608,
+      "version": "4.0.1"
+     },
+     "reference-count": 1,
+     "publisher": "MIT Press - Journals",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "short-container-title": [
+      "TACL"
+     ],
+     "published-print": {
+      "date-parts": [
+       [
+        2014,
+        12
+       ]
+      ]
+     },
+     "abstract": "<jats:p> Prepositional phrase (PP) attachment disambiguation is a known challenge in syntactic parsing. The lexical sparsity associated with PP attachments motivates research in word representations that can capture pertinent syntactic and semantic features of the word. One promising solution is to use word vectors induced from large amounts of raw text. However, state-of-the-art systems that employ such representations yield modest gains in PP attachment accuracy. </jats:p><jats:p> In this paper, we show that word vector representations can yield significant PP attachment performance gains. This is achieved via a non-linear architecture that is discriminatively trained to maximize PP attachment accuracy. The architecture is initialized with word vectors trained from unlabeled data, and relearns those to maximize attachment accuracy. We obtain additional performance gains with alternative representations such as dependency-based word vectors. When tested on both English and Arabic datasets, our method outperforms both a strong SVM classifier and state-of-the-art parsers. For instance, we achieve 82.6% PP attachment accuracy on Arabic, while the Turbo and Charniak self-trained parsers obtain 76.7% and 80.8% respectively. </jats:p>",
+     "DOI": "10.1162/tacl_a_00203",
+     "type": "journal-article",
+     "created": {
+      "date-parts": [
+       [
+        2018,
+        12,
+        28
+       ]
+      ],
+      "date-time": "2018-12-28T15:43:26Z",
+      "timestamp": 1546011806000
+     },
+     "page": "561-572",
+     "source": "Crossref",
+     "is-referenced-by-count": 3,
+     "title": [
+      "Exploring Compositional Architectures and Word Vector Representations                     for Prepositional Phrase Attachment"
+     ],
+     "prefix": "10.1162",
+     "volume": "2",
+     "author": [
+      {
+       "given": "Yonatan",
+       "family": "Belinkov",
+       "sequence": "first",
+       "affiliation": [
+        {
+         "name": "Massachusetts Institute of Technology,"
+        }
+       ],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Tao",
+       "family": "Lei",
+       "sequence": "additional",
+       "affiliation": [
+        {
+         "name": "Massachusetts Institute of Technology,"
+        }
+       ],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Regina",
+       "family": "Barzilay",
+       "sequence": "additional",
+       "affiliation": [
+        {
+         "name": "Massachusetts Institute of Technology,"
+        }
+       ],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      },
+      {
+       "given": "Amir",
+       "family": "Globerson",
+       "sequence": "additional",
+       "affiliation": [
+        {
+         "name": "The Hebrew University,"
+        }
+       ],
+       "role": [
+        {
+         "vocabulary": "crossref",
+         "role": "author"
+        }
+       ]
+      }
+     ],
+     "member": "281",
+     "reference": [
+      {
+       "key": "p_2",
+       "author": "Arts Tressy",
+       "year": "2014",
+       "journal-title": "Journal of King Saud University - Computer and Information Sciences."
+      }
+     ],
+     "container-title": [
+      "Transactions of the Association for Computational Linguistics"
+     ],
+     "language": "en",
+     "link": [
+      {
+       "URL": "https://www.mitpressjournals.org/doi/pdf/10.1162/tacl_a_00203",
+       "content-type": "unspecified",
+       "content-version": "vor",
+       "intended-application": "similarity-checking"
+      }
+     ],
+     "deposited": {
+      "date-parts": [
+       [
+        2021,
+        3,
+        12
+       ]
+      ],
+      "date-time": "2021-03-12T21:39:02Z",
+      "timestamp": 1615585142000
+     },
+     "score": 21.14576,
+     "resource": {
+      "primary": {
+       "URL": "https://direct.mit.edu/tacl/article/43344"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2014,
+        12
+       ]
+      ]
+     },
+     "references-count": 1,
+     "alternative-id": [
+      "10.1162/tacl_a_00203"
+     ],
+     "URL": "https://doi.org/10.1162/tacl_a_00203",
+     "ISSN": [
+      "2307-387X"
+     ],
+     "issn-type": [
+      {
+       "value": "2307-387X",
+       "type": "electronic"
+      }
+     ],
+     "published": {
+      "date-parts": [
+       [
+        2014,
+        12
+       ]
+      ]
+     }
+    },
+    {
+     "indexed": {
+      "date-parts": [
+       [
+        2022,
+        4,
+        2
+       ]
+      ],
+      "date-time": "2022-04-02T13:49:34Z",
+      "timestamp": 1648907374269
+     },
+     "reference-count": 12,
+     "publisher": "The Korean Society for Cognitive Science",
+     "issue": "3",
+     "content-domain": {
+      "domain": [],
+      "crossmark-restriction": false
+     },
+     "short-container-title": [
+      "koreanjournalofcognitivescience"
+     ],
+     "published-print": {
+      "date-parts": [
+       [
+        2012,
+        9
+       ]
+      ]
+     },
+     "DOI": "10.19066/cogsci.2012.23.3.001",
+     "type": "journal-article",
+     "created": {
+      "date-parts": [
+       [
+        2015,
+        10,
+        28
+       ]
+      ],
+      "date-time": "2015-10-28T03:26:34Z",
+      "timestamp": 1446002794000
+     },
+     "page": "295-322",
+     "source": "Crossref",
+     "is-referenced-by-count": 0,
+     "title": [
+      "Word Sense Similarity Clustering Based on Vector Space Model and HAL"
+     ],
+     "prefix": "10.19066",
+     "volume": "23",
+     "author": [
+      {
+       "family": "김동성",
+       "sequence": "first",
+       "affiliation": [],
+       "role": [
+        {
+         "role": "author",
+         "vocabulary": "crossref"
+        }
+       ]
+      }
+     ],
+     "member": "8140",
+     "reference": [
+      {
+       "issue": "23",
+       "key": "REF028706597",
+       "first-page": "146",
+       "volume": "10",
+       "author": "Harris, Z.",
+       "journal-title": "Word"
+      },
+      {
+       "issue": "2",
+       "key": "REF028706600",
+       "doi-asserted-by": "crossref",
+       "first-page": "203",
+       "DOI": "10.3758/BF03204766",
+       "volume": "28",
+       "author": "Lund, K",
+       "journal-title": "Instruments & Computers"
+      },
+      {
+       "issue": "11",
+       "key": "REF028706601",
+       "doi-asserted-by": "crossref",
+       "first-page": "613",
+       "DOI": "10.1145/361219.361220",
+       "volume": "18",
+       "author": "Salton, G.",
+       "journal-title": "Communications of the ACM"
+      },
+      {
+       "issue": "1",
+       "key": "REF028706603",
+       "first-page": "97",
+       "volume": "24",
+       "author": "Schutze, H.",
+       "journal-title": "Journal of Computational Linguistics"
+      },
+      {
+       "key": "REF028706605",
+       "doi-asserted-by": "crossref",
+       "first-page": "211",
+       "DOI": "10.1037/0033-295X.104.2.211",
+       "volume": "104",
+       "author": "Landauer. T",
+       "journal-title": "Psychological Review"
+      },
+      {
+       "issue": "1",
+       "key": "REF028706606",
+       "doi-asserted-by": "crossref",
+       "first-page": "18",
+       "DOI": "10.1111/j.1756-8765.2010.01097.x",
+       "volume": "3",
+       "author": "Steyvers, M",
+       "journal-title": "Topics in Cognitive Science"
+      },
+      {
+       "key": "REF028706607",
+       "first-page": "573",
+       "volume": "7",
+       "author": "Rohde, D.",
+       "journal-title": "Cognitive Psychology"
+      },
+      {
+       "key": "REF028706608",
+       "first-page": "61",
+       "volume": "19",
+       "author": "Dunning, T.",
+       "journal-title": "Journal of Computational Linguistics"
+      },
+      {
+       "key": "REF028706610",
+       "first-page": "22",
+       "volume": "16",
+       "author": "Church, K",
+       "journal-title": "Journal of Computational Linguistics"
+      },
+      {
+       "key": "REF028706614",
+       "doi-asserted-by": "crossref",
+       "first-page": "534",
+       "DOI": "10.1016/j.jml.2006.07.003",
+       "volume": "55",
+       "author": "Jones, M.",
+       "journal-title": "Journal of Memory and Language"
+      },
+      {
+       "key": "REF028706615",
+       "doi-asserted-by": "crossref",
+       "first-page": "141",
+       "DOI": "10.1613/jair.2934",
+       "volume": "37",
+       "author": "Turney, P.",
+       "journal-title": "Journal of Artificial Intelligence Research"
+      },
+      {
+       "key": "REF028706616",
+       "first-page": "129",
+       "volume": "12",
+       "author": "이성헌",
+       "journal-title": "프랑스어문교육"
+      }
+     ],
+     "container-title": [
+      "Korean Journal of Cognitive Science"
+     ],
+     "language": "en",
+     "deposited": {
+      "date-parts": [
+       [
+        2019,
+        8,
+        31
+       ]
+      ],
+      "date-time": "2019-08-31T21:47:29Z",
+      "timestamp": 1567288049000
+     },
+     "score": 21.143343,
+     "resource": {
+      "primary": {
+       "URL": "http://www.kci.go.kr/kciportal/landing/article.kci?arti_id=ART001700556"
+      }
+     },
+     "issued": {
+      "date-parts": [
+       [
+        2012,
+        9
+       ]
+      ]
+     },
+     "references-count": 12,
+     "journal-issue": {
+      "issue": "3",
+      "published-print": {
+       "date-parts": [
+        [
+         2012,
+         9
+        ]
+       ]
+      }
+     },
+     "URL": "https://doi.org/10.19066/cogsci.2012.23.3.001",
+     "ISSN": [
+      "1226-4067"
+     ],
+     "issn-type": [
+      {
+       "value": "1226-4067",
+       "type": "print"
+      }
+     ],
+     "published": {
+      "date-parts": [
+       [
+        2012,
+        9
+       ]
+      ]
+     }
+    }
+   ],
+   "items-per-page": 5,
+   "query": {
+    "start-index": 0,
+    "search-terms": null
+   }
+  }
+ }
+}
