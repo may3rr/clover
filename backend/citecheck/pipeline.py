@@ -77,8 +77,11 @@ async def run_pipeline(
         meta.layers[layer].status = status  # type: ignore[assignment]
         meta.layers[layer].findings = n
         meta.layers[layer].error = error
-        send({"type": "layer", "layer": layer, "status": status,
-              "findings": n})
+        ev = {"type": "layer", "layer": layer, "status": status,
+              "findings": n}
+        if error:
+            ev["error"] = error
+        send(ev)
 
     # ---- parse (threaded; docx XML work) -------------------------------
     try:
