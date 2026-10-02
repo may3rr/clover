@@ -172,16 +172,17 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
      深色同图形色。判定词、彩色计数用 --*-text，正文文本永不上彩色底 */
   --high-text / --medium-text / --ok-text
   --low = --text-secondary;  --low-tint = --fill-strong;
-  /* 图层 tile 也是 macOS 系统色：blue #007AFF、purple #AF52DE、
-     green = --ok、orange #FF9F0A、grey #8E8E93，dark 用深色系统色变体 */
-  --tile-blue/purple/green/orange/yellow/grey
+  /* 图层 tile 用非语义的 macOS 系统色相（语义色只表达状态）：
+     indigo #5856D6、blue #007AFF、teal #30B0C7、purple #AF52DE、
+     grey #8E8E93，dark 用深色系统色变体 */
+  --tile-indigo/blue/teal/purple/grey
   --hairline / --shimmer                 /* SVG 页边 / 占位微光 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1) /* 唯一缓动 */
 }
 /* dark：--bg #191919 等，同名定义在 tokens.css */
 ```
 
-图层 tile 配色：文献真实性 green，论断支持度 blue，引用分布 purple，格式规范 orange，全部问题 grey。
+图层 tile 配色：文献真实性 indigo，论断支持度 blue，引用分布 teal，格式规范 purple，全部问题 grey。检查器列表行不用 tile，用严重度实心 glyph（high=红感叹号圆、medium=橙三角、low=灰 i、rev=绿铅笔），因为列表已按图层分组；真实性/支持度行的次要行写文献标识（`[1] Vaswani 等，2017，标题`），问题描述进详情。
 
 ### 6.3 不加没有意义的线条
 

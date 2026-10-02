@@ -110,6 +110,17 @@ select {
 .drag-strip {
   -webkit-app-region: drag;
 }
+/* translucent strip material — scrolled content blurs under the text */
+.bar-blur {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+.bar-blur-subtle {
+  background: color-mix(in srgb, var(--bg-subtle) 82%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
 .drag-strip button,
 .drag-strip a,
 .drag-strip select,
@@ -333,17 +344,23 @@ select {
 }
 
 /* ======================================================== skeleton */
-/* page thumbnails on the running screen */
+/* page thumbnails on the running screen — paper sheets on a --bg-subtle
+   rounded backdrop */
 .sk-row {
   display: flex;
   gap: 12px;
+  background: var(--bg-subtle);
+  border-radius: 12px;
+  padding: 12px;
 }
 .sk-page {
   width: 124px;
   height: 170px;
   border-radius: 8px;
-  background: var(--bg-subtle);
-  box-shadow: var(--glass-edge); /* page edge — the one allowed ring */
+  background: var(--bg);
+  box-shadow:
+    var(--glass-edge), /* page edge — the one allowed ring */
+    var(--glass-shadow); /* soft lift so pages read as paper */
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -399,15 +416,16 @@ select {
   max-width: 100px;
   text-overflow: ellipsis;
 }
-/* layer anchors light the bar in the severity tint */
+/* layer anchors light the bar in the vivid severity color (~0.85 —
+   these are graphics, not highlights behind text) */
 .sk-sev-high {
-  background: var(--high-tint);
+  background: color-mix(in srgb, var(--high) 85%, transparent);
 }
 .sk-sev-medium {
-  background: var(--medium-tint);
+  background: color-mix(in srgb, var(--medium) 85%, transparent);
 }
 .sk-sev-low {
-  background: var(--low-tint);
+  background: color-mix(in srgb, var(--text-secondary) 85%, transparent);
 }
 /* citation markers: accent dots on the bars */
 .sk-dot {
@@ -444,7 +462,7 @@ select {
 .sk-shimmer {
   position: relative;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 12px;
   -webkit-mask-image: -webkit-radial-gradient(white, black);
 }
 .sk-shimmer::after {
@@ -559,6 +577,15 @@ select {
 /* highlights fade in after the rows */
 .hl {
   animation: cc-fade 240ms var(--ease) 260ms both;
+}
+
+/* support excerpt: measured-height expand + content crossfade (240ms) */
+.excerpt-clip {
+  overflow: hidden;
+  transition: height 240ms var(--ease);
+}
+.excerpt-swap {
+  animation: cc-fade 240ms var(--ease) both;
 }
 
 /* properties block (Notion page header) */

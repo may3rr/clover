@@ -28,12 +28,12 @@
   --medium-text: #a05a00;
   --ok-text: #1e7e34;
 
-  /* 图标色块（图层 tile；白字上图标，不需要文本对比度） */
+  /* 图标色块（图层 tile；非语义色相——语义色只表达状态，不当图层色。
+     白字上图标，不需要文本对比度） */
+  --tile-indigo: #5856d6;    /* 文献真实性 */
   --tile-blue: #007aff;      /* 论断支持度 */
-  --tile-purple: #af52de;    /* 引用分布 */
-  --tile-green: #28c840;     /* 文献真实性（= --ok） */
-  --tile-orange: #ff9f0a;    /* 格式规范 */
-  --tile-yellow: #ffcc00;
+  --tile-teal: #30b0c7;      /* 引用分布 */
+  --tile-purple: #af52de;    /* 格式规范 */
   --tile-grey: #8e8e93;      /* 全部问题 */
 
   /* 骨架页细边 / 占位微光 / SVG 页边描线（唯一允许线条的几处数据图形） */
@@ -69,11 +69,10 @@
     --ok-text: #32d74b;
 
     /* dark 下色块提亮（macOS dark system colors） */
+    --tile-indigo: #5e5ce6;
     --tile-blue: #0a84ff;
+    --tile-teal: #40cbe0;
     --tile-purple: #bf5af2;
-    --tile-green: #32d74b;
-    --tile-orange: #ff9f0a;
-    --tile-yellow: #ffd60a;
     --tile-grey: #98989d;
 
     --shimmer: rgba(255, 255, 255, 0.12);

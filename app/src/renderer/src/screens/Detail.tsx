@@ -1,4 +1,5 @@
-import type { Report, RefCheck } from '../types/report'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import type { Report, RefCheck, SectionDist } from '../types/report'
 import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
@@ -122,13 +123,11 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
               {s.sourceTitle}
             </div>
           )}
-          <div className="font-normal">
-            <ExcerptWithEvidence
-              text={s.excerpt}
-              span={s.evidenceSpan}
-              label={s.label}
-            />
-          </div>
+          <Excerpt
+            text={s.excerpt}
+            span={s.evidenceSpan}
+            label={s.label}
+          />
           <div className="t13 secondary" style={{ marginTop: 8 }}>
             {s.sourceKind === 'fulltext' ? '依据开放全文' : '依据摘要'}
           </div>
@@ -146,7 +145,26 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
   )
 }
 
-function ExcerptWithEvidence({
+/** sentence boundaries [start, end) — split after ., !, ? + whitespace */
+function sentenceRanges(text: string): [number, number][] {
+  const out: [number, number][] = []
+  let s = 0
+  const re = /[.!?]['"”’)\]]?\s+/g
+  let m: RegExpExecArray | null
+  while ((m = re.exec(text))) {
+    if (m.index + m[0].length > s) {
+      out.push([s, m.index + m[0].length])
+      s = m.index + m[0].length
+    }
+  }
+  if (s < text.length) out.push([s, text.length])
+  return out
+}
+
+/** Source excerpt: collapsed to the evidence sentence ±1 with "…" ends
+ * (or the first 3 sentences when there is no evidence); a text button
+ * expands to the full excerpt with a 240ms height tween. */
+function Excerpt({
   text,
   span,
   label,
@@ -155,9 +173,49 @@ function ExcerptWithEvidence({
   span: [number, number] | null
   label: string | null
 }) {
-  if (!span || span[0] >= span[1] || span[1] > text.length) {
-    return <>{text}</>
-  }
+  const [open, setOpen] = useState(false)
+  const innerRef = useRef<HTMLDivElement>(null)
+  const [h, setH] = useState<number>()
+
+  const hasSpan =
+    !!span && span[0] < span[1] && span[1] <= text.length
+  const { cutS, cutE } = useMemo(() => {
+    const sents = sentenceRanges(text)
+    if (!sents.length) return { cutS: 0, cutE: text.length }
+    let lo = 0
+    let hi = sents.length - 1
+    if (hasSpan && span) {
+      const i0 = sents.findIndex(([, e]) => span[0] < e)
+      const i1 = sents.findIndex(([, e]) => span[1] <= e)
+      lo = Math.max(0, (i0 === -1 ? sents.length - 1 : i0) - 1)
+      hi = Math.min(
+        sents.length - 1,
+        (i1 === -1 ? sents.length - 1 : i1) + 1
+      )
+    } else {
+      hi = Math.min(sents.length - 1, 2)
+    }
+    return { cutS: sents[lo][0], cutE: sents[hi][1] }
+  }, [text, hasSpan, span])
+
+  const trimmed = cutS > 0 || cutE < text.length
+  const shown = open || !trimmed ? [0, text.length] : [cutS, cutE]
+  const slice = text.slice(shown[0], shown[1])
+  const rel: [number, number] | null =
+    hasSpan && span
+      ? [
+          Math.max(0, span[0] - shown[0]),
+          Math.min(slice.length, span[1] - shown[0]),
+        ]
+      : null
+  const valid = rel && rel[0] < rel[1] ? rel : null
+
+  // measure content height after each toggle for the expand animation
+  useLayoutEffect(() => {
+    const el = innerRef.current
+    if (el) setH(el.scrollHeight)
+  }, [open, slice])
+
   const cls =
     label === 'supported'
       ? 'hl-rev'
@@ -166,11 +224,38 @@ function ExcerptWithEvidence({
         : label === 'unsupported'
           ? 'hl-high'
           : 'hl-low'
+
   return (
     <>
-      {text.slice(0, span[0])}
-      <span className={`hl ${cls}`}>{text.slice(span[0], span[1])}</span>
-      {text.slice(span[1])}
+      <div
+        className="excerpt-clip"
+        style={h !== undefined ? { height: h } : undefined}
+      >
+        <div className="font-normal excerpt-swap" key={String(open)} ref={innerRef}>
+          {!open && shown[0] > 0 && '… '}
+          {valid ? (
+            <>
+              {slice.slice(0, valid[0])}
+              <span className={`hl ${cls}`}>
+                {slice.slice(valid[0], valid[1])}
+              </span>
+              {slice.slice(valid[1])}
+            </>
+          ) : (
+            slice
+          )}
+          {!open && shown[1] < text.length && ' …'}
+        </div>
+      </div>
+      {trimmed && (
+        <button
+          className="link-accent t13 font-normal"
+          style={{ marginTop: 8 }}
+          onClick={() => setOpen((o) => !o)}
+        >
+          {open ? '收起' : '显示完整片段'}
+        </button>
+      )}
     </>
   )
 }
@@ -321,31 +406,28 @@ function DistributionDetail({
   )
 }
 
-function DistRow({ s }: { s: import('../types/report').SectionDist }) {
-  const share = barGeom(s.share ?? 0, s.bench_share ?? null)
-  const density = barGeom(s.density ?? 0, s.bench_density ?? null)
+function DistRow({ s }: { s: SectionDist }) {
   const comparable = s.density_flag !== 'na'
   return (
     <div>
       <div className="font-semibold" style={{ marginBottom: 4 }}>
-        {s.title}
+        {s.title || '全文'}
       </div>
-      <BarRow
-        label="本文"
-        frac={share.valueFrac}
-        valueLabel={`${((s.share ?? 0) * 100).toFixed(1)}%`}
-        geom={share}
+      <MetricGroup
+        label="引用占比"
+        value={s.share ?? 0}
+        bench={s.bench_share ?? null}
+        fmt={(x) => `${(x * 100).toFixed(1)}%`}
       />
-      {comparable && (
-        <BarRow
-          label="密度"
-          frac={density.valueFrac}
-          valueLabel={`${(s.density ?? 0).toFixed(1)} /千词`}
-          geom={density}
+      {comparable ? (
+        <MetricGroup
+          label="每千词引用"
+          value={s.density ?? 0}
+          bench={s.bench_density ?? null}
+          fmt={(x) => x.toFixed(1)}
         />
-      )}
-      {!comparable && (
-        <div className="t13 secondary" style={{ marginTop: 4 }}>
+      ) : (
+        <div className="t13 secondary" style={{ marginTop: 8 }}>
           密度不可比（语言不同）
         </div>
       )}
@@ -353,80 +435,90 @@ function DistRow({ s }: { s: import('../types/report').SectionDist }) {
   )
 }
 
-function BarRow({
+/** one metric: "本文" bar + "领域常见范围" band on a shared 0..max axis,
+ * end values in 13px secondary, labels like "本文 13.0%" / "常见 4.8%–14.7%" */
+function MetricGroup({
   label,
-  frac,
-  valueLabel,
-  geom,
+  value,
+  bench,
+  fmt,
 }: {
   label: string
-  frac: number
-  valueLabel: string
-  geom: { q1: number; q3: number; median: number }
+  value: number
+  bench: { q1?: number | null; q3?: number | null; median?: number | null } | null
+  fmt: (x: number) => string
 }) {
+  const g = barGeom(value, bench)
+  const track = (children: React.ReactNode) => (
+    <div
+      className="relative"
+      style={{ flex: 1, height: 8, background: 'var(--fill)', borderRadius: 4 }}
+    >
+      {children}
+    </div>
+  )
+  const val = (t: string) => (
+    <span className="t13 secondary" style={{ minWidth: 104 }}>
+      {t}
+    </span>
+  )
   return (
-    <div style={{ marginTop: 4 }}>
-      <div className="flex items-center gap-2">
-        <div
-          className="relative"
-          style={{
-            flex: 1,
-            height: 8,
-            background: 'var(--fill)',
-            borderRadius: 4,
-          }}
-        >
+    <div style={{ marginTop: 8 }}>
+      <div className="t13 secondary">{label}</div>
+      <div className="flex items-center gap-2" style={{ marginTop: 6 }}>
+        {track(
           <div
             style={{
               position: 'absolute',
               left: 0,
               top: 0,
               bottom: 0,
-              width: `${frac * 100}%`,
+              width: `${g.valueFrac * 100}%`,
               background: 'var(--accent)',
               borderRadius: 4,
             }}
           />
-        </div>
-        <span className="t13 secondary" style={{ minWidth: 88 }}>
-          {label} {valueLabel}
-        </span>
+        )}
+        {val(`本文 ${fmt(value)}`)}
       </div>
-      <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
-        <div
-          className="relative"
-          style={{
-            flex: 1,
-            height: 8,
-            background: 'var(--fill)',
-            borderRadius: 4,
-          }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              left: `${geom.q1 * 100}%`,
-              width: `${Math.max(geom.q3 - geom.q1, 0.01) * 100}%`,
-              top: 0,
-              bottom: 0,
-              background: 'color-mix(in srgb, var(--accent) 30%, transparent)',
-              borderRadius: 4,
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              left: `${geom.median * 100}%`,
-              width: 2,
-              top: -2,
-              bottom: -2,
-              background: 'var(--accent)',
-            }}
-          />
+      {bench && (
+        <div className="flex items-center gap-2" style={{ marginTop: 4 }}>
+          {track(
+            <>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${g.q1 * 100}%`,
+                  width: `${Math.max(g.q3 - g.q1, 0.01) * 100}%`,
+                  top: 0,
+                  bottom: 0,
+                  background:
+                    'color-mix(in srgb, var(--accent) 30%, transparent)',
+                  borderRadius: 4,
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${g.median * 100}%`,
+                  width: 2,
+                  top: -2,
+                  bottom: -2,
+                  background: 'var(--accent)',
+                }}
+              />
+            </>
+          )}
+          {val(`常见 ${fmt(bench.q1 ?? 0)}–${fmt(bench.q3 ?? 0)}`)}
         </div>
-        <span className="t13 secondary" style={{ minWidth: 88 }}>
-          领域常见范围
-        </span>
+      )}
+      {/* shared axis ends, aligned to the track column */}
+      <div className="flex items-center gap-2" style={{ marginTop: 2 }}>
+        <div className="flex justify-between" style={{ flex: 1 }}>
+          <span className="t13 secondary">0</span>
+          <span className="t13 secondary">{fmt(g.max)}</span>
+        </div>
+        <span style={{ minWidth: 104 }} />
       </div>
     </div>
   )

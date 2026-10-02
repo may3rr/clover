@@ -128,15 +128,27 @@ export function layoutSkeleton(outline: Outline): SkLayout {
     units.push({ kind: 'ref', key: `r-${i}`, short: true })
   }
 
-  // paginate: heading counts as ~2 lines tall
+  // paginate evenly: pick the page count first, then spread lines so no
+  // page (especially the last) is nearly empty — headings weigh 2 lines
+  const weight = (u: SkLine) => (u.kind === 'heading' ? 2 : 1)
+  const totalW = units.reduce((a, u) => a + weight(u), 0)
+  const nPages = Math.min(
+    MAX_PAGES,
+    Math.max(1, Math.ceil(totalW / LINES_PER_PAGE))
+  )
   const pages: SkPage[] = []
   const pageOf: Record<string, number> = {}
   let page: SkPage = []
   let used = 0
+  let remainingW = totalW
+  let pagesLeft = nPages
   for (const u of units) {
-    const h = u.kind === 'heading' ? 2 : 1
-    if (used + h > pageCap && page.length) {
+    const h = weight(u)
+    const cap = Math.ceil(remainingW / pagesLeft)
+    if (used + h > cap && page.length && pagesLeft > 1) {
       pages.push(page)
+      remainingW -= used
+      pagesLeft--
       page = []
       used = 0
     }

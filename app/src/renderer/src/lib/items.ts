@@ -116,6 +116,24 @@ export function firstLine(detail: string): string {
   return detail.split('\n')[0] ?? ''
 }
 
+/** "[1] Vaswani 等，2017，Attention is all you need" — identifies the
+ * reference an authenticity/support finding is about; the issue text
+ * itself lives in the detail view. */
+export function refLine(item: ListItem, report: Report): string | null {
+  if (item.layer !== 'authenticity' && item.layer !== 'support') return null
+  const refId = item.finding?.refs?.[0]
+  if (!refId) return null
+  const r = (report.references ?? []).find((x) => x.id === refId)
+  if (!r) return null
+  const num = r.label ? `[${r.label}] ` : ''
+  const first = (r.authors?.[0] ?? '').split(/[\s,]+/)[0] ?? ''
+  const who = first ? `${first}${(r.authors?.length ?? 0) > 1 ? ' 等' : ''}` : ''
+  const parts = [who, r.year ? String(r.year) : '', r.title ?? ''].filter(
+    Boolean
+  )
+  return `${num}${parts.join('，')}`
+}
+
 /** The item a clicked segment selects: most severe, then shortest span. */
 export function pickItem(covering: ListItem[]): ListItem | null {
   if (!covering.length) return null

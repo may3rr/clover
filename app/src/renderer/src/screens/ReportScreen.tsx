@@ -11,6 +11,7 @@ import {
   firstLine,
   moveSelection,
   pickItem,
+  refLine,
   type ListItem,
 } from '../lib/items'
 import {
@@ -27,8 +28,9 @@ import {
   PlusFillIcon,
   ArrowUpDocFillIcon,
   PageIcon,
-  SealCheckFillIcon,
+  DocMagnifyIcon,
   SealOkIllustration,
+  SevGlyph,
 } from '../components/Icons'
 
 const LAYER_NAMES: Record<string, string> = {
@@ -257,7 +259,7 @@ export default function ReportScreen({
         style={{ marginLeft: 240, marginRight: 380, background: 'var(--bg)' }}
       >
         <div
-          className="drag-strip flex items-center justify-between"
+          className="drag-strip bar-blur flex items-center justify-between"
           style={{ height: 52, flex: 'none', padding: '0 24px' }}
         >
           <div className="font-semibold">{filterName}</div>
@@ -343,6 +345,7 @@ export default function ReportScreen({
         ) : (
           <InspectorList
             items={shown}
+            report={report}
             grouped={filter === null}
             selectedId={selectedId}
             onSelect={(id) => select(id, true)}
@@ -466,7 +469,7 @@ function PaperBody({
           ))}
         </div>
         <div className="callout" style={{ marginTop: 24, marginBottom: 40 }}>
-          <SealCheckFillIcon size={20} color="var(--accent)" />
+          <DocMagnifyIcon size={20} color="var(--accent)" />
           <div className="font-normal">
             发现{' '}
             <span className="font-semibold sem-high">{nHigh}</span>{' '}
@@ -529,11 +532,13 @@ function PaperBody({
 
 function InspectorList({
   items,
+  report,
   grouped,
   selectedId,
   onSelect,
 }: {
   items: ListItem[]
+  report: Report
   grouped: boolean
   selectedId: string | null
   onSelect: (id: string) => void
@@ -552,6 +557,7 @@ function InspectorList({
   const row = (i: ListItem) => {
     // staggered entrance — max 12 rows animate, the rest are instant
     const delay = Math.min(rowIdx++, 12) * 20
+    const sub = refLine(i, report) ?? firstLine(i.detail)
     return (
       <button
         key={i.id}
@@ -560,16 +566,16 @@ function InspectorList({
         onClick={() => onSelect(i.id)}
       >
         <div className="flex items-start gap-2">
-          <LayerTile layer={i.layer} size={22} />
+          <span style={{ marginTop: 1, flex: 'none' }}>
+            <SevGlyph severity={i.severity} />
+          </span>
           <div className="min-w-0">
             <div
               className={`font-semibold${i.id === selectedId ? ' row-title-sel' : ''}`}
             >
               {i.title}
             </div>
-            {firstLine(i.detail) && (
-              <div className="t13 secondary clamp-2">{firstLine(i.detail)}</div>
-            )}
+            {sub && <div className="t13 secondary truncate">{sub}</div>}
           </div>
         </div>
       </button>
@@ -579,7 +585,7 @@ function InspectorList({
   return (
     <>
       <div
-        className="font-semibold"
+        className="font-semibold bar-blur-subtle"
         style={{ fontSize: 17, padding: '14px 16px', flex: 'none', height: 52 }}
       >
         {items.length} 个问题

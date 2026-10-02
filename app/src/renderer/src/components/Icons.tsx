@@ -155,6 +155,73 @@ export function ExclaimCircleFillIcon(p: IconProps) {
   )
 }
 
+export function ExclaimTriangleFillIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d="M12 3.2c.9 0 1.7.5 2.1 1.3l6.6 11.9c.8 1.4-.1 3.1-1.7 3.1H5c-1.6 0-2.5-1.7-1.7-3.1l6.6-11.9c.4-.8 1.2-1.3 2.1-1.3zM11 8.8h2l-.3 4.7h-1.4zM12 15a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6z"
+      />
+    </Fill>
+  )
+}
+
+export function InfoCircleFillIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM12 6.6a1.3 1.3 0 1 1 0 2.6 1.3 1.3 0 0 1 0-2.6zM10.9 10.6h2.3v6.6h-2.3z"
+      />
+    </Fill>
+  )
+}
+
+export function PencilCircleFillIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM16.6 7.4a1.7 1.7 0 0 1 0 2.4l-.8.8-2.4-2.4.8-.8a1.7 1.7 0 0 1 2.4 0zM12.7 9.3l2.4 2.4-5.3 5.3-3 .7.7-3z"
+      />
+    </Fill>
+  )
+}
+
+/** doc.text.magnifyingglass — the summary-callout glyph (--accent) */
+export function DocMagnifyIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d="M6.5 2.5h6.6l5.4 5.4V19a2.5 2.5 0 0 1-2.5 2.5H6.5A2.5 2.5 0 0 1 4 19V5a2.5 2.5 0 0 1 2.5-2.5zM12.6 3.9v4h4z"
+      />
+      <rect
+        x="7.5"
+        y="9"
+        width="6"
+        height="1.4"
+        rx="0.7"
+        fill="var(--bg-subtle)"
+      />
+      {/* magnifier over the bottom-right corner */}
+      <circle cx="15.6" cy="15.2" r="4.2" fill="var(--bg-subtle)" />
+      <path
+        fillRule="evenodd"
+        d="M15.6 12a3.2 3.2 0 1 1 0 6.4 3.2 3.2 0 0 1 0-6.4zm0 1.2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"
+      />
+      <rect
+        x="17.8"
+        y="17.4"
+        width="1.5"
+        height="3.4"
+        rx="0.75"
+        transform="rotate(-45 17.8 17.4)"
+      />
+    </Fill>
+  )
+}
+
 /** done state: filled circle + check that draws via stroke-dashoffset */
 export function CheckCircleFillIcon({
   size = 18,
@@ -227,10 +294,10 @@ export function ChevronDownIcon({ size = 18, color = 'currentColor' }: IconProps
 // ------------------------------------------------------------ tiles
 
 export const LAYER_TILE: Record<string, string> = {
-  authenticity: 'var(--tile-green)',
+  authenticity: 'var(--tile-indigo)',
   support: 'var(--tile-blue)',
-  distribution: 'var(--tile-purple)',
-  norms: 'var(--tile-orange)',
+  distribution: 'var(--tile-teal)',
+  norms: 'var(--tile-purple)',
 }
 
 export const LAYER_FILL_ICONS: Record<
@@ -241,6 +308,36 @@ export const LAYER_FILL_ICONS: Record<
   support: QuoteBubbleFillIcon,
   distribution: ChartBarFillIcon,
   norms: TextFormatFillIcon,
+}
+
+/** inspector-row severity glyph — filled, semantic graphic colors.
+ * The list is already grouped by layer, so rows show the severity, not
+ * the layer tile (a green check tile on a problem row reads as "passed") */
+export function SevGlyph({
+  severity,
+  size = 18,
+}: {
+  severity: string
+  size?: number
+}) {
+  const C = (
+    {
+      high: ExclaimCircleFillIcon,
+      medium: ExclaimTriangleFillIcon,
+      low: InfoCircleFillIcon,
+      rev: PencilCircleFillIcon,
+    } as Record<string, (p: IconProps) => React.ReactElement>
+  )[severity] ?? InfoCircleFillIcon
+  const color =
+    (
+      {
+        high: 'var(--high)',
+        medium: 'var(--medium)',
+        low: 'var(--low)',
+        rev: 'var(--ok)',
+      } as Record<string, string>
+    )[severity] ?? 'var(--low)'
+  return <C size={size} color={color} />
 }
 
 /** colored rounded square with a white filled glyph inside */
