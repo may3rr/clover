@@ -27,16 +27,17 @@ const LAYER_NAMES: Record<string, string> = {
 interface Props {
   report: Report
   jobId: string
+  /** shot/E2E driver: selection applied after mount via effect */
+  externalSelection?: { id: string | null; open: boolean } | null
   registerExport: (fn: () => void) => void
-  registerSelect: (fn: (id: string | null, open?: boolean) => void) => void
   onExported: (path: string | null) => void
 }
 
 export default function ReportScreen({
   report,
   jobId,
+  externalSelection,
   registerExport,
-  registerSelect,
   onExported,
 }: Props) {
   const items = useMemo(() => buildItems(report), [report])
@@ -90,6 +91,12 @@ export default function ReportScreen({
     registerExport(doExport)
   }, [doExport, registerExport])
 
+  // E2E: export fires itself once the report is on screen
+  useEffect(() => {
+    if (window.citecheck.e2eFile) doExport()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // ------------------------------------------------------ selection nav
   const select = useCallback(
     (id: string | null, openDetail: boolean) => {
@@ -99,15 +106,15 @@ export default function ReportScreen({
         // scroll its paper segments into view
         requestAnimationFrame(() => {
           const el = segRefs.current.get(id)?.[0]
-          el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+          el?.scrollIntoView({ block: 'center' })
         })
       }
     },
     []
   )
   useEffect(() => {
-    registerSelect((id, open = true) => select(id, open))
-  }, [registerSelect, select])
+    if (externalSelection) select(externalSelection.id, externalSelection.open)
+  }, [externalSelection, select])
 
   // --------------------------------------------------------------- keys
   useEffect(() => {

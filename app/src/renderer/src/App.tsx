@@ -112,17 +112,21 @@ export default function App() {
   useEffect(() => {
     if (!window.citecheck.shotsMode) return
     window.citecheck.sampleReport().then((r) => {
+      setJobId('shot') // report/running branches require a truthy jobId
       shotState.current.report = r as Report
       shotState.current.setScreen = setScreen
       shotState.current.setReport = setReport
       shotState.current.setLayers = (l) => setShotLayers(l)
-      shotState.current.selectItem = (id) => shotSelect.current?.(id)
+      shotState.current.selectItem = (id, open) =>
+        setExtSel({ id, open: open !== false })
       shotState.current.setDrag = (v) => setDragHint(v)
     })
   }, [])
   const [shotLayers, setShotLayers] = useState<LayerUI | null>(null)
   const [dragHint, setDragHint] = useState(false)
-  const shotSelect = useRef<((id: string | null) => void) | null>(null)
+  const [extSel, setExtSel] = useState<{ id: string | null; open: boolean } | null>(
+    null
+  )
 
   useEffect(() => {
     if (!window.citecheck.shotsMode) return
@@ -169,8 +173,8 @@ export default function App() {
       <ReportScreen
         report={report}
         jobId={jobId}
+        externalSelection={extSel}
         registerExport={(fn) => (exportRef.current = fn)}
-        registerSelect={(fn) => (shotSelect.current = fn)}
         onExported={(_path) => {
           if (window.citecheck.e2eFile && !e2eExportDone.current) {
             e2eExportDone.current = true

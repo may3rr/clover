@@ -46,7 +46,10 @@ app.add_middleware(
 
 @app.middleware("http")
 async def _auth(request: Request, call_next):
-    if TOKEN and request.url.path != "/health":
+    # OPTIONS is the CORS preflight — it carries no credentials; the real
+    # request behind it is still checked.
+    if TOKEN and request.method != "OPTIONS" \
+            and request.url.path != "/health":
         given = request.headers.get("x-citecheck-token") or \
             request.query_params.get("token")
         if not (given and secrets.compare_digest(given, TOKEN)):
