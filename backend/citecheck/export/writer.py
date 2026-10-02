@@ -530,8 +530,9 @@ def export_report(
             else:
                 orig.addnext(copy_p)
         else:
-            pred = current_elem.get(rev.move_after) or p_by_id.get(
-                rev.move_after)
+            pred = current_elem.get(rev.move_after)
+            if pred is None:
+                pred = p_by_id.get(rev.move_after)
             if pred is not None:
                 pred.addnext(copy_p)
             else:
@@ -615,9 +616,10 @@ def _self_check(src: Path, out_root: etree._Element, out: Path,
 
     src_root = etree.fromstring(zipfile.ZipFile(src).read("word/document.xml"))
 
-    # (b) reject-all reproduces the original texts exactly
-    orig = [dx.paragraph_text_map(p)[0]
-            for _, p in dx.iter_paragraphs(src_root)]
+    # (b) reject-all reproduces the original texts exactly. If the source
+    # itself already carries tracked changes, "original" is its own
+    # fully-rejected text.
+    orig = simulated_texts(src_root, "reject")
     rejected = simulated_texts(out_root, "reject")
     if rejected != orig:
         raise RuntimeError(
