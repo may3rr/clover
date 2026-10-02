@@ -42,8 +42,15 @@ export default function Empty({
       setDrag(false)
       const file = e.dataTransfer.files?.[0]
       if (!file) return
-      if (!file.name.toLowerCase().endsWith('.docx')) {
-        setErr('无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。')
+      // 拖进来的可能是 LaTeX 项目文件夹：webkitGetAsEntry 能区分
+      const entry = e.dataTransfer.items?.[0]?.webkitGetAsEntry?.()
+      const name = file.name.toLowerCase()
+      const ok =
+        entry?.isDirectory === true ||
+        name.endsWith('.docx') ||
+        name.endsWith('.tex')
+      if (!ok) {
+        setErr('无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目文件夹。')
         return
       }
       setErr(null)
@@ -80,7 +87,7 @@ export default function Empty({
           把论文拖到这里
         </button>
         <div className="secondary" style={{ marginTop: 8 }}>
-          支持英文论文的 .docx 文件。全文在本机解析，不会上传。
+          支持英文论文的 .docx 文件或 LaTeX 项目文件夹。全文在本机解析，不会上传。
         </div>
         {(err || dropError) && (
           <div className="font-normal" style={{ marginTop: 12 }}>

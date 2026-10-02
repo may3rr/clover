@@ -2,6 +2,7 @@
 
 export type Title = string | null;
 export type Filename = string | null;
+export type SourceFormat = "docx" | "tex";
 export type CitationStyle = "numeric" | "author_year" | "mixed" | "unknown";
 export type ManagedBy = ("zotero" | "endnote") | null;
 export type WordCount = number;
@@ -20,8 +21,9 @@ export type ParagraphId = string;
 export type Start = number;
 export type End = number;
 export type Raw = string;
-export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year") | null;
+export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year" | "cite_key") | null;
 export type RefIds = string[];
+export type Keys = string[];
 export type Markers = CitationMarker[];
 export type Id3 = string;
 export type Raw1 = string;
@@ -33,6 +35,7 @@ export type Doi = string | null;
 export type Lang = "en" | "zh" | "other";
 export type ParagraphId1 = string | null;
 export type Label = string | null;
+export type Key = string | null;
 export type References = Reference[];
 export type RefId = string;
 export type Status = "verified" | "mismatch" | "not_found" | "unverifiable";
@@ -124,6 +127,7 @@ export interface Report {
 export interface Document {
   title?: Title;
   filename?: Filename;
+  source_format?: SourceFormat;
   citation_style?: CitationStyle;
   managed_by?: ManagedBy;
   word_count?: WordCount;
@@ -148,6 +152,7 @@ export interface CitationMarker {
   raw: Raw;
   kind?: Kind;
   ref_ids?: RefIds;
+  keys?: Keys;
 }
 export interface Reference {
   id: Id3;
@@ -160,6 +165,7 @@ export interface Reference {
   lang?: Lang;
   paragraph_id?: ParagraphId1;
   label?: Label;
+  key?: Key;
 }
 export interface RefCheck {
   ref_id: RefId;

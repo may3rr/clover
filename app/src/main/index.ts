@@ -122,8 +122,9 @@ ipcMain.handle('citecheck:info', () => ({
 ipcMain.handle('citecheck:open-docx', async () => {
   if (!win) return null
   const r = await dialog.showOpenDialog(win, {
-    properties: ['openFile'],
-    filters: [{ name: 'Word 文档', extensions: ['docx'] }],
+    // LaTeX 稿件是一个文件夹：允许同时选文件或目录
+    properties: ['openFile', 'openDirectory'],
+    filters: [{ name: '论文', extensions: ['docx', 'tex'] }],
   })
   return r.canceled || !r.filePaths.length ? null : r.filePaths[0]
 })

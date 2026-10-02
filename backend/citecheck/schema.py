@@ -36,7 +36,9 @@ class Paragraph(BaseModel):
     char_offset: int
 
 
-MarkerKind = Literal["zotero", "endnote", "superscript", "numeric", "author_year"]
+MarkerKind = Literal[
+    "zotero", "endnote", "superscript", "numeric", "author_year", "cite_key"
+]
 
 
 class CitationMarker(BaseModel):
@@ -47,6 +49,8 @@ class CitationMarker(BaseModel):
     raw: str
     kind: MarkerKind | None = None  # how the marker was detected
     ref_ids: list[str] = Field(default_factory=list)
+    # cite_key only: the bib keys inside the \cite{...} command, in order
+    keys: list[str] = Field(default_factory=list)
 
 
 CitationStyle = Literal["numeric", "author_year", "mixed", "unknown"]
@@ -56,6 +60,7 @@ RefManager = Literal["zotero", "endnote"]
 class Document(BaseModel):
     title: str | None = None
     filename: str | None = None
+    source_format: Literal["docx", "tex"] = "docx"
     citation_style: CitationStyle = "unknown"
     managed_by: RefManager | None = None
     word_count: int = 0
@@ -75,6 +80,7 @@ class Reference(BaseModel):
     lang: RefLang = "other"
     paragraph_id: str | None = None
     label: str | None = None
+    key: str | None = None  # bib cite key (latex sources only)
 
 
 RefStatus = Literal["verified", "mismatch", "not_found", "unverifiable"]

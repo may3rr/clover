@@ -53,7 +53,8 @@
                 "endnote",
                 "superscript",
                 "numeric",
-                "author_year"
+                "author_year",
+                "cite_key"
               ],
               "type": "string"
             },
@@ -69,6 +70,13 @@
             "type": "string"
           },
           "title": "Ref Ids",
+          "type": "array"
+        },
+        "keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Keys",
           "type": "array"
         }
       },
@@ -239,6 +247,15 @@
           ],
           "default": null,
           "title": "Filename"
+        },
+        "source_format": {
+          "default": "docx",
+          "enum": [
+            "docx",
+            "tex"
+          ],
+          "title": "Source Format",
+          "type": "string"
         },
         "citation_style": {
           "default": "unknown",
@@ -558,6 +575,18 @@
           ],
           "default": null,
           "title": "Label"
+        },
+        "key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Key"
         }
       },
       "required": [

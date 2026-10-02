@@ -178,7 +178,10 @@ def _author_year_order(refs: list[Reference]) -> list[str] | None:
 def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
     """Revisions to bring the reference list and markers into order."""
     refs = parsed.references
-    if not refs or parsed.document.managed_by:
+    # 重排修订的 anchor/move_after 语义是 docx 段落移动，LaTeX 源文件
+    # 不适用（bib 顺序由编译决定）；latex 报告不产出 reorder 修订。
+    if not refs or parsed.document.managed_by \
+            or parsed.document.source_format != "docx":
         return []
     para_text = {p.id: p.text for p in parsed.paragraphs}
     revs: list[Revision] = []
