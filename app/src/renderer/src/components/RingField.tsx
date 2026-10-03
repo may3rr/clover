@@ -126,9 +126,12 @@ export default function RingField({ mode }: { mode: FieldMode }) {
         ]
       }
       // orbit around an element (avatar, lock)
+      // anchor rects are viewport coords; the canvas may not sit at the
+      // viewport origin (e.g. the web replica's framed window)
       const rect = m.anchor()
-      const ax = rect ? rect.left + rect.width / 2 : cx
-      const ay = rect ? rect.top + rect.height / 2 : cy
+      const own = cvRef.current?.getBoundingClientRect()
+      const ax = rect ? rect.left - (own?.left ?? 0) + rect.width / 2 : cx
+      const ay = rect ? rect.top - (own?.top ?? 0) + rect.height / 2 : cy
       const spread = m.tight ? 6 : 14
       const r = m.radius + d.ring * spread + d.jitter * (m.tight ? 2 : 5)
       const speed = m.tight ? 0.06 : 0.035
