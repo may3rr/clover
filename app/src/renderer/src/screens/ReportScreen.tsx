@@ -26,6 +26,7 @@ import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
 import AccountChip from '../components/AccountChip'
 import HistoryRow from '../components/HistoryRow'
+import OverviewCard from '../components/OverviewCard'
 import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
 import {
@@ -526,7 +527,10 @@ function PaperBody({
             </div>
           ))}
         </div>
-        <div className="callout" style={{ marginTop: 24, marginBottom: 40 }}>
+        <div
+          className="callout"
+          style={{ marginTop: 24, marginBottom: report.overview ? 16 : 40 }}
+        >
           <DocMagnifyIcon size={20} color="var(--accent)" />
           <div className="font-normal">
             {nHigh + nMedium === 0 ? (
@@ -553,6 +557,7 @@ function PaperBody({
             )}
           </div>
         </div>
+        <OverviewCard overview={report.overview} style={{ marginBottom: 40 }} />
       </div>
       {(report.paragraphs ?? []).map((p) => {
         const ptext = p.text ?? ''

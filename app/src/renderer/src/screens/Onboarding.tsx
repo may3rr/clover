@@ -209,13 +209,13 @@ export default function Onboarding({
                 icon={<PaperplaneFillIcon size={13} />}
                 color="var(--tile-teal)"
                 title="只发给你配置的模型服务"
-                body="判断引用时，论断和相关片段会发送到你选择的模型服务商，不会上传整篇稿件，也不经过我们的服务器。"
+                body="判断引用时，论断和相关片段会发送到你选择的模型服务商。期刊对标还会发送论文的标题、摘要、章节标题和图表题注。不会上传整篇稿件，也不经过我们的服务器。"
               />
               <PrivacyRow
                 icon={<BooksFillIcon size={13} />}
                 color="var(--tile-purple)"
-                title="核验文献时查询公开数据库"
-                body="参考文献的标题、作者和 DOI 会发送到 Crossref、OpenAlex、Semantic Scholar 和 arXiv 检索。"
+                title="核验文献和对标期刊时访问公开数据库"
+                body="参考文献的标题、作者和 DOI 会发送到 Crossref、OpenAlex、Semantic Scholar 和 arXiv 检索。期刊对标会从 ACL Anthology 下载已发表的公开论文，不发送你的稿件。"
               />
               <PrivacyRow
                 icon={<GitHubMarkIcon size={13} />}
