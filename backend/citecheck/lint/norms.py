@@ -16,7 +16,7 @@ import re
 
 from rapidfuzz import fuzz
 
-from ..parse.links import _numeric_items, unresolved_numeric
+from ..parse.links import author_year_items, _numeric_items, unresolved_numeric
 from ..parse.parser import ParsedDocument
 from ..refs.structure import _TYPE_TAG_RE
 from ..schema import Anchor, Finding, Reference
@@ -86,6 +86,25 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
                        "建议：核对编号是否笔误，或补全缺失的参考文献条目。",
                 refs=[],
             ))
+
+    # author-year: a marker naming more works than it resolved to has at
+    # least one citation with no matching entry
+    for m in parsed.markers:
+        if m.kind != "author_year":
+            continue
+        items = author_year_items(m.raw)
+        if not items or len(set(m.ref_ids)) >= len(items):
+            continue
+        findings.append(Finding(
+            id="", layer="norms", severity="high",
+            anchor=Anchor(paragraph_id=m.paragraph_id, start=m.start,
+                          end=m.end),
+            title="正文引用找不到对应的参考文献条目",
+            detail=f"依据：引用 {m.raw.strip()} 在参考文献列表中找不到作者和"
+                   "年份都对得上的条目。\n"
+                   "建议：补全缺失的参考文献条目，或核对作者姓氏与年份是否笔误。",
+            refs=list(m.ref_ids),
+        ))
 
     # ---- duplicate references ----------------------------------------
     keyed = [(i, r) for i, r in enumerate(refs) if r.title]

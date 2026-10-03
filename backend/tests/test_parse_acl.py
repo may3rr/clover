@@ -75,3 +75,26 @@ def test_standalone_unnumbered_headings():
               "Acknowledgments:"]:
         assert heading_level(_p(), t, {}) == 1, t
     assert heading_level(_p(), "Results are mixed.", {}) is None
+
+
+def test_unresolved_author_year_marker_is_flagged():
+    from citecheck.lint.norms import check_norms
+    from citecheck.parse.parser import ParsedDocument
+    from citecheck.schema import CitationMarker, Document, Paragraph
+
+    doc = ParsedDocument(
+        document=Document(),
+        paragraphs=[Paragraph(id="p0", section_id="s0", text="x", char_offset=0)],
+        markers=[
+            CitationMarker(id="m0", paragraph_id="p0", start=0, end=1,
+                           raw="(Lewis et al., 2020; Thoppilan et al., 2022)",
+                           ref_ids=["r1"], kind="author_year"),
+            CitationMarker(id="m1", paragraph_id="p0", start=0, end=1,
+                           raw="(Lewis et al., 2020)", ref_ids=["r1"],
+                           kind="author_year"),
+        ],
+        references=[Reference(id="r1", raw="Lewis", authors=["Patrick Lewis"],
+                              year=2020, paragraph_id="p0")],
+    )
+    titles = [f.title for f in check_norms(doc)]
+    assert titles.count("正文引用找不到对应的参考文献条目") == 1
