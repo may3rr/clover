@@ -12,6 +12,16 @@ type CloverWin = Window & {
   }
 }
 
+// ------------------------------------------------------- ?card=end
+// closing card of the video: the first screen plus "Powered by 千问"
+// (Qwen mark from LobeHub lobe-icons, MIT)
+if (new URLSearchParams(location.search).get('card') === 'end') {
+  document.querySelector('.hero-team')?.insertAdjacentHTML(
+    'afterend',
+    `<p class="hero-powered"><span>Powered by</span><img src="./brand/qwen-color.svg" alt="" width="28" height="28" /><b>千问</b></p>`
+  )
+}
+
 // ---------------------------------------------------------------- links
 for (const a of document.querySelectorAll<HTMLAnchorElement>('[data-link]')) {
   const href = LINKS[a.dataset.link as keyof typeof LINKS]

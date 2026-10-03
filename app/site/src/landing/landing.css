@@ -202,6 +202,19 @@ p {
   color: var(--text);
   margin-right: 8px;
 }
+.hero-powered {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+.hero-powered b {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text);
+}
 .hero-hint {
   margin-top: 16px;
   font-size: 13px;
