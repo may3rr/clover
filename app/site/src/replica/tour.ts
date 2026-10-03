@@ -13,6 +13,7 @@ export type Step =
   | { hover: Target; pause?: number }
   | { scroll: Target; by: number; ms?: number }
   | { reveal: string; ms?: number }
+  | { type: Target; text: string; pause?: number }
   | { wait: number }
   | { cursor: 'show' | 'hide' }
 
@@ -25,6 +26,22 @@ export const OVERVIEW_CARD = 'section[aria-label$="对标"]'
 
 /** Scenes for the product video; each also stands alone. */
 export const TOURS: Record<string, Step[]> = {
+  // 首次启动引导：圆点聚成环 -> 连接模型 -> 名字与头像 -> 隐私说明 -> 首页
+  onboarding: [
+    { go: 'onboarding-intro' },
+    { cursor: 'hide' },
+    { wait: 3600 },
+    { cursor: 'show' },
+    { click: { sel: '.pill-accent', text: '开始设置' }, pause: 2400 },
+    { hover: '.onboard-model', pause: 1200 },
+    { click: { sel: '.onboard-model .pill-accent', text: '保存并继续' }, pause: 1400 },
+    { type: '.account-name-input', text: '李明', pause: 600 },
+    { click: { sel: '.swatch', nth: 3 }, pause: 500 },
+    { click: { sel: '.swatch', nth: 1 }, pause: 900 },
+    { click: { sel: '.pill-accent', text: '继续' }, pause: 2400 },
+    { click: '.onboard-consent', pause: 900 },
+    { click: { sel: '.pill-accent', text: '开始使用' }, pause: 1800 },
+  ],
   // 拖入论文 -> 体检中 -> 报告
   check: [
     { go: 'empty' },
@@ -90,7 +107,8 @@ export const TOURS: Record<string, Step[]> = {
   ],
 }
 TOURS.full = [
-  ...TOURS.check,
+  ...TOURS.onboarding,
+  ...TOURS.check.slice(1),
   ...TOURS.authenticity.slice(2),
   ...TOURS.support.slice(2),
   ...TOURS.distribution.slice(2),
@@ -194,6 +212,24 @@ async function run(list: Step[]) {
       await sleep(110)
       el.click()
       await sleep(s.pause ?? 500)
+    } else if ('type' in s) {
+      const el = (await find(s.type)) as HTMLInputElement
+      await moveTo(el)
+      el.focus()
+      // React tracks the value through the native setter, so set it there
+      const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+      const put = (v: string) => {
+        set.call(el, v)
+        el.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+      put('')
+      await sleep(300)
+      for (let i = 1; i <= s.text.length; i++) {
+        put(s.text.slice(0, i))
+        await sleep(180)
+      }
+      el.blur()
+      await sleep(s.pause ?? 400)
     } else if ('reveal' in s) {
       await reveal(s.reveal, s.ms)
     } else if ('scroll' in s) {

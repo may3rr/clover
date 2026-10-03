@@ -31,7 +31,7 @@ const flag = (k) => argv.includes(`--${k}`)
 const valued = new Set(['--fps', '--scale', '--out', '--page', '--seconds'])
 const names = argv.filter((a, i) => !a.startsWith('--') && !valued.has(argv[i - 1]))
 
-const ALL = ['check', 'authenticity', 'support', 'distribution', 'norms', 'overview', 'export', 'settings', 'full']
+const ALL = ['onboarding', 'check', 'authenticity', 'support', 'distribution', 'norms', 'overview', 'export', 'settings', 'full']
 const page = opt('page')
 const jobs = page
   ? [{ name: path.basename(page).replace(/\W+/g, '-'), url: page, seconds: +opt('seconds', 15) }]

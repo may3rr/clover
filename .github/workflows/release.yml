@@ -39,7 +39,7 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - name: Smoke test the bundled backend
         run: |
-          APP=release/mac-arm64/Clover.app/Contents/Resources
+          APP="$PWD/release/mac-arm64/Clover.app/Contents/Resources"
           cd "$APP/backend"
           CITECHECK_HOME="$RUNNER_TEMP/clover" "$APP/python/bin/python3" -c "import citecheck.server; print('backend imports ok')"
           test ! -e .env && test ! -e config.toml && echo 'no secrets in bundle'
