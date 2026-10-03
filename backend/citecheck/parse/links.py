@@ -48,26 +48,32 @@ _PARTICLES = {"van", "von", "de", "der", "den", "del", "della", "di", "da",
               "du", "la", "le", "ter", "ten", "dos", "das", "al", "bin"}
 
 
+def latin_surname(name: str) -> str:
+    """Surname of a latin-script author in any common order:
+    'Devlin, J.' / 'Devlin J' / 'Devlin J. M.' (surname first) and
+    'Jacob Devlin' / 'Aaron van den Oord' (ACL full names, surname last,
+    lowercase particles kept)."""
+    n = name.strip()
+    if "," in n:
+        return n.split(",", 1)[0].strip()
+    toks = n.split()
+    if len(toks) <= 1:
+        return n
+    if all(re.fullmatch(r"(?:[A-Z]\.?-?){1,3}", t) for t in toks[1:]):
+        return toks[0]
+    i = len(toks) - 1
+    while i > 1 and toks[i - 1].lower() in _PARTICLES:
+        i -= 1
+    return " ".join(toks[i:])
+
+
 def _ref_first_surname(ref: Reference) -> str:
     if not ref.authors:
         return ""
     first = ref.authors[0].strip()
     if _ZH_NAME.search(first):
         return _ZH_NAME.search(first).group(0)  # type: ignore[union-attr]
-    if "," in first:  # "Devlin, J."
-        return first.split(",", 1)[0].strip()
-    toks = first.split()
-    if len(toks) == 1:
-        return toks[0]
-    # "Devlin J" / "Devlin JM" / "Devlin J. M." — surname first, initials after
-    if all(re.fullmatch(r"(?:[A-Z]\.?-?){1,3}", t) for t in toks[1:]):
-        return toks[0]
-    # "Jacob Devlin" / "Aaron van den Oord" (ACL full names) — surname last,
-    # keeping lowercase particles that belong to it
-    i = len(toks) - 1
-    while i > 1 and toks[i - 1].lower() in _PARTICLES:
-        i -= 1
-    return " ".join(toks[i:])
+    return latin_surname(first)
 
 
 def _marker_surname(authors_part: str) -> str:

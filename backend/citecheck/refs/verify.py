@@ -35,6 +35,7 @@ from dataclasses import dataclass, field
 
 from rapidfuzz import fuzz
 
+from ..parse.links import latin_surname
 from ..schema import Anchor, Finding, Paragraph, RefCheck, Reference
 from .sources import RetrievalClient, SourceResult
 from .structure import complete_reference_fields
@@ -64,11 +65,9 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9一-鿿]+", " ", s).strip()
 
 
-def _surname(name: str, *, display_order: bool = False) -> str:
+def _surname(name: str) -> str:
     """Surname from 'Surname, I.' / 'Vaswani A' / 'Ashish Vaswani' / 中文名.
 
-    display_order=True treats bare 'First Last' as given-name-first (the
-    format Crossref author lists and OpenAlex/S2 display names use).
     """
     n = (name or "").strip()
     if not n:
@@ -76,10 +75,10 @@ def _surname(name: str, *, display_order: bool = False) -> str:
     zh = _CJK.search(n)
     if zh:
         return n[zh.start()]  # Chinese surname = first character
-    if "," in n:
-        return n.split(",", 1)[0].strip()
-    tokens = n.split()
-    return tokens[-1] if display_order else tokens[0]
+    # manuscript lists may be "Surname, I.", "Surname I" or ACL "Given
+    # Surname"; database display names are "Given Surname" — the shared
+    # heuristic reads all of them the same way
+    return latin_surname(n)
 
 
 def _ref_surname(ref: Reference) -> str:
@@ -88,7 +87,7 @@ def _ref_surname(ref: Reference) -> str:
 
 def _hit_surname(hit: dict) -> str:
     authors = hit.get("authors") or []
-    return _surname(authors[0], display_order=True) if authors else ""
+    return _surname(authors[0]) if authors else ""
 
 
 async def _gather_hits(
@@ -203,7 +202,10 @@ def _evaluate(
         if _CJK.search(ref_surname):
             ok = hit_surname.startswith(ref_surname) or ref_surname.startswith(hit_surname)
         else:
-            ok = fuzz.ratio(_norm(ref_surname), _norm(hit_surname)) >= _SURNAME_MIN
+            a, b = _norm(ref_surname), _norm(hit_surname)
+            # particles are written inconsistently ("van den Oord" / "Oord")
+            ok = (fuzz.ratio(a, b) >= _SURNAME_MIN
+                  or a.split()[-1:] == b.split()[-1:])
         if not ok:
             author_diff = True
             issues.append(

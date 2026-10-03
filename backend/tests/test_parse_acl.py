@@ -98,3 +98,9 @@ def test_unresolved_author_year_marker_is_flagged():
     )
     titles = [f.title for f in check_norms(doc)]
     assert titles.count("正文引用找不到对应的参考文献条目") == 1
+
+
+def test_verify_surname_same_for_acl_and_database_names():
+    from citecheck.refs.verify import _surname
+    assert _surname("Akari Asai") == _surname("Asai, A.") == "Asai"
+    assert _surname("Vaswani A") == "Vaswani"
