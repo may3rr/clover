@@ -1,11 +1,11 @@
-// Electron side of frame.mjs: render a page at 1920 x 1080 CSS px, 2x,
+// Electron side of frame.mjs: render a page at `size` CSS px (1920 x 1080 by default), 2x,
 // light and dark -> PNG (+ the window slot in output pixels, if the page
 // exposes window.__slot). `ready` is a selector to wait for, if any.
 const { app, BrowserWindow, nativeTheme } = require('electron')
 const fs = require('node:fs')
 const path = require('node:path')
 
-const { base, out, page, name, ready, themes } = JSON.parse(process.env.CLOVER_FRAME)
+const { base, out, page, name, ready, themes, size = [1920, 1080] } = JSON.parse(process.env.CLOVER_FRAME)
 app.dock?.hide()
 app.on('window-all-closed', () => {})
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -15,7 +15,7 @@ app.whenReady().then(async () => {
   for (const theme of themes) {
     nativeTheme.themeSource = theme
     const win = new BrowserWindow({
-      width: 3840, height: 2160, useContentSize: true, show: false,
+      width: size[0] * 2, height: size[1] * 2, useContentSize: true, show: false,
       webPreferences: { offscreen: true, zoomFactor: 2 },
     })
     let latest = null

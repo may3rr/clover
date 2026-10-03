@@ -49,3 +49,4 @@ demo/*_events.json
 .idea/
 .vscode/
 app/build/python/
+dist/

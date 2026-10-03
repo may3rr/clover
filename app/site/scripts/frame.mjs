@@ -7,6 +7,7 @@
 //   --template desk    the window on a desktop, padding all round (desk.html)
 //   --template cover   no video: the landing page's first screen as a PNG
 //   --template end     same, plus "Powered by 千问" (closing card)
+//   --template poster  competition cover, 1080 x 1920 (rendered 2x)
 //
 // Output: site-videos/frame/<template>-{light,dark}.png, <template>.slot.json,
 // <template>.mask.png; videos in site-videos/05-成片-<主页框|桌面>/<name>.mp4
@@ -27,6 +28,7 @@ const TEMPLATES = {
   desk: { page: 'desk.html', dir: '05-成片-桌面' },
   cover: { page: 'index.html', ready: '.hero-window .window.ready' },
   end: { page: 'index.html?card=end', ready: '.hero-window .window.ready' },
+  poster: { page: 'poster.html', ready: '.window.ready', size: [1080, 1920], themes: ['light'] },
 }
 const T = TEMPLATES[template]
 if (!T) throw new Error(`unknown template ${template}`)
@@ -48,7 +50,7 @@ await new Promise((resolve, reject) => {
       ...process.env,
       CLOVER_FRAME: JSON.stringify({
         base: server.resolvedUrls.local[0], out: frameDir, page: T.page, name: template,
-        ready: T.ready, themes: ['light', 'dark'],
+        ready: T.ready, themes: T.themes ?? ['light', 'dark'], size: T.size ?? [1920, 1080],
       }),
     },
     stdio: ['ignore', 'inherit', 'ignore'],
