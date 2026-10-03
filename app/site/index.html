@@ -24,6 +24,7 @@
         <span>Clover</span>
       </a>
       <nav class="nav-links">
+        <a href="#about">关于</a>
         <a href="#layers">功能</a>
         <a href="#export">导出</a>
         <a href="#principles">原则</a>
@@ -55,10 +56,35 @@
               <span class="dl-note">To be continued</span>
             </span>
           </div>
-          <p class="hero-hint">适用于 Apple 芯片的 Mac。下面是 Clover 的真实界面，可以直接点。</p>
+          <p class="hero-hint">适用于 Apple 芯片的 Mac。</p>
         </div>
         <div class="hero-window">
           <div class="window" data-src="app.html?state=report" data-eager></div>
+        </div>
+      </section>
+
+      <!-- ========================================================== about -->
+      <section class="about" id="about">
+        <div class="about-head">
+          <p class="eyebrow"><i class="dot" style="--c: var(--tile-indigo)"></i>关于</p>
+          <h2>想法到实验已经很快，论文的最后一公里还靠手工</h2>
+        </div>
+        <div class="about-body">
+          <p>
+            大语言模型和多智能体工具普及以后，研究者从一个想法走到一组实验结果的时间缩短了很多。写代码、跑实验、整理结果，智能体都能分担，投稿量也随之增长。
+          </p>
+          <p>
+            一篇论文投出之前，还有一段绕不开的路。为了满足学术诚信的要求，作者要逐条确认参考文献真实存在，作者、年份和 DOI 无误，确认每一处引用确实支持对应的论断，再检查格式和错别字。这些核对繁琐耗时，也最容易在截稿前被压缩。生成式工具写出的文字越多，编造的文献和张冠李戴的引用也越容易混进稿件。
+          </p>
+          <p>
+            Clover 想回答一个问题：这份核对能不能自动完成。它把核对拆成文献真实性、论断支持度、引用分布和格式规范四层，用 Qwen 系列模型配合公开学术数据库逐条检查，再把结果写回作者熟悉的 Word。核对交给机器，判断留给作者。
+          </p>
+          <p class="about-note">
+            这是我们为天猫 AI 黑客松效率进化赛道、阿里云基于 Qwen 的科研提效赛题做的回答：让科研提效一直延伸到投稿前的最后一公里。
+          </p>
+          <p class="about-note">
+            需要说明一点：英文期刊和会议的元数据、摘要与开放全文更容易获取，所以 Clover 目前只支持英文论文。中文文献的核验与对标，会在之后补上。
+          </p>
         </div>
       </section>
 
@@ -106,7 +132,7 @@
               错别字、文献重新排序和随之变化的引用编号，写成修订，由你逐条接受或拒绝。未被引用的文献、找不到条目的引用，写成批注。
             </p>
           </article>
-          <article class="step" data-state="report">
+          <article class="step" data-state="report" data-reveal='section[aria-label$="对标"]'>
             <p class="eyebrow"><i class="dot" style="--c: var(--tile-pink)"></i>期刊评审</p>
             <h3>投之前，先和目标会议比一比</h3>
             <p class="body">

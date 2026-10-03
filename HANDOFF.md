@@ -66,7 +66,7 @@
 - [ ]  Word/WPS 人工验收导出文件（PLAN.md 提交前清单要求）
 - [ ] 录 2 分钟 Demo 视频（收尾镜头：Word 中接受全部修订，文献顺序编号归位）
 - [ ] 项目方案文档（痛点、原则、架构、检出率实测、规划）
-- [ ] Onboarding：头像/名字目前走设置屏；用户说过要把这一步挪到首次启动的 onboarding 里（参考 `/Users/jackielyu/Coding/tmall-latex/demo/onboarding.html`），**先没改逻辑**
+- [ ] Onboarding：头像/名字目前走设置屏；用户说过要把这一步挪到首次启动的 onboarding 里（参考同级目录 `tmall-latex/demo/onboarding.html`），**先没改逻辑**
 - [ ] （已决定不做）中文文献核验——只做英文，中文列为未来工作
 - [ ] （可选）S2 API key 提升 Semantic Scholar 覆盖率
 - [ ] ~~（可选）token 统计的界面展示~~——已在设置屏"用量与费用"里做了（T14）
@@ -74,7 +74,7 @@
 ## 关键路径与命令
 
 ```bash
-cd /Users/jackielyu/Coding/tmall
+cd tmall   # 仓库根目录
 
 # 测试（用 conda claude 环境）
 cd backend && /opt/anaconda3/envs/claude/bin/python -m pytest -x -q

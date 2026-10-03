@@ -316,6 +316,35 @@ h3 {
   transform: scale(0.97);
 }
 
+/* ---------------------------------------------------------------- about */
+.about {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 200px 24px 0;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: 64px;
+  align-items: start;
+}
+.about-head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: sticky;
+  top: 96px;
+}
+.about-body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-size: 20px;
+  line-height: 1.75;
+}
+.about-note {
+  font-size: 17px;
+  color: var(--text-secondary);
+}
+
 /* ---------------------------------------------------------- layers (sticky) */
 .layers {
   max-width: 1280px;
@@ -567,6 +596,17 @@ h3 {
 @media (max-width: 960px) {
   .nav-links a:not([data-link='repo']) {
     display: none;
+  }
+  .about {
+    grid-template-columns: minmax(0, 1fr);
+    padding-top: 112px;
+    gap: 32px;
+  }
+  .about-head {
+    position: static;
+  }
+  .about-body {
+    font-size: 17px;
   }
   .band,
   .layers {

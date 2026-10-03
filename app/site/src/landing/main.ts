@@ -5,7 +5,11 @@ import { startField } from './field'
 import { renderDoc } from './doc'
 
 type CloverWin = Window & {
-  clover?: { go(s: string): Promise<void>; play(t: string): Promise<void> }
+  clover?: {
+    go(s: string): Promise<void>
+    play(t: string): Promise<void>
+    reveal(sel: string, ms?: number): Promise<void>
+  }
 }
 
 // ---------------------------------------------------------------- links
@@ -110,14 +114,18 @@ const layersBox = document.getElementById('layers-window')!
 const steps = Array.from(document.querySelectorAll<HTMLElement>('.step'))
 let current = ''
 let pending: string | null = null
-async function show(state: string) {
-  pending = state
+/** step key = state, plus "@selector" when the reading area should scroll
+ *  to that element (the venue review card sits below the title block) */
+async function show(key: string) {
+  pending = key
   const c = await driver(layersBox)
   // a fast scroll queues several states; only the last one matters
   while (pending && pending !== current) {
     const next: string = pending
     current = next
-    await c.go(next)
+    const [state, sel] = next.split('@')
+    await c.go(state)
+    if (sel) await c.reveal(sel)
   }
 }
 const stepObs = new IntersectionObserver(
@@ -125,7 +133,8 @@ const stepObs = new IntersectionObserver(
     for (const e of entries) {
       if (!e.isIntersecting) continue
       steps.forEach((s) => s.classList.toggle('on', s === e.target))
-      show((e.target as HTMLElement).dataset.state!)
+      const d = (e.target as HTMLElement).dataset
+      show(d.reveal ? `${d.state}@${d.reveal}` : d.state!)
     }
   },
   { rootMargin: '-45% 0px -45% 0px' }
@@ -154,7 +163,7 @@ const revealObs = new IntersectionObserver(
   },
   { rootMargin: '0px 0px -12% 0px' }
 )
-for (const el of document.querySelectorAll('.band, .principles .grid > div, .cta, .doc'))
+for (const el of document.querySelectorAll('.band, .about, .principles .grid > div, .cta, .doc'))
   el.classList.add('reveal'), revealObs.observe(el)
 
 // ----------------------------------------------------- export + footer

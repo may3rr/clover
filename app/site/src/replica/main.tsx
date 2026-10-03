@@ -6,7 +6,7 @@
  *  app.html?frame=1              draw the macOS window on a desktop, 1:1
  *                                (what site/scripts/record.mjs captures) */
 import { go } from './mock'
-import { play, TOURS } from './tour'
+import { play, reveal, TOURS } from './tour'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '../../../src/renderer/src/App'
@@ -25,6 +25,7 @@ if (q.get('state')) root.classList.add('booting')
 const clover = {
   go,
   play,
+  reveal,
   tours: Object.keys(TOURS),
   ready: false,
   tourDone: false,

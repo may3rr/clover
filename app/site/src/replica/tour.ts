@@ -12,6 +12,7 @@ export type Step =
   | { click: Target; pause?: number }
   | { hover: Target; pause?: number }
   | { scroll: Target; by: number; ms?: number }
+  | { reveal: string; ms?: number }
   | { wait: number }
   | { cursor: 'show' | 'hide' }
 
@@ -19,6 +20,8 @@ const row = (text: string): Target => ({ sel: '.list-row', text })
 const side = (text: string): Target => ({ sel: '.side-row', text })
 const back: Target = { sel: '.detail-in .link-accent' }
 const reading = '.paper'
+/** the venue review card in the reading area (OverviewCard) */
+export const OVERVIEW_CARD = 'section[aria-label$="对标"]'
 
 /** Scenes for the product video; each also stands alone. */
 export const TOURS: Record<string, Step[]> = {
@@ -71,9 +74,9 @@ export const TOURS: Record<string, Step[]> = {
   overview: [
     { go: 'report' },
     { wait: 900 },
-    { scroll: reading, by: 260, ms: 1600 },
+    { reveal: OVERVIEW_CARD, ms: 1600 },
     { wait: 3600 },
-    { scroll: reading, by: -260, ms: 1200 },
+    { scroll: reading, by: -2000, ms: 1200 },
   ],
   export: [
     { go: 'report' },
@@ -146,6 +149,17 @@ async function moveTo(el: HTMLElement) {
   await sleep(ms + 60)
 }
 
+/** Scroll the reading area so `sel` sits near its top. */
+export async function reveal(sel: string, ms = 900): Promise<void> {
+  const el = await find(sel)
+  const pane = el.closest<HTMLElement>(reading)
+  if (!pane) return
+  const top =
+    el.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop - 72
+  pane.scrollTo({ top, behavior: 'smooth' })
+  await sleep(ms)
+}
+
 // ------------------------------------------------------------------- run
 export async function play(steps: Step[] | string): Promise<void> {
   const list = typeof steps === 'string' ? TOURS[steps] : steps
@@ -180,6 +194,8 @@ async function run(list: Step[]) {
       await sleep(110)
       el.click()
       await sleep(s.pause ?? 500)
+    } else if ('reveal' in s) {
+      await reveal(s.reveal, s.ms)
     } else if ('scroll' in s) {
       const el = await find(s.scroll)
       el.scrollBy({ top: s.by, behavior: 'smooth' })

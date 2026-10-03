@@ -1,7 +1,7 @@
 /** Every outbound link on the landing page, in one place.
  *  The .dmg name is pinned by build.mac.artifactName in app/package.json,
  *  so /releases/latest/download keeps working across versions. */
-const REPO = 'https://github.com/may3rr/citecheck'
+const REPO = 'https://github.com/may3rr/clover'
 
 export const LINKS = {
   repo: REPO,

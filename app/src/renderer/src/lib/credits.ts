@@ -3,7 +3,7 @@
  * actually uses, or that AGENTS.md names as design references. */
 
 /** repo link shown in onboarding and About — update once the repo is public */
-export const GITHUB_URL = 'https://github.com/may3rr/citecheck'
+export const GITHUB_URL = 'https://github.com/may3rr/clover'
 
 export type Credit = [name: string, role: string, url: string]
 
