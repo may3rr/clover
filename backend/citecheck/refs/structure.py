@@ -225,3 +225,100 @@ async def complete_reference_fields(raw: str) -> dict[str, Any]:
     if res.value is None:
         return {}
     return {k: v for k, v in res.value.model_dump().items() if v}
+
+
+# ------------------------------------------------------- LLM-first batch
+#
+# The regex path above is fast but can be confidently wrong (an ACL author
+# list read as a title); the per-entry fallback only fires on blank fields.
+# So every bibliography goes through the cheap model, ten entries a call,
+# and the model's fields replace the regex ones — but only fields that can
+# be found in the entry itself, so the model can restructure, never invent.
+
+_BATCH = 10
+
+_BATCH_PROMPT = (
+    "下面是一篇论文参考文献列表中的若干条目，每条前有编号。逐条解析为 JSON。\n"
+    "字段：i（条目编号）、title（论文或书的标题，不含作者、年份、会议名，去掉[J][M]等类型标识）、"
+    "authors（作者列表，按原文顺序，英文保留原写法如 \"Patrick Lewis\" 或 \"Lewis, P.\"，"
+    "中文每人一个字符串，不要包含 et al. 或“等”）、year（发表年份，整数；"
+    "只取表示这篇文献发表时间的年份，会议名里的年份如“2022 Conference”不算，"
+    "DOI 和网址里的年份也不算；没有就填 null）、venue（期刊或会议名）、doi。\n"
+    "原文没有的信息一律填 null，不要补全、不要猜。\n"
+    "只输出 JSON：{{\"items\": [{{\"i\": 1, \"title\": ..., \"authors\": [...], "
+    "\"year\": ..., \"venue\": ..., \"doi\": ...}}]}}\n\n{entries}"
+)
+
+
+def _squash(s: str) -> str:
+    return re.sub(r"[^0-9a-z一-鿿]+", "", (s or "").lower())
+
+
+def _grounded(field: str, value: Any, raw: str) -> bool:
+    """A model-proposed field is kept only if the entry itself contains it."""
+    if value in (None, "", []):
+        return False
+    flat = _squash(raw)
+    if field == "year":
+        return bool(re.search(rf"(?<!\d){int(value)}(?!\d)", raw))
+    if field == "doi":
+        return str(value).lower() in raw.lower()
+    if field == "authors":
+        from ..parse.links import latin_surname
+
+        first = str(value[0])
+        key = first if _CJK_RE.search(first) else latin_surname(first)
+        return bool(_squash(key)) and _squash(key) in flat
+    # title / venue: near-verbatim (punctuation and case aside)
+    from rapidfuzz import fuzz
+
+    v = _squash(str(value))
+    return bool(v) and (v in flat or fuzz.partial_ratio(v, flat) >= 95)
+
+
+async def structure_references(refs: list) -> int:
+    """Re-structure every reference with the model (batched, cached via
+    chat_json). Returns how many references had authors or year changed —
+    the caller relinks citation markers when that is non-zero."""
+    import asyncio
+
+    from pydantic import BaseModel
+
+    from ..llm.client import chat_json
+
+    class _Item(BaseModel):
+        i: int
+        title: str | None = None
+        authors: list[str] = []
+        year: int | None = None
+        venue: str | None = None
+        doi: str | None = None
+
+    class _Batch(BaseModel):
+        items: list[_Item] = []
+
+    async def one(chunk: list) -> int:
+        entries = "\n".join(f"[{k + 1}] {r.raw}" for k, r in enumerate(chunk))
+        res = await chat_json(
+            "structure",
+            [{"role": "user", "content": _BATCH_PROMPT.format(entries=entries)}],
+            _Batch,
+        )
+        if res.value is None:
+            return 0
+        changed = 0
+        for it in res.value.items:
+            if not 1 <= it.i <= len(chunk):
+                continue
+            r = chunk[it.i - 1]
+            before = (tuple(r.authors), r.year)
+            for field in ("title", "venue", "doi", "authors", "year"):
+                val = getattr(it, field)
+                if _grounded(field, val, r.raw):
+                    setattr(r, field, val)
+            if (tuple(r.authors), r.year) != before:
+                changed += 1
+        return changed
+
+    chunks = [refs[i:i + _BATCH] for i in range(0, len(refs), _BATCH)]
+    return sum(await asyncio.gather(*(one(c) for c in chunks)))

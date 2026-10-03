@@ -351,3 +351,19 @@ def apply_bibliography_start(parsed: ParsedDocument, start: int) -> int:
         m.ref_ids = next(it)
     parsed.markers = kept
     return added
+
+
+def relink_markers(parsed: ParsedDocument) -> None:
+    """Re-resolve list-reference markers after reference fields changed
+    (model re-structuring). Footnote links are positional and kept."""
+    det = [
+        DetectedMarker(start=m.start, end=m.end, raw=m.raw,
+                       kind=m.kind or "numeric")
+        for m in parsed.markers if m.kind != "footnote"
+    ]
+    lists = link_markers(det, [r for r in parsed.references
+                               if r.origin == "list"])
+    it = iter(lists)
+    for m in parsed.markers:
+        if m.kind != "footnote":
+            m.ref_ids = next(it)

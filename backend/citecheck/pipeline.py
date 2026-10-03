@@ -31,7 +31,13 @@ from .lint.reorder import plan_reorder
 from .lint.typos import check_typos
 from .llm.client import doc_scope, stats_scope
 from .parse.bibguess import guess_bibliography_start
-from .parse.parser import ParsedDocument, apply_bibliography_start, parse_docx
+from .parse.parser import (
+    ParsedDocument,
+    apply_bibliography_start,
+    parse_docx,
+    relink_markers,
+)
+from .refs.structure import structure_references
 from .refs.sources import RetrievalClient
 from .refs.verify import verify_references
 from .schema import (
@@ -175,6 +181,20 @@ async def run_pipeline(
             added = await asyncio.to_thread(
                 apply_bibliography_start, parsed, start)
             log.info("llm bibliography boundary -> %d references", added)
+
+    # every entry is re-structured by the model (regex can be confidently
+    # wrong on unfamiliar styles); fields must be grounded in the entry text
+    if parsed.references:
+        try:
+            changed = await structure_references(
+                [r for r in parsed.references if r.origin == "list"])
+        except Exception as e:  # noqa: BLE001 — regex fields stand
+            log.warning("reference structuring failed: %s", e)
+            changed = 0
+        if changed:
+            relink_markers(parsed)
+            log.info("model re-structured %d references; markers relinked",
+                     changed)
 
     para_by_id = {p.id: p for p in parsed.paragraphs}
     t_parsed = time.monotonic()

@@ -394,7 +394,67 @@ async def _finalize(
             if retried and len(retried[0][2]) < len(title_matches[0][2]):
                 title_matches = retried
 
+    # gray zone: nothing cleared the title bar, but some record comes close
+    # (abbreviated title, dropped subtitle, renamed preprint). The model may
+    # rescue a match — it can never turn an entry into "not found".
+    if not title_matches and doi_hit is None:
+        rescued = await _adjudicate(ref, st.hits)
+        if rescued is not None:
+            issues, _a, _y = _evaluate(ref, rescued)
+            title_matches = [(_GRAY_MIN, rescued, issues)]
+
     return _conclude(ref, title_matches, doi_hit, st.responded, para_len)
+
+
+_GRAY_MIN = 70.0
+
+_ADJ_PROMPT = (
+    "判断论文参考文献中的一条条目，和文献数据库里的几条候选记录，是否指同一篇文献。\n"
+    "同一篇文献的标题可能有缩写、省略副标题、预印本改名或大小写标点差异；"
+    "作者、年份可能有个别出入。但如果研究内容明显不同，就不是同一篇。\n"
+    "条目：{raw}\n\n候选记录：\n{cands}\n\n"
+    "只输出 JSON：{{\"match\": 候选编号或 null, \"reason\": \"一句中文理由\"}}。"
+    "没有把握就填 null。"
+)
+
+
+async def _adjudicate(ref: Reference, hits: list[dict]) -> dict | None:
+    from pydantic import BaseModel
+
+    from ..llm.client import chat_json
+
+    want = _norm(ref.title or ref.raw[:160])
+    scored = sorted(
+        ((fuzz.token_sort_ratio(want, _norm(h["title"])), h)
+         for h in hits if h.get("title")),
+        key=lambda t: -t[0],
+    )
+    gray: list[dict] = []
+    for score, h in scored:
+        if score < _GRAY_MIN or len(gray) == 3:
+            break
+        if all(_norm(h["title"]) != _norm(g["title"]) for g in gray):
+            gray.append(h)
+    if not gray:
+        return None
+
+    class _Verdict(BaseModel):
+        match: int | None = None
+        reason: str = ""
+
+    cands = "\n".join(
+        f"[{k + 1}] 标题：{h.get('title')}；作者：{', '.join((h.get('authors') or [])[:3])}；"
+        f"年份：{h.get('year')}；出处：{h.get('venue') or ''}"
+        for k, h in enumerate(gray)
+    )
+    res = await chat_json("judge", [{"role": "user", "content": _ADJ_PROMPT.format(
+        raw=ref.raw, cands=cands)}], _Verdict)
+    v = res.value
+    if v is None or v.match is None or not 1 <= v.match <= len(gray):
+        return None
+    hit = dict(gray[v.match - 1])
+    hit["adjudicated"] = v.reason[:120]  # shown with the match, for traceability
+    return hit
 
 
 async def _stage1(
