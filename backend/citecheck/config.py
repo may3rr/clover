@@ -49,8 +49,8 @@ class CloudSettings(BaseModel):
 # different model to fall back to.
 MODEL_TIERS: dict[str, tuple[str, ...]] = {
     "fast": ("judge", "extract", "typo", "structure", "function",
-             "review_fallback"),
-    "deep": ("review",),
+             "review_fallback", "profile"),
+    "deep": ("review", "overview"),
 }
 
 
@@ -62,6 +62,8 @@ class ModelNames(BaseModel):
     typo: str = "qwen3.8-flash"
     structure: str = "qwen3.7-flash"
     function: str = "qwen3.7-flash"
+    profile: str = "qwen3.8-flash"   # overview: paper "shape" extraction
+    overview: str = "qwen3.8-max"    # overview: venue-level critic
 
 
 class PriceSettings(BaseModel):

@@ -140,6 +140,8 @@ async def analyze(
     file: UploadFile | None = File(None),
     path: str | None = Form(None),
     benchmark: str = Form("arxiv_cs_cl"),
+    # target venue for the overview stage; "" turns it off
+    venue: str = Form("emnlp"),
 ):
     if file is not None and file.filename:
         _UPLOADS.mkdir(parents=True, exist_ok=True)
@@ -166,7 +168,8 @@ async def analyze(
     async def _run() -> None:
         try:
             job.report = await run_pipeline(
-                src, benchmark_id=benchmark, emit=emit)
+                src, benchmark_id=benchmark, emit=emit,
+                venue_id=venue or None)
             _save_report(job.id, src, benchmark, job.report)
         except PipelineError as e:
             job.error = str(e)

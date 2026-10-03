@@ -106,7 +106,9 @@ def _provider_for(route: str) -> str:
     if route == "local":
         return "mlx-local"
     host = urlparse(get_settings().llm.cloud.base_url).hostname or "cloud"
-    if "dashscope" in host or "aliyun" in host:
+    # Qwen endpoints (official DashScope or a qianwen-branded gateway) all
+    # bill as Alibaba Bailian in the usage view
+    if any(k in host for k in ("dashscope", "aliyun", "qianwen")):
         return "dashscope"
     return host
 

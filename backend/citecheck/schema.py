@@ -223,6 +223,42 @@ class ReportMeta(BaseModel):
     timings: dict = Field(default_factory=dict)
 
 
+OverviewTier = Literal["below", "near", "at", "above", "na"]
+
+
+class ExemplarPaper(BaseModel):
+    """A recently published paper from the target venue, used as a yardstick."""
+    id: str  # ACL Anthology id, e.g. 2024.emnlp-main.123
+    title: str
+    year: int | None = None
+    url: str
+    # n_datasets / n_baselines / n_tables / n_figures / has_ablation /
+    # has_human_eval / has_error_analysis / has_limitations (None = unknown)
+    stats: dict[str, int | bool | None] = Field(default_factory=dict)
+
+
+class OverviewDim(BaseModel):
+    key: str  # experiments | analysis | literature | citations | completeness
+    label: str
+    tier: OverviewTier = "na"
+    note: str = ""
+
+
+class Overview(BaseModel):
+    """Venue-level read of the manuscript: where it sits against a few
+    recent papers of the target venue. A coarse tier plus a direction —
+    deliberately not edit-level advice (AGENTS §2)."""
+    status: Literal["ok", "unavailable"] = "ok"
+    venue_id: str
+    venue_name: str
+    overall: OverviewTier = "na"
+    comment: str = ""
+    dims: list[OverviewDim] = Field(default_factory=list)
+    exemplars: list[ExemplarPaper] = Field(default_factory=list)
+    manuscript: dict[str, int | bool | float | None] = Field(default_factory=dict)
+    note: str | None = None  # why it is unavailable, for the UI
+
+
 class Report(BaseModel):
     document: Document
     sections: list[Section] = Field(default_factory=list)
@@ -235,4 +271,5 @@ class Report(BaseModel):
     distribution: Distribution | None = None
     findings: list[Finding] = Field(default_factory=list)
     revisions: list[Revision] = Field(default_factory=list)
+    overview: Overview | None = None
     meta: ReportMeta = Field(default_factory=ReportMeta)

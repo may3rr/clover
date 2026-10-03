@@ -17,6 +17,8 @@ typo = "qwen3.8-flash"
 extract = "qwen3.7-flash"
 structure = "qwen3.7-flash"
 function = "qwen3.7-flash"
+profile = "qwen3.8-flash"
+overview = "qwen3.8-max"
 
 [llm.local]
 enabled = false

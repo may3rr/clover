@@ -102,9 +102,25 @@ export type New = string;
 export type Reason = string;
 export type MoveAfter = string | null;
 export type Revisions = Revision[];
+export type Status1 = "ok" | "unavailable";
+export type VenueId = string;
+export type VenueName = string;
+export type Overall = "below" | "near" | "at" | "above" | "na";
+export type Comment = string;
+export type Key = string;
+export type Label2 = string;
+export type Tier = "below" | "near" | "at" | "above" | "na";
+export type Note1 = string;
+export type Dims = OverviewDim[];
+export type Id7 = string;
+export type Title5 = string;
+export type Year1 = number | null;
+export type Url = string;
+export type Exemplars = ExemplarPaper[];
+export type Note2 = string | null;
 export type Local = number;
 export type Cloud = number;
-export type Status1 = "pending" | "running" | "done" | "failed";
+export type Status2 = "pending" | "running" | "done" | "failed";
 export type Error = string | null;
 export type Findings1 = number;
 export type DurationS = number;
@@ -121,6 +137,7 @@ export interface Report {
   distribution?: Distribution | null;
   findings?: Findings;
   revisions?: Revisions;
+  overview?: Overview | null;
   meta?: ReportMeta;
 }
 export interface Document {
@@ -254,6 +271,44 @@ export interface Revision {
   reason: Reason;
   move_after?: MoveAfter;
 }
+/**
+ * Venue-level read of the manuscript: where it sits against a few
+ * recent papers of the target venue. A coarse tier plus a direction —
+ * deliberately not edit-level advice (AGENTS §2).
+ */
+export interface Overview {
+  status?: Status1;
+  venue_id: VenueId;
+  venue_name: VenueName;
+  overall?: Overall;
+  comment?: Comment;
+  dims?: Dims;
+  exemplars?: Exemplars;
+  manuscript?: Manuscript;
+  note?: Note2;
+}
+export interface OverviewDim {
+  key: Key;
+  label: Label2;
+  tier?: Tier;
+  note?: Note1;
+}
+/**
+ * A recently published paper from the target venue, used as a yardstick.
+ */
+export interface ExemplarPaper {
+  id: Id7;
+  title: Title5;
+  year?: Year1;
+  url: Url;
+  stats?: Stats;
+}
+export interface Stats {
+  [k: string]: number | boolean | null | undefined;
+}
+export interface Manuscript {
+  [k: string]: number | boolean | null | undefined;
+}
 export interface ReportMeta {
   llm_calls?: LLMCalls;
   layers?: Layers;
@@ -269,7 +324,7 @@ export interface Layers {
   [k: string]: LayerStatus | undefined;
 }
 export interface LayerStatus {
-  status?: Status1;
+  status?: Status2;
   error?: Error;
   findings?: Findings1;
 }

@@ -277,6 +277,59 @@
       "title": "Document",
       "type": "object"
     },
+    "ExemplarPaper": {
+      "description": "A recently published paper from the target venue, used as a yardstick.",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "stats": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Stats",
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "url"
+      ],
+      "title": "ExemplarPaper",
+      "type": "object"
+    },
     "Finding": {
       "properties": {
         "id": {
@@ -387,6 +440,132 @@
         }
       },
       "title": "LayerStatus",
+      "type": "object"
+    },
+    "Overview": {
+      "description": "Venue-level read of the manuscript: where it sits against a few\nrecent papers of the target venue. A coarse tier plus a direction —\ndeliberately not edit-level advice (AGENTS §2).",
+      "properties": {
+        "status": {
+          "default": "ok",
+          "enum": [
+            "ok",
+            "unavailable"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "venue_id": {
+          "title": "Venue Id",
+          "type": "string"
+        },
+        "venue_name": {
+          "title": "Venue Name",
+          "type": "string"
+        },
+        "overall": {
+          "default": "na",
+          "enum": [
+            "below",
+            "near",
+            "at",
+            "above",
+            "na"
+          ],
+          "title": "Overall",
+          "type": "string"
+        },
+        "comment": {
+          "default": "",
+          "title": "Comment",
+          "type": "string"
+        },
+        "dims": {
+          "items": {
+            "$ref": "#/$defs/OverviewDim"
+          },
+          "title": "Dims",
+          "type": "array"
+        },
+        "exemplars": {
+          "items": {
+            "$ref": "#/$defs/ExemplarPaper"
+          },
+          "title": "Exemplars",
+          "type": "array"
+        },
+        "manuscript": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "title": "Manuscript",
+          "type": "object"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        }
+      },
+      "required": [
+        "venue_id",
+        "venue_name"
+      ],
+      "title": "Overview",
+      "type": "object"
+    },
+    "OverviewDim": {
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "tier": {
+          "default": "na",
+          "enum": [
+            "below",
+            "near",
+            "at",
+            "above",
+            "na"
+          ],
+          "title": "Tier",
+          "type": "string"
+        },
+        "note": {
+          "default": "",
+          "title": "Note",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label"
+      ],
+      "title": "OverviewDim",
       "type": "object"
     },
     "Paragraph": {
@@ -1073,6 +1252,17 @@
       },
       "title": "Revisions",
       "type": "array"
+    },
+    "overview": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Overview"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "meta": {
       "$ref": "#/$defs/ReportMeta"

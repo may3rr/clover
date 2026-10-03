@@ -1,7 +1,8 @@
 """任务编排：解析 -> 四个图层并发 -> Report。
 
 并发结构：[norms（含 typos + reorder）]、[authenticity -> support]、
-[distribution]。每个图层单独包裹：单层异常只把该层标为 failed，其余
+[distribution]、[overview 准备：目标期刊参照论文 + 结构画像]；四层结束后
+overview 的评审者汇总给出整体定位（可选，venue_id 为 None 时关闭）。每个图层单独包裹：单层异常只把该层标为 failed，其余
 图层照常产出。authenticity 失败时 support 仍然运行（matched 为空，
 全部 undetermined / source_kind=none）。
 
@@ -41,6 +42,7 @@ from .schema import (
     ReportMeta,
     Revision,
 )
+from .overview.run import Prepared, critique, prepare, run_overview_safe
 from .support.layer import SupportRun
 
 log = logging.getLogger(__name__)
@@ -107,6 +109,7 @@ async def run_pipeline(
     *,
     retrieval: RetrievalClient | None = None,
     cache: Cache | None = None,
+    venue_id: str | None = None,
 ) -> Report:
     send = emit or (lambda _e: None)
     t0 = time.monotonic()
@@ -253,6 +256,12 @@ async def run_pipeline(
                 _layer("norms", "done", len(norm_findings),
                        anchors=_anchors(norm_findings))
 
+            # overview prep (venue exemplars + shape reading) needs no
+            # findings — it overlaps the four layers
+            prep_task = asyncio.create_task(run_overview_safe(
+                prepare(parsed, venue_id, retrieval._client, cache))
+            ) if venue_id else None
+
             await asyncio.gather(
                 _auth_then_support(), _distribution(), _norms())
 
@@ -267,6 +276,15 @@ async def run_pipeline(
                 f.id = f"f{i}"
             for i, r in enumerate(revisions, 1):
                 r.id = f"v{i}"
+
+            overview = None
+            if prep_task is not None:
+                send({"type": "overview", "status": "running"})
+                prep = await prep_task
+                if isinstance(prep, Prepared):
+                    overview = await run_overview_safe(critique(prep, findings))
+                send({"type": "overview",
+                      "status": overview.status if overview else "unavailable"})
 
             meta.llm_calls = LLMCalls(local=stats.local, cloud=stats.cloud)
             meta.duration_s = round(time.monotonic() - t0, 1)
@@ -292,6 +310,7 @@ async def run_pipeline(
                 distribution=dist,
                 findings=findings,
                 revisions=revisions,
+                overview=overview,
                 meta=meta,
             )
             send({"type": "done"})
