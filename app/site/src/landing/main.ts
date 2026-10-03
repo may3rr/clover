@@ -20,6 +20,18 @@ if (new URLSearchParams(location.search).get('card') === 'end') {
     'afterend',
     `<p class="hero-powered"><span>Powered by</span><img src="./brand/qwen-color.svg" alt="" width="28" height="28" /><b>千问</b></p>`
   )
+  // &anim=1: frame-exact closing animation, driven by site/scripts/endcard.mjs
+  if (new URLSearchParams(location.search).get('anim')) {
+    const w = window as unknown as {
+      __endSetup: () => Promise<number>
+      __render?: (t: number) => Promise<void>
+    }
+    w.__endSetup = async () => {
+      const { setupEndAnim, DURATION } = await import('./endanim')
+      w.__render = await setupEndAnim()
+      return DURATION
+    }
+  }
 }
 
 // ---------------------------------------------------------------- links

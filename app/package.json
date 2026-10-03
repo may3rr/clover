@@ -21,7 +21,8 @@
     "site:record": "node site/scripts/record.mjs",
     "site:icon": "node site/scripts/icon.mjs && rsvg-convert -w 1024 build/icon.svg -o build/icon.png && rsvg-convert -w 180 build/icon.svg -o site/public/apple-touch-icon.png && rsvg-convert -w 1200 site/scripts/.og.svg -o site/public/og.png && rm site/scripts/.og.svg",
     "site:frame": "node site/scripts/frame.mjs",
-    "site:film": "node site/scripts/film.mjs"
+    "site:film": "node site/scripts/film.mjs",
+    "site:endcard": "node site/scripts/endcard.mjs"
   },
   "dependencies": {
     "react": "18.3.1",
