@@ -14,6 +14,9 @@ export type Step =
   | { scroll: Target; by: number; ms?: number }
   | { reveal: string; ms?: number }
   | { type: Target; text: string; pause?: number }
+  /** narration line N (1-based, demo/narration.txt) starts `lead` ms from
+   *  here; the shot then lasts at least until `tail` ms after it ends */
+  | { speak: number; lead?: number; tail?: number }
   | { wait: number }
   | { cursor: 'show' | 'hide' }
 
@@ -118,6 +121,115 @@ TOURS.full = [
   ...TOURS.export.slice(1),
 ]
 
+// ------------------------------------------------------------------ film
+/** The narrated cut: one shot per narration line, paced by the audio.
+ *  Speech starts a beat after the screen settles (lead) and the picture
+ *  holds a while after it ends (tail), so a line never runs over a cut. */
+const LEAD = 900
+const TAIL = 1600
+export const FILM: Step[][] = [
+  // 1-3 over the intro: dots gather, the title shuffles in
+  [{ go: 'onboarding-intro' }, { cursor: 'hide' }, { wait: 1400 }, { speak: 1, lead: 0, tail: 500 }],
+  [{ speak: 2, lead: 0, tail: 900 }],
+  [{ speak: 3, lead: 0, tail: 1800 }],
+  // 4 onboarding
+  [
+    { cursor: 'show' },
+    { click: { sel: '.pill-accent', text: '开始设置' }, pause: 300 },
+    { speak: 4 },
+    { hover: '.onboard-model', pause: 1600 },
+    { click: { sel: '.onboard-model .pill-accent', text: '保存并继续' }, pause: 1400 },
+    { type: '.account-name-input', text: '李明', pause: 500 },
+    { click: { sel: '.swatch', nth: 3 }, pause: 400 },
+    { click: { sel: '.swatch', nth: 1 }, pause: 800 },
+    { click: { sel: '.pill-accent', text: '继续' }, pause: 2000 },
+    { click: '.onboard-consent', pause: 800 },
+    { click: { sel: '.pill-accent', text: '开始使用' }, pause: 1600 },
+  ],
+  // 5 the check
+  [
+    { click: { sel: '.pill-accent', text: '选择文件' }, pause: 200 },
+    { speak: 5, lead: 1200 },
+    { cursor: 'hide' },
+    { wait: 10200 },
+    { cursor: 'show' },
+    { hover: row('未能在数据库中找到'), pause: 600 },
+  ],
+  // 6-9 the four layers
+  [
+    { click: side('文献真实性'), pause: 500 },
+    { speak: 6 },
+    { click: row('未能在数据库中找到'), pause: 3600 },
+    { click: back, pause: 500 },
+    { click: row('文献信息与数据库记录不一致'), pause: 2800 },
+    { click: back, pause: 400 },
+  ],
+  [
+    { click: side('论断支持度'), pause: 500 },
+    { speak: 7 },
+    { click: row('不支持这条论断'), pause: 3000 },
+    { scroll: '.detail-in .overflow-y-auto', by: 320, ms: 1400 },
+    { wait: 1800 },
+    { click: back, pause: 500 },
+    { click: row('可能引错了文献'), pause: 2800 },
+    { click: back, pause: 400 },
+  ],
+  [
+    { click: side('引用分布'), pause: 500 },
+    { speak: 8 },
+    { click: row('引用分布偏离'), pause: 3600 },
+    { click: back, pause: 500 },
+    { click: row('同时引用了'), pause: 2600 },
+    { click: back, pause: 400 },
+  ],
+  [
+    { click: side('格式规范'), pause: 500 },
+    { speak: 9 },
+    { click: row('建议修订'), pause: 3000 },
+    { click: back, pause: 400 },
+  ],
+  // 10 venue review
+  [
+    { click: side('全部问题'), pause: 400 },
+    { reveal: OVERVIEW_CARD, ms: 1400 },
+    { speak: 10, lead: 600 },
+    { wait: 2000 },
+  ],
+  // 11 export
+  [
+    { scroll: reading, by: -4000, ms: 1000 },
+    { click: { sel: 'button', text: '导出到 Word' }, pause: 300 },
+    { speak: 11, lead: 700 },
+    { hover: { sel: '.list-row', nth: 0 }, pause: 600 },
+  ],
+  // 12 closing line over the finished report
+  [{ cursor: 'hide' }, { speak: 12, lead: 800, tail: 3200 }],
+]
+
+/** speech start times (wall clock ms) the recorder turns into audio offsets */
+export const marks: { line: number; at: number }[] = []
+
+export async function playFilm(durations: number[]): Promise<void> {
+  marks.length = 0
+  flags.quietExport = true
+  ensureCursor().style.opacity = '1'
+  try {
+    for (const shot of FILM) {
+      let until = 0
+      await run(shot, (s) => {
+        const lead = s.lead ?? LEAD
+        const at = Date.now() + lead
+        marks.push({ line: s.speak, at })
+        until = at + (durations[s.speak - 1] ?? 0) * 1000 + (s.tail ?? TAIL)
+      })
+      const rest = until - Date.now()
+      if (rest > 0) await sleep(rest)
+    }
+  } finally {
+    flags.quietExport = false
+  }
+}
+
 // ----------------------------------------------------------------- cursor
 let cursor: HTMLDivElement | null = null
 let pos = { x: 640, y: 560 }
@@ -194,9 +306,11 @@ export async function play(steps: Step[] | string): Promise<void> {
   }
 }
 
-async function run(list: Step[]) {
+type SpeakStep = Extract<Step, { speak: number }>
+async function run(list: Step[], onSpeak?: (s: SpeakStep) => void) {
   for (const s of list) {
-    if ('go' in s) await go(s.go)
+    if ('speak' in s) onSpeak?.(s)
+    else if ('go' in s) await go(s.go)
     else if ('wait' in s) await sleep(s.wait)
     else if ('cursor' in s) ensureCursor().style.opacity = s.cursor === 'show' ? '1' : '0'
     else if ('hover' in s) {

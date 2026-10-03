@@ -10,11 +10,13 @@
 //   --fps <n>         frame rate (30)           --frame       window on a desktop
 //   --out <dir>       output dir (site-videos)  --page <path> record a page instead
 //   --seconds <n>     length for --page (15)    --check       run tours, no video
+//   --film <dir>      the narrated cut: paced by <dir>/NN.wav, writes
+//                     film.mp4 + film.timeline.json (see film.mjs)
 //
 // A vite dev server serves the site; Electron renders it offscreen and
 // the frames go to ffmpeg (VideoToolbox when present). Tours live in
 // site/src/replica/tour.ts.
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -28,12 +30,19 @@ const opt = (k, d) => {
   return i >= 0 ? argv[i + 1] : d
 }
 const flag = (k) => argv.includes(`--${k}`)
-const valued = new Set(['--fps', '--scale', '--out', '--page', '--seconds'])
+const valued = new Set(['--fps', '--scale', '--out', '--page', '--seconds', '--film'])
 const names = argv.filter((a, i) => !a.startsWith('--') && !valued.has(argv[i - 1]))
 
 const ALL = ['onboarding', 'check', 'authenticity', 'support', 'distribution', 'norms', 'overview', 'export', 'settings', 'full']
 const page = opt('page')
-const jobs = page
+const filmDir = opt('film')
+const durs = filmDir
+  ? fs.readdirSync(filmDir).filter((f) => /^\d+\.(wav|mp3)$/.test(f)).sort().map((f) =>
+      Number(spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path.join(filmDir, f)], { encoding: 'utf8' }).stdout.trim()))
+  : null
+const jobs = durs
+  ? [{ name: 'film', url: `app.html?tour=film&durs=${durs.join(',')}${flag('frame') ? '&frame=1' : ''}`, timeline: true }]
+  : page
   ? [{ name: path.basename(page).replace(/\W+/g, '-'), url: page, seconds: +opt('seconds', 15) }]
   : (names.length ? names : ALL).map((t) => ({
       name: t,

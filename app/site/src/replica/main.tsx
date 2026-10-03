@@ -6,7 +6,7 @@
  *  app.html?frame=1              draw the macOS window on a desktop, 1:1
  *                                (what site/scripts/record.mjs captures) */
 import { go } from './mock'
-import { play, reveal, TOURS } from './tour'
+import { marks, play, playFilm, reveal, TOURS } from './tour'
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '../../../src/renderer/src/App'
@@ -27,6 +27,7 @@ const clover = {
   play,
   reveal,
   tours: Object.keys(TOURS),
+  marks,
   ready: false,
   tourDone: false,
 }
@@ -53,7 +54,9 @@ async function boot() {
   if (tour) {
     await new Promise((r) => setTimeout(r, Number(q.get('delay') ?? 600)))
     try {
-      await play(tour)
+      if (tour === 'film')
+        await playFilm((q.get('durs') ?? '').split(',').map(Number))
+      else await play(tour)
     } finally {
       clover.tourDone = true
       window.parent?.postMessage({ clover: 'tour-done', tour }, '*')

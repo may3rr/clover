@@ -45,6 +45,7 @@ async function record(job) {
   let ff = null
   let timer = null
   let frames = 0
+  let frame0 = 0 // wall clock of video t = 0
   const file = path.join(cfg.out, `${job.name}${cfg.dark ? '-dark' : ''}.mp4`)
   const startEncoder = () => {
     const { width, height } = size
@@ -60,6 +61,7 @@ async function record(job) {
     // constant-rate writer on the wall clock: paint only fires on change,
     // and timers drift, so top up to the frame count the elapsed time needs
     const start = Date.now()
+    frame0 = start
     timer = setInterval(() => {
       const due = Math.floor(((Date.now() - start) / 1000) * cfg.fps)
       while (frames < due && latest && latest.length === width * height * 4) {
@@ -81,6 +83,11 @@ async function record(job) {
       await sleep(100)
     }
     await sleep(800) // let the last transition settle
+  }
+  if (job.timeline && !cfg.check) {
+    const marks = await win.webContents.executeJavaScript('window.clover.marks')
+    const lines = marks.map((m) => ({ line: m.line, t: (m.at - frame0) / 1000 }))
+    require('node:fs').writeFileSync(file.replace(/\.mp4$/, '.timeline.json'), JSON.stringify({ fps: cfg.fps, lines }, null, 2))
   }
   if (ff) {
     clearInterval(timer)
