@@ -179,6 +179,11 @@ ipcMain.on('citecheck:e2e-done', (_e, info: unknown) => {
 })
 
 const SHOT_STATES = [
+  'onboarding-intro',
+  'onboarding-model',
+  'onboarding-profile',
+  'onboarding-privacy',
+  'credits',
   'empty',
   'empty-dragover',
   'running-shimmer',

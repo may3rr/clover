@@ -79,6 +79,8 @@ function scanFile(file) {
   // font-size values other than the 6-step scale
   for (const m of text.matchAll(/font-size:\s*([^;]+)/g)) {
     const v = m[1].trim()
+    // the onboarding display title is the one sanctioned size off the scale
+    if (v === 'var(--display-size)') continue
     if (!FONT_OK.has(v.replace('px', ''))) {
       failures.push(`${file}: font-size ${v}`)
     }

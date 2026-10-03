@@ -45,6 +45,11 @@
   --hairline: var(--separator);
   --shimmer: rgba(255, 255, 255, 0.45);
 
+  /* 致谢彩蛋：全屏片尾，深浅色下都是黑底白字的「游戏片尾」 */
+  --egg-bg: #000000;
+  --egg-ink: #ffffff;
+  --egg-dim: rgba(255, 255, 255, 0.55);
+
   /* 缓动：一次定义，全站共用 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }

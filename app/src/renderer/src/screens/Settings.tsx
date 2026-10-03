@@ -17,8 +17,10 @@ import {
   InfoCircleFillIcon,
   LayerTile,
   PageIcon,
+  GitHubMarkIcon,
 } from '../components/Icons'
 import AccountChip from '../components/AccountChip'
+import { CREDITS, GITHUB_URL } from '../lib/credits'
 import {
   BrandIcon,
   QwenIcon,
@@ -152,11 +154,13 @@ export default function Settings({
   prefs,
   onPrefs,
   onBack,
+  onCredits,
   initialSection = 'account',
 }: {
   prefs: Prefs
   onPrefs: (p: Prefs) => void
   onBack: () => void
+  onCredits: () => void
   initialSection?: Section
 }) {
   const [sec, setSec] = useState<Section>(initialSection)
@@ -178,9 +182,8 @@ export default function Settings({
   )
 
   const pickImage = async () => {
-    const raw = await window.citecheck.pickAvatar().catch(() => null)
-    if (!raw) return
-    const small = await downscale(raw)
+    const small = await pickAvatarImage()
+    if (!small) return
     update({ avatar: { kind: 'image', color: prefs.avatar.color, image: small } })
   }
 
@@ -242,7 +245,7 @@ export default function Settings({
             )}
             {sec === 'model' && <ModelSection />}
             {sec === 'usage' && <UsageSection />}
-            {sec === 'about' && <AboutSection />}
+            {sec === 'about' && <AboutSection onCredits={onCredits} />}
           </div>
         </main>
       </div>
@@ -266,6 +269,84 @@ function Field({
       {hint && <div className="field-hint">{hint}</div>}
     </div>
   )
+}
+
+/** avatar + name + colour swatches — shared by Settings and onboarding */
+export function ProfileEditor({
+  prefs,
+  update,
+  pickImage,
+}: {
+  prefs: Prefs
+  update: (p: Partial<Prefs>) => void
+  pickImage: () => void
+}) {
+  return (
+    <div className="account-hero">
+      <button
+        className="avatar-btn"
+        onClick={pickImage}
+        title="上传头像图片"
+      >
+        <Avatar prefs={prefs} size={72} />
+      </button>
+      <input
+        className="account-name-input"
+        value={prefs.name}
+        placeholder="你的名字"
+        onChange={(e) => update({ name: e.target.value })}
+      />
+      <div className="swatches">
+        {AVATAR_COLORS.map((c) => {
+          const on =
+            prefs.avatar.kind === 'color' && prefs.avatar.color === c
+          return (
+            <button
+              key={c}
+              className="swatch"
+              style={{ background: `var(--tile-${c})` }}
+              aria-label={c}
+              onClick={() =>
+                update({ avatar: { kind: 'color', color: c, image: null } })
+              }
+            >
+              {on && (
+                <svg
+                  width={12}
+                  height={12}
+                  viewBox="0 0 12 12"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth={2}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden
+                >
+                  <path d="M2.5 6.5 5 9 9.5 3.5" />
+                </svg>
+              )}
+            </button>
+          )
+        })}
+      </div>
+      {prefs.avatar.kind === 'image' && (
+        <button
+          className="t13 secondary avatar-remove"
+          onClick={() =>
+            update({ avatar: { ...prefs.avatar, kind: 'color', image: null } })
+          }
+        >
+          移除图片，改用颜色头像
+        </button>
+      )}
+    </div>
+  )
+}
+
+/** native picker → downscaled data URL, or null when cancelled */
+export async function pickAvatarImage(): Promise<string | null> {
+  const raw = await window.citecheck.pickAvatar().catch(() => null)
+  return raw ? downscale(raw) : null
 }
 
 function AccountSection({
@@ -303,64 +384,7 @@ function AccountSection({
   return (
     <>
       <h2 className="t26 account-hello">{hello}</h2>
-      <div className="account-hero">
-        <button
-          className="avatar-btn"
-          onClick={pickImage}
-          title="上传头像图片"
-        >
-          <Avatar prefs={prefs} size={72} />
-        </button>
-        <input
-          className="account-name-input"
-          value={prefs.name}
-          placeholder="你的名字"
-          onChange={(e) => update({ name: e.target.value })}
-        />
-        <div className="swatches">
-          {AVATAR_COLORS.map((c) => {
-            const on =
-              prefs.avatar.kind === 'color' && prefs.avatar.color === c
-            return (
-              <button
-                key={c}
-                className="swatch"
-                style={{ background: `var(--tile-${c})` }}
-                aria-label={c}
-                onClick={() =>
-                  update({ avatar: { kind: 'color', color: c, image: null } })
-                }
-              >
-                {on && (
-                  <svg
-                    width={12}
-                    height={12}
-                    viewBox="0 0 12 12"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <path d="M2.5 6.5 5 9 9.5 3.5" />
-                  </svg>
-                )}
-              </button>
-            )
-          })}
-        </div>
-        {prefs.avatar.kind === 'image' && (
-          <button
-            className="t13 secondary avatar-remove"
-            onClick={() =>
-              update({ avatar: { ...prefs.avatar, kind: 'color', image: null } })
-            }
-          >
-            移除图片，改用颜色头像
-          </button>
-        )}
-      </div>
+      <ProfileEditor prefs={prefs} update={update} pickImage={pickImage} />
 
       <div className="account-activity">
         {days && <ActivityCard days={days} />}
@@ -816,7 +840,20 @@ function ModelGlyph({ model }: { model?: string }) {
   return null
 }
 
-function ModelSection() {
+/** `compact` (onboarding): endpoint + key only, the per-task model grid
+ * keeps its defaults and lives in Settings; `onSaved` fires on success */
+export function ModelSection({
+  compact = false,
+  onSaved,
+  leading,
+  trailing,
+}: {
+  compact?: boolean
+  onSaved?: () => void
+  /** extra controls in the action row (onboarding: back / skip) */
+  leading?: React.ReactNode
+  trailing?: React.ReactNode
+} = {}) {
   const [cfg, setCfg] = useState<ModelCfg | null>(null)
   const [key, setKey] = useState('')
   const [msg, setMsg] = useState('')
@@ -900,6 +937,7 @@ function ModelSection() {
       setCfg(body)
       setKey('')
       setMsg('已保存')
+      onSaved?.()
     } else {
       const body = r ? await r.json().catch(() => null) : null
       setMsg(body?.detail ?? '保存失败，请检查后端是否运行')
@@ -921,9 +959,20 @@ function ModelSection() {
 
   if (!cfg)
     return <div className="secondary font-normal">{msg || '载入中'}</div>
+  const actions = (
+    <div className="settings-actions">
+      {leading}
+      <div className="flex-1" />
+      {msg && <span className="t13 secondary">{msg}</span>}
+      {trailing}
+      <button className="pill-accent" onClick={save}>
+        {compact ? '保存并继续' : '保存设置'}
+      </button>
+    </div>
+  )
   return (
     <>
-      <h2 className="t20 settings-h">模型</h2>
+      {!compact && <h2 className="t20 settings-h">模型</h2>}
       <div className="group-label">选择服务商，或添加自己的 OpenAI 兼容端点</div>
       <div className="card">
         <div className="prov-grid">
@@ -1040,6 +1089,10 @@ function ModelSection() {
           />
         </Field>
       </div>
+      {compact ? (
+        actions
+      ) : (
+        <>
       <div className="group-label flex items-center">
         各任务使用的模型
         <div className="flex-1" />
@@ -1069,16 +1122,12 @@ function ModelSection() {
           ))}
         </datalist>
       </div>
-      <div className="settings-actions">
-        <div className="flex-1" />
-        {msg && <span className="t13 secondary">{msg}</span>}
-        <button className="pill-accent" onClick={save}>
-          保存设置
-        </button>
-      </div>
+      {actions}
       <div className="group-label">
         费用记录与这些模型名对应，改名前的用量会保留在旧名字下
       </div>
+        </>
+      )}
     </>
   )
 }
@@ -1253,48 +1302,7 @@ function UsageSection() {
 
 // ------------------------------------------------------------- about
 
-type Credit = [name: string, role: string, url: string]
-
-const CREDITS: { group: string; items: Credit[] }[] = [
-  {
-    group: '设计参考',
-    items: [
-      ['Notion', '阅读区的排版、配色与属性行', 'https://www.notion.so'],
-      ['macOS', '窗口、侧栏与设置界面的结构', 'https://developer.apple.com/design/human-interface-guidelines/'],
-      ['GitHub', '账户页的活动热力图', 'https://github.com'],
-    ],
-  },
-  {
-    group: '文献数据',
-    items: [
-      ['Crossref', 'DOI 与出版元数据', 'https://www.crossref.org'],
-      ['OpenAlex', '开放的学术图谱', 'https://openalex.org'],
-      ['Semantic Scholar', '论文摘要与开放全文', 'https://www.semanticscholar.org'],
-      ['arXiv', '预印本与领域对标语料', 'https://arxiv.org'],
-    ],
-  },
-  {
-    group: '开源软件',
-    items: [
-      ['Electron', '桌面应用外壳', 'https://www.electronjs.org'],
-      ['React', '界面', 'https://react.dev'],
-      ['Vite 与 electron-vite', '构建与开发服务', 'https://electron-vite.org'],
-      ['Tailwind CSS', '布局工具类', 'https://tailwindcss.com'],
-      ['TypeScript', '前端类型', 'https://www.typescriptlang.org'],
-      ['FastAPI 与 Uvicorn', '本地后端服务', 'https://fastapi.tiangolo.com'],
-      ['Pydantic', '数据模型与结构化输出校验', 'https://docs.pydantic.dev'],
-      ['lxml 与 python-docx', '读取与写入 Word 文档', 'https://lxml.de'],
-      ['HTTPX', '文献检索请求', 'https://www.python-httpx.org'],
-      ['RapidFuzz', '标题与作者的模糊匹配', 'https://github.com/rapidfuzz/RapidFuzz'],
-      ['rank-bm25', '证据片段检索', 'https://github.com/dorianbrown/rank_bm25'],
-      ['pypdf', '读取开放全文', 'https://github.com/py-pdf/pypdf'],
-      ['OpenAI Python SDK', '调用 OpenAI 兼容接口', 'https://github.com/openai/openai-python'],
-      ['LobeHub Icons', '服务商图标（MIT）', 'https://github.com/lobehub/lobe-icons'],
-    ],
-  },
-]
-
-function AboutSection() {
+function AboutSection({ onCredits }: { onCredits: () => void }) {
   return (
     <>
       <div className="about-hero">
@@ -1306,6 +1314,14 @@ function AboutSection() {
         <p className="font-normal about-blurb">
           拖入一篇论文，检查参考文献是否真实、引用是否支持论断，问题以批注和修订写回 Word。判断由通义千问完成，也可以接入你自己维护的 OpenAI 兼容端点。
         </p>
+        <button
+          className="pill flex items-center gap-2"
+          style={{ marginTop: 16 }}
+          onClick={() => window.citecheck.openExternal(GITHUB_URL)}
+        >
+          <GitHubMarkIcon size={15} />
+          <span className="font-normal">在 GitHub 上查看源代码</span>
+        </button>
       </div>
       {CREDITS.map(({ group, items }) => (
         <section key={group}>
@@ -1324,8 +1340,13 @@ function AboutSection() {
           </div>
         </section>
       ))}
-      <div className="t13 secondary" style={{ marginTop: 24, textAlign: 'center' }}>
-        感谢这些项目和数据服务，没有它们就没有这个应用。
+      <div className="about-thanks">
+        <div className="t13 secondary">
+          感谢这些项目和数据服务，没有它们就没有这个应用。
+        </div>
+        <button className="pill pill-s" onClick={onCredits}>
+          致谢
+        </button>
       </div>
     </>
   )

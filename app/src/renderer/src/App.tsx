@@ -6,12 +6,14 @@ import Running, { type LayerUI } from './screens/Running'
 import ReportScreen from './screens/ReportScreen'
 import ErrorScreen from './screens/Error'
 import Settings from './screens/Settings'
+import Onboarding, { type OnboardStep } from './screens/Onboarding'
+import Credits from './components/Credits'
 import { applyShotState, type ShotCtx } from './lib/shots'
 import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
 
-type Screen = 'empty' | 'running' | 'report' | 'error' | 'settings'
+type Screen = 'empty' | 'running' | 'report' | 'error' | 'settings' | 'onboarding'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('empty')
@@ -27,6 +29,8 @@ export default function App() {
   const shotState = useRef<ShotCtx>({})
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS)
   const settingsFrom = useRef<Screen>('empty')
+  const [onboardStep, setOnboardStep] = useState<OnboardStep>(0)
+  const [credits, setCredits] = useState<false | 'live' | 'shot'>(false)
   const [settingsSection, setSettingsSection] = useState<
     'account' | 'comments' | 'model' | 'usage' | 'about'
   >('account')
@@ -49,7 +53,12 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    getPrefs().then(setPrefs)
+    getPrefs().then((p) => {
+      setPrefs(p)
+      // first run: guide + privacy consent before anything else
+      if (!p.onboarded && !window.citecheck.shotsMode && !window.citecheck.e2eFile)
+        setScreen((s) => (s === 'error' ? s : 'onboarding'))
+    })
     getInfo().then((i) => {
       setInfo(i)
       if (i.backendError) setScreen('error')
@@ -180,6 +189,8 @@ export default function App() {
       shotState.current.setDrag = (v) => setDragHint(v)
       shotState.current.setPrefs = (p) => setPrefs(p)
       shotState.current.setSettingsSection = (s) => setSettingsSection(s)
+      shotState.current.setOnboardStep = (n) => setOnboardStep(n)
+      shotState.current.setCredits = (v) => setCredits(v ? 'shot' : false)
     })
   }, [])
   const [shotLayers, setShotLayers] = useState<LayerUI | null>(null)
@@ -230,15 +241,33 @@ export default function App() {
   if (!info) return <div className="h-full" />
   if (screen === 'error') return <ErrorScreen />
 
+  if (screen === 'onboarding') {
+    return (
+      <Onboarding
+        key={onboardStep}
+        initialStep={onboardStep}
+        prefs={prefs}
+        onPrefs={setPrefs}
+        onDone={() => morph(() => setScreen('empty'))}
+      />
+    )
+  }
+
   if (screen === 'settings') {
     return (
+      <>
+      {credits && (
+        <Credits shot={credits === 'shot'} onClose={() => setCredits(false)} />
+      )}
       <Settings
+        onCredits={() => setCredits('live')}
         key={settingsSection}
         initialSection={settingsSection}
         prefs={prefs}
         onPrefs={setPrefs}
         onBack={() => morph(() => setScreen(settingsFrom.current))}
       />
+      </>
     )
   }
 

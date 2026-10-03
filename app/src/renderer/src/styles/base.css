@@ -1206,3 +1206,185 @@ select {
   filter: saturate(0.3);
   opacity: 0.8;
 }
+
+/* ======================================================= onboarding */
+.onboard-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 64px 24px 72px;
+  animation: cc-stage-in 480ms var(--ease) both;
+}
+.onboard-stage.leaving {
+  opacity: 0;
+  transform: scale(0.98);
+  transition: opacity 480ms var(--ease), transform 480ms var(--ease);
+}
+@keyframes cc-stage-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.onboard-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.onboard-hero {
+  font-weight: 700;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 800ms var(--ease), transform 800ms var(--ease);
+}
+.onboard-rise {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 480ms var(--ease) 480ms, transform 480ms var(--ease) 480ms;
+}
+.onboard-intro.on .onboard-hero,
+.onboard-intro.on .onboard-rise {
+  opacity: 1;
+  transform: none;
+}
+.onboard-intro.on .pill-accent.onboard-rise {
+  transition-delay: 800ms;
+}
+.onboard-panel {
+  max-width: 100%;
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+}
+.onboard-h {
+  font-weight: 600;
+  margin: 0;
+}
+.onboard-sub {
+  margin: 8px 0 16px;
+}
+.onboard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+.onboard-lock {
+  display: flex;
+  justify-content: center;
+  /* room for the dot ring that closes around the lock */
+  padding: 40px 0;
+  margin-bottom: 8px;
+}
+.onboard-avatar-anchor .account-hero {
+  /* clear room for the dot ring orbiting the avatar */
+  gap: 32px;
+  padding-top: 48px;
+}
+.onboard-model .settings-actions {
+  margin-top: 24px;
+}
+.onboard-nav .pill,
+.onboard-model .settings-actions .pill {
+  height: 30px;
+  padding: 0 14px;
+}
+.onboard-privacy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg-subtle);
+}
+.onboard-consent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+.onboard-consent input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+.link-quiet {
+  color: var(--text-secondary);
+  transition: opacity 160ms var(--ease);
+}
+.link-quiet:hover {
+  opacity: 0.75;
+}
+.pill-accent:disabled {
+  opacity: 0.4;
+}
+.onboard-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+.onboard-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fill-strong);
+  transition: transform 240ms var(--ease), opacity 240ms var(--ease);
+}
+.onboard-dots span.on {
+  background: var(--text);
+  transform: scale(1.35);
+}
+@media (prefers-reduced-motion: reduce) {
+  .onboard-stage { animation: none; }
+  .onboard-hero, .onboard-rise { transition: none; }
+}
+
+/* ===================================================== credits egg */
+.credits {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--egg-bg);
+  animation: cc-stage-in 480ms var(--ease) both;
+}
+.credits-cv {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: pixelated;
+}
+.credits-hint {
+  position: absolute;
+  right: 24px;
+  bottom: 16px;
+  color: var(--egg-dim);
+}
+.about-thanks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* intro title: one line, old-style serif once settled */
+.onboard-shuffle {
+  /* display size for the intro title only; see lint-design exception */
+  --display-size: 56px;
+  font-size: var(--display-size);
+  line-height: 1.25;
+  transition: opacity 480ms var(--ease);
+}
+.shuffle-ch {
+  display: inline-block;
+  text-align: center;
+}

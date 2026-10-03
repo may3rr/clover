@@ -15,6 +15,8 @@ export interface Prefs {
   comment_author: string
   /** initials for Word comments; '' = derived from the author name */
   comment_initials: string
+  /** first-run guide finished and the privacy note accepted */
+  onboarded: boolean
 }
 
 export const DEFAULT_PREFS: Prefs = {
@@ -22,6 +24,7 @@ export const DEFAULT_PREFS: Prefs = {
   avatar: { kind: 'color', color: 'blue', image: null },
   comment_author: '',
   comment_initials: '',
+  onboarded: false,
 }
 
 export async function getPrefs(): Promise<Prefs> {

@@ -84,6 +84,7 @@ _DEFAULT_PREFS = {
     "avatar": {"kind": "color", "color": "blue", "image": None},
     "comment_author": "",   # falls back to name, then 引用体检
     "comment_initials": "",  # falls back to derived
+    "onboarded": False,      # first-run guide + privacy consent done
 }
 
 
@@ -329,7 +330,8 @@ async def put_prefs(request: Request) -> dict:
     body = await request.json()
     if not isinstance(body, dict):
         return JSONResponse({"detail": "需要 JSON 对象"}, status_code=400)
-    allowed = {"name", "avatar", "comment_author", "comment_initials"}
+    allowed = {"name", "avatar", "comment_author", "comment_initials",
+               "onboarded"}
     prefs = _prefs()
     for k in allowed:
         if k in body:

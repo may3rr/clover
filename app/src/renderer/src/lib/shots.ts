@@ -11,7 +11,7 @@ import {
 export interface ShotCtx {
   report?: Report
   setScreen?: (
-    s: 'empty' | 'running' | 'report' | 'error' | 'settings'
+    s: 'empty' | 'running' | 'report' | 'error' | 'settings' | 'onboarding'
   ) => void
   setReport?: (r: Report | null) => void
   setLayers?: (l: LayerUI) => void
@@ -21,6 +21,8 @@ export interface ShotCtx {
   setFilter?: (layer: string | null) => void
   setDrag?: (v: boolean) => void
   setPrefs?: (p: import('./prefs').Prefs) => void
+  setOnboardStep?: (n: 0 | 1 | 2 | 3) => void
+  setCredits?: (on: boolean) => void
   setSettingsSection?: (s: 'account' | 'comments' | 'model' | 'usage' | 'about') => void
 }
 
@@ -29,6 +31,7 @@ const SAMPLE_PREFS = {
   avatar: { kind: 'color' as const, color: 'teal', image: null },
   comment_author: '',
   comment_initials: '',
+  onboarded: true,
 }
 
 const LAYER_KEYS = ['authenticity', 'support', 'distribution', 'norms']
@@ -48,6 +51,7 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   ctx.selectItem?.(null)
   ctx.setFilter?.(null)
   ctx.setPrefs?.(SAMPLE_PREFS)
+  ctx.setCredits?.(false)
 
   const items = report ? buildItems(report) : []
   const firstOf = (pred: (i: (typeof items)[0]) => boolean) =>
@@ -59,6 +63,20 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   const ALL_DONE: LayerUI = Object.fromEntries(LAYER_KEYS.map((k) => [k, done(k)]))
 
   switch (state) {
+    case 'onboarding-intro':
+    case 'onboarding-model':
+    case 'onboarding-profile':
+    case 'onboarding-privacy': {
+      const steps = ['intro', 'model', 'profile', 'privacy']
+      ctx.setOnboardStep?.(steps.indexOf(state.replace('onboarding-', '')) as 0 | 1 | 2 | 3)
+      ctx.setScreen?.('onboarding')
+      return
+    }
+    case 'credits':
+      ctx.setSettingsSection?.('about')
+      ctx.setScreen?.('settings')
+      ctx.setCredits?.(true)
+      return
     case 'empty':
       ctx.setScreen?.('empty')
       return
