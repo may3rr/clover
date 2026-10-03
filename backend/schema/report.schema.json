@@ -1162,6 +1162,11 @@
           ],
           "default": null,
           "title": "Evidence Span"
+        },
+        "off_topic": {
+          "default": false,
+          "title": "Off Topic",
+          "type": "boolean"
         }
       },
       "required": [

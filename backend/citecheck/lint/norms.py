@@ -69,6 +69,18 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
                 refs=[r.id],
             ))
 
+    # ---- entries without a publication year --------------------------
+    for r in refs:
+        if r.year is None and r.origin == "list" and len(r.raw) > 40:
+            findings.append(Finding(
+                id="", layer="norms", severity="low",
+                anchor=_ref_anchor(r, para_len),
+                title="这条参考文献缺少发表年份",
+                detail="依据：条目中没有找到表示发表时间的年份（会议名和 DOI 中的"
+                       "年份不计）。\n建议：补全发表年份。",
+                refs=[r.id],
+            ))
+
     # ---- markers without a matching entry ----------------------------
     for m in parsed.markers:
         if m.kind not in {"numeric", "superscript", "endnote"}:

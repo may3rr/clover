@@ -60,6 +60,7 @@ export type Rationale = string;
 export type SourceTitle = string | null;
 export type SourceExcerpt = string | null;
 export type EvidenceSpan = [unknown, unknown] | null;
+export type OffTopic = boolean;
 export type SupportChecks = SupportCheck[];
 export type BenchmarkId = string;
 export type BenchmarkName = string;
@@ -207,6 +208,7 @@ export interface SupportCheck {
   source_title?: SourceTitle;
   source_excerpt?: SourceExcerpt;
   evidence_span?: EvidenceSpan;
+  off_topic?: OffTopic;
 }
 export interface Distribution {
   benchmark_id: BenchmarkId;

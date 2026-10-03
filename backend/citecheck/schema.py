@@ -120,6 +120,10 @@ class SupportCheck(BaseModel):
     source_title: str | None = None
     source_excerpt: str | None = None
     evidence_span: tuple[int, int] | None = None
+    # label stays undetermined; set when the cited work's subject is
+    # unrelated to the claim (checked by the review model) — a likely
+    # miscitation, surfaced as its own finding
+    off_topic: bool = False
 
 
 FindingLayer = Literal["authenticity", "support", "distribution", "norms"]

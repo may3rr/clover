@@ -19,6 +19,9 @@ class JudgeOut(BaseModel):
     label: Literal["supported", "partial", "unsupported", "undetermined"]
     evidence: str | None = None
     rationale: str = ""
+    # the cited work is about something else entirely (a likely miscitation),
+    # as opposed to an excerpt that merely doesn't mention the detail
+    off_topic: bool = False
 
 
 _PROMPT = (
@@ -28,10 +31,13 @@ _PROMPT = (
     "被引文献标题：{title}\n"
     "被引文献原文片段：{excerpt}\n\n"
     "输出 JSON：{{\"label\": \"supported|partial|unsupported|undetermined\", "
-    "\"evidence\": \"...\", \"rationale\": \"...\"}}。\n"
+    "\"evidence\": \"...\", \"rationale\": \"...\", \"off_topic\": false}}。\n"
     "规则：evidence 必须从原文片段中原样摘抄，不超过两句；rationale 用一句"
     "中文说明判断依据；如果原文片段没有涉及该论断，label 用 undetermined，"
-    "不要猜测。只输出 JSON。"
+    "不要猜测。\n"
+    "off_topic：只有当被引文献整体的研究对象（看标题和片段）与论断讨论的对象"
+    "明显不是一回事时才填 true，例如论断讲 LoRA 的原理而文献是关于 DPO 的；"
+    "如果文献主题相关、只是片段没提到这个细节，填 false。只输出 JSON。"
 )
 
 _CORRECTION = (

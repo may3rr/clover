@@ -4,7 +4,7 @@ Finding。三层规则：
 - source_kind=none：不问模型，直接 undetermined；
 - label 为 supported/partial/unsupported 但 evidence 为空或无法逐字
   定位 → 降级 undetermined（§5.3）；
-- Findings：unsupported=高、partial=中；每个拿不到原文的参考文献给一
+- Findings：unsupported=高、partial=中、off_topic（复核确认主题无关）=中；每个拿不到原文的参考文献给一
   条低优先级提示（挂在参考文献段落上）。
 """
 
@@ -177,6 +177,19 @@ def _support_findings(
                     refs=[rid],
                 )
             )
+        elif check.off_topic:
+            findings.append(
+                Finding(
+                    id="", layer="support", severity="medium",
+                    anchor=Anchor(paragraph_id=claim.paragraph_id,
+                                  start=claim.start, end=claim.end),
+                    title="被引文献的研究内容与这条论断无关，可能引错了文献",
+                    detail=f"依据：{check.rationale or '被引文献的主题与论断不符'}"
+                           f"（被引文献：{check.source_title or '无标题'}）\n"
+                           "建议：确认这里想引用的是否是另一篇文献。",
+                    refs=[rid],
+                )
+            )
         if check.source_kind == "none":
             no_source_refs.add(rid)
     for rid in sorted(no_source_refs):
@@ -268,11 +281,21 @@ async def evaluate_with_excerpt(
         else:
             label, evidence, rationale, span = _apply_verdict(rev, excerpt)
 
+    # unrelated subject: the fast model's hunch must be confirmed by the
+    # review model before it is shown as a likely miscitation
+    off_topic = False
+    if label == "undetermined" and out.off_topic:
+        rev = await judge_claim(
+            claim.text, title, excerpt, sentence=claim.sentence, task="review")
+        if rev is not None and rev.off_topic and rev.label not in _POSITIVE:
+            off_topic = True
+            rationale = rev.rationale or rationale
+
     return SupportCheck(
         claim_id=claim.id, ref_id=ref_id, label=label, evidence=evidence,
         source_kind=source_kind,  # type: ignore[arg-type]
         rationale=rationale, source_title=title,
-        source_excerpt=excerpt, evidence_span=span,
+        source_excerpt=excerpt, evidence_span=span, off_topic=off_topic,
     )
 
 

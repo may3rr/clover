@@ -104,3 +104,19 @@ def test_verify_surname_same_for_acl_and_database_names():
     from citecheck.refs.verify import _surname
     assert _surname("Akari Asai") == _surname("Asai, A.") == "Asai"
     assert _surname("Vaswani A") == "Vaswani"
+
+
+def test_sentences_do_not_split_inside_citation_brackets():
+    from citecheck.support.claims import split_sentences
+    t = "Retrieval helps (Lewis et al., 2020; Guu et al., 2020). Next; then."
+    assert [s.text for s in split_sentences(t)] == [
+        "Retrieval helps (Lewis et al., 2020; Guu et al., 2020).", "Next;", "then."]
+
+
+def test_model_year_must_not_come_from_venue_or_doi():
+    from citecheck.refs.structure import _grounded
+    raw = ("Vladimir Karpukhin and Danqi Chen. 2018. Dense passage retrieval. In "
+           "Proceedings of the 2020 Conference on EMNLP. "
+           "https://doi.org/10.18653/v1/2020.emnlp-main.550")
+    assert _grounded("year", 2018, raw)
+    assert not _grounded("year", 2020, raw)

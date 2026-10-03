@@ -47,6 +47,13 @@ def split_sentences(text: str) -> list[Sentence]:
             continue
         ch = m.group(0)
         punct_end = m.end()
+        # inside an open bracket — "(Lewis et al., 2020; Guu et al., 2020)",
+        # "[3; 7]" — punctuation separates citations, not sentences
+        seg = text[start:i]
+        if (seg.count("(") + seg.count("（") + seg.count("[")
+                > seg.count(")") + seg.count("）") + seg.count("]")):
+            i += 1
+            continue
         if ch[0] == ".":
             prev = text[start:i + 1]
             # decimal point

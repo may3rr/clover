@@ -260,7 +260,14 @@ def _grounded(field: str, value: Any, raw: str) -> bool:
         return False
     flat = _squash(raw)
     if field == "year":
-        return bool(re.search(rf"(?<!\d){int(value)}(?!\d)", raw))
+        # same rule as the regex path: a year in a DOI/URL or naming an
+        # event ("2020 Conference") doesn't date the work — the model must
+        # not "correct" a deliberately wrong year from those
+        dated = re.sub(r"https?://\S+|10\.\d{4,9}/\S+",
+                       lambda m: " " * len(m.group(0)), raw)
+        return any(int(m.group(1)) == int(value)
+                   and not _EVENT_YEAR_RE.match(dated, m.end())
+                   for m in _YEAR_RE.finditer(dated))
     if field == "doi":
         return str(value).lower() in raw.lower()
     if field == "authors":

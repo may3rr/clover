@@ -285,6 +285,11 @@ def _select(
         if not h.get("title"):
             continue
         score = fuzz.token_sort_ratio(_norm(want_title), _norm(h["title"]))
+        # same DOI and one title contains the other — databases often drop
+        # the subtitle ("On the Dangers of Stochastic Parrots")
+        if (score < _TITLE_MIN and h is doi_hit
+                and fuzz.partial_ratio(_norm(want_title), _norm(h["title"])) >= 95):
+            score = _TITLE_MIN
         if score < _TITLE_MIN:
             continue
         issues, author_diff, year_diff = _evaluate(ref, h)
