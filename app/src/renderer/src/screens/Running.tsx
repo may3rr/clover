@@ -3,8 +3,9 @@ import { eventsUrl } from '../lib/api'
 import {
   CheckCircleFillIcon,
   ExclaimCircleFillIcon,
-  LayerTile,
 } from '../components/Icons'
+import Mascot, { type MascotState } from '../components/Mascot'
+import { AGENT_COLOR } from '../lib/mascot'
 import SkeletonPaper from '../components/Skeleton'
 import type { Outline, SkAnchor } from '../lib/outline'
 
@@ -14,6 +15,8 @@ export interface LayerState {
   error?: string
 }
 export type LayerUI = Record<string, LayerState>
+/** venue overview stage, driven by the SSE `overview` event */
+export type OverviewRun = 'waiting' | 'running' | 'ok' | 'unavailable'
 
 const LAYERS: { key: string; name: string }[] = [
   { key: 'authenticity', name: '文献真实性' },
@@ -21,6 +24,7 @@ const LAYERS: { key: string; name: string }[] = [
   { key: 'distribution', name: '引用分布' },
   { key: 'norms', name: '格式规范' },
 ]
+const OVERVIEW_NAME = '期刊评审'
 
 interface Props {
   jobId: string
@@ -29,10 +33,14 @@ interface Props {
   onFailed: (err: string) => void
   error: string | null
   onReset: () => void
+  /** target venue id; '' = overview stage off, so its row is hidden */
+  venue?: string
   /** shots mode: drive the rows and skeleton directly */
   overrideLayers?: LayerUI | null
   overrideOutline?: Outline | null
   overrideAnchors?: Record<string, SkAnchor[]> | null
+  /** shots mode: show the overview row in this state (omit to hide it) */
+  overrideOverview?: OverviewRun | null
 }
 
 export default function Running({
@@ -42,15 +50,18 @@ export default function Running({
   onFailed,
   error,
   onReset,
+  venue,
   overrideLayers,
   overrideOutline,
   overrideAnchors,
+  overrideOverview,
 }: Props) {
   const [layers, setLayers] = useState<LayerUI>(() =>
     Object.fromEntries(
       LAYERS.map((l) => [l.key, { status: 'waiting', findings: 0 }])
     )
   )
+  const [overview, setOverview] = useState<OverviewRun>('waiting')
   const [outline, setOutline] = useState<Outline | null>(null)
   const [anchors, setAnchors] = useState<Record<string, SkAnchor[]>>({})
 
@@ -82,6 +93,15 @@ export default function Running({
           }))
         }
       })
+      es.addEventListener('overview', (ev) => {
+        const d = JSON.parse((ev as MessageEvent).data)
+        if (
+          d.status === 'running' ||
+          d.status === 'ok' ||
+          d.status === 'unavailable'
+        )
+          setOverview(d.status)
+      })
       es.addEventListener('done', () => {
         es?.close()
         onDone()
@@ -106,6 +126,11 @@ export default function Running({
   const shown = overrideLayers ?? layers
   const skOutline = overrideLayers ? (overrideOutline ?? null) : outline
   const skAnchors = overrideLayers ? (overrideAnchors ?? {}) : anchors
+  const ovStatus: OverviewRun | null = overrideLayers
+    ? (overrideOverview ?? null)
+    : venue
+      ? overview
+      : null
 
   return (
     <div
@@ -147,10 +172,10 @@ export default function Running({
                 style={{ height: 44 }}
               >
                 <span
-                  className="flex items-center gap-2"
-                  style={{ fontWeight: 500 }}
+                  className="flex items-center"
+                  style={{ fontWeight: 500, gap: 12 }}
                 >
-                  <LayerTile layer={key} size={20} />
+                  <RunMascot agent={key} status={s.status} />
                   {name}
                 </span>
                 <span className="secondary flex items-center gap-2">
@@ -160,6 +185,46 @@ export default function Running({
               </div>
             )
           })}
+          {ovStatus && (
+            <div
+              className="flex items-center justify-between"
+              style={{ height: 44 }}
+            >
+              <span
+                className="flex items-center"
+                style={{ fontWeight: 500, gap: 12 }}
+              >
+                <RunMascot
+                  agent="overview"
+                  status={
+                    ovStatus === 'ok' || ovStatus === 'unavailable'
+                      ? 'done'
+                      : ovStatus
+                  }
+                />
+                {OVERVIEW_NAME}
+              </span>
+              <span className="secondary flex items-center gap-2">
+                <StatusMark
+                  s={{
+                    status:
+                      ovStatus === 'ok'
+                        ? 'done'
+                        : ovStatus === 'running'
+                          ? 'running'
+                          : 'waiting',
+                    findings: 0,
+                  }}
+                />
+                {{
+                  waiting: '等待',
+                  running: '进行中',
+                  ok: '已完成',
+                  unavailable: '暂无对标',
+                }[ovStatus]}
+              </span>
+            </div>
+          )}
         </div>
       </div>
       {error && (
@@ -174,6 +239,47 @@ export default function Running({
         </div>
       )}
     </div>
+  )
+}
+
+/** the layer's agent: sleeps until its turn, reads and thinks while it
+ *  works, nods once when it lands, worries when it fails */
+function RunMascot({
+  agent,
+  status,
+}: {
+  agent: string
+  status: LayerState['status']
+}) {
+  const [phase, setPhase] = useState<MascotState>('reading')
+  useEffect(() => {
+    if (status !== 'running') return
+    setPhase('reading')
+    const iv = setInterval(
+      () => setPhase((p) => (p === 'reading' ? 'thinking' : 'reading')),
+      3200
+    )
+    return () => clearInterval(iv)
+  }, [status])
+  const state: MascotState =
+    status === 'running'
+      ? phase
+      : status === 'failed'
+        ? 'worried'
+        : status === 'done'
+          ? 'idle'
+          : 'sleep'
+  return (
+    <Mascot
+      color={AGENT_COLOR[agent]}
+      size={24}
+      state={state}
+      cue={status === 'done' ? { action: 'nod', key: 'done' } : null}
+      style={{
+        opacity: status === 'waiting' ? 0.5 : 1,
+        transition: 'opacity 240ms var(--ease)',
+      }}
+    />
   )
 }
 

@@ -35,6 +35,10 @@
   --tile-teal: #30b0c7;      /* 引用分布 */
   --tile-purple: #af52de;    /* 格式规范 */
   --tile-grey: #8e8e93;      /* 全部问题 */
+  /* 期刊评审的智能体色。取偏品红的粉，而不是 macOS 的 #ff2d55：
+     后者与语义红 --high 只差十几度，会被读成「严重问题」 */
+  --tile-pink: #d6409f;      /* 期刊评审 */
+  --on-tile: #ffffff;        /* 色块与智能体小球上的眼睛 / 白色 glyph */
 
   /* 品牌色：设置页供应商图标（LobeHub lobe-icons 品牌色） */
   --brand-qwen: #6336e7;
@@ -89,6 +93,8 @@
     --tile-teal: #40cbe0;
     --tile-purple: #bf5af2;
     --tile-grey: #98989d;
+    --tile-pink: #e55aaa;
+    --on-tile: #ffffff;
 
     /* 品牌色在 dark 下保持原色，白字不变 */
     --brand-qwen: #6336e7;
