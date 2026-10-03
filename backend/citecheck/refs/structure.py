@@ -16,6 +16,16 @@ _LABEL_RE = re.compile(r"^\s*[\[\(（【]?(\d{1,3})[\]\)）】]?[\.、]?\s+")
 _CJK_RE = re.compile(r"[一-鿿]")
 _TYPE_TAG_RE = re.compile(r"\[[JMDPCRNSZOA](/[A-Z]{1,2})?\]")
 
+# ACL / EMNLP: "Given Surname, Given Surname, and Given Surname. 2020.
+# Title. In Venue, pages 1–9." — the year is its own sentence after the
+# author list. Non-greedy authors stop at the first ". YYYY." so middle
+# initials ("Aidan N. Gomez") never end the author list early.
+_ACL_RE = re.compile(r"^(?P<authors>.+?)\.\s+(?P<year>(?:19|20)\d{2})[a-z]?\.\s+(?P<rest>.+)$", re.S)
+# a year that names an event rather than dating the work:
+# "Proceedings of the 2022 Conference on ...", "2021 Annual Meeting"
+_EVENT_YEAR_RE = re.compile(
+    r"\s+(Conference|Annual|Meeting|Workshop|International|Joint|Findings|Edition)\b")
+
 _EN_NAME = re.compile(r"^[^\W\d_][^\W\d_'’\-]*(?:\s+[^\W\d_]\.?)*$")
 _EN_INITIAL = re.compile(r"^[^\W\d_](?:\.-?\s?[^\W\d_]\.?)*\.?$")
 _ZH_NAME = re.compile(r"^[一-鿿]{2,4}$")
@@ -34,19 +44,36 @@ def detect_lang(raw: str) -> str:
     return "en" if raw and asciiish / len(raw) > 0.9 else "other"
 
 
-def _looks_like_author_list(chunk: str) -> bool:
+_NAME_PARTICLES = {"van", "von", "de", "der", "den", "del", "della", "di",
+                   "da", "du", "la", "le", "ter", "ten", "dos", "das", "al", "bin"}
+
+
+def _is_full_name(p: str) -> bool:
+    """'Akari Asai', 'Emily M. Bender', 'Aaron van den Oord' — given name(s)
+    then surname. Only trusted where the entry's shape already says
+    "author list" (the ACL year sentence), since Title-Case titles look
+    the same."""
+    toks = p.split()
+    if not 2 <= len(toks) <= 5:
+        return False
+    return all(t[0].isupper() or t.lower() in _NAME_PARTICLES for t in toks) \
+        and toks[-1][0].isupper()
+
+
+def _looks_like_author_list(chunk: str, full_names: bool = False) -> bool:
     c = chunk.strip()
-    if not c or len(c) > 250:
+    if not c or len(c) > 600:
         return False
     if re.search(r"et\s+al|等", c):
         return True
     parts = re.split(r"[,，、;；]\s*(?:&\s*)?|\s+and\s+|\s*&\s*", c)
-    parts = [p.strip() for p in parts if p.strip()]
+    parts = [re.sub(r"^and\s+", "", p.strip()) for p in parts if p.strip()]
     if not parts:
         return False
     hit = 0
     for p in parts:
-        if _EN_NAME.match(p) or _ZH_NAME.match(p) or _EN_INITIAL.match(p):
+        if (_EN_NAME.match(p) or _ZH_NAME.match(p) or _EN_INITIAL.match(p)
+                or (full_names and _is_full_name(p))):
             hit += 1
     return hit >= max(1, len(parts) - 1)
 
@@ -88,6 +115,7 @@ def parse_authors(part: str, lang: str) -> list[str]:
             for a in re.split(r"\s*,\s*|\s+and\s+|\s*&\s*", raw)
             if a.strip()
         ]
+    authors = [re.sub(r"^and\s+", "", a) for a in authors]
     return [a for a in authors if a and a.lower() not in {"et", "al", "et al."}]
 
 
@@ -108,9 +136,28 @@ def parse_reference(raw: str) -> dict:
 
     out["lang"] = detect_lang(body)
 
+    acl = _ACL_RE.match(body)
+    if acl and out["lang"] != "zh" and _looks_like_author_list(
+            acl["authors"], full_names=True):
+        out["year"] = int(acl["year"])
+        out["authors"] = parse_authors(acl["authors"], out["lang"])
+        # the title ends at its own sentence end — "?" and "!" stay in it
+        title, venue = (re.split(r"(?<=[.?!])\s+", acl["rest"], maxsplit=1) + [""])[:2]
+        out["title"] = title.rstrip(".").strip() or None
+        venue = re.sub(r"^In\s+", "", venue.strip())
+        venue = re.split(r",\s*(?:pages|pp\.|volume|vol\.)\b", venue)[0]
+        out["venue"] = venue.strip(" .,") or None
+        return out
+
     # "(2017)." APA-style year immediately after authors
     apa = re.search(r"\(((?:19|20)\d{2})[a-z]?\)\s*\.?\s*", body)
-    year_m = apa or _YEAR_RE.search(body)
+    # DOIs and URLs carry years too ("…/2022.emnlp-main.566") — blank them
+    # out (same length, so offsets stay valid) before looking for the year
+    dated = re.sub(r"https?://\S+|10\.\d{4,9}/\S+",
+                   lambda m: " " * len(m.group(0)), body)
+    year_m = apa or next(
+        (m for m in _YEAR_RE.finditer(dated)
+         if not _EVENT_YEAR_RE.match(dated, m.end())), None)
     if year_m:
         out["year"] = int(year_m.group(1))
 
@@ -125,7 +172,10 @@ def parse_reference(raw: str) -> dict:
 
     chunks = re.split(r"\.\s+", body)
     idx = 0
-    if chunks and _looks_like_author_list(chunks[0]) and len(chunks) > 1:
+    # three or more "Given Surname" names separated by commas is an author
+    # list even without a year sentence (an ACL entry missing its year)
+    if chunks and len(chunks) > 1 and _looks_like_author_list(
+            chunks[0], full_names=chunks[0].count(",") >= 2):
         out["authors"] = parse_authors(chunks[0], out["lang"])
         idx = 1
     if idx < len(chunks):

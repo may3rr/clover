@@ -3,7 +3,12 @@
   "citation_style": "numeric",
   "managed_by": null,
   "reference_count": 3,
-  "sections": [],
+  "sections": [
+    {
+      "title": "References",
+      "canonical": "other"
+    }
+  ],
   "markers": [
     {
       "raw": "[1]",

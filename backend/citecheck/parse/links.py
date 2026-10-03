@@ -44,6 +44,10 @@ def _numeric_items(raw: str) -> list[int]:
     return nums
 
 
+_PARTICLES = {"van", "von", "de", "der", "den", "del", "della", "di", "da",
+              "du", "la", "le", "ter", "ten", "dos", "das", "al", "bin"}
+
+
 def _ref_first_surname(ref: Reference) -> str:
     if not ref.authors:
         return ""
@@ -52,7 +56,18 @@ def _ref_first_surname(ref: Reference) -> str:
         return _ZH_NAME.search(first).group(0)  # type: ignore[union-attr]
     if "," in first:  # "Devlin, J."
         return first.split(",", 1)[0].strip()
-    return first.split()[0]
+    toks = first.split()
+    if len(toks) == 1:
+        return toks[0]
+    # "Devlin J" / "Devlin JM" / "Devlin J. M." — surname first, initials after
+    if all(re.fullmatch(r"(?:[A-Z]\.?-?){1,3}", t) for t in toks[1:]):
+        return toks[0]
+    # "Jacob Devlin" / "Aaron van den Oord" (ACL full names) — surname last,
+    # keeping lowercase particles that belong to it
+    i = len(toks) - 1
+    while i > 1 and toks[i - 1].lower() in _PARTICLES:
+        i -= 1
+    return " ".join(toks[i:])
 
 
 def _marker_surname(authors_part: str) -> str:

@@ -84,6 +84,23 @@ _YEAR_PROSE_RE = re.compile(r"^\s*(19|20)\d{2}\s*年")
 
 _MAX_HEADING_LEN = 60
 
+# Unnumbered section titles that stand alone on a line in papers without
+# heading styles (ACL/EMNLP back matter, abstracts). Matched exactly, after
+# stripping numbering and a trailing colon — never as a substring, so body
+# text that merely mentions "results" is unaffected.
+STANDALONE_HEADINGS = {
+    "abstract", "introduction", "related work", "background",
+    "method", "methods", "methodology", "approach",
+    "experiments", "experimental setup", "results", "evaluation",
+    "analysis", "discussion", "conclusion", "conclusions",
+    "limitations", "ethics statement", "ethical considerations",
+    "broader impact", "broader impacts", "acknowledgments",
+    "acknowledgements", "acknowledgment", "acknowledgement",
+    "references", "bibliography", "appendix", "appendices",
+    "摘要", "引言", "相关工作", "方法", "实验", "结论", "致谢", "参考文献", "附录",
+}
+_HAS_WORD_RE = re.compile(r"[A-Za-z\u4e00-\u9fff]")
+
 
 @dataclass
 class StyleInfo:
@@ -176,13 +193,23 @@ def heading_level(
     if ol is not None and ol <= 8:
         return ol + 1
 
+    # table cells are data, not structure — "40.1" in a results table
+    # would otherwise read as heading "40" > "1"
+    if any(True for _ in p.iterancestors(dx.qn("tc"))):
+        return None
+
     stripped = text.strip()
     if not stripped or len(stripped) > _MAX_HEADING_LEN:
         return None
     if _YEAR_PROSE_RE.match(stripped):
         return None
+    bare = re.sub(r"^\s*[\d.]*\s*", "", stripped).rstrip(":：").strip().lower()
+    if bare in STANDALONE_HEADINGS:
+        return 1
     m = _NUMBERED_HEADING_RE.match(stripped)
-    if m and m.group(1).count(".") <= 4 and len(m.group(2)) >= 1:
+    # the title part must be words, not more numbers ("56.4", "12 0.3")
+    if (m and m.group(1).count(".") <= 4 and _HAS_WORD_RE.search(m.group(2))
+            and not m.group(2)[0].isdigit()):
         # avoid "3.14 is the value of pi"-style prose: heading titles do not
         # end with a sentence terminator
         if not re.search(r"[。．.!！?？]$", stripped):
