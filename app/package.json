@@ -14,7 +14,7 @@
     "lint:design": "node scripts/lint-design.mjs",
     "test": "vitest run",
     "shots": "node scripts/shots.mjs",
-    "dist": "electron-builder",
+    "dist": "sh scripts/bundle-python.sh && electron-vite build && electron-builder --mac",
     "site:dev": "vite --config site/vite.config.ts",
     "site:build": "vite build --config site/vite.config.ts",
     "site:preview": "vite preview --config site/vite.config.ts",
@@ -54,17 +54,28 @@
         "from": "../backend",
         "to": "backend",
         "filter": [
-          "**/*",
-          ".env",
-          "!tests/**",
+          "citecheck/**/*",
+          "benchmarks/*.json",
+          "config.example.toml",
+          "pyproject.toml",
           "!**/__pycache__/**",
-          "!*.pyc",
-          "!citecheck.egg-info/**"
+          "!**/*.pyc"
+        ]
+      },
+      {
+        "from": "build/python",
+        "to": "python",
+        "filter": [
+          "**/*"
         ]
       }
     ],
     "directories": {
       "output": "release"
+    },
+    "afterPack": "scripts/after-pack.cjs",
+    "dmg": {
+      "title": "Clover"
     }
   },
   "devDependencies": {
@@ -83,5 +94,6 @@
     "typescript": "5.9.3",
     "vite": "7.3.6",
     "vitest": "4.1.11"
-  }
+  },
+  "license": "PolyForm-Noncommercial-1.0.0"
 }

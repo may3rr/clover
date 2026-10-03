@@ -48,3 +48,4 @@ demo/*_events.json
 *.log
 .idea/
 .vscode/
+app/build/python/

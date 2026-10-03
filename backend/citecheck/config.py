@@ -2,6 +2,8 @@
 
 Reads secrets from backend/.env and tunables from backend/config.toml
 (falling back to backend/config.example.toml when config.toml is absent).
+The packaged app sets CITECHECK_HOME (~/Library/Application Support/Clover)
+so .env and config.toml live in the user's Library, never in the bundle.
 Model names, base URLs and temperatures all live in config.toml — code
 must not hard-code them (AGENTS.md §5.2).
 """
@@ -16,8 +18,10 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 _BACKEND_DIR = Path(__file__).resolve().parent.parent
-_ENV_PATH = _BACKEND_DIR / ".env"
-_CONFIG_PATH = _BACKEND_DIR / "config.toml"
+_HOME = Path(os.environ["CITECHECK_HOME"]) if os.environ.get("CITECHECK_HOME") \
+    else _BACKEND_DIR
+_ENV_PATH = _HOME / ".env"
+_CONFIG_PATH = _HOME / "config.toml"
 _CONFIG_EXAMPLE_PATH = _BACKEND_DIR / "config.example.toml"
 
 

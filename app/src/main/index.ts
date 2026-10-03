@@ -13,15 +13,25 @@ import net from 'node:net'
 import path from 'node:path'
 import fs from 'node:fs'
 
+// packaged: a standalone CPython and the backend ship in Resources
+// (scripts/bundle-python.sh); dev: the conda env and the repo's backend/
+const PACKAGED = app.isPackaged
 const PYTHON =
-  process.env.CITECHECK_PYTHON || '/opt/anaconda3/envs/claude/bin/python'
+  process.env.CITECHECK_PYTHON ||
+  (PACKAGED
+    ? path.join(process.resourcesPath, 'python/bin/python3')
+    : '/opt/anaconda3/envs/claude/bin/python')
+/** where .env and config.toml live once packaged — never inside the bundle */
+const USER_HOME = path.join(app.getPath('appData'), 'Clover')
 const TOKEN = randomBytes(32).toString('hex')
 const SHOTS_DIR = process.env.CITECHECK_SHOTS
 const E2E_FILE = process.env.CITECHECK_E2E
 const THEME = process.env.CITECHECK_THEME
 
 // repo layout: app/out/main/index.js -> <repo>/backend
-const BACKEND_DIR = path.resolve(import.meta.dirname, '../../../backend')
+const BACKEND_DIR = PACKAGED
+  ? path.join(process.resourcesPath, 'backend')
+  : path.resolve(import.meta.dirname, '../../../backend')
 
 let win: BrowserWindow | null = null
 let backend: ChildProcess | null = null
@@ -55,6 +65,7 @@ function freePort(): Promise<number> {
 }
 
 async function startBackend(): Promise<void> {
+  if (PACKAGED) fs.mkdirSync(USER_HOME, { recursive: true })
   if (!(await portFree(8765))) port = await freePort()
   backend = spawn(
     PYTHON,
@@ -69,7 +80,16 @@ async function startBackend(): Promise<void> {
     ],
     {
       cwd: BACKEND_DIR,
-      env: { ...process.env, CITECHECK_TOKEN: TOKEN },
+      env: {
+        ...process.env,
+        CITECHECK_TOKEN: TOKEN,
+        ...(PACKAGED && {
+          CITECHECK_HOME: USER_HOME,
+          // the bundle is read-only and must not pick up user site-packages
+          PYTHONDONTWRITEBYTECODE: '1',
+          PYTHONNOUSERSITE: '1',
+        }),
+      },
     }
   )
   backend.stdout?.on('data', (d) => process.stdout.write(`[backend] ${d}`))
