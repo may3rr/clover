@@ -1,0 +1,54 @@
+html,
+body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+}
+.frame {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 48px;
+}
+.logo {
+  width: 72px;
+  height: 72px;
+}
+.frame h1 {
+  margin-top: 16px;
+  font-size: 60px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+.frame .sub {
+  margin-top: 8px;
+  font-size: 24px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+.frame .dl {
+  margin-top: 24px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 980px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--dl-bg);
+  color: var(--dl-ink);
+}
+.frame .dl svg {
+  width: 18px;
+  height: 18px;
+}
+.slot {
+  margin-top: 40px;
+  border-radius: 12px;
+  background: var(--bg-subtle);
+  box-shadow: var(--win-shadow);
+}
