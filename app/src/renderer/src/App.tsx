@@ -13,6 +13,18 @@ import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
 
+const VENUE_KEY = 'clover.venue'
+const VENUES = ['emnlp', 'acl', 'naacl', 'findings-emnlp', '']
+function readVenue(): string {
+  try {
+    const v = localStorage.getItem(VENUE_KEY)
+    if (v !== null && VENUES.includes(v)) return v
+  } catch {
+    /* ignore */
+  }
+  return 'emnlp'
+}
+
 type Screen = 'empty' | 'running' | 'report' | 'error' | 'settings' | 'onboarding'
 
 export default function App() {
@@ -23,6 +35,17 @@ export default function App() {
   const [jobId, setJobId] = useState<string | null>(null)
   const [report, setReport] = useState<Report | null>(null)
   const [benchmark, setBenchmark] = useState('arxiv_cs_cl')
+  const [venue, setVenueState] = useState(readVenue)
+  const setVenue = useCallback((v: string) => {
+    setVenueState(v)
+    try {
+      localStorage.setItem(VENUE_KEY, v)
+    } catch {
+      /* private mode: the choice just lasts for this session */
+    }
+  }, [])
+  // venue the running job was started with ('' = overview off)
+  const [runVenue, setRunVenue] = useState('')
   const [jobError, setJobError] = useState<string | null>(null)
   const [fileName, setFileName] = useState('paper.docx')
   const exportRef = useRef<(() => void) | null>(null)
@@ -80,6 +103,7 @@ export default function App() {
         const fd = new FormData()
         fd.append('path', path)
         fd.append('benchmark', benchmark)
+        fd.append('venue', venue)
         const r = await apiFetch('/analyze', { method: 'POST', body: fd })
         if (!r.ok) {
           setJobError('无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。')
@@ -89,13 +113,14 @@ export default function App() {
         // the front sheet flies into the first skeleton page
         morph(() => {
           setJobId(job_id)
+          setRunVenue(venue)
           setScreen('running')
         })
       } catch {
         setJobError('无法连接本地服务。请重新打开应用。')
       }
     },
-    [benchmark]
+    [benchmark, venue]
   )
 
   const openDialog = useCallback(async () => {
@@ -280,6 +305,7 @@ export default function App() {
         onFailed={onJobFailed}
         error={jobError}
         onReset={reset}
+        venue={runVenue}
         overrideLayers={shotLayers}
         overrideOutline={shotOutline}
         overrideAnchors={shotAnchors}
@@ -314,6 +340,8 @@ export default function App() {
     <Empty
       benchmark={benchmark}
       setBenchmark={setBenchmark}
+      venue={venue}
+      setVenue={setVenue}
       onFile={analyze}
       onOpenDialog={openDialog}
       onOpenReport={openReport}

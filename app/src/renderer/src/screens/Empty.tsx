@@ -13,6 +13,9 @@ import type { Prefs } from '../lib/prefs'
 interface Props {
   benchmark: string
   setBenchmark: (b: string) => void
+  /** target venue for the overview stage; '' = off */
+  venue: string
+  setVenue: (v: string) => void
   onFile: (path: string) => void
   onOpenDialog: () => void
   onOpenReport: (id: string) => void
@@ -30,6 +33,14 @@ interface Bench {
 
 /** Home: the three-pane shell with history in the sidebar and the drop
  *  zone as the reading area — the window never shows a bare whiteboard. */
+const VENUE_OPTIONS: [string, string][] = [
+  ['emnlp', 'EMNLP'],
+  ['acl', 'ACL'],
+  ['naacl', 'NAACL'],
+  ['findings-emnlp', 'Findings of EMNLP'],
+  ['', '不对标'],
+]
+
 const PREVIEW_LAYERS: [string, string][] = [
   ['authenticity', '文献真实性'],
   ['support', '论断支持度'],
@@ -40,6 +51,8 @@ const PREVIEW_LAYERS: [string, string][] = [
 export default function Empty({
   benchmark,
   setBenchmark,
+  venue,
+  setVenue,
   onFile,
   onOpenDialog,
   onOpenReport,
@@ -155,8 +168,8 @@ export default function Empty({
               </div>
             )}
             <div
-              className="flex items-center gap-3"
-              style={{ marginTop: 24 }}
+              className="flex items-center justify-center gap-3"
+              style={{ marginTop: 24, flexWrap: 'wrap' }}
             >
               <button className="pill-accent" onClick={onOpenDialog}>
                 选择文件
@@ -180,6 +193,28 @@ export default function Empty({
                   {benches.map((b) => (
                     <option key={b.id} value={b.id}>
                       {b.name}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDownIcon size={13} color="var(--text-secondary)" />
+              </label>
+              <label className="pill-quiet flex items-center gap-1">
+                <span className="secondary">目标会议</span>
+                <select
+                  className="font-normal"
+                  style={{
+                    appearance: 'none',
+                    background: 'transparent',
+                    border: 'none',
+                    padding: 0,
+                  }}
+                  value={venue}
+                  onChange={(e) => setVenue(e.target.value)}
+                  aria-label="目标会议"
+                >
+                  {VENUE_OPTIONS.map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
                     </option>
                   ))}
                 </select>
