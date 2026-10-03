@@ -10,18 +10,18 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  padding-top: 112px;
+  padding-top: 96px;
   background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 62%, var(--bg-subtle) 100%);
 }
 .poster .hero-event {
   height: 40px;
   padding: 0 20px;
   font-size: 20px;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 .p-logo {
-  width: 168px;
-  height: 168px;
+  width: 144px;
+  height: 144px;
 }
 .poster h1 {
   margin-top: 32px;
@@ -37,14 +37,30 @@ body {
   letter-spacing: 0.06em;
   color: var(--text-secondary);
 }
+.p-dl {
+  margin-top: 40px;
+}
+.p-dl .dl {
+  height: 64px;
+  padding: 0 32px;
+  font-size: 22px;
+  gap: 12px;
+}
+.p-dl .dl-glyph {
+  width: 24px;
+  height: 24px;
+}
+.p-dl .dl-note {
+  font-size: 18px;
+}
 .p-line {
-  margin-top: 32px;
+  margin-top: 40px;
   font-size: 30px;
   line-height: 1.5;
   color: var(--text);
 }
 .p-win {
-  margin-top: 64px;
+  margin-top: 56px;
   width: 984px;
 }
 .p-foot {
