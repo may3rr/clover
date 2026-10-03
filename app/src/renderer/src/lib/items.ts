@@ -159,3 +159,17 @@ export function moveSelection(
   const next = Math.min(items.length - 1, Math.max(0, idx + delta))
   return items[next].id
 }
+
+/** Sidebar filter changed: the inspector always goes back to the list for
+ * the new filter. The selection survives only if that item belongs to the
+ * new filter (null = all layers); otherwise it is cleared. */
+export function reconcileFilter(
+  items: ListItem[],
+  filter: string | null,
+  selectedId: string | null
+): { selectedId: string | null; detailId: null } {
+  const keep =
+    selectedId !== null &&
+    items.some((i) => i.id === selectedId && (!filter || i.layer === filter))
+  return { selectedId: keep ? selectedId : null, detailId: null }
+}

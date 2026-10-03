@@ -10,16 +10,12 @@ import Avatar from '../components/Avatar'
 import { pickGreeting } from '../lib/greetings'
 import {
   ChevronLeftIcon,
-  PersonFillIcon,
-  QuoteBubbleFillIcon,
   GearshapeFillIcon,
-  ChartBarFillIcon,
-  InfoCircleFillIcon,
-  LayerTile,
   PageIcon,
   GitHubMarkIcon,
 } from '../components/Icons'
 import AccountChip from '../components/AccountChip'
+import { SideIcon, type SideIconName } from '../components/SideIcons'
 import { GITHUB_URL } from '../lib/credits'
 import { APP_NAME } from '../lib/brand'
 import {
@@ -33,42 +29,12 @@ import { BRAND_PATHS } from '../components/brandPaths'
 /** Left-nav pane + grouped fields, in the style of macOS Settings. */
 
 export type Section = 'account' | 'comments' | 'model' | 'usage' | 'about'
-const SECTIONS: {
-  id: Section
-  label: string
-  color: string
-  icon: React.ReactNode
-}[] = [
-  {
-    id: 'account',
-    label: '账户',
-    color: 'var(--tile-blue)',
-    icon: <PersonFillIcon size={13} />,
-  },
-  {
-    id: 'comments',
-    label: '批注署名',
-    color: 'var(--tile-teal)',
-    icon: <QuoteBubbleFillIcon size={13} />,
-  },
-  {
-    id: 'model',
-    label: '模型',
-    color: 'var(--tile-grey)',
-    icon: <GearshapeFillIcon size={13} />,
-  },
-  {
-    id: 'usage',
-    label: '用量与费用',
-    color: 'var(--tile-purple)',
-    icon: <ChartBarFillIcon size={13} />,
-  },
-  {
-    id: 'about',
-    label: '关于',
-    color: 'var(--tile-indigo)',
-    icon: <InfoCircleFillIcon size={13} />,
-  },
+const SECTIONS: { id: Section; label: string; icon: SideIconName }[] = [
+  { id: 'account', label: '账户', icon: 'account' },
+  { id: 'comments', label: '批注署名', icon: 'comments' },
+  { id: 'model', label: '模型', icon: 'model' },
+  { id: 'usage', label: '用量与费用', icon: 'usage' },
+  { id: 'about', label: '关于', icon: 'about' },
 ]
 
 const AVATAR_COLORS = ['blue', 'teal', 'indigo', 'purple', 'grey'] as const
@@ -209,7 +175,7 @@ export default function Settings({
               className={`side-row${sec === s.id ? ' sel' : ''}`}
               onClick={() => setSec(s.id)}
             >
-              <LayerTile size={20} color={s.color} icon={s.icon} />
+              <SideIcon name={s.icon} />
               <span className="font-normal">{s.label}</span>
             </button>
           ))}

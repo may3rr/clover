@@ -11,6 +11,7 @@ import {
   firstLine,
   moveSelection,
   pickItem,
+  reconcileFilter,
   refLine,
   type ListItem,
 } from '../lib/items'
@@ -26,10 +27,8 @@ import Detail from './Detail'
 import AccountChip from '../components/AccountChip'
 import HistoryRow from '../components/HistoryRow'
 import { useReports, type ReportMeta } from '../lib/useReports'
+import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
 import {
-  LayerTile,
-  DocTextFillIcon,
-  PlusFillIcon,
   ArrowUpDocFillIcon,
   PageIcon,
   DocMagnifyIcon,
@@ -182,6 +181,23 @@ export default function ReportScreen({
     morph(() => setDetailId(null))
   }, [])
 
+  // sidebar filter click: the inspector returns to the list for that filter
+  // (a detail left open would keep showing the old item under the new
+  // filter's back label)
+  const changeFilter = useCallback(
+    (next: string | null) => {
+      const apply = () => {
+        const r = reconcileFilter(items, next, selectedId)
+        setFilter(next)
+        setSelectedId(r.selectedId)
+        setDetailId(r.detailId)
+      }
+      if (detailId !== null) morph(apply)
+      else apply()
+    },
+    [items, selectedId, detailId]
+  )
+
   useEffect(() => {
     if (externalSelection) {
       select(externalSelection.id, externalSelection.open)
@@ -189,6 +205,8 @@ export default function ReportScreen({
   }, [externalSelection, select])
 
   useEffect(() => {
+    // screenshot-mode driver: sets the filter only, selection is driven
+    // separately by externalSelection
     if (externalFilter) setFilter(externalFilter.layer)
   }, [externalFilter])
 
@@ -244,20 +262,25 @@ export default function ReportScreen({
         </div>
         <nav className="flex flex-col" style={{ padding: '0 8px' }}>
           <SideRow
-            icon={<LayerTile size={20} />}
+            icon={<SideIcon name="all" />}
             label="全部问题"
             count={items.length}
             active={filter === null}
-            onClick={() => setFilter(null)}
+            onClick={() => changeFilter(null)}
           />
           {LAYER_ORDER.map((key) => (
             <SideRow
               key={key}
-              icon={<LayerTile layer={key} size={20} />}
+              icon={
+                <SideIcon
+                  name={LAYER_SIDE[key].icon}
+                  hue={LAYER_SIDE[key].hue}
+                />
+              }
               label={LAYER_NAMES[key]}
               count={counts[key] ?? 0}
               active={filter === key}
-              onClick={() => setFilter(key)}
+              onClick={() => changeFilter(key)}
             />
           ))}
         </nav>
@@ -269,7 +292,7 @@ export default function ReportScreen({
           style={{ padding: '0 8px 8px' }}
         >
           <button className="side-row" onClick={onReset}>
-            <LayerTile size={20} icon={<PlusFillIcon size={12} />} />
+            <SideIcon name="plus" />
             <span className="font-normal">检查另一篇</span>
           </button>
           {historyList.map((h) => (

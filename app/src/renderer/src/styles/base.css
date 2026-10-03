@@ -456,6 +456,24 @@ select {
   flex: none;
 }
 
+/* transparent sidebar glyph (20px box, same footprint the tiles had):
+   neutral glyphs are secondary text and go full --text on the selected row;
+   layer glyphs keep their hue (.side-ic-hue, colour set inline) */
+.side-ic {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--text-secondary);
+  transition: color 160ms var(--ease);
+}
+.side-row.sel .side-ic:not(.side-ic-hue),
+.hist-row.sel .side-ic:not(.side-ic-hue) {
+  color: var(--text);
+}
+
 /* ======================================================== skeleton */
 /* page thumbnails on the running screen — paper sheets on a --bg-subtle
    rounded backdrop */
@@ -1179,13 +1197,14 @@ select {
   }
 }
 
-/* window in the background: selection goes neutral-quiet, tiles desaturate */
+/* window in the background: selection goes neutral-quiet, hued glyphs desaturate */
 :root[data-window-focus='false'] .side-row.sel,
 :root[data-window-focus='false'] .list-row.sel,
 :root[data-window-focus='false'] .hist-row.sel {
   background: var(--fill);
 }
-:root[data-window-focus='false'] .glass-sidebar .tile {
+:root[data-window-focus='false'] .glass-sidebar .tile,
+:root[data-window-focus='false'] .glass-sidebar .side-ic-hue {
   filter: saturate(0.3);
   opacity: 0.8;
 }

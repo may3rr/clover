@@ -6,7 +6,13 @@ import {
   DEFAULT_PREFS,
 } from './prefs'
 import { segmentsForParagraph } from './highlight'
-import { buildItems, moveSelection, pickItem, type ListItem } from './items'
+import {
+  buildItems,
+  moveSelection,
+  pickItem,
+  reconcileFilter,
+  type ListItem,
+} from './items'
 import { supportForFinding } from './claims'
 import { pickGreeting } from './greetings'
 import { relDay } from './reltime'
@@ -384,5 +390,26 @@ describe('prefs display names', () => {
     expect(
       commentInitials({ ...p, name: '李明', comment_initials: 'LMY' })
     ).toBe('LMY')
+  })
+})
+
+describe('reconcileFilter', () => {
+  const a: ListItem = { ...item('a', 'p1', 0, 5, 'high'), layer: 'distribution' }
+  const b: ListItem = { ...item('b', 'p1', 6, 9, 'low'), layer: 'support' }
+  const items = [a, b]
+
+  it('always closes the detail', () => {
+    expect(reconcileFilter(items, 'distribution', 'a').detailId).toBeNull()
+    expect(reconcileFilter(items, null, 'a').detailId).toBeNull()
+  })
+  it('clears a selection that is not in the new filter', () => {
+    expect(reconcileFilter(items, 'support', 'a').selectedId).toBeNull()
+  })
+  it('keeps a selection that is in the new filter or when showing all', () => {
+    expect(reconcileFilter(items, 'distribution', 'a').selectedId).toBe('a')
+    expect(reconcileFilter(items, null, 'b').selectedId).toBe('b')
+  })
+  it('handles no selection', () => {
+    expect(reconcileFilter(items, 'support', null).selectedId).toBeNull()
   })
 })

@@ -133,7 +133,7 @@ class Report:         document, sections, paragraphs, markers, references,
 
 ## 6. 设计规范（必须严格执行）
 
-气质参考：Notion 的内容区 + macOS 26 的窗口壳——通高系统侧栏（原生 vibrancy）、彩色图层 tile（macOS 设置风格）、安静的排版。克制、留白充足，一屏只做一件事。
+气质参考：Notion 的内容区 + macOS 26 的窗口壳——通高系统侧栏（原生 vibrancy）、透明底侧栏图标（Finder / Notion 风格）、安静的排版。克制、留白充足，一屏只做一件事。
 
 ### 6.1 字体
 
@@ -172,7 +172,7 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
      深色同图形色。判定词、彩色计数用 --*-text，正文文本永不上彩色底 */
   --high-text / --medium-text / --ok-text
   --low = --text-secondary;  --low-tint = --fill-strong;
-  /* 图层 tile 用非语义的 macOS 系统色相（语义色只表达状态）：
+  /* 图层色相（侧栏图层图标的字形色，也用于其余 tile；非语义色相，语义色只表达状态）：
      indigo #5856D6、blue #007AFF、teal #30B0C7、purple #AF52DE、
      grey #8E8E93，dark 用深色系统色变体 */
   --tile-indigo/blue/teal/purple/grey
@@ -184,7 +184,7 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
 /* dark：--bg #191919 等，同名定义在 tokens.css */
 ```
 
-图层 tile 配色：文献真实性 indigo，论断支持度 blue，引用分布 teal，格式规范 purple，全部问题 grey。检查器列表行不用 tile，用严重度实心 glyph（high=红感叹号圆、medium=橙三角、low=灰 i、rev=绿铅笔），因为列表已按图层分组；真实性/支持度行的次要行写文献标识（`[1] Vaswani 等，2017，标题`），问题描述进详情。
+图层图标配色：文献真实性 indigo，论断支持度 blue，引用分布 teal，格式规范 purple，全部问题 grey。检查器列表行不用 tile，用严重度实心 glyph（high=红感叹号圆、medium=橙三角、low=灰 i、rev=绿铅笔），因为列表已按图层分组；真实性/支持度行的次要行写文献标识（`[1] Vaswani 等，2017，标题`），问题描述进详情。
 
 ### 6.3 不加没有意义的线条
 
@@ -196,7 +196,7 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
 ### 6.4 间距、圆角、动效
 
 - 间距只用这组值：4 / 8 / 12 / 16 / 24 / 32 / 48 px。
-- 圆角：检查器内的详情卡 12px，callout 8px，列表行 8–10px，图层 tile 5px（20px 尺寸），高亮 4px，主按钮胶囊形（980px）。侧栏和检查器是通高直边窗格，没有圆角。
+- 圆角：检查器内的详情卡 12px，callout 8px，列表行 8–10px，其余 tile 5px（20px 尺寸），高亮 4px，主按钮胶囊形（980px）。侧栏和检查器是通高直边窗格，没有圆角。
 - 动效曲线统一 `var(--ease)`；时长：hover/press 160ms、面板 240ms、跨屏 morph 320–400ms。只允许 transform / opacity（骨架条加 scaleX）。
 - 屏幕切换与列表→详情用 `document.startViewTransition`（`lib/vt.ts` 的 `morph()`，reduced-motion 时退化为直接切换）。
 - 尊重 `prefers-reduced-motion`：所有动画降为仅 opacity 或直接跳过。
@@ -218,5 +218,6 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
 ### 6.7 图标与插画
 
 - 只用自绘的内联 SVG，SF Symbols 风格 **filled**（`.fill` 变体）：`fill="currentColor"`，双色处用 `var(--tile-bg)` 镂空。描边只留给 chevron 和 checkmark 的描画动画。禁止图标字体和图标库。
-- 图层图标放在 20–22px 圆角色块（`.tile`）里：白色实心 glyph + 图层色底（见 6.2）。
+- 侧栏图标（图层、历史记录、检查另一篇、设置导航）用 `components/SideIcons.tsx` 的透明底实心 glyph：20×20 网格，可见区 2–18，镂空用 SVG mask 做成真孔，不画色块。图层图标字形色取图层色相（见 6.2）；其余图标用 `--text-secondary`，选中行变 `--text`。窗口失焦时色相图标降饱和（`.side-ic-hue`）。
+- 其他位置（运行页、引导页、关于页）仍可用 20–22px 圆角色块（`.tile`）：白色实心 glyph + 图层色底。
 - 插画（空状态纸张堆、阅读页 56px 页面图标、空筛选印章）全部内联 SVG，颜色只走 CSS 变量，viewBox + CSS 控尺寸，不用 PNG。

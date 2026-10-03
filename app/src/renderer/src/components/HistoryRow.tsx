@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
-import { DocTextFillIcon, TrashFillIcon, LayerTile } from './Icons'
+import { TrashFillIcon } from './Icons'
+import { SideIcon } from './SideIcons'
 import { relDay } from '../lib/reltime'
 import type { ReportMeta } from '../lib/useReports'
 
@@ -37,7 +38,7 @@ export default function HistoryRow({
       onClick={active ? undefined : onOpen}
     >
       <span className="hist-row-main min-w-0">
-        <LayerTile size={20} icon={<DocTextFillIcon size={12} />} />
+        <SideIcon name="doc" />
         <span className="min-w-0">
           <MiddleTruncate className="hist-row-name" text={meta.filename} />
           <span className="t13 secondary hist-row-sub">
