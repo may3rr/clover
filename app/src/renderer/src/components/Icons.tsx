@@ -129,6 +129,14 @@ export function PlusFillIcon(p: IconProps) {
   )
 }
 
+export function TrashFillIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path d="M9.2 3.5h5.6l.8 2.3h3.65c.41 0 .75.34.75.75s-.34.75-.75.75H4.75c-.41 0-.75-.34-.75-.75s.34-.75.75-.75h3.65l.8-2.3zM6.1 9h11.8l-.86 9.55c-.07.9-.83 1.7-1.74 1.7H8.7c-.9 0-1.67-.8-1.74-1.7L6.1 9z" />
+    </Fill>
+  )
+}
+
 export function ArrowUpDocFillIcon(p: IconProps) {
   return (
     <Fill {...p}>

@@ -85,6 +85,26 @@ export default function App() {
     setJobError(null)
   }, [])
 
+  // open a past report from the home history — no re-run, no re-upload
+  const openReport = useCallback(async (id: string) => {
+    setJobError(null)
+    try {
+      const r = await apiFetch(`/reports/${id}`)
+      if (!r.ok) {
+        setJobError('读取报告失败。这条记录可能已被删除。')
+        return
+      }
+      const rep = (await r.json()) as Report
+      morph(() => {
+        setJobId(id)
+        setReport(rep)
+        setScreen('report')
+      })
+    } catch {
+      setJobError('无法连接本地服务。请重新打开应用。')
+    }
+  }, [])
+
   // ------------------------------------------------------- job lifecycle
   const onJobDone = useCallback(async () => {
     if (!jobId) return
@@ -249,6 +269,7 @@ export default function App() {
       setBenchmark={setBenchmark}
       onFile={analyze}
       onOpenDialog={openDialog}
+      onOpenReport={openReport}
       dropError={jobError}
       forceDrag={dragHint}
       prefs={prefs}

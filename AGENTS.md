@@ -45,7 +45,7 @@
 | 检索 | Crossref、OpenAlex、Semantic Scholar、arXiv 公开 API |
 | 模型（云） | 阿里云百炼 DashScope，OpenAI 兼容接口，模型名全部走配置 |
 | 模型（端） | mlx-lm 加载 Qwen 小模型，Apple Silicon 本地推理（可选能力，失败自动回退云端） |
-| 缓存 | SQLite（检索结果、模型判断结果都缓存，避免重复花钱） |
+| 缓存 | SQLite（检索结果、模型判断结果都缓存，避免重复花钱；另存 reports 表：体检完成的报告落库，首屏历史列表与重新导出都走它） |
 | 测试 | pytest（后端），vitest（前端纯函数） |
 
 ## 4. 目录结构

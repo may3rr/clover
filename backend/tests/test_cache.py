@@ -65,3 +65,45 @@ def test_usage_log_aggregates(tmp_path):
     assert by_model["qwen3.8-flash"]["prompt"] == 150
     assert by_model["qwen3.8-max"]["provider"] == "dashscope"
     assert by_model["Qwen3.5-4B"]["provider"] == "mlx-local"
+
+
+def _save(cache: Cache, rid: str, **kw) -> None:
+    cache.save_report(
+        rid,
+        kw.get("filename", f"{rid}.docx"),
+        kw.get("title", f"Title {rid}"),
+        kw.get("src_path", f"/tmp/{rid}.docx"),
+        kw.get("benchmark", "arxiv_cs_cl"),
+        kw.get("severity_counts", {"high": 2, "medium": 3, "low": 1}),
+        kw.get("report_json", '{"document": {"filename": "x.docx"}}'),
+    )
+
+
+def test_reports_roundtrip(tmp_path):
+    with Cache(tmp_path / "c.sqlite") as cache:
+        _save(cache, "r1")
+        _save(cache, "r2")
+        listing = cache.list_reports()
+        assert [r["id"] for r in listing] == ["r2", "r1"]  # newest first
+        assert listing[0]["n_high"] == 2
+        assert "report_json" not in listing[0]  # list stays light
+        row = cache.get_report("r1")
+        assert row["src_path"] == "/tmp/r1.docx"
+        assert '"document"' in row["report_json"]
+        assert cache.get_report("nope") is None
+
+
+def test_reports_delete(tmp_path):
+    with Cache(tmp_path / "c.sqlite") as cache:
+        _save(cache, "r1")
+        assert cache.delete_report("r1") is True
+        assert cache.delete_report("r1") is False
+        assert cache.list_reports() == []
+
+
+def test_reports_same_file_twice_lists_both(tmp_path):
+    # dropping the same docx again is a new job id → two parallel entries
+    with Cache(tmp_path / "c.sqlite") as cache:
+        _save(cache, "jobA", filename="paper.docx")
+        _save(cache, "jobB", filename="paper.docx")
+        assert len(cache.list_reports()) == 2

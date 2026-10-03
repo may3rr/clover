@@ -185,6 +185,56 @@ select {
   }
 }
 
+/* home sidebar history rows */
+.hist-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: background 160ms var(--ease);
+}
+.hist-row:hover {
+  background: var(--fill);
+}
+.hist-row-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.hist-row-name {
+  display: block;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.hist-row-sub {
+  display: block;
+}
+.hist-row-del {
+  flex: none;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0;
+  transition:
+    opacity 160ms var(--ease),
+    color 160ms var(--ease);
+}
+.hist-row:hover .hist-row-del,
+.hist-row-del.confirming {
+  opacity: 1;
+}
+.hist-row-del.confirming {
+  color: var(--high-text);
+  font-weight: 500;
+}
+
 /* flush left pane — native vibrancy shows through; the 1px separator is
    the only line besides the focus ring */
 .glass-sidebar {
@@ -746,15 +796,6 @@ select {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.account-corner {
-  position: absolute;
-  left: 16px;
-  bottom: 16px;
-  width: 200px;
-}
-.account-corner .account-chip {
-  width: auto;
 }
 
 /* account section: centered identity + activity heatmap */

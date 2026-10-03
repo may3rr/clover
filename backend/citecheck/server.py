@@ -7,6 +7,9 @@
 - GET /jobs/{id}/report：运行中返回 409。
 - GET /benchmarks：backend/benchmarks/*.json 的 [{id, name, n_papers}]。
 - POST /jobs/{id}/export：{path}。
+- GET /reports：历史报告列表（体检完成即落库，id = job_id）；
+  GET /reports/{id} 取完整报告，DELETE 删除，POST /reports/{id}/export
+  用库存报告与原始 docx 导出（原文件缺失返回 400）。
 
 鉴权：环境变量 CITECHECK_TOKEN 存在时，除 /health 外所有路由要求
 X-Citecheck-Token 头或 ?token= 查询参数（EventSource 无法设置请求头）。
@@ -163,6 +166,7 @@ async def analyze(
         try:
             job.report = await run_pipeline(
                 src, benchmark_id=benchmark, emit=emit)
+            _save_report(job.id, src, benchmark, job.report)
         except PipelineError as e:
             job.error = str(e)
         except Exception as e:  # noqa: BLE001
@@ -172,6 +176,81 @@ async def analyze(
 
     job.task = asyncio.create_task(_run())
     return {"job_id": job.id}
+
+
+def _save_report(report_id: str, src: Path, benchmark: str, rep) -> None:
+    """Persist the finished report (id = job id) so /reports can list and
+    reopen it later; export then works for live jobs and history alike."""
+    try:
+        counts = {"high": 0, "medium": 0, "low": 0}
+        for f in rep.findings:
+            if f.severity in counts:
+                counts[f.severity] += 1
+        Cache(get_settings().cache_path).save_report(
+            report_id,
+            rep.document.filename or src.name,
+            (rep.document.title or "").strip() or src.stem,
+            str(src),
+            benchmark,
+            counts,
+            json.dumps(rep.model_dump(mode="json"), ensure_ascii=False),
+        )
+    except Exception:  # noqa: BLE001
+        log.exception("failed to persist report %s", report_id)
+
+
+# ---------------------------------------------------------------- reports
+
+
+@app.get("/reports")
+async def list_reports() -> list[dict]:
+    return Cache(get_settings().cache_path).list_reports()
+
+
+def _stored_report(report_id: str) -> dict | JSONResponse:
+    row = Cache(get_settings().cache_path).get_report(report_id)
+    if row is None:
+        return JSONResponse({"detail": "report not found"}, status_code=404)
+    return row
+
+
+@app.get("/reports/{report_id}")
+async def get_stored_report(report_id: str):
+    row = _stored_report(report_id)
+    if isinstance(row, JSONResponse):
+        return row
+    return JSONResponse(json.loads(row["report_json"]))
+
+
+@app.delete("/reports/{report_id}")
+async def delete_stored_report(report_id: str):
+    if not Cache(get_settings().cache_path).delete_report(report_id):
+        return JSONResponse({"detail": "report not found"}, status_code=404)
+    return {"ok": True}
+
+
+@app.post("/reports/{report_id}/export")
+async def export_stored_report(report_id: str):
+    row = _stored_report(report_id)
+    if isinstance(row, JSONResponse):
+        return row
+    src = Path(row["src_path"])
+    if not src.is_file():
+        return JSONResponse(
+            {"detail": "原文件已移动或删除，无法导出。请重新体检这篇论文。"},
+            status_code=400,
+        )
+    try:
+        from .export import export_report
+        from .schema import Report
+        rep = Report.model_validate(json.loads(row["report_json"]))
+        author, initials = _comment_identity(_prefs())
+        out = await asyncio.to_thread(
+            export_report, src, rep, None, author, initials)
+    except Exception as e:  # noqa: BLE001
+        log.exception("export failed for stored report %s", report_id)
+        return JSONResponse({"detail": str(e)}, status_code=500)
+    return {"path": str(out)}
 
 
 def _job(job_id: str) -> Job | JSONResponse:

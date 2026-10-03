@@ -96,7 +96,7 @@ export default function ReportScreen({
     setExportErr(null)
     setExported(null)
     try {
-      const r = await apiFetch(`/jobs/${jobId}/export`, { method: 'POST' })
+      const r = await apiFetch(`/reports/${jobId}/export`, { method: 'POST' })
       if (!r.ok) {
         const d = await r.json().catch(() => ({}))
         setExportErr(d.detail ?? '导出失败。请重试。')

@@ -51,6 +51,18 @@ class Cache:
         if "doc" not in cols:
             self._conn.execute(
                 "ALTER TABLE llm_usage ADD COLUMN doc TEXT")
+        self._conn.execute(
+            "CREATE TABLE IF NOT EXISTS reports ("
+            "id TEXT PRIMARY KEY, "
+            "filename TEXT NOT NULL, "
+            "title TEXT NOT NULL, "
+            "src_path TEXT NOT NULL, "
+            "benchmark TEXT NOT NULL, "
+            "created_at TEXT NOT NULL, "
+            "n_high INTEGER NOT NULL DEFAULT 0, "
+            "n_medium INTEGER NOT NULL DEFAULT 0, "
+            "n_low INTEGER NOT NULL DEFAULT 0, "
+            "report_json TEXT NOT NULL)")
         self._conn.commit()
 
     def get(self, key: str) -> Any | None:
@@ -141,6 +153,70 @@ class Cache:
             )
             cols = [c[0] for c in cur.description]
             return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+    def save_report(
+        self,
+        report_id: str,
+        filename: str,
+        title: str,
+        src_path: str,
+        benchmark: str,
+        severity_counts: dict[str, int],
+        report_json: str,
+    ) -> None:
+        """Persist a finished check report so the home screen can list and
+        reopen past results without re-running the pipeline."""
+        with self._lock:
+            self._conn.execute(
+                "INSERT OR REPLACE INTO reports (id, filename, title, "
+                "src_path, benchmark, created_at, n_high, n_medium, n_low, "
+                "report_json) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (
+                    report_id,
+                    filename,
+                    title,
+                    src_path,
+                    benchmark,
+                    datetime.now().isoformat(timespec="seconds"),
+                    severity_counts.get("high", 0),
+                    severity_counts.get("medium", 0),
+                    severity_counts.get("low", 0),
+                    report_json,
+                ),
+            )
+            self._conn.commit()
+
+    def list_reports(self) -> list[dict]:
+        """Sidebar listing — metadata only, newest first."""
+        with self._lock:
+            cur = self._conn.execute(
+                "SELECT id, filename, title, created_at, "
+                "n_high, n_medium, n_low "
+                "FROM reports ORDER BY created_at DESC, rowid DESC"
+            )
+            cols = [c[0] for c in cur.description]
+            return [dict(zip(cols, row)) for row in cur.fetchall()]
+
+    def get_report(self, report_id: str) -> dict | None:
+        """Full row incl. src_path and the report JSON blob."""
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT id, filename, title, src_path, benchmark, "
+                "created_at, report_json FROM reports WHERE id = ?",
+                (report_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        cols = ["id", "filename", "title", "src_path", "benchmark",
+                "created_at", "report_json"]
+        return dict(zip(cols, row))
+
+    def delete_report(self, report_id: str) -> bool:
+        with self._lock:
+            cur = self._conn.execute(
+                "DELETE FROM reports WHERE id = ?", (report_id,))
+            self._conn.commit()
+            return cur.rowcount > 0
 
     def close(self) -> None:
         with self._lock:

@@ -9,6 +9,7 @@ import { segmentsForParagraph } from './highlight'
 import { buildItems, moveSelection, pickItem, type ListItem } from './items'
 import { supportForFinding } from './claims'
 import { pickGreeting } from './greetings'
+import { relDay } from './reltime'
 import { barGeom, comparedSections } from './dist'
 import type { Finding, Report, Revision } from '../types/report'
 
@@ -349,6 +350,18 @@ describe('greetings', () => {
     )
     expect(fri.has('Happy Friday')).toBe(true)
     expect(tue.has('Happy Friday')).toBe(false)
+  })
+})
+
+describe('relDay', () => {
+  const now = new Date(2026, 9, 3, 15, 0, 0) // 2026-10-03 15:00
+
+  it('today and yesterday carry the time, older dates do not', () => {
+    expect(relDay('2026-10-03T09:05:00', now)).toBe('今天 09:05')
+    expect(relDay('2026-10-02T23:40:00', now)).toBe('昨天 23:40')
+    expect(relDay('2026-09-28T10:00:00', now)).toBe('9 月 28 日')
+    expect(relDay('2025-12-31T10:00:00', now)).toBe('2025 年 12 月 31 日')
+    expect(relDay('not-a-date', now)).toBe('')
   })
 })
 
