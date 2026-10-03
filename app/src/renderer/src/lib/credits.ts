@@ -44,4 +44,11 @@ export const CREDITS: { group: string; items: Credit[] }[] = [
       ['LobeHub Icons', '服务商图标（MIT）', 'https://github.com/lobehub/lobe-icons'],
     ],
   },
+  {
+    group: '片尾配乐',
+    items: [
+      ['Claude Debussy', '《月光》，8-bit 改编', 'https://imslp.org/wiki/Suite_bergamasque_(Debussy%2C_Claude)'],
+      ['Mutopia Project', '公有领域乐谱与 MIDI', 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1778'],
+    ],
+  },
 ]
