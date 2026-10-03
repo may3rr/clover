@@ -103,7 +103,7 @@ p {
 .hero {
   /* app window: 1280 x 820. Three quarters of it stands in the first
      screen; the copy takes what is left above it. */
-  --win-w: min(1200px, calc(100vw - 48px), calc((100svh - 365px) / 0.75 / 0.640625));
+  --win-w: min(1200px, calc(100vw - 48px), calc((100svh - 410px) / 0.75 / 0.640625));
   min-height: 100svh;
   display: flex;
   flex-direction: column;
@@ -175,6 +175,32 @@ p {
   font-weight: 400;
   font-size: 13px;
   padding-left: 4px;
+}
+.hero-event {
+  margin-bottom: 16px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 980px;
+  display: inline-flex;
+  align-items: center;
+  background: var(--fill);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.hero-team {
+  margin-top: 16px;
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+.hero-team b {
+  font-weight: 600;
+  color: var(--text);
+  margin-right: 8px;
 }
 .hero-hint {
   margin-top: 16px;

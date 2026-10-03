@@ -1,6 +1,7 @@
 // The narrated cut, end to end.
 //
-//   npm run site:film -- --voice <dir of 01.wav ...> [--music song.mp3] [--skip-record]
+//   npm run site:film -- --voice <dir of 01.wav ...> [--music song.mp3]
+//                        [--template frame|desk] [--skip-record]
 //
 // 1. record the 'film' tour paced by the clip lengths (record.mjs --film),
 //    which also logs the video time each line starts (film.timeline.json)
@@ -24,6 +25,8 @@ const opt = (k) => {
 }
 const voice = path.resolve(opt('voice') ?? path.join(appDir, 'site-videos/voice'))
 const music = opt('music') && path.resolve(opt('music'))
+const template = opt('template') ?? 'frame'
+const tag = template === 'desk' ? '桌面-' : ''
 const out = path.join(appDir, 'site-videos/06-成片')
 const rawDir = path.join(out, 'raw')
 fs.mkdirSync(rawDir, { recursive: true })
@@ -40,9 +43,9 @@ if (!argv.includes('--skip-record'))
   run('node', [path.join(here, 'record.mjs'), '--film', voice, '--fps', '60', '--out', rawDir])
 
 // 2. frame
-run('node', [path.join(here, 'frame.mjs'), raw])
-const framed = path.join(appDir, 'site-videos/05-成片-主页框/film.mp4')
-const silent = path.join(out, '成片-无声.mp4')
+run('node', [path.join(here, 'frame.mjs'), '--template', template, raw])
+const framed = path.join(appDir, `site-videos/05-成片-${template === 'desk' ? '桌面' : '主页框'}/film.mp4`)
+const silent = path.join(out, `成片-${tag}无声.mp4`)
 fs.copyFileSync(framed, silent)
 const total = dur(silent)
 
@@ -60,7 +63,7 @@ run('ffmpeg', ['-y', '-v', 'error', ...ins, '-filter_complex',
   `${parts.join(';')};${lines.map((_, i) => `[a${i}]`).join('')}amix=inputs=${lines.length}:normalize=0,apad,atrim=0:${total}[out]`,
   '-map', '[out]', '-c:a', 'pcm_s16le', narr])
 run('ffmpeg', ['-y', '-v', 'error', '-i', silent, '-i', narr, '-map', '0:v', '-map', '1:a',
-  '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', path.join(out, '成片-旁白.mp4')])
+  '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', path.join(out, `成片-${tag}旁白.mp4`)])
 
 // 4. optional music, ducked under the voice
 if (music) {
@@ -69,7 +72,7 @@ if (music) {
     `[2:a]aresample=48000,aformat=channel_layouts=stereo,atrim=0:${total},volume=0.32,afade=t=in:d=1.5,afade=t=out:st=${fade}:d=4[m];` +
     `[1:a]asplit[v][key];[m][key]sidechaincompress=threshold=0.02:ratio=6:attack=80:release=600[duck];` +
     `[v][duck]amix=inputs=2:normalize=0[a]`,
-    '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', path.join(out, '成片-旁白-配乐.mp4')])
+    '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', path.join(out, `成片-${tag}旁白-配乐.mp4`)])
 }
 console.log(`\n${path.relative(appDir, out)}  ${total.toFixed(1)}s`)
 for (const l of lines) console.log(`  ${l.t.toFixed(2).padStart(6)}s  line ${l.line}`)

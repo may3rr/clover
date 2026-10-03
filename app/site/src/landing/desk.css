@@ -1,0 +1,17 @@
+html,
+body {
+  width: 1920px;
+  height: 1080px;
+  margin: 0;
+  overflow: hidden;
+  background: var(--desk);
+}
+body::before {
+  display: none; /* replica.css draws traffic lights; the recording has its own */
+}
+.slot {
+  position: absolute;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--glass-edge), 0 24px 80px rgba(0, 0, 0, 0.35);
+}

@@ -25,16 +25,17 @@ interface Data {
   grounded: Report
   outline: unknown
 }
-let data: Data | null = null
-export async function loadData(): Promise<Data> {
+// one shared request: the state driver and App both wait on it, and the
+// driver must not run ahead of App's own sampleReport() handler
+let data: Promise<Data> | null = null
+export function loadData(): Promise<Data> {
   if (data) return data
   const get = (p: string) => fetch(p).then((r) => r.json())
-  const [showcase, grounded, outline] = await Promise.all([
+  data = Promise.all([
     get('./data/showcase.json'),
     get('./data/grounded.json'),
     get('./data/showcase_outline.json'),
-  ])
-  data = { showcase, grounded, outline }
+  ]).then(([showcase, grounded, outline]) => ({ showcase, grounded, outline }))
   return data
 }
 
