@@ -24,6 +24,8 @@ import { morph } from '../lib/vt'
 import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
 import AccountChip from '../components/AccountChip'
+import HistoryRow from '../components/HistoryRow'
+import { useReports, type ReportMeta } from '../lib/useReports'
 import {
   LayerTile,
   DocTextFillIcon,
@@ -51,6 +53,7 @@ interface Props {
   registerExport: (fn: () => void) => void
   onExported: (path: string | null) => void
   onReset: () => void
+  onOpenReport: (id: string) => void
   prefs: Prefs
   onOpenSettings: () => void
 }
@@ -63,9 +66,11 @@ export default function ReportScreen({
   registerExport,
   onExported,
   onReset,
+  onOpenReport,
   prefs,
   onOpenSettings,
 }: Props) {
+  const { reports: history, remove: removeReport } = useReports()
   const items = useMemo(() => buildItems(report), [report])
   const [filter, setFilter] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -198,6 +203,22 @@ export default function ReportScreen({
   const filterName = filter ? LAYER_NAMES[filter] : '全部问题'
   const fileName = report.document.filename ?? report.document.title ?? '论文'
 
+  // sidebar history: the stored list, plus a synthetic row for the current
+  // report when it isn't persisted (e.g. screenshot mode)
+  const historyList = useMemo(() => {
+    if (history.some((h) => h.id === jobId)) return history
+    const cur: ReportMeta = {
+      id: jobId,
+      filename: fileName,
+      title: (report.document.title ?? '').trim() || fileName,
+      created_at: new Date().toISOString(),
+      n_high: items.filter((i) => i.severity === 'high').length,
+      n_medium: items.filter((i) => i.severity === 'medium').length,
+      n_low: items.filter((i) => i.severity === 'low').length,
+    }
+    return [cur, ...history]
+  }, [history, jobId, fileName, report, items])
+
   return (
     <div className="relative h-full overflow-hidden">
       {/* ---------- flush sidebar pane (vibrancy) ---------- */}
@@ -226,36 +247,27 @@ export default function ReportScreen({
           ))}
         </nav>
         <div className="group-label" style={{ fontWeight: 600, marginTop: 16 }}>
-          论文
+          最近检查
         </div>
-        <div className="flex flex-col" style={{ padding: '0 8px' }}>
-          <div
-            className="side-row"
-            style={{ cursor: 'default' }}
-            title={fileName}
-          >
-            <LayerTile
-              size={20}
-              icon={<DocTextFillIcon size={12} />}
-            />
-            <span
-              className="font-normal min-w-0"
-              style={{
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {fileName}
-            </span>
-          </div>
+        <div
+          className="flex-1 overflow-y-auto flex flex-col gap-1"
+          style={{ padding: '0 8px 8px' }}
+        >
           <button className="side-row" onClick={onReset}>
             <LayerTile size={20} icon={<PlusFillIcon size={12} />} />
             <span className="font-normal">检查另一篇</span>
           </button>
+          {historyList.map((h) => (
+            <HistoryRow
+              key={h.id}
+              meta={h}
+              active={h.id === jobId}
+              onOpen={() => onOpenReport(h.id)}
+              onDelete={() => removeReport(h.id)}
+            />
+          ))}
         </div>
-        <div className="flex-1" />
-        <div className="t13 secondary" style={{ padding: '0 20px 8px' }}>
+        <div className="t13 secondary" style={{ padding: '8px 20px 8px' }}>
           <div>全文在本机解析</div>
           <div>云端复核 {cloudCalls} 次</div>
         </div>

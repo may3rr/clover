@@ -199,6 +199,9 @@ select {
 .hist-row:hover {
   background: var(--fill);
 }
+.hist-row.sel {
+  background: var(--fill-strong);
+}
 .hist-row-main {
   display: flex;
   align-items: center;

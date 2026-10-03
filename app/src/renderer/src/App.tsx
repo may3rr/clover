@@ -245,6 +245,7 @@ export default function App() {
   if (screen === 'report' && report && jobId) {
     return (
       <ReportScreen
+        key={jobId}
         report={report}
         jobId={jobId}
         externalSelection={extSel}
@@ -253,6 +254,7 @@ export default function App() {
         prefs={prefs}
         onOpenSettings={openSettings}
         onReset={reset}
+        onOpenReport={openReport}
         onExported={(_path) => {
           if (window.citecheck.e2eFile && !e2eExportDone.current) {
             e2eExportDone.current = true

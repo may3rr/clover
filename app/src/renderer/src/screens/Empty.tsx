@@ -1,15 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { apiFetch } from '../lib/api'
 import {
   PapersIllustration,
   ChevronDownIcon,
-  DocTextFillIcon,
-  TrashFillIcon,
   SealOkIllustration,
-  LayerTile,
 } from '../components/Icons'
 import AccountChip from '../components/AccountChip'
-import { relDay } from '../lib/reltime'
+import HistoryRow from '../components/HistoryRow'
+import { useReports } from '../lib/useReports'
 import type { Prefs } from '../lib/prefs'
 
 interface Props {
@@ -30,46 +28,6 @@ interface Bench {
   n_papers: number
 }
 
-interface ReportMeta {
-  id: string
-  filename: string
-  title: string
-  created_at: string
-  n_high: number
-  n_medium: number
-  n_low: number
-}
-
-const SHOT_HISTORY: ReportMeta[] = [
-  {
-    id: 'shot-1',
-    filename: 'numeric_en.docx',
-    title: 'Citation Behaviour in Neural Models',
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-    n_high: 3,
-    n_medium: 11,
-    n_low: 1,
-  },
-  {
-    id: 'shot-2',
-    filename: 'hallucination_survey.docx',
-    title: 'A Survey of Hallucination',
-    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
-    n_high: 1,
-    n_medium: 6,
-    n_low: 2,
-  },
-  {
-    id: 'shot-3',
-    filename: 'retrieval_paper.docx',
-    title: 'Dense Passage Retrieval',
-    created_at: new Date(Date.now() - 9 * 86400000).toISOString(),
-    n_high: 0,
-    n_medium: 4,
-    n_low: 3,
-  },
-]
-
 /** Home: the three-pane shell with history in the sidebar and the drop
  *  zone as the reading area — the window never shows a bare whiteboard. */
 export default function Empty({
@@ -86,21 +44,13 @@ export default function Empty({
   const [drag, setDrag] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [benches, setBenches] = useState<Bench[]>([])
-  const [history, setHistory] = useState<ReportMeta[]>([])
+  const { reports, remove } = useReports()
 
   useEffect(() => {
     apiFetch('/benchmarks')
       .then((r) => r.json())
       .then((b: Bench[]) => setBenches(b))
       .catch(() => setBenches([]))
-    if (window.citecheck.shotsMode) {
-      setHistory(SHOT_HISTORY)
-      return
-    }
-    apiFetch('/reports')
-      .then((r) => r.json())
-      .then((h: ReportMeta[]) => setHistory(Array.isArray(h) ? h : []))
-      .catch(() => setHistory([]))
   }, [])
 
   const onDrop = useCallback(
@@ -118,12 +68,6 @@ export default function Empty({
     },
     [onFile]
   )
-
-  const removeReport = useCallback((id: string) => {
-    setHistory((h) => h.filter((r) => r.id !== id))
-    if (window.citecheck.shotsMode) return
-    apiFetch(`/reports/${id}`, { method: 'DELETE' }).catch(() => {})
-  }, [])
 
   const active = drag || forceDrag
   return (
@@ -146,17 +90,17 @@ export default function Empty({
           className="flex-1 overflow-y-auto flex flex-col gap-1"
           style={{ padding: '0 8px 8px' }}
         >
-          {history.length === 0 && (
+          {reports.length === 0 && (
             <div className="t13 secondary" style={{ padding: '4px 12px' }}>
               检查过的论文会出现在这里
             </div>
           )}
-          {history.map((h) => (
+          {reports.map((h) => (
             <HistoryRow
               key={h.id}
               meta={h}
               onOpen={() => onOpenReport(h.id)}
-              onDelete={() => removeReport(h.id)}
+              onDelete={() => remove(h.id)}
             />
           ))}
         </nav>
@@ -251,70 +195,5 @@ export default function Empty({
         </div>
       </aside>
     </div>
-  )
-}
-
-function HistoryRow({
-  meta,
-  onOpen,
-  onDelete,
-}: {
-  meta: ReportMeta
-  onOpen: () => void
-  onDelete: () => void
-}) {
-  const [confirming, setConfirming] = useState(false)
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  const arm = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setConfirming(true)
-    if (timer.current) clearTimeout(timer.current)
-    timer.current = setTimeout(() => setConfirming(false), 3000)
-  }
-  const confirm = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (timer.current) clearTimeout(timer.current)
-    onDelete()
-  }
-
-  return (
-    <button className="hist-row" onClick={onOpen}>
-      <span className="hist-row-main min-w-0">
-        <LayerTile
-          size={20}
-          icon={<DocTextFillIcon size={12} />}
-        />
-        <span className="min-w-0">
-          <span className="hist-row-name">{meta.filename}</span>
-          <span className="t13 secondary hist-row-sub">
-            {relDay(meta.created_at)}
-            {meta.n_high > 0 && ` · ${meta.n_high} 严重`}
-          </span>
-        </span>
-      </span>
-      {confirming ? (
-        <span
-          className="t13 hist-row-del confirming"
-          role="button"
-          tabIndex={0}
-          onClick={confirm}
-          onKeyDown={(e) => e.key === 'Enter' && confirm(e as never)}
-        >
-          删除
-        </span>
-      ) : (
-        <span
-          className="hist-row-del"
-          role="button"
-          tabIndex={0}
-          aria-label={`删除 ${meta.filename} 的检查记录`}
-          onClick={arm}
-          onKeyDown={(e) => e.key === 'Enter' && arm(e as never)}
-        >
-          <TrashFillIcon size={13} color="var(--text-secondary)" />
-        </span>
-      )}
-    </button>
   )
 }
