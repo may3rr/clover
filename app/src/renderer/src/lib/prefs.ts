@@ -1,4 +1,5 @@
 import { apiFetch } from './api'
+import { APP_NAME } from './brand'
 
 export type AvatarSpec = {
   kind: 'color' | 'image'
@@ -59,7 +60,7 @@ export function displayName(p: Prefs): string {
 
 /** Word comment author shown in exports. */
 export function commentAuthor(p: Prefs): string {
-  return (p.comment_author || p.name).trim() || '引用体检'
+  return (p.comment_author || p.name).trim() || APP_NAME
 }
 
 /** Word comment initials; Word has no photo field — initials are its avatar. */

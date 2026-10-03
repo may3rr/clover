@@ -40,7 +40,7 @@ log = logging.getLogger(__name__)
 
 W = dx.qn
 XML_SPACE = "{http://www.w3.org/XML/1998/namespace}space"
-AUTHOR = "引用体检"
+AUTHOR = "Clover"
 INITIALS = "体检"
 # per-export overrides, set by export_report(author=..., initials=...)
 _author = AUTHOR
@@ -73,7 +73,7 @@ def _default_out(src: Path) -> Path:
         pass
     stem = src.stem
     for k in range(1, 1000):
-        suffix = "（引用体检）" if k == 1 else f"（引用体检 {k}）"
+        suffix = "（Clover）" if k == 1 else f"（Clover {k}）"
         cand = directory / f"{stem}{suffix}.docx"
         if not cand.exists():
             return cand

@@ -47,12 +47,12 @@ def test_prefs_rejects_oversized_avatar(client):
 
 def test_comment_identity_derivation():
     # single-word name -> first two chars; multi-word -> first letters;
-    # short names stay whole; everything falls back to 引用体检
+    # short names stay whole; everything falls back to Clover
     assert _comment_identity({"name": "Jackie"}) == ("Jackie", "JA")
     assert _comment_identity({"name": "Li Ming Yuan"}) == (
         "Li Ming Yuan", "LM")
     assert _comment_identity({"name": "李明"}) == ("李明", "李明")
-    assert _comment_identity({}) == ("引用体检", "引用体检")
+    assert _comment_identity({}) == ("Clover", "CL")
     assert _comment_identity(
         {"name": "李明", "comment_author": "王老师",
          "comment_initials": "WS"}) == ("王老师", "WS")

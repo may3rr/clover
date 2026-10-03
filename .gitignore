@@ -13,5 +13,6 @@ backend/benchmarks/.build.log
 
 # T10 export artifacts
 *（引用体检*.docx
+*（Clover*.docx
 app/shots/
 app/release/

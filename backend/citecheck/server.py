@@ -82,7 +82,7 @@ _DEFAULT_PREFS = {
     # avatar: {"kind": "color"|"image", "color": "--tile-blue" etc,
     #          "image": data-url}
     "avatar": {"kind": "color", "color": "blue", "image": None},
-    "comment_author": "",   # falls back to name, then 引用体检
+    "comment_author": "",   # falls back to name, then Clover
     "comment_initials": "",  # falls back to derived
     "onboarded": False,      # first-run guide + privacy consent done
 }
@@ -103,7 +103,7 @@ def _comment_identity(p: dict) -> tuple[str, str]:
     """(author, initials) for exported docx comments."""
     author = (p.get("comment_author") or p.get("name") or "").strip()
     if not author:
-        author = "引用体检"
+        author = "Clover"
     initials = (p.get("comment_initials") or "").strip()
     if not initials:
         if len(author) <= 4:

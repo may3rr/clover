@@ -1,6 +1,6 @@
 {
   "name": "citecheck",
-  "productName": "引用体检",
+  "productName": "Clover",
   "version": "0.1.0",
   "description": "Academic citation health check — docx in, Word comments + tracked changes out.",
   "main": "./out/main/index.js",
@@ -22,15 +22,37 @@
   },
   "build": {
     "appId": "com.citecheck.app",
-    "productName": "引用体检",
+    "productName": "Clover",
+    "icon": "build/icon.png",
     "mac": {
-      "category": "public.app-category.productivity"
+      "category": "public.app-category.productivity",
+      "identity": null,
+      "target": [
+        {
+          "target": "default",
+          "arch": ["arm64"]
+        }
+      ]
     },
     "fileAssociations": [
       {
         "ext": "docx",
         "name": "Word Document",
         "role": "Viewer"
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "../backend",
+        "to": "backend",
+        "filter": [
+          "**/*",
+          ".env",
+          "!tests/**",
+          "!**/__pycache__/**",
+          "!*.pyc",
+          "!citecheck.egg-info/**"
+        ]
       }
     ],
     "directories": {

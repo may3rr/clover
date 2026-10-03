@@ -366,10 +366,10 @@ describe('relDay', () => {
 })
 
 describe('prefs display names', () => {
-  it('falls back through name → 引用体检 for the comment author', () => {
+  it('falls back through name → Clover for the comment author', () => {
     const p = DEFAULT_PREFS
     expect(displayName(p)).toBe('设置')
-    expect(commentAuthor(p)).toBe('引用体检')
+    expect(commentAuthor(p)).toBe('Clover')
     expect(commentAuthor({ ...p, name: '李明' })).toBe('李明')
     expect(
       commentAuthor({ ...p, name: '李明', comment_author: '王老师' })

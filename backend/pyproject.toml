@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "citecheck"
 version = "0.1.0"
-description = "引用体检 — citation health check for academic docx manuscripts"
+description = "Clover — citation health check for academic docx manuscripts"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi",

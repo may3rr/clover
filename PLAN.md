@@ -1,4 +1,4 @@
-# PLAN.md — 引用体检 · 任务拆分
+# PLAN.md — Clover · 任务拆分
 
 > 配合 `AGENTS.md` 使用。每个任务都是一次独立的 Kimi Code 会话。
 
@@ -236,15 +236,15 @@
 **目标：** 把 `Report` 写回一份新的 docx，用户在 Word 里接受修订、处理批注。这是用户最终拿走的东西。
 
 **内容（全部用 lxml 直接操作 docx 的 XML）：**
-- **复制原文件，绝不改动原文件。** 新文件命名为 `原文件名（引用体检）.docx`。
+- **复制原文件，绝不改动原文件。** 新文件命名为 `原文件名（Clover）.docx`。
 - **批注：**
   - 如果原文件没有 `word/comments.xml`，就新建，并同时在 `[Content_Types].xml` 和 `word/_rels/document.xml.rels` 中注册。
   - 在正文对应位置插入 `w:commentRangeStart`、`w:commentRangeEnd` 和带 `w:commentReference` 的 run。锚点跨越多个 run 时要正确拆分 run，保留原有的字体格式。
-  - 批注作者统一写"引用体检"。
+  - 批注作者统一写"Clover"。
   - 批注正文格式：第一行写问题（如"未能在数据库中找到这篇文献"），第二行写证据或依据，第三行写建议方向（如"请核对文献信息，或确认是否误引"）。
   - 参考文献层面的问题挂在参考文献列表中对应条目上；全文层面的问题（如引用分布）挂在第一个章节标题上。
 - **修订：**
-  - 每个 `Revision` 写成一对 `w:del`（包裹 `w:delText`）和 `w:ins`，带上 `w:author="引用体检"` 与 `w:date`。
+  - 每个 `Revision` 写成一对 `w:del`（包裹 `w:delText`）和 `w:ins`，带上 `w:author="Clover"` 与 `w:date`。
   - 同样需要处理跨 run 拆分，保留格式。
   - 参考文献列表的重排：整条删除原段落、在新位置插入新段落，均以修订形式表示。
 - **导出前校验：**

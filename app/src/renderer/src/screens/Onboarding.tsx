@@ -43,16 +43,18 @@ export default function Onboarding({
   // beat 0 → 1: scattered dots gather into rings; the title starts
   // flickering once they have settled; beat 2 arrives when it lands
   const [shuffle, setShuffle] = useState(beat >= 2)
+  // keyed on step only — re-running on beat would cancel the title timer
   useEffect(() => {
-    if (step !== 0 || beat >= 1) return
+    if (step !== 0 || shuffle) return
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
-    const a = setTimeout(() => setBeat(1), reduced ? 0 : 700)
+    const a = setTimeout(() => setBeat((b) => Math.max(b, 1)), reduced ? 0 : 700)
     const b = setTimeout(() => setShuffle(true), reduced ? 0 : 1700)
     return () => {
       clearTimeout(a)
       clearTimeout(b)
     }
-  }, [step, beat])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step])
 
   const update = (patch: Partial<Prefs>) => onPrefs({ ...prefs, ...patch })
   const pickImage = async () => {
@@ -139,7 +141,7 @@ export default function Onboarding({
           <div className="onboard-panel" style={{ width: 560 }}>
             <h1 className="t26 onboard-h">连接模型服务</h1>
             <p className="secondary onboard-sub">
-              引用体检用大模型判断引用是否支持论断。默认使用阿里云百炼的通义千问，也可以填入你自己维护的 OpenAI 兼容端点。
+              {APP_NAME} 用大模型判断引用是否支持论断。默认使用阿里云百炼的通义千问，也可以填入你自己维护的 OpenAI 兼容端点。
             </p>
             <div className="onboard-model">
               <ModelSection

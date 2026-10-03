@@ -101,7 +101,7 @@ def test_export_creates_comments_part(tmp_path):
     assert "relationships/comments" in rels
     # author/date on every comment
     for c in root.findall(w("comment")):
-        assert c.get(w("author")) == "引用体检"
+        assert c.get(w("author")) == "Clover"
         assert c.get(w("date"))
 
 

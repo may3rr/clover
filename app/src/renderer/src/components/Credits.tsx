@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { CREDITS } from '../lib/credits'
 import { Chiptune } from '../lib/chiptune'
+import { APP_NAME } from '../lib/brand'
 
 /** Credits easter egg: a full-screen, game-style staff roll. Every name
  * flies from the lower left toward the upper right along a 30° line over
@@ -30,7 +31,7 @@ interface Line {
 const GROUP_COLORS = ['--tile-teal', '--tile-indigo', '--tile-purple']
 
 function script(): Line[][] {
-  const cards: Line[][] = [[{ text: '引用体检', tone: 'title' }, { text: '致谢', tone: 'role' }]]
+  const cards: Line[][] = [[{ text: APP_NAME, tone: 'title' }, { text: '致谢', tone: 'role' }]]
   CREDITS.forEach(({ group, items }, gi) => {
     cards.push([{ text: group, tone: 'group', color: GROUP_COLORS[gi % GROUP_COLORS.length] }])
     for (const [name, role] of items)

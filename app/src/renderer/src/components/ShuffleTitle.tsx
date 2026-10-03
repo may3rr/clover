@@ -1,7 +1,8 @@
 import { useEffect, useLayoutEffect, useRef } from 'react'
 
 /** "Think Different"-style title: every letter flickers through unrelated
- * typefaces, then the whole line settles at once into an old-style serif.
+ * typefaces on its own clock, then the letters land one by one, left to
+ * right, in an old-style serif.
  * Only fonts that ship with macOS — no web or bundled font files. Letter
  * widths are locked to the final face first, so the line never jitters. */
 
@@ -27,11 +28,24 @@ const FONTS = [
   "'Rockwell', serif",
   "'Big Caslon', serif",
   "'Trattatello', fantasy",
+  "'Bodoni 72', serif",
+  "'Zapfino', cursive",
+  "'Papyrus', fantasy",
+  "'Herculanum', fantasy",
+  "'Skia', sans-serif",
+  "'Chalkduster', fantasy",
+  "'Phosphate', fantasy",
+  "'Luminari', fantasy",
+  "'Savoye LET', cursive",
+  "'Andale Mono', monospace",
+  "'Trebuchet MS', sans-serif",
+  "'Verdana', sans-serif",
 ]
 
-const HOLD_MS = 1100
-const SWAP_MIN = 120
-const SWAP_MAX = 230
+const SHUFFLE_MS = 1400 // every letter flickers on its own clock
+const SETTLE_MS = 900 // then letters land left to right
+const SWAP_MIN = 70
+const SWAP_MAX = 150
 
 export default function ShuffleTitle({
   text,
@@ -40,7 +54,7 @@ export default function ShuffleTitle({
   className,
 }: {
   text: string
-  /** start flickering; settles after HOLD_MS */
+  /** start flickering; lands after SHUFFLE_MS + SETTLE_MS */
   play: boolean
   onSettled?: () => void
   className?: string
@@ -70,20 +84,36 @@ export default function ShuffleTitle({
       return
     }
     const next = spans.map(() => 0)
+    // each letter's landing time: left to right, with a little jitter
+    const landAt = spans.map(
+      (_, i) =>
+        SHUFFLE_MS +
+        (i / Math.max(1, spans.length - 1)) * SETTLE_MS +
+        (Math.random() - 0.5) * 120
+    )
+    const landed = spans.map(() => false)
     let t0 = 0
     let raf = 0
     const frame = (now: number) => {
       if (!t0) t0 = now
-      if (now - t0 >= HOLD_MS) {
-        for (const el of spans) el.style.fontFamily = SETTLE_FONT
+      const t = now - t0
+      spans.forEach((el, i) => {
+        if (landed[i]) return
+        if (t >= landAt[i]) {
+          el.style.fontFamily = SETTLE_FONT
+          landed[i] = true
+          return
+        }
+        if (now < next[i]) return
+        let f = FONTS[(Math.random() * FONTS.length) | 0]
+        if (f === el.style.fontFamily) f = FONTS[(Math.random() * FONTS.length) | 0]
+        el.style.fontFamily = f
+        next[i] = now + SWAP_MIN + Math.random() * (SWAP_MAX - SWAP_MIN)
+      })
+      if (landed.every(Boolean)) {
         settledCb.current?.()
         return
       }
-      spans.forEach((el, i) => {
-        if (now < next[i]) return
-        el.style.fontFamily = FONTS[(Math.random() * FONTS.length) | 0]
-        next[i] = now + SWAP_MIN + Math.random() * (SWAP_MAX - SWAP_MIN)
-      })
       raf = requestAnimationFrame(frame)
     }
     raf = requestAnimationFrame(frame)

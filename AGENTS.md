@@ -1,4 +1,4 @@
-# AGENTS.md — 引用体检（工作代号 citecheck）
+# AGENTS.md — Clover（工作代号 citecheck）
 
 > 本文件放在仓库根目录，是每个任务开始前必须完整阅读的项目上下文。
 > 任务清单见 `PLAN.md`。本文件中的约束优先级高于任何单个任务的描述。

@@ -217,7 +217,7 @@ async def test_server_flow(app_client, tmp_path):
     r = await client.post(f"/jobs/{job}/export")
     assert r.status_code == 200, r.text
     out = Path(r.json()["path"])
-    assert out.exists() and "引用体检" in out.name
+    assert out.exists() and "Clover" in out.name
     # tmp sources are treated as uploads -> land in ~/Downloads
     assert out != src and src.read_bytes() == (
         FIXTURES / "numeric_unordered_en.docx").read_bytes()

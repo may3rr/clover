@@ -21,6 +21,7 @@ import {
 } from '../components/Icons'
 import AccountChip from '../components/AccountChip'
 import { CREDITS, GITHUB_URL } from '../lib/credits'
+import { APP_NAME } from '../lib/brand'
 import {
   BrandIcon,
   QwenIcon,
@@ -524,7 +525,7 @@ function CommentsSection({
           <input
             className="field-input"
             value={prefs.comment_author}
-            placeholder={prefs.name || '引用体检'}
+            placeholder={prefs.name || APP_NAME}
             onChange={(e) => update({ comment_author: e.target.value })}
           />
         </Field>
@@ -1308,7 +1309,7 @@ function AboutSection({ onCredits }: { onCredits: () => void }) {
       <div className="about-hero">
         <PageIcon size={56} />
         <h2 className="t20 settings-h" style={{ marginTop: 12 }}>
-          引用体检
+          {APP_NAME}
         </h2>
         <div className="secondary">版本 0.1.0</div>
         <p className="font-normal about-blurb">
