@@ -36,6 +36,11 @@
   --tile-purple: #af52de;    /* 格式规范 */
   --tile-grey: #8e8e93;      /* 全部问题 */
 
+  /* 品牌色：设置页供应商图标（LobeHub lobe-icons 品牌色） */
+  --brand-qwen: #6336e7;
+  --brand-deepseek: #4d6bfe;
+  --on-brand: #ffffff;       /* 品牌色块上的白色 glyph */
+
   /* 骨架页细边 / 占位微光 / SVG 页边描线（唯一允许线条的几处数据图形） */
   --hairline: var(--separator);
   --shimmer: rgba(255, 255, 255, 0.45);
@@ -74,6 +79,11 @@
     --tile-teal: #40cbe0;
     --tile-purple: #bf5af2;
     --tile-grey: #98989d;
+
+    /* 品牌色在 dark 下保持原色，白字不变 */
+    --brand-qwen: #6336e7;
+    --brand-deepseek: #4d6bfe;
+    --on-brand: #ffffff;
 
     --shimmer: rgba(255, 255, 255, 0.12);
   }

@@ -223,6 +223,10 @@ select {
   border-radius: 12px;
   padding: 16px;
 }
+/* the settings pane itself is --bg, so its cards flip to the subtle fill */
+.settings-col .card {
+  background: var(--bg-subtle);
+}
 
 /* sidebar rows */
 .side-row {
@@ -665,11 +669,12 @@ select {
   z-index: 1;
   background: var(--sidebar-tint);
   box-shadow: 1px 0 0 var(--separator);
-  padding-top: 52px; /* clears the traffic lights */
 }
 .settings-col {
-  max-width: 520px;
+  width: 100%;
+  max-width: 1080px;
   padding: 24px 48px 48px;
+  margin: 0 auto;
 }
 .settings-h {
   font-weight: 600;
@@ -752,11 +757,64 @@ select {
   width: auto;
 }
 
-/* account section */
-.account-head {
+/* account section: centered identity + activity heatmap */
+.account-hello {
+  font-weight: 600;
+  margin: 0;
+}
+.account-hero {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  padding: 32px 0 24px;
+}
+.avatar-btn {
+  border-radius: 50%;
+  transition:
+    transform 160ms var(--ease),
+    opacity 160ms var(--ease);
+}
+.avatar-btn:hover {
+  opacity: 0.85;
+}
+.avatar-btn:active {
+  transform: scale(0.96);
+}
+.account-name-input {
+  background: transparent;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  width: 320px;
+  max-width: 100%;
+}
+.account-name-input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+.avatar-remove {
+  transition: color 160ms var(--ease);
+}
+.avatar-remove:hover {
+  color: var(--text);
+}
+.act-grid {
+  display: grid;
+  grid-template-rows: repeat(7, 12px);
+  grid-auto-flow: column;
+  grid-auto-columns: 12px;
+  gap: 4px;
+  justify-content: center;
+}
+.act-cell {
+  border-radius: 4px;
+  background: var(--fill);
+}
+.act-summary {
+  margin-top: 12px;
+  text-align: center;
 }
 .swatches {
   display: flex;
@@ -807,24 +865,154 @@ select {
   margin-top: 4px;
 }
 
-/* model provider header row */
-.provider-card {
+/* provider picker (model settings) */
+.prov-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+}
+.prov-sub {
+  margin: 12px 0 4px;
+}
+.prov-card {
+  min-width: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  padding: 12px 8px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: background 120ms var(--ease);
+}
+.prov-card:hover {
+  background: var(--fill);
+}
+.prov-card.sel {
+  background: var(--fill-strong);
+}
+.prov-card-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.prov-add {
+  color: var(--text-secondary);
 }
 .provider-badge {
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: var(--ok-tint);
   display: flex;
   align-items: center;
   justify-content: center;
   flex: none;
 }
-.provider-name {
+.prov-card .provider-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+}
+.prov-addform {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--fill);
+}
+.prov-addform .field:first-child {
+  margin-top: 0;
+}
+.prov-addform .field-input {
+  background: var(--bg);
+}
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 4px;
+}
+.icopt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 0;
+  border-radius: 8px;
+  transition: background 120ms var(--ease);
+}
+.icopt:hover {
+  background: var(--bg-subtle);
+}
+.icopt.sel {
+  background: var(--fill-strong);
+}
+.model-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  column-gap: 12px;
+}
+.pill-s {
+  height: 26px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+
+/* usage hero + bars + daily chart */
+.usage-hero-num {
+  font-weight: 700;
+}
+.usage-stats {
+  display: flex;
+  gap: 48px;
+  margin-top: 16px;
+}
+.usage-stat-num {
   font-weight: 600;
+}
+.usage-model {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.usage-bar {
+  height: 4px;
+  border-radius: 4px;
+  background: var(--fill);
+  overflow: hidden;
+  margin: 4px 0 2px;
+}
+.usage-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--tile-purple);
+}
+.usage-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 96px;
+  padding-top: 8px;
+}
+.usage-col {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+}
+.usage-col-bar {
+  width: 100%;
+  max-width: 24px;
+  border-radius: 4px 4px 0 0;
+  background: var(--tile-purple);
+}
+.usage-col-label {
+  white-space: nowrap;
 }
 
 /* usage tables */
@@ -854,7 +1042,4 @@ select {
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
-}
-.usage-total-num {
-  font-weight: 600;
 }

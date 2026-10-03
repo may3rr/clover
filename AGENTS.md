@@ -176,6 +176,8 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
      indigo #5856D6、blue #007AFF、teal #30B0C7、purple #AF52DE、
      grey #8E8E93，dark 用深色系统色变体 */
   --tile-indigo/blue/teal/purple/grey
+  /* 品牌色（设置页供应商图标，LobeHub lobe-icons 品牌色）：
+     --brand-qwen / --brand-deepseek；品牌色块上的白色 glyph 用 --on-brand */
   --hairline / --shimmer                 /* SVG 页边 / 占位微光 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1) /* 唯一缓动 */
 }

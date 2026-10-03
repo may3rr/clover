@@ -109,9 +109,13 @@ export default function Running({
 
   return (
     <div
-      className="h-full flex flex-col items-center justify-center"
+      className="relative h-full flex flex-col items-center justify-center"
       style={{ background: 'var(--bg)' }}
     >
+      <div
+        className="drag-strip"
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 52 }}
+      />
       <div className="t26 font-semibold">{fileName}</div>
       <div className="secondary" style={{ marginTop: 8 }}>
         正在检查，通常需要一两分钟。

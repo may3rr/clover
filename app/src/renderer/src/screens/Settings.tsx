@@ -7,15 +7,22 @@ import {
   type Prefs,
 } from '../lib/prefs'
 import Avatar from '../components/Avatar'
+import { pickGreeting } from '../lib/greetings'
 import {
   ChevronLeftIcon,
-  SealCheckFillIcon,
   PersonFillIcon,
   QuoteBubbleFillIcon,
   GearshapeFillIcon,
   ChartBarFillIcon,
   LayerTile,
 } from '../components/Icons'
+import {
+  BrandIcon,
+  QwenIcon,
+  OpenAIIcon,
+  DeepSeekIcon,
+} from '../components/BrandIcons'
+import { BRAND_PATHS } from '../components/brandPaths'
 
 /** Left-nav pane + grouped fields, in the style of macOS Settings. */
 
@@ -171,6 +178,7 @@ export default function Settings({
   return (
     <div className="relative h-full overflow-hidden">
       <aside className="settings-nav">
+        <div className="drag-strip" style={{ height: 52 }} />
         <nav className="flex flex-col gap-1" style={{ padding: '0 8px' }}>
           {SECTIONS.map((s) => (
             <button
@@ -184,7 +192,10 @@ export default function Settings({
           ))}
         </nav>
       </aside>
-      <div className="flex flex-col h-full" style={{ marginLeft: 200 }}>
+      <div
+        className="flex flex-col h-full"
+        style={{ marginLeft: 200, background: 'var(--bg)' }}
+      >
         <header
           className="drag-strip bar-solid strip-edge flex items-center"
           style={{ height: 52, flex: 'none', padding: '0 24px', gap: 12 }}
@@ -249,31 +260,46 @@ function AccountSection({
   update: (p: Partial<Prefs>) => void
   pickImage: () => void
 }) {
+  const [hello] = useState(() => pickGreeting(prefs.name))
+  const [days, setDays] = useState<Map<string, number> | null>(null)
+  useEffect(() => {
+    const merge = (u: Usage) => {
+      const m = new Map<string, number>()
+      for (const r of u.by_day) {
+        if (r.day) m.set(r.day, (m.get(r.day) ?? 0) + r.calls)
+      }
+      if (window.citecheck.shotsMode) {
+        for (const [d, n] of SHOT_ACTIVITY) m.set(d, (m.get(d) ?? 0) + n)
+      }
+      setDays(m)
+    }
+    if (window.citecheck.shotsMode) {
+      merge(SHOT_USAGE)
+      return
+    }
+    apiFetch('/usage')
+      .then((r) => r.json())
+      .then(merge)
+      .catch(() => setDays(new Map()))
+  }, [])
+
   return (
     <>
-      <h2 className="t20 settings-h">账户</h2>
-      <div className="group-label">头像和名字会显示在侧栏左下角</div>
-      <div className="card account-head">
-        <Avatar prefs={prefs} size={56} />
-        <div className="flex flex-col gap-2">
-          <button className="pill-accent" onClick={pickImage}>
-            选择图片
-          </button>
-          {prefs.avatar.kind === 'image' && (
-            <button
-              className="pill"
-              onClick={() =>
-                update({
-                  avatar: { ...prefs.avatar, kind: 'color', image: null },
-                })
-              }
-            >
-              移除图片
-            </button>
-          )}
-        </div>
-      </div>
-      <div className="card" style={{ marginTop: 16 }}>
+      <h2 className="t26 account-hello">{hello}</h2>
+      <div className="account-hero">
+        <button
+          className="avatar-btn"
+          onClick={pickImage}
+          title="上传头像图片"
+        >
+          <Avatar prefs={prefs} size={72} />
+        </button>
+        <input
+          className="account-name-input"
+          value={prefs.name}
+          placeholder="你的名字"
+          onChange={(e) => update({ name: e.target.value })}
+        />
         <div className="swatches">
           {AVATAR_COLORS.map((c) => {
             const on =
@@ -307,18 +333,102 @@ function AccountSection({
             )
           })}
         </div>
-        <Field label="你的名字">
-          <input
-            className="field-input"
-            value={prefs.name}
-            placeholder="例如 小明"
-            onChange={(e) => update({ name: e.target.value })}
-          />
-        </Field>
+        {prefs.avatar.kind === 'image' && (
+          <button
+            className="t13 secondary avatar-remove"
+            onClick={() =>
+              update({ avatar: { ...prefs.avatar, kind: 'color', image: null } })
+            }
+          >
+            移除图片，改用颜色头像
+          </button>
+        )}
       </div>
+
+      <div className="group-label">体检活动</div>
+      {days && <ActivityCard days={days} />}
     </>
   )
 }
+
+const WEEKS = 26
+
+/** GitHub-style activity grid: one cell per day, Monday-first weeks,
+ *  intensity from model-call count. */
+function ActivityCard({ days }: { days: Map<string, number> }) {
+  const today = new Date()
+  const todayKey = keyOf(today)
+  // Monday of this week, then back WEEKS-1 more weeks
+  const mondayOffset = (today.getDay() + 6) % 7
+  const start = new Date(today)
+  start.setDate(start.getDate() - mondayOffset - (WEEKS - 1) * 7)
+
+  const cells: { key: string; calls: number }[] = []
+  const cursor = new Date(start)
+  while (keyOf(cursor) <= todayKey) {
+    const k = keyOf(cursor)
+    cells.push({ key: k, calls: days.get(k) ?? 0 })
+    cursor.setDate(cursor.getDate() + 1)
+  }
+  const max = Math.max(...cells.map((c) => c.calls), 1)
+  const activeDays = cells.filter((c) => c.calls > 0).length
+  let streak = 0
+  for (let i = cells.length - 1; i >= 0; i--) {
+    // today without activity yet doesn't break the streak
+    if (cells[i].calls === 0 && i === cells.length - 1) continue
+    if (cells[i].calls === 0) break
+    streak++
+  }
+
+  return (
+    <div className="card">
+      <div className="act-grid" role="img" aria-label="体检活动热力图">
+        {cells.map((c) => (
+          <div
+            key={c.key}
+            className="act-cell"
+            title={`${c.key} · ${c.calls ? `${c.calls} 次调用` : '没有活动'}`}
+            style={
+              c.calls === 0
+                ? undefined
+                : {
+                    background: 'var(--accent)',
+                    opacity: 0.3 + 0.7 * Math.cbrt(c.calls / max),
+                  }
+            }
+          />
+        ))}
+      </div>
+      <div className="t13 secondary act-summary">
+        过去 {WEEKS} 周活跃 {activeDays} 天
+        {streak >= 2 ? ` · 连续 ${streak} 天，保持这个节奏` : ''}
+      </div>
+    </div>
+  )
+}
+
+function keyOf(d: Date): string {
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${m}-${day}`
+}
+
+/** Extra history only for screenshot mode, so the activity grid is not
+ *  confined to the two weeks SHOT_USAGE covers. */
+const SHOT_ACTIVITY: [string, number][] = [
+  ['2026-06-15', 9],
+  ['2026-06-24', 14],
+  ['2026-07-02', 6],
+  ['2026-07-18', 22],
+  ['2026-07-21', 11],
+  ['2026-08-05', 17],
+  ['2026-08-19', 8],
+  ['2026-08-27', 25],
+  ['2026-09-03', 12],
+  ['2026-09-10', 30],
+  ['2026-09-11', 16],
+  ['2026-09-19', 7],
+]
 
 function CommentsSection({
   prefs,
@@ -456,26 +566,28 @@ const SHOT_USAGE: Usage = {
     },
   ],
   by_day: [
-    {
-      day: '2026-10-06',
-      provider: 'dashscope',
-      model: 'qwen3.8-flash',
-      calls: 80,
-      cached_calls: 0,
-      prompt: 319000,
-      completion: 40000,
-      cost: 0.3632,
-    },
-    {
-      day: '2026-10-06',
-      provider: 'dashscope',
-      model: 'qwen3.7-flash',
-      calls: 47,
-      cached_calls: 6,
-      prompt: 33000,
-      completion: 5200,
-      cost: 0.0108,
-    },
+    { day: '2026-09-25', model: 'qwen3.7-flash', calls: 12, cached_calls: 2,
+      prompt: 9000, completion: 1400, cost: 0.003 },
+    { day: '2026-09-26', model: 'qwen3.8-flash', calls: 20, cached_calls: 0,
+      prompt: 76000, completion: 9500, cost: 0.086 },
+    { day: '2026-09-28', model: 'qwen3.8-flash', calls: 8, cached_calls: 1,
+      prompt: 31000, completion: 3800, cost: 0.035 },
+    { day: '2026-09-30', model: 'qwen3.7-flash', calls: 15, cached_calls: 3,
+      prompt: 11000, completion: 1700, cost: 0.004 },
+    { day: '2026-10-01', model: 'qwen3.8-flash', calls: 26, cached_calls: 0,
+      prompt: 98000, completion: 12000, cost: 0.111 },
+    { day: '2026-10-02', model: 'qwen3.8-flash', calls: 31, cached_calls: 2,
+      prompt: 118000, completion: 14500, cost: 0.134 },
+    { day: '2026-10-03', model: 'qwen3.8-flash', calls: 44, cached_calls: 0,
+      prompt: 166000, completion: 20500, cost: 0.188 },
+    { day: '2026-10-04', model: 'qwen3.7-flash', calls: 18, cached_calls: 4,
+      prompt: 13000, completion: 2000, cost: 0.005 },
+    { day: '2026-10-05', model: 'qwen3.8-flash', calls: 55, cached_calls: 1,
+      prompt: 205000, completion: 26000, cost: 0.232 },
+    { day: '2026-10-06', model: 'qwen3.8-flash', calls: 80, cached_calls: 0,
+      prompt: 319000, completion: 40000, cost: 0.3632 },
+    { day: '2026-10-06', model: 'qwen3.7-flash', calls: 47, cached_calls: 6,
+      prompt: 33000, completion: 5200, cost: 0.0108 },
   ],
   totals: [
     {
@@ -505,11 +617,151 @@ const SHOT_USAGE: Usage = {
   ],
 }
 
+type ProviderKey = 'dashscope' | 'openai' | 'deepseek'
+
+interface Preset {
+  id: ProviderKey
+  name: string
+  base: string
+  models: Record<string, string>
+}
+
+const PRESETS: Preset[] = [
+  {
+    id: 'dashscope',
+    name: '阿里云百炼',
+    base: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+    models: {
+      judge: 'qwen3.8-flash',
+      review: 'qwen3.8-max',
+      review_fallback: 'qwen3.7-max',
+      extract: 'qwen3.7-flash',
+      typo: 'qwen3.8-flash',
+      structure: 'qwen3.7-flash',
+      function: 'qwen3.7-flash',
+    },
+  },
+  {
+    id: 'openai',
+    name: 'OpenAI',
+    base: 'https://api.openai.com/v1',
+    models: {
+      judge: 'gpt-4o-mini',
+      review: 'gpt-4o',
+      review_fallback: 'gpt-4o-mini',
+      extract: 'gpt-4o-mini',
+      typo: 'gpt-4o-mini',
+      structure: 'gpt-4o-mini',
+      function: 'gpt-4o-mini',
+    },
+  },
+  {
+    id: 'deepseek',
+    name: 'DeepSeek',
+    base: 'https://api.deepseek.com/v1',
+    models: {
+      judge: 'deepseek-chat',
+      review: 'deepseek-reasoner',
+      review_fallback: 'deepseek-chat',
+      extract: 'deepseek-chat',
+      typo: 'deepseek-chat',
+      structure: 'deepseek-chat',
+      function: 'deepseek-chat',
+    },
+  },
+]
+
+interface CustomProvider {
+  name: string
+  base: string
+  icon: string
+}
+
+const providerStore = {
+  load(): { sel?: string; customs?: CustomProvider[] } {
+    try {
+      return JSON.parse(localStorage.getItem('citecheck.providers') ?? '{}')
+    } catch {
+      return {}
+    }
+  },
+  save(sel: string, customs: CustomProvider[]) {
+    try {
+      localStorage.setItem(
+        'citecheck.providers',
+        JSON.stringify({ sel, customs })
+      )
+    } catch {
+      /* localStorage unavailable — selection just won't persist */
+    }
+  },
+}
+
+/** Brand tile: colored rounded square + white glyph, macOS Settings style. */
+function ProviderTile({ k, size }: { k: ProviderKey; size: number }) {
+  const glyph = Math.round(size * 0.6)
+  let bg = 'var(--tile-grey)'
+  let icon: React.ReactNode = (
+    <GearshapeFillIcon size={glyph} color="var(--on-brand)" />
+  )
+  if (k === 'dashscope') {
+    bg = 'var(--brand-qwen)'
+    icon = <QwenIcon size={glyph} color="var(--on-brand)" />
+  } else if (k === 'deepseek') {
+    bg = 'var(--brand-deepseek)'
+    icon = <DeepSeekIcon size={glyph} color="var(--on-brand)" />
+  } else if (k === 'openai') {
+    bg = 'var(--text)'
+    icon = <OpenAIIcon size={glyph} color="var(--bg)" />
+  }
+  return (
+    <span className="provider-badge" style={{ background: bg }}>
+      {icon}
+    </span>
+  )
+}
+
+/** Neutral tile for user-added endpoints: their picked glyph on grey. */
+function CustomTile({ icon, size }: { icon: string; size: number }) {
+  const glyph = Math.round(size * 0.6)
+  return (
+    <span className="provider-badge" style={{ background: 'var(--fill-strong)' }}>
+      {BRAND_PATHS[icon] ? (
+        <BrandIcon name={icon} size={glyph} color="var(--text)" />
+      ) : (
+        <GearshapeFillIcon size={glyph} color="var(--text)" />
+      )}
+    </span>
+  )
+}
+
+/** Small brand glyph for a model name, used in usage rows. */
+function ModelGlyph({ model }: { model?: string }) {
+  const m = (model ?? '').toLowerCase()
+  if (m.startsWith('qwen'))
+    return <QwenIcon size={15} color="var(--brand-qwen)" />
+  if (/^(gpt|o[134])/.test(m))
+    return <OpenAIIcon size={15} color="var(--text)" />
+  if (m.startsWith('deepseek'))
+    return <DeepSeekIcon size={15} color="var(--brand-deepseek)" />
+  return null
+}
+
 function ModelSection() {
   const [cfg, setCfg] = useState<ModelCfg | null>(null)
   const [key, setKey] = useState('')
   const [msg, setMsg] = useState('')
   const [models, setModels] = useState<string[]>([])
+  const [customs, setCustoms] = useState<CustomProvider[]>(
+    () => providerStore.load().customs ?? []
+  )
+  const [sel, setSel] = useState(
+    () => providerStore.load().sel ?? 'dashscope'
+  )
+  const [showAdd, setShowAdd] = useState(false)
+  const [cname, setCname] = useState('')
+  const [cbase, setCbase] = useState('')
+  const [cicon, setCicon] = useState('ollama')
 
   useEffect(() => {
     if (window.citecheck.shotsMode) {
@@ -521,6 +773,46 @@ function ModelSection() {
       .then(setCfg)
       .catch(() => setMsg('设置服务不可用'))
   }, [])
+
+  const persistProviders = (s: string, c: CustomProvider[]) =>
+    providerStore.save(s, c)
+
+  const applyPreset = (p: Preset) => {
+    if (!cfg) return
+    setCfg({ ...cfg, base_url: p.base, models: { ...p.models } })
+    setSel(p.id)
+    persistProviders(p.id, customs)
+    setMsg(`已填入${p.name}的推荐配置，保存后生效`)
+  }
+
+  const applyCustom = (c: CustomProvider) => {
+    if (!cfg) return
+    setCfg({ ...cfg, base_url: c.base })
+    setSel(c.name)
+    persistProviders(c.name, customs)
+    setMsg('已填入接口地址，模型名请按该端点修改，保存后生效')
+  }
+
+  const addCustom = () => {
+    const name = cname.trim()
+    const base = cbase.trim()
+    if (!name || !base || customs.some((c) => c.name === name)) return
+    const next = [...customs, { name, base, icon: cicon }]
+    setCustoms(next)
+    setCname('')
+    setCbase('')
+    setShowAdd(false)
+    persistProviders(name, next)
+    applyCustom({ name, base, icon: cicon })
+  }
+
+  const removeCustom = (i: number) => {
+    const next = customs.filter((_, j) => j !== i)
+    setCustoms(next)
+    const nextSel = sel === customs[i].name ? 'dashscope' : sel
+    setSel(nextSel)
+    persistProviders(nextSel, next)
+  }
 
   const save = async () => {
     if (!cfg) return
@@ -551,7 +843,7 @@ function ModelSection() {
     if (r && r.ok) {
       const body = (await r.json()) as { models?: string[] }
       setModels(body.models ?? [])
-      setMsg(body.models?.length ? '' : '没有拉取到模型列表')
+      setMsg(body.models?.length ? '模型列表已更新，点击输入框选择' : '没有拉取到模型列表')
     } else {
       const body = r ? await r.json().catch(() => null) : null
       setMsg(body?.detail ?? '拉取失败，请检查 API Key 和接口地址')
@@ -563,17 +855,99 @@ function ModelSection() {
   return (
     <>
       <h2 className="t20 settings-h">模型</h2>
-      <div className="group-label">API 接口</div>
+      <div className="group-label">选择服务商，或添加自己的 OpenAI 兼容端点</div>
       <div className="card">
-        <div className="provider-card">
-          <span className="provider-badge">
-            <SealCheckFillIcon size={16} color="var(--ok)" />
-          </span>
-          <div className="min-w-0">
-            <div className="provider-name font-normal">阿里云百炼</div>
-            <div className="t13 secondary">DashScope OpenAI 兼容接口</div>
-          </div>
+        <div className="prov-grid">
+          {PRESETS.map((p) => (
+            <button
+              key={p.id}
+              className={`prov-card${sel === p.id ? ' sel' : ''}`}
+              onClick={() => applyPreset(p)}
+            >
+              <ProviderTile k={p.id} size={22} />
+              <span>{p.name}</span>
+            </button>
+          ))}
         </div>
+        <div className="t13 secondary prov-sub">
+          自定义端点（双击卡片移除）
+        </div>
+        <div className="prov-grid">
+          {customs.map((c, i) => (
+            <button
+              key={c.name}
+              className={`prov-card${sel === c.name ? ' sel' : ''}`}
+              onClick={() => applyCustom(c)}
+              onDoubleClick={() => removeCustom(i)}
+            >
+              <CustomTile icon={c.icon} size={22} />
+              <span className="prov-card-name">{c.name}</span>
+            </button>
+          ))}
+          <button
+            className="prov-card prov-add"
+            onClick={() => setShowAdd((v) => !v)}
+          >
+            <span
+              className="provider-badge"
+              style={{ background: 'var(--fill)' }}
+            >
+              <svg
+                width={13}
+                height={13}
+                viewBox="0 0 24 24"
+                fill="var(--text-secondary)"
+                aria-hidden
+              >
+                <path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
+              </svg>
+            </span>
+            <span>添加</span>
+          </button>
+        </div>
+        {showAdd && (
+          <div className="prov-addform">
+            <Field label="名称">
+              <input
+                className="field-input"
+                value={cname}
+                placeholder="例如：本地 Ollama"
+                onChange={(e) => setCname(e.target.value)}
+              />
+            </Field>
+            <Field label="Base URL">
+              <input
+                className="field-input"
+                value={cbase}
+                placeholder="http://127.0.0.1:11434/v1"
+                onChange={(e) => setCbase(e.target.value)}
+              />
+            </Field>
+            <Field label="图标">
+              <div className="icon-grid">
+                {Object.keys(BRAND_PATHS).map((n) => (
+                  <button
+                    key={n}
+                    className={`icopt${cicon === n ? ' sel' : ''}`}
+                    title={n}
+                    onClick={() => setCicon(n)}
+                  >
+                    <BrandIcon name={n} size={16} color="var(--text)" />
+                  </button>
+                ))}
+              </div>
+            </Field>
+            <div className="settings-actions" style={{ marginTop: 12 }}>
+              <div className="flex-1" />
+              <button className="pill" onClick={() => setShowAdd(false)}>
+                取消
+              </button>
+              <button className="pill-accent" onClick={addCustom}>
+                添加端点
+              </button>
+            </div>
+          </div>
+        )}
         <Field
           label="API Key"
           hint={cfg.has_api_key ? '已配置，输入新值可替换' : '尚未配置'}
@@ -594,8 +968,14 @@ function ModelSection() {
           />
         </Field>
       </div>
-      <div className="group-label">各任务使用的模型</div>
-      <div className="card">
+      <div className="group-label flex items-center">
+        各任务使用的模型
+        <div className="flex-1" />
+        <button className="pill pill-s" onClick={pullModels}>
+          拉取模型列表
+        </button>
+      </div>
+      <div className="card model-fields">
         {TASK_FIELDS.map((t) => (
           <Field key={t.key} label={t.label}>
             <input
@@ -618,13 +998,11 @@ function ModelSection() {
         </datalist>
       </div>
       <div className="settings-actions">
+        <div className="flex-1" />
+        {msg && <span className="t13 secondary">{msg}</span>}
         <button className="pill-accent" onClick={save}>
           保存设置
         </button>
-        <button className="pill" onClick={pullModels}>
-          拉取模型列表
-        </button>
-        {msg && <span className="t13 secondary">{msg}</span>}
       </div>
       <div className="group-label">
         费用记录与这些模型名对应，改名前的用量会保留在旧名字下
@@ -661,6 +1039,7 @@ function UsageSection() {
     )
   const totalPrompt = u.totals.reduce((s, r) => s + (r.prompt ?? 0), 0)
   const totalCompletion = u.totals.reduce((s, r) => s + (r.completion ?? 0), 0)
+  const totalCached = u.totals.reduce((s, r) => s + (r.cached_calls ?? 0), 0)
   const totalCost = u.totals.every((r) => r.cost === null)
     ? null
     : u.totals.reduce((s, r) => s + (r.cost ?? 0), 0)
@@ -671,50 +1050,91 @@ function UsageSection() {
     const k = r.doc ?? ''
     docs.set(k, [...(docs.get(k) ?? []), r])
   }
+  const docCost = [...docs.entries()].map(([doc, rows]) => ({
+    doc,
+    rows,
+    calls: rows.reduce((s, r) => s + r.calls, 0),
+    cost: rows.reduce((s, r) => s + (r.cost ?? 0), 0),
+  }))
+  const maxDocCost = Math.max(...docCost.map((d) => d.cost), 0)
+
+  // merge by_day rows (day × provider × model) into one entry per day
+  const days = new Map<string, { tokens: number; cached: number }>()
+  for (const r of u.by_day) {
+    if (!r.day) continue
+    const d = days.get(r.day) ?? { tokens: 0, cached: 0 }
+    d.tokens += rowTokens(r)
+    d.cached += r.cached_calls ?? 0
+    days.set(r.day, d)
+  }
+  const dayList = [...days.entries()].sort().slice(-14)
+  const maxDay = Math.max(...dayList.map(([, v]) => v.tokens), 1)
 
   return (
     <>
       <h2 className="t20 settings-h">用量与费用</h2>
-      <div className="card usage-total">
-        <div className="t20 usage-total-num">¥{yuan(totalCost)}</div>
-        <div className="t13 secondary" style={{ marginTop: 4 }}>
-          累计估算花费 · {totalCalls} 次调用 · 输入 {tokens(totalPrompt)} · 输出{' '}
-          {tokens(totalCompletion)}
+      <div className="card usage-hero">
+        <div className="t32 usage-hero-num">¥{yuan(totalCost)}</div>
+        <div className="t13 secondary">累计估算花费</div>
+        <div className="usage-stats">
+          <div className="usage-stat">
+            <div className="t20 usage-stat-num">{totalCalls}</div>
+            <div className="t13 secondary">模型调用</div>
+          </div>
+          <div className="usage-stat">
+            <div className="t20 usage-stat-num">{tokens(totalPrompt)}</div>
+            <div className="t13 secondary">输入 token</div>
+          </div>
+          <div className="usage-stat">
+            <div className="t20 usage-stat-num">{tokens(totalCompletion)}</div>
+            <div className="t13 secondary">输出 token</div>
+          </div>
+          <div className="usage-stat">
+            <div className="t20 usage-stat-num">{totalCached}</div>
+            <div className="t13 secondary">缓存命中</div>
+          </div>
         </div>
       </div>
 
       <div className="group-label">按论文</div>
       <div className="card usage-card">
-        {[...docs.entries()].map(([doc, rows]) => {
-          const calls = rows.reduce((s, r) => s + r.calls, 0)
-          const cost = rows.reduce((s, r) => s + (r.cost ?? 0), 0)
-          return (
-            <div key={doc || '?'} className="usage-doc">
-              <div className="usage-row">
-                <span className="usage-name">{doc || '未关联文档'}</span>
+        {docCost.map(({ doc, rows, calls, cost }) => (
+          <div key={doc || '?'} className="usage-doc">
+            <div className="usage-row">
+              <span className="usage-name">{doc || '未关联文档'}</span>
+              <span className="t13 secondary">
+                {calls} 次 · ¥{yuan(cost)}
+              </span>
+            </div>
+            <div className="usage-bar">
+              <i
+                style={{
+                  width: `${maxDocCost ? (cost / maxDocCost) * 100 : 0}%`,
+                }}
+              />
+            </div>
+            {rows.map((r, i) => (
+              <div key={i} className="usage-row usage-sub">
+                <span className="t13 usage-model">
+                  <ModelGlyph model={r.model} />
+                  {r.model}
+                </span>
                 <span className="t13 secondary">
-                  {calls} 次 · ¥{yuan(cost)}
+                  {r.calls} 次 · {tokens(rowTokens(r))} tok · ¥
+                  {yuan(r.cost)}
                 </span>
               </div>
-              {rows.map((r, i) => (
-                <div key={i} className="usage-row usage-sub">
-                  <span className="t13">{r.model}</span>
-                  <span className="t13 secondary">
-                    {r.calls} 次 · {tokens(rowTokens(r))} tok · ¥
-                    {yuan(r.cost)}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )
-        })}
+            ))}
+          </div>
+        ))}
       </div>
 
       <div className="group-label">按供应商和模型</div>
       <div className="card usage-card">
         {u.by_provider.map((r, i) => (
           <div key={i} className="usage-row">
-            <span className="usage-name">
+            <span className="usage-name usage-model">
+              <ModelGlyph model={r.model} />
               {r.provider} · {r.model}
             </span>
             <span className="t13 secondary">
@@ -725,18 +1145,28 @@ function UsageSection() {
       </div>
 
       <div className="group-label">按天</div>
-      <div className="card usage-card">
-        {u.by_day.map((r, i) => (
-          <div key={i} className="usage-row">
-            <span className="usage-name">
-              {r.day} · {r.model}
-            </span>
-            <span className="t13 secondary">
-              {r.calls} 次 · {tokens(rowTokens(r))} tok
-              {r.cached_calls ? ` · 缓存 ${r.cached_calls}` : ''}
-            </span>
-          </div>
-        ))}
+      <div className="card">
+        <div className="usage-chart">
+          {dayList.map(([day, v]) => (
+            <div
+              key={day}
+              className="usage-col"
+              title={`${day} · ${tokens(v.tokens)} token${
+                v.cached ? ` · 缓存 ${v.cached} 次` : ''
+              }`}
+            >
+              <div
+                className="usage-col-bar"
+                style={{
+                  height: `${Math.max(4, (v.tokens / maxDay) * 100)}%`,
+                }}
+              />
+              <div className="t13 secondary usage-col-label">
+                {day.slice(5).replace('-', '/')}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
       <div className="group-label">缓存命中的调用不消耗 token，单独列出</div>
     </>

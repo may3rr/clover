@@ -61,7 +61,7 @@ export default function Empty({
   const active = drag || forceDrag
   return (
     <div
-      className="h-full flex items-center justify-center"
+      className="relative h-full flex items-center justify-center"
       style={{
         background: active ? 'var(--bg-subtle)' : 'var(--bg)',
         transition: 'background 200ms ease-out',
@@ -73,6 +73,10 @@ export default function Empty({
       onDragLeave={() => setDrag(false)}
       onDrop={onDrop}
     >
+      <div
+        className={active ? undefined : 'drag-strip'}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 52 }}
+      />
       <div className="flex flex-col items-center" style={{ maxWidth: 460 }}>
         {/* morphs into skeleton page 1 on drop */}
         <span style={{ viewTransitionName: 'cc-paper' }}>

@@ -8,6 +8,7 @@ import {
 import { segmentsForParagraph } from './highlight'
 import { buildItems, moveSelection, pickItem, type ListItem } from './items'
 import { supportForFinding } from './claims'
+import { pickGreeting } from './greetings'
 import { barGeom, comparedSections } from './dist'
 import type { Finding, Report, Revision } from '../types/report'
 
@@ -299,6 +300,55 @@ describe('comparedSections', () => {
     }
     const out = comparedSections(d as never)
     expect(out.map((s) => s.section_id)).toEqual(['s1'])
+  })
+})
+
+describe('greetings', () => {
+  const at = (h: number, day = 2) => {
+    const d = new Date(2026, 9, 6, h, 0, 0) // a Tuesday
+    d.setDate(d.getDate() - ((d.getDay() - day + 7) % 7))
+    return d
+  }
+
+  it('interpolates the name and never leaves a placeholder', () => {
+    for (const h of [7, 13, 20, 2]) {
+      const g = pickGreeting('李明', at(h), () => 0.999)
+      expect(g).not.toContain('{name}')
+    }
+  })
+
+  it('skips name entries when no name is set', () => {
+    for (const h of [7, 13, 20, 2]) {
+      const g = pickGreeting('', at(h), () => 0.5)
+      expect(g).not.toContain('{name}')
+      expect(g.length).toBeGreaterThan(0)
+    }
+  })
+
+  it('respects the period: morning picks are morning or any-time entries', () => {
+    const seen = new Set<string>()
+    for (let i = 0; i < 40; i++) {
+      seen.add(pickGreeting('李明', at(8), () => i / 40))
+    }
+    expect(seen.has('晚上好')).toBe(false)
+    expect(seen.has('早上好，李明')).toBe(true)
+  })
+
+  it('offers weekday entries only on that weekday', () => {
+    const friday = at(10, 5)
+    const tuesday = at(10, 2)
+    const fri = new Set(
+      Array.from({ length: 60 }, (_, i) =>
+        pickGreeting('李明', friday, () => i / 60)
+      )
+    )
+    const tue = new Set(
+      Array.from({ length: 60 }, (_, i) =>
+        pickGreeting('李明', tuesday, () => i / 60)
+      )
+    )
+    expect(fri.has('Happy Friday')).toBe(true)
+    expect(tue.has('Happy Friday')).toBe(false)
   })
 })
 

@@ -201,7 +201,8 @@ export default function ReportScreen({
   return (
     <div className="relative h-full overflow-hidden">
       {/* ---------- flush sidebar pane (vibrancy) ---------- */}
-      <aside className="glass-sidebar flex flex-col" style={{ paddingTop: 52 }}>
+      <aside className="glass-sidebar flex flex-col">
+        <div className="drag-strip" style={{ height: 52, flex: 'none' }} />
         <div className="group-label" style={{ fontWeight: 600 }}>
           检查结果
         </div>
@@ -596,7 +597,7 @@ function InspectorList({
   return (
     <>
       <div
-        className="font-semibold bar-solid-subtle"
+        className="font-semibold bar-solid-subtle drag-strip"
         style={{ fontSize: 17, padding: '14px 16px', flex: 'none', height: 52 }}
       >
         {items.length} 个问题

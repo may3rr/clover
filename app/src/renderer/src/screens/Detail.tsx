@@ -21,8 +21,11 @@ const VERDICT: Record<string, { label: string; cls: string }> = {
 
 export default function Detail({ item, report, backLabel, onBack }: Props) {
   return (
-    <div className="detail-in flex-1 overflow-y-auto" key={item.id}>
-      <div style={{ padding: '8px 16px 16px' }}>
+    <div className="detail-in flex flex-col flex-1 min-h-0" key={item.id}>
+      <div
+        className="drag-strip flex items-center"
+        style={{ height: 52, flex: 'none', padding: '0 16px' }}
+      >
         <button
           className="link-accent flex items-center gap-1"
           onClick={onBack}
@@ -30,24 +33,25 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
           <ChevronLeftIcon size={15} />
           {backLabel}
         </button>
-        <div
-          className="font-semibold detail-title"
-          style={{ fontSize: 17, marginTop: 8 }}
-        >
-          {item.title}
-        </div>
-        <div
-          className="flex flex-col"
-          style={{ gap: 12, marginTop: 16 }}
-        >
-          {item.kind === 'group' ? (
-            <ReorderDetail item={item} report={report} />
-          ) : item.kind === 'revision' ? (
-            <RevisionDetail item={item} />
-          ) : (
-            <FindingDetail item={item} report={report} />
-          )}
-          <DetailLines detail={item.detail} />
+      </div>
+      <div className="flex-1 overflow-y-auto">
+        <div style={{ padding: '0 16px 16px' }}>
+          <div className="font-semibold detail-title" style={{ fontSize: 17 }}>
+            {item.title}
+          </div>
+          <div
+            className="flex flex-col"
+            style={{ gap: 12, marginTop: 16 }}
+          >
+            {item.kind === 'group' ? (
+              <ReorderDetail item={item} report={report} />
+            ) : item.kind === 'revision' ? (
+              <RevisionDetail item={item} />
+            ) : (
+              <FindingDetail item={item} report={report} />
+            )}
+            <DetailLines detail={item.detail} />
+          </div>
         </div>
       </div>
     </div>
