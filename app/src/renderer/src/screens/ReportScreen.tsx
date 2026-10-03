@@ -161,7 +161,14 @@ export default function ReportScreen({
         // after the commit: scroll the highlighted paper segment into view
         // and keep the selected list row visible
         setTimeout(() => {
-          segRefs.current.get(id)?.[0]?.scrollIntoView({ block: 'center' })
+          const segs = segRefs.current.get(id) ?? []
+          segs[0]?.scrollIntoView({ block: 'center' })
+          // a brief pulse so the eye lands on the passage
+          for (const el of segs) {
+            el.classList.remove('hl-flash')
+            void el.offsetWidth // restart the animation on repeat picks
+            el.classList.add('hl-flash')
+          }
           document
             .querySelector('.list-row.sel')
             ?.scrollIntoView({ block: 'nearest' })
@@ -208,7 +215,6 @@ export default function ReportScreen({
     return () => window.removeEventListener('keydown', h)
   }, [shown, selectedId, detailId, select, closeDetail])
 
-  const cloudCalls = report.meta?.llm_calls?.cloud ?? 0
   const filterName = filter ? LAYER_NAMES[filter] : '全部问题'
   const fileName = report.document.filename ?? report.document.title ?? '论文'
 
@@ -275,10 +281,6 @@ export default function ReportScreen({
               onDelete={() => removeReport(h.id)}
             />
           ))}
-        </div>
-        <div className="t13 secondary" style={{ padding: '8px 20px 8px' }}>
-          <div>全文在本机解析</div>
-          <div>云端复核 {cloudCalls} 次</div>
         </div>
         <div style={{ padding: '0 12px 12px' }}>
           <AccountChip prefs={prefs} onOpen={onOpenSettings} />

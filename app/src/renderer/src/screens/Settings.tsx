@@ -14,8 +14,11 @@ import {
   QuoteBubbleFillIcon,
   GearshapeFillIcon,
   ChartBarFillIcon,
+  InfoCircleFillIcon,
   LayerTile,
+  PageIcon,
 } from '../components/Icons'
+import AccountChip from '../components/AccountChip'
 import {
   BrandIcon,
   QwenIcon,
@@ -26,7 +29,7 @@ import { BRAND_PATHS } from '../components/brandPaths'
 
 /** Left-nav pane + grouped fields, in the style of macOS Settings. */
 
-type Section = 'account' | 'comments' | 'model' | 'usage'
+export type Section = 'account' | 'comments' | 'model' | 'usage' | 'about'
 const SECTIONS: {
   id: Section
   label: string
@@ -56,6 +59,12 @@ const SECTIONS: {
     label: '用量与费用',
     color: 'var(--tile-purple)',
     icon: <ChartBarFillIcon size={13} />,
+  },
+  {
+    id: 'about',
+    label: '关于',
+    color: 'var(--tile-indigo)',
+    icon: <InfoCircleFillIcon size={13} />,
   },
 ]
 
@@ -177,9 +186,14 @@ export default function Settings({
 
   return (
     <div className="relative h-full overflow-hidden">
-      <aside className="settings-nav">
-        <div className="drag-strip" style={{ height: 52 }} />
-        <nav className="flex flex-col gap-1" style={{ padding: '0 8px' }}>
+      {/* same pane as the report/home sidebar, so switching screens
+          doesn't shift the chrome */}
+      <aside className="glass-sidebar flex flex-col">
+        <div className="drag-strip" style={{ height: 52, flex: 'none' }} />
+        <div className="group-label" style={{ fontWeight: 600 }}>
+          设置
+        </div>
+        <nav className="flex-1 flex flex-col" style={{ padding: '0 8px' }}>
           {SECTIONS.map((s) => (
             <button
               key={s.id}
@@ -191,6 +205,9 @@ export default function Settings({
             </button>
           ))}
         </nav>
+        <div style={{ padding: '0 12px 12px' }}>
+          <AccountChip prefs={prefs} onOpen={() => setSec('account')} />
+        </div>
       </aside>
       <div
         className="flex flex-col h-full"
@@ -208,7 +225,6 @@ export default function Settings({
             <ChevronLeftIcon size={13} color="var(--text-secondary)" />
             <span className="font-normal">返回</span>
           </button>
-          <div className="font-semibold">设置</div>
           <div className="flex-1" />
           {savedAt > 0 && <span className="t13 secondary">已保存</span>}
         </header>
@@ -226,6 +242,7 @@ export default function Settings({
             )}
             {sec === 'model' && <ModelSection />}
             {sec === 'usage' && <UsageSection />}
+            {sec === 'about' && <AboutSection />}
           </div>
         </main>
       </div>
@@ -1230,6 +1247,86 @@ function UsageSection() {
         </div>
       </div>
       <div className="group-label">缓存命中的调用不消耗 token，单独列出</div>
+    </>
+  )
+}
+
+// ------------------------------------------------------------- about
+
+type Credit = [name: string, role: string, url: string]
+
+const CREDITS: { group: string; items: Credit[] }[] = [
+  {
+    group: '设计参考',
+    items: [
+      ['Notion', '阅读区的排版、配色与属性行', 'https://www.notion.so'],
+      ['macOS', '窗口、侧栏与设置界面的结构', 'https://developer.apple.com/design/human-interface-guidelines/'],
+      ['GitHub', '账户页的活动热力图', 'https://github.com'],
+    ],
+  },
+  {
+    group: '文献数据',
+    items: [
+      ['Crossref', 'DOI 与出版元数据', 'https://www.crossref.org'],
+      ['OpenAlex', '开放的学术图谱', 'https://openalex.org'],
+      ['Semantic Scholar', '论文摘要与开放全文', 'https://www.semanticscholar.org'],
+      ['arXiv', '预印本与领域对标语料', 'https://arxiv.org'],
+    ],
+  },
+  {
+    group: '开源软件',
+    items: [
+      ['Electron', '桌面应用外壳', 'https://www.electronjs.org'],
+      ['React', '界面', 'https://react.dev'],
+      ['Vite 与 electron-vite', '构建与开发服务', 'https://electron-vite.org'],
+      ['Tailwind CSS', '布局工具类', 'https://tailwindcss.com'],
+      ['TypeScript', '前端类型', 'https://www.typescriptlang.org'],
+      ['FastAPI 与 Uvicorn', '本地后端服务', 'https://fastapi.tiangolo.com'],
+      ['Pydantic', '数据模型与结构化输出校验', 'https://docs.pydantic.dev'],
+      ['lxml 与 python-docx', '读取与写入 Word 文档', 'https://lxml.de'],
+      ['HTTPX', '文献检索请求', 'https://www.python-httpx.org'],
+      ['RapidFuzz', '标题与作者的模糊匹配', 'https://github.com/rapidfuzz/RapidFuzz'],
+      ['rank-bm25', '证据片段检索', 'https://github.com/dorianbrown/rank_bm25'],
+      ['pypdf', '读取开放全文', 'https://github.com/py-pdf/pypdf'],
+      ['OpenAI Python SDK', '调用 OpenAI 兼容接口', 'https://github.com/openai/openai-python'],
+      ['LobeHub Icons', '服务商图标（MIT）', 'https://github.com/lobehub/lobe-icons'],
+    ],
+  },
+]
+
+function AboutSection() {
+  return (
+    <>
+      <div className="about-hero">
+        <PageIcon size={56} />
+        <h2 className="t20 settings-h" style={{ marginTop: 12 }}>
+          引用体检
+        </h2>
+        <div className="secondary">版本 0.1.0</div>
+        <p className="font-normal about-blurb">
+          拖入一篇论文，检查参考文献是否真实、引用是否支持论断，问题以批注和修订写回 Word。判断由通义千问完成，也可以接入你自己维护的 OpenAI 兼容端点。
+        </p>
+      </div>
+      {CREDITS.map(({ group, items }) => (
+        <section key={group}>
+          <div className="group-label">{group}</div>
+          <div className="card about-card">
+            {items.map(([name, role, url]) => (
+              <button
+                key={name}
+                className="about-row"
+                onClick={() => window.citecheck.openExternal(url)}
+              >
+                <span className="font-normal">{name}</span>
+                <span className="t13 secondary">{role}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      ))}
+      <div className="t13 secondary" style={{ marginTop: 24, textAlign: 'center' }}>
+        感谢这些项目和数据服务，没有它们就没有这个应用。
+      </div>
     </>
   )
 }

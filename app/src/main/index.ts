@@ -196,6 +196,7 @@ const SHOT_STATES = [
   'settings-comments',
   'settings-model',
   'settings-usage',
+  'settings-about',
 ]
 
 function shotReady(): Promise<void> {

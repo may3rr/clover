@@ -21,7 +21,7 @@ export interface ShotCtx {
   setFilter?: (layer: string | null) => void
   setDrag?: (v: boolean) => void
   setPrefs?: (p: import('./prefs').Prefs) => void
-  setSettingsSection?: (s: 'account' | 'comments' | 'model' | 'usage') => void
+  setSettingsSection?: (s: 'account' | 'comments' | 'model' | 'usage' | 'about') => void
 }
 
 const SAMPLE_PREFS = {
@@ -150,13 +150,11 @@ export function applyShotState(state: string, ctx: ShotCtx) {
     case 'settings-account':
     case 'settings-comments':
     case 'settings-model':
-    case 'settings-usage': {
+    case 'settings-usage':
+    case 'settings-about': {
       ctx.setSettingsSection?.(
         state.replace('settings-', '') as
-          | 'account'
-          | 'comments'
-          | 'model'
-          | 'usage'
+          | 'account' | 'comments' | 'model' | 'usage' | 'about'
       )
       ctx.setScreen?.('settings')
       return

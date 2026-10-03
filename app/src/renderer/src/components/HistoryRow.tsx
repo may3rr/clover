@@ -39,7 +39,7 @@ export default function HistoryRow({
       <span className="hist-row-main min-w-0">
         <LayerTile size={20} icon={<DocTextFillIcon size={12} />} />
         <span className="min-w-0">
-          <span className="hist-row-name">{meta.filename}</span>
+          <MiddleTruncate className="hist-row-name" text={meta.filename} />
           <span className="t13 secondary hist-row-sub">
             {relDay(meta.created_at)}
             {meta.n_high > 0 && (
@@ -73,5 +73,18 @@ export default function HistoryRow({
         </span>
       )}
     </button>
+  )
+}
+
+/** "hallucination_survey.docx" → "hallucinat…survey.docx": the head
+ * ellipsizes, the tail (incl. extension) always stays visible */
+function MiddleTruncate({ text, className }: { text: string; className: string }) {
+  const tail = text.length > 16 ? text.slice(-10) : ''
+  const head = tail ? text.slice(0, -10) : text
+  return (
+    <span className={`${className} mid-trunc`} title={text}>
+      <span className="mid-trunc-head">{head}</span>
+      {tail && <span className="mid-trunc-tail">{tail}</span>}
+    </span>
   )
 }

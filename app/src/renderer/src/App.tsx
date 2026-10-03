@@ -28,10 +28,26 @@ export default function App() {
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS)
   const settingsFrom = useRef<Screen>('empty')
   const [settingsSection, setSettingsSection] = useState<
-    'account' | 'comments' | 'model' | 'usage'
+    'account' | 'comments' | 'model' | 'usage' | 'about'
   >('account')
 
   // ---------------------------------------------------------------- boot
+  // macOS dims selection and tiles while the window is in the background
+  useEffect(() => {
+    const set = () =>
+      (document.documentElement.dataset.windowFocus = String(
+        // shot runs capture an often-unfocused window; show the active look
+        window.citecheck.shotsMode || document.hasFocus()
+      ))
+    set()
+    window.addEventListener('focus', set)
+    window.addEventListener('blur', set)
+    return () => {
+      window.removeEventListener('focus', set)
+      window.removeEventListener('blur', set)
+    }
+  }, [])
+
   useEffect(() => {
     getPrefs().then(setPrefs)
     getInfo().then((i) => {
