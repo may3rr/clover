@@ -73,20 +73,25 @@ const SECTIONS: {
 
 const AVATAR_COLORS = ['blue', 'teal', 'indigo', 'purple', 'grey'] as const
 
-const TASK_FIELDS: { key: string; label: string }[] = [
-  { key: 'judge', label: '支持度判断' },
-  { key: 'review', label: '深度复核' },
-  { key: 'review_fallback', label: '复核兜底' },
-  { key: 'extract', label: '论断抽取' },
-  { key: 'typo', label: '错别字' },
-  { key: 'structure', label: '字段补全' },
-  { key: 'function', label: '引用功能' },
+/** two tiers; the backend fans each out to its tasks (config.MODEL_TIERS) */
+const TIER_FIELDS: { key: 'fast' | 'deep'; label: string; hint: string }[] = [
+  {
+    key: 'fast',
+    label: '快速模型',
+    hint: '论断抽取、支持度初判、错别字、文献字段补全和引用功能分类，调用多，选便宜快速的',
+  },
+  {
+    key: 'deep',
+    label: '深度复核模型',
+    hint: '只复核有疑问的判断，调用少，选最强的',
+  },
 ]
 
 interface ModelCfg {
   base_url: string
   has_api_key: boolean
-  models: Record<string, string>
+  fast: string
+  deep: string
 }
 
 interface UsageRow {
@@ -563,15 +568,8 @@ function CommentsSection({
 const SHOT_CFG: ModelCfg = {
   base_url: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
   has_api_key: true,
-  models: {
-    judge: 'qwen3.8-flash',
-    review: 'qwen3.8-max',
-    review_fallback: 'qwen3.7-max',
-    extract: 'qwen3.7-flash',
-    typo: 'qwen3.8-flash',
-    structure: 'qwen3.7-flash',
-    function: 'qwen3.7-flash',
-  },
+  fast: 'qwen3.8-flash',
+  deep: 'qwen3.8-max',
 }
 
 const SHOT_USAGE: Usage = {
@@ -717,7 +715,8 @@ interface Preset {
   id: ProviderKey
   name: string
   base: string
-  models: Record<string, string>
+  fast: string
+  deep: string
 }
 
 const PRESETS: Preset[] = [
@@ -725,43 +724,22 @@ const PRESETS: Preset[] = [
     id: 'dashscope',
     name: '阿里云百炼',
     base: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    models: {
-      judge: 'qwen3.8-flash',
-      review: 'qwen3.8-max',
-      review_fallback: 'qwen3.7-max',
-      extract: 'qwen3.7-flash',
-      typo: 'qwen3.8-flash',
-      structure: 'qwen3.7-flash',
-      function: 'qwen3.7-flash',
-    },
+    fast: 'qwen3.8-flash',
+    deep: 'qwen3.8-max',
   },
   {
     id: 'openai',
     name: 'OpenAI',
     base: 'https://api.openai.com/v1',
-    models: {
-      judge: 'gpt-4o-mini',
-      review: 'gpt-4o',
-      review_fallback: 'gpt-4o-mini',
-      extract: 'gpt-4o-mini',
-      typo: 'gpt-4o-mini',
-      structure: 'gpt-4o-mini',
-      function: 'gpt-4o-mini',
-    },
+    fast: 'gpt-4o-mini',
+    deep: 'gpt-4o',
   },
   {
     id: 'deepseek',
     name: 'DeepSeek',
     base: 'https://api.deepseek.com/v1',
-    models: {
-      judge: 'deepseek-chat',
-      review: 'deepseek-reasoner',
-      review_fallback: 'deepseek-chat',
-      extract: 'deepseek-chat',
-      typo: 'deepseek-chat',
-      structure: 'deepseek-chat',
-      function: 'deepseek-chat',
-    },
+    fast: 'deepseek-chat',
+    deep: 'deepseek-reasoner',
   },
 ]
 
@@ -886,7 +864,7 @@ export function ModelSection({
 
   const applyPreset = (p: Preset) => {
     if (!cfg) return
-    setCfg({ ...cfg, base_url: p.base, models: { ...p.models } })
+    setCfg({ ...cfg, base_url: p.base, fast: p.fast, deep: p.deep })
     setSel(p.id)
     persistProviders(p.id, customs)
     setMsg(`已填入${p.name}的推荐配置，保存后生效`)
@@ -930,7 +908,8 @@ export function ModelSection({
       body: JSON.stringify({
         base_url: cfg.base_url,
         dashscope_api_key: key || undefined,
-        models: cfg.models,
+        fast: cfg.fast,
+        deep: cfg.deep,
       }),
     }).catch(() => null)
     if (r && r.ok) {
@@ -1090,30 +1069,21 @@ export function ModelSection({
           />
         </Field>
       </div>
-      {compact ? (
-        actions
-      ) : (
-        <>
       <div className="group-label flex items-center">
-        各任务使用的模型
+        使用的模型
         <div className="flex-1" />
         <button className="pill pill-s" onClick={pullModels}>
           拉取模型列表
         </button>
       </div>
-      <div className="card model-fields">
-        {TASK_FIELDS.map((t) => (
-          <Field key={t.key} label={t.label}>
+      <div className="card">
+        {TIER_FIELDS.map((t) => (
+          <Field key={t.key} label={t.label} hint={t.hint}>
             <input
               className="field-input"
               list="model-list"
-              value={cfg.models[t.key] ?? ''}
-              onChange={(e) =>
-                setCfg({
-                  ...cfg,
-                  models: { ...cfg.models, [t.key]: e.target.value },
-                })
-              }
+              value={cfg[t.key]}
+              onChange={(e) => setCfg({ ...cfg, [t.key]: e.target.value })}
             />
           </Field>
         ))}
@@ -1124,10 +1094,10 @@ export function ModelSection({
         </datalist>
       </div>
       {actions}
-      <div className="group-label">
-        费用记录与这些模型名对应，改名前的用量会保留在旧名字下
-      </div>
-        </>
+      {!compact && (
+        <div className="group-label">
+          费用记录与这些模型名对应，改名前的用量会保留在旧名字下
+        </div>
       )}
     </>
   )

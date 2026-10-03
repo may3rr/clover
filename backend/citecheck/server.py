@@ -414,6 +414,9 @@ async def get_config() -> dict:
     return {
         "base_url": s.llm.cloud.base_url,
         "models": s.llm.models.model_dump(),
+        # the two tiers the UI edits; per-task names stay in config.toml
+        "fast": s.llm.models.judge,
+        "deep": s.llm.models.review,
         "has_api_key": bool(s.dashscope_api_key),
     }
 
@@ -429,8 +432,16 @@ async def put_config(request: Request):
     cfg = _CONFIG_PATH if _CONFIG_PATH.exists() else _CONFIG_EXAMPLE_PATH
     text = cfg.read_text(encoding="utf-8") if cfg.exists() else ""
 
+    from .config import MODEL_TIERS
+
     models = body.get("models")
-    if isinstance(models, dict):
+    models = dict(models) if isinstance(models, dict) else {}
+    for tier, tasks in MODEL_TIERS.items():
+        name = body.get(tier)
+        if isinstance(name, str) and name.strip():
+            for t in tasks:
+                models[t] = name.strip()
+    if models:
         valid = set(get_settings().llm.models.model_dump())
         for k, v in models.items():
             if k in valid and isinstance(v, str) and v.strip():

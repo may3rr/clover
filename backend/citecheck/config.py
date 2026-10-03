@@ -44,6 +44,16 @@ class CloudSettings(BaseModel):
     max_concurrency: int = 12
 
 
+# The settings UI exposes two tiers; each tier fans out to these tasks.
+# review_fallback rides the fast tier so a failing deep model still has a
+# different model to fall back to.
+MODEL_TIERS: dict[str, tuple[str, ...]] = {
+    "fast": ("judge", "extract", "typo", "structure", "function",
+             "review_fallback"),
+    "deep": ("review",),
+}
+
+
 class ModelNames(BaseModel):
     judge: str = "qwen3.8-flash"
     review: str = "qwen3.8-max"
