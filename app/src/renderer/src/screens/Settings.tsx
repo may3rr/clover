@@ -338,12 +338,12 @@ function AccountSection({
       for (const r of u.by_day) {
         if (r.day) m.set(r.day, (m.get(r.day) ?? 0) + r.calls)
       }
-      if (window.citecheck.shotsMode) {
+      if (window.citecheck.sampleData) {
         for (const [d, n] of SHOT_ACTIVITY) m.set(d, (m.get(d) ?? 0) + n)
       }
       setDays(m)
     }
-    if (window.citecheck.shotsMode) {
+    if (window.citecheck.sampleData) {
       merge(SHOT_USAGE)
       return
     }
@@ -815,7 +815,7 @@ export function ModelSection({
   const [cicon, setCicon] = useState('ollama')
 
   useEffect(() => {
-    if (window.citecheck.shotsMode) {
+    if (window.citecheck.sampleData) {
       setCfg(SHOT_CFG)
       return
     }
@@ -1073,7 +1073,7 @@ function UsageSection() {
   const [u, setU] = useState<Usage | null>(null)
   const [err, setErr] = useState('')
   useEffect(() => {
-    if (window.citecheck.shotsMode) {
+    if (window.citecheck.sampleData) {
       setU(SHOT_USAGE)
       return
     }

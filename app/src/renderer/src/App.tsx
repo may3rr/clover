@@ -199,7 +199,7 @@ export default function App() {
 
   // --------------------------------------------------------- shots hook
   useEffect(() => {
-    if (!window.citecheck.shotsMode) return
+    if (!window.citecheck.sampleData) return
     window.citecheck.sampleReport().then((r) => {
       setJobId('shot') // report/running branches require a truthy jobId
       shotState.current.report = r as Report
@@ -232,7 +232,7 @@ export default function App() {
   )
 
   useEffect(() => {
-    if (!window.citecheck.shotsMode) return
+    if (!window.citecheck.sampleData) return
     const off = window.citecheck.onShotState((state) => {
       applyShotState(state, shotState.current)
       requestAnimationFrame(() =>

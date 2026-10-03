@@ -1,0 +1,111 @@
+/* Web replica chrome: what Electron's window gives the app for free.
+   Colours come from tokens.css; the vibrancy stand-in is the only new
+   surface. */
+:root {
+  --vibrancy: linear-gradient(180deg, #efeeec 0%, #e7e6e3 100%);
+  --desk: radial-gradient(120% 90% at 30% 10%, #dfe7f1 0%, #c9d3e0 55%, #b9c4d3 100%);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --vibrancy: linear-gradient(180deg, #2b2b2b 0%, #242424 100%);
+    --desk: radial-gradient(120% 90% at 30% 10%, #2a3140 0%, #1b2029 60%, #14181f 100%);
+  }
+}
+
+html,
+body {
+  background: var(--vibrancy);
+}
+html.booting #root {
+  opacity: 0;
+}
+#root {
+  transition: opacity 240ms var(--ease);
+}
+
+/* traffic lights at Electron's trafficLightPosition {20, 20} */
+body::before {
+  content: '';
+  position: fixed;
+  z-index: 50;
+  left: 20px;
+  top: 20px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--high);
+  box-shadow: 20px 0 0 var(--medium), 40px 0 0 var(--ok),
+    inset 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+/* ?frame=1: the window sits on a desktop at its native 1280 x 820 */
+html.framed,
+html.framed body {
+  background: var(--desk);
+  overflow: hidden;
+}
+html.framed #root {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1280px;
+  height: 820px;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--vibrancy);
+  box-shadow: var(--glass-edge), 0 24px 80px rgba(0, 0, 0, 0.35);
+}
+html.framed body::before {
+  position: absolute;
+  left: calc(50% - 640px + 20px);
+  top: calc(50% - 410px + 20px);
+}
+
+/* tour cursor */
+.tour-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  pointer-events: none;
+  will-change: transform;
+  transition: opacity 240ms var(--ease);
+}
+.tour-cursor svg {
+  display: block;
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.35));
+}
+.tour-ripple {
+  position: absolute;
+  left: -12px;
+  top: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--fill-strong);
+  opacity: 0;
+  transform: scale(0.4);
+}
+.tour-cursor.press svg {
+  animation: tour-press 220ms var(--ease);
+}
+.tour-cursor.press .tour-ripple {
+  animation: tour-ripple 420ms var(--ease);
+}
+@keyframes tour-press {
+  50% {
+    transform: scale(0.86);
+  }
+}
+@keyframes tour-ripple {
+  0% {
+    opacity: 1;
+    transform: scale(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}

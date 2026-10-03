@@ -62,6 +62,15 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   const done = (k: string) => ({ status: 'done' as const, findings: counts[k] })
   const ALL_DONE: LayerUI = Object.fromEntries(LAYER_KEYS.map((k) => [k, done(k)]))
 
+  // item:<id> — report with that inspector item's detail open (the web
+  // replica on the landing page points each section at one finding)
+  if (state.startsWith('item:')) {
+    ctx.setReport?.(report ?? null)
+    ctx.setScreen?.('report')
+    ctx.selectItem?.(state.slice(5))
+    return
+  }
+
   switch (state) {
     case 'onboarding-intro':
     case 'onboarding-model':

@@ -22,6 +22,10 @@ export interface CitecheckApi {
   setMenuState(s: { exportEnabled: boolean }): void
   /** Debug hooks — used by shots/E2E modes only. */
   shotsMode: boolean
+  /** Built-in sample data instead of the backend (settings usage/config)
+   *  and the shot-state driver. True under shots; the web replica on the
+   *  landing page sets it without shotsMode so animations still play. */
+  sampleData: boolean
   e2eFile: string | null
   sampleReport(): Promise<unknown>
   onShotState(cb: (state: string) => void): () => void
@@ -55,6 +59,7 @@ const api: CitecheckApi = {
   rendererReady: () => ipcRenderer.send('citecheck:renderer-ready'),
   setMenuState: (s) => ipcRenderer.send('citecheck:menu-state', s),
   shotsMode: !!process.env.CITECHECK_SHOTS,
+  sampleData: !!process.env.CITECHECK_SHOTS,
   e2eFile: process.env.CITECHECK_E2E || null,
   sampleReport: () => ipcRenderer.invoke('citecheck:sample-report'),
   onShotState: (cb) => {

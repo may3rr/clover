@@ -9,12 +9,17 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "start": "electron-vite preview",
-    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "typecheck": "tsc -p tsconfig.node.json --noEmit && tsc -p tsconfig.web.json --noEmit && tsc -p site/tsconfig.json --noEmit",
     "gen:types": "node scripts/gen-types.mjs",
     "lint:design": "node scripts/lint-design.mjs",
     "test": "vitest run",
     "shots": "node scripts/shots.mjs",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "site:dev": "vite --config site/vite.config.ts",
+    "site:build": "vite build --config site/vite.config.ts",
+    "site:preview": "vite preview --config site/vite.config.ts",
+    "site:record": "node site/scripts/record.mjs",
+    "site:icon": "node site/scripts/icon.mjs && rsvg-convert -w 1024 build/icon.svg -o build/icon.png && rsvg-convert -w 180 build/icon.svg -o site/public/apple-touch-icon.png && rsvg-convert -w 1200 site/scripts/.og.svg -o site/public/og.png && rm site/scripts/.og.svg"
   },
   "dependencies": {
     "react": "18.3.1",
@@ -30,9 +35,12 @@
       "target": [
         {
           "target": "default",
-          "arch": ["arm64"]
+          "arch": [
+            "arm64"
+          ]
         }
-      ]
+      ],
+      "artifactName": "Clover-mac-${arch}.${ext}"
     },
     "fileAssociations": [
       {

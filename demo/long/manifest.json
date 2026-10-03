@@ -1,0 +1,380 @@
+{
+  "paper": "VeriCite: Evidence-Grounded Verification for Citation Faithfulness in Retrieval-Augmented Generation",
+  "venue_style": "EMNLP / ACL author-year citations; reference list in ACL style, no numeric labels",
+  "note": "All three files share one body text (BODY in build_long.py). Fabricated refs exist only in long_errors.docx. Real references use real metadata except where an issue says otherwise.",
+  "variants": {
+    "no_headings": {
+      "file": "long_no_headings.docx",
+      "description": "No Word heading styles; all section titles are plain Normal paragraphs. Otherwise clean.",
+      "stats": {
+        "body_words": 6234,
+        "references": 52,
+        "citation_markers_approx": 111,
+        "uncited_refs_actual": [],
+        "cited_but_absent_keys": []
+      },
+      "issues": [
+        {
+          "id": "no_headings-01",
+          "type": "structure_no_heading_styles",
+          "section": "Whole document",
+          "detail": "Every title (Abstract, numbered sections 1-8, subsections 2.1 ... 6.3, and unnumbered Limitations / Ethics Statement / Acknowledgments / References) is a plain Normal paragraph; the paper title is also a plain bold centred Normal paragraph."
+        }
+      ]
+    },
+    "errors": {
+      "file": "long_errors.docx",
+      "description": "Heading 1/2 styles; substantive citation defects injected.",
+      "stats": {
+        "body_words": 6727,
+        "references": 55,
+        "citation_markers_approx": 125,
+        "uncited_refs_actual": [],
+        "cited_but_absent_keys": []
+      },
+      "issues": [
+        {
+          "id": "errors-01",
+          "type": "wrong_year",
+          "section": "References",
+          "reference": "Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2018. Dense passage retrieval for open-domain question answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing, pages 6769–6781. https://doi.org/10.18653/v1/2020.emnlp-main.550",
+          "detail": "Reference entry says 2018; the real DPR paper (Karpukhin et al.) is EMNLP 2020. In-text citations were rendered with the wrong year as well.",
+          "real_year": 2020,
+          "listed_year": 2018,
+          "ref_key": "karpukhin20"
+        },
+        {
+          "id": "errors-02",
+          "type": "wrong_first_author",
+          "section": "References",
+          "reference": "Kalpesh Krishna, Sewon Min, Xinxi Lyu, Mike Lewis, Wen-tau Yih, Pang Wei Koh, Mohit Iyyer, Luke Zettlemoyer, and Hannaneh Hajishirzi. 2023. FActScore: Fine-grained atomic evaluation of factual precision in long form text generation. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 12076–12100. https://doi.org/10.18653/v1/2023.emnlp-main.741",
+          "detail": "Reference lists Kalpesh Krishna as first author; the real FActScore paper is Sewon Min et al. (EMNLP 2023). In-text citations render as 'Krishna et al., 2023'.",
+          "real_first_author": "Sewon Min",
+          "listed_first_author": "Kalpesh Krishna",
+          "ref_key": "min23"
+        },
+        {
+          "id": "errors-03",
+          "type": "fabricated_reference",
+          "section": "2 Related Work",
+          "sentence": "Evidence-anchored decoding constrains the generator to emit citation markers only for passages from which a supporting span can be copied (Zhou et al., 2023).",
+          "reference": "Mei-Ling Zhou, Tobias Brandt, and Rahul Iyer. 2023. Evidence-anchored decoding for citation-faithful language generation. In Findings of the Association for Computational Linguistics: EMNLP 2023, pages 5512–5527.",
+          "detail": "Plausible but non-existent paper (invented authors/title/venue). Cited once in the body.",
+          "ref_key": "zhou23x"
+        },
+        {
+          "id": "errors-04",
+          "type": "fabricated_reference",
+          "section": "2 Related Work",
+          "sentence": "Provenance-aware retrieval has been proposed to keep track of the source of every retrieved fact in long-form question answering (Marchetti and Osei, 2022).",
+          "reference": "Sofia Marchetti and Daniel K. Osei. 2022. Provenance-aware retrieval for faithful long-form question answering. Transactions of the Association for Computational Linguistics, 10:1187–1203.",
+          "detail": "Plausible but non-existent paper (invented authors/title/venue). Cited once in the body.",
+          "ref_key": "marchetti22x"
+        },
+        {
+          "id": "errors-05",
+          "type": "fabricated_reference",
+          "section": "7 Discussion",
+          "sentence": "Self-auditing models that check their own source attributions during decoding have recently been proposed (Park et al., 2024).",
+          "reference": "Hyun-Woo Park, Elena Vasquez, Jonas Lindqvist, and Priya Raman. 2024. CiteGuard: Self-auditing language models for source attribution. In Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics, pages 3341–3358.",
+          "detail": "Plausible but non-existent paper (invented authors/title/venue). Cited once in the body.",
+          "ref_key": "park24x"
+        },
+        {
+          "id": "errors-06",
+          "type": "misattribution",
+          "section": "2 Related Work",
+          "sentence": "Fusion-in-Decoder encodes each retrieved passage independently together with the question and lets the decoder attend over all encoded passages (Khattab and Zaharia, 2020).",
+          "reference": "Omar Khattab and Matei Zaharia. 2020. ColBERT: Efficient and effective passage search via contextualized late interaction over BERT. In Proceedings of the 43rd International ACM SIGIR Conference on Research and Development in Information Retrieval, pages 39–48. https://doi.org/10.1145/3397271.3401075",
+          "detail": "Fusion-in-Decoder claim cited to ColBERT (late-interaction retrieval). Correct source would be izacard21.",
+          "cited": "khattab20",
+          "correct": "izacard21",
+          "ref_key": "khattab20"
+        },
+        {
+          "id": "errors-07",
+          "type": "misattribution",
+          "section": "2 Related Work",
+          "sentence": "SelfCheckGPT detects hallucinations in a zero-resource, black-box setting by comparing sampled responses for consistency (Johnson et al., 2021).",
+          "reference": "Jeff Johnson, Matthijs Douze, and Hervé Jégou. 2021. Billion-scale similarity search with GPUs. IEEE Transactions on Big Data, 7(3):535–547. https://doi.org/10.1109/TBDATA.2019.2921572",
+          "detail": "SelfCheckGPT claim cited to FAISS (similarity-search library). Correct source would be manakul23.",
+          "cited": "johnson21",
+          "correct": "manakul23",
+          "ref_key": "johnson21"
+        },
+        {
+          "id": "errors-08",
+          "type": "misattribution",
+          "section": "3 Method",
+          "sentence": "Low-rank adaptation freezes the pre-trained weights and injects trainable rank decomposition matrices into each Transformer layer (Rafailov et al., 2023).",
+          "reference": "Rafael Rafailov, Archit Sharma, Eric Mitchell, Stefano Ermon, Christopher D. Manning, and Chelsea Finn. 2023. Direct preference optimization: Your language model is secretly a reward model. In Advances in Neural Information Processing Systems, volume 36.",
+          "detail": "LoRA claim cited to DPO. Correct source would be hu22.",
+          "cited": "rafailov23",
+          "correct": "hu22",
+          "ref_key": "rafailov23"
+        },
+        {
+          "id": "errors-09",
+          "type": "misattribution",
+          "section": "1 Introduction",
+          "sentence": "Large language models now write fluent, well-organized answers to open-ended questions, and the architecture behind most of them is the Transformer, which dispenses with recurrence and convolution and relies on attention alone (Ji et al., 2023).",
+          "reference": "Ziwei Ji, Nayeon Lee, Rita Frieske, Tiezheng Yu, Dan Su, Yan Xu, Etsuko Ishii, Ye Jin Bang, Andrea Madotto, and Pascale Fung. 2023. Survey of hallucination in natural language generation. ACM Computing Surveys, 55(12):1–38. https://doi.org/10.1145/3571730",
+          "detail": "Transformer claim cited to the hallucination survey. Correct source would be vaswani17.",
+          "cited": "ji23",
+          "correct": "vaswani17",
+          "ref_key": "ji23"
+        },
+        {
+          "id": "errors-10",
+          "type": "partial_support",
+          "section": "2 Related Work",
+          "sentence": "Dense passage retrieval trains a dual encoder from a small number of questions and passages and outperforms BM25 on top-20 retrieval accuracy and requires no task-specific training data at all (Karpukhin et al., 2018).",
+          "reference": "Vladimir Karpukhin, Barlas Oğuz, Sewon Min, Patrick Lewis, Ledell Wu, Sergey Edunov, Danqi Chen, and Wen-tau Yih. 2018. Dense passage retrieval for open-domain question answering. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing, pages 6769–6781. https://doi.org/10.18653/v1/2020.emnlp-main.550",
+          "detail": "First half true; DPR is trained on question-passage pairs, so the 'no training data' part is unsupported.",
+          "ref_key": "karpukhin20"
+        },
+        {
+          "id": "errors-11",
+          "type": "partial_support",
+          "section": "2 Related Work",
+          "sentence": "ALCE evaluates fluency, correctness and citation quality of model generations on ASQA, QAMPARI and ELI5, and reports that the best systems already provide complete citation support for nearly every statement (Gao et al., 2023b).",
+          "reference": "Tianyu Gao, Howard Yen, Jiatong Yu, and Danqi Chen. 2023. Enabling large language models to generate text with citations. In Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing, pages 6465–6488. https://doi.org/10.18653/v1/2023.emnlp-main.398",
+          "detail": "Benchmark description is right; ALCE reports that even the best models lack complete citation support for a large share of statements.",
+          "ref_key": "gao23alce"
+        },
+        {
+          "id": "errors-12",
+          "type": "partial_support",
+          "section": "6 Analysis and Ablation",
+          "sentence": "Performance is highest when relevant information appears at the beginning or end of the input context and degrades when it sits in the middle, an effect that disappears for models with longer context windows (Liu et al., 2024), and we see the same pattern for citation precision when the gold passage is placed in the middle of the context.",
+          "reference": "Nelson F. Liu, Kevin Lin, John Hewitt, Ashwin Paranjape, Michele Bevilacqua, Fabio Petroni, and Percy Liang. 2024. Lost in the middle: How language models use long contexts. Transactions of the Association for Computational Linguistics, 12:157–173. https://doi.org/10.1162/tacl_a_00638",
+          "detail": "Position effect is right; the paper reports degradation persists even for explicitly long-context models.",
+          "ref_key": "liu24"
+        },
+        {
+          "id": "errors-13",
+          "type": "citation_stack",
+          "section": "1 Introduction",
+          "sentence": "Retrieval augmentation has been adopted in pre-training, fine-tuning and prompting alike (Lewis et al., 2020; Guu et al., 2020; Karpukhin et al., 2018; Izacard and Grave, 2021; Izacard et al., 2023; Asai et al., 2024; Jiang et al., 2023b).",
+          "detail": "7 references in one sentence.",
+          "n_refs": 7
+        },
+        {
+          "id": "errors-14",
+          "type": "citation_stack",
+          "section": "4 Experimental Setup",
+          "sentence": "Related attribution and factuality metrics include human-judged attribution, attributed QA, audits of search engines, automatic attribution judges, atomic-fact precision and sampling-based consistency (Rashkin et al., 2023; Bohnet et al., 2022; Liu et al., 2023; Yue et al., 2023; Krishna et al., 2023; Manakul et al., 2023).",
+          "detail": "6 references in one sentence.",
+          "n_refs": 6
+        },
+        {
+          "id": "errors-15",
+          "type": "dense_section",
+          "section": "2 Related Work",
+          "detail": "Two extra paragraphs add 43 further citation markers to Related Work in about 310 words (citation density far above every other section), mostly 4-6 refs per sentence."
+        }
+      ]
+    },
+    "missing": {
+      "file": "long_missing.docx",
+      "description": "Heading 1/2 styles; missing or broken parts injected.",
+      "stats": {
+        "body_words": 5934,
+        "references": 53,
+        "citation_markers_approx": 79,
+        "uncited_refs_actual": [
+          "wei22",
+          "papineni02",
+          "lin04",
+          "clark18"
+        ],
+        "cited_but_absent_keys": [
+          "thoppilan22",
+          "kryscinski20",
+          "bender21"
+        ]
+      },
+      "issues": [
+        {
+          "id": "missing-01",
+          "type": "citation_without_reference",
+          "section": "2 Related Work",
+          "sentence": "WebGPT fine-tunes a language model to browse the web and to collect references while answering (Nakano et al., 2021), GopherCite teaches a model to support answers with verified quotes (Menick et al., 2022), and LaMDA consults external knowledge sources to improve the factual grounding of dialogue responses (Thoppilan et al., 2022).",
+          "marker": "(Thoppilan et al., 2022)",
+          "detail": "In-text citation present, but the reference entry was deleted from the list.",
+          "removed_entry": "Romal Thoppilan, Daniel De Freitas, Jamie Hall, et al. 2022. LaMDA: Language models for dialog applications. arXiv preprint arXiv:2201.08239.",
+          "ref_key": "thoppilan22"
+        },
+        {
+          "id": "missing-02",
+          "type": "citation_without_reference",
+          "section": "Ethics Statement",
+          "sentence": "Large language models carry known risks, including the amplification of biases present in their training data (Bender et al., 2021), and a verifier does not remove these risks.",
+          "marker": "(Bender et al., 2021)",
+          "detail": "In-text citation present, but the reference entry was deleted from the list.",
+          "removed_entry": "Emily M. Bender, Timnit Gebru, Angelina McMillan-Major, and Shmargaret Shmitchell. 2021. On the dangers of stochastic parrots: Can language models be too big? In Proceedings of the 2021 ACM Conference on Fairness, Accountability, and Transparency, pages 610–623. https://doi.org/10.1145/3442188.3445922",
+          "ref_key": "bender21"
+        },
+        {
+          "id": "missing-03",
+          "type": "citation_without_reference",
+          "section": "2 Related Work",
+          "sentence": "A weakly supervised model-based approach can verify the factual consistency of a summary against its source document (Kryscinski et al., 2020).",
+          "marker": "(Kryscinski et al., 2020)",
+          "detail": "In-text citation present, but the reference entry was deleted from the list.",
+          "removed_entry": "Wojciech Kryscinski, Bryan McCann, Caiming Xiong, and Richard Socher. 2020. Evaluating the factual consistency of abstractive text summarization. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing, pages 9332–9346. https://doi.org/10.18653/v1/2020.emnlp-main.750",
+          "ref_key": "kryscinski20"
+        },
+        {
+          "id": "missing-04",
+          "type": "uncited_reference",
+          "section": "References",
+          "detail": "Entry is in the reference list but cited nowhere in the text.",
+          "reference": "Jason Wei, Xuezhi Wang, Dale Schuurmans, Maarten Bosma, Brian Ichter, Fei Xia, Ed Chi, Quoc V. Le, and Denny Zhou. 2022. Chain-of-thought prompting elicits reasoning in large language models. In Advances in Neural Information Processing Systems, volume 35, pages 24824–24837.",
+          "ref_key": "wei22"
+        },
+        {
+          "id": "missing-05",
+          "type": "uncited_reference",
+          "section": "References",
+          "detail": "Entry is in the reference list but cited nowhere in the text.",
+          "reference": "Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002. BLEU: a method for automatic evaluation of machine translation. In Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics, pages 311–318. https://doi.org/10.3115/1073083.1073135",
+          "ref_key": "papineni02"
+        },
+        {
+          "id": "missing-06",
+          "type": "uncited_reference",
+          "section": "References",
+          "detail": "Entry is in the reference list but cited nowhere in the text.",
+          "reference": "Chin-Yew Lin. 2004. ROUGE: A package for automatic evaluation of summaries. In Text Summarization Branches Out, pages 74–81.",
+          "ref_key": "lin04"
+        },
+        {
+          "id": "missing-07",
+          "type": "uncited_reference",
+          "section": "References",
+          "detail": "Entry is in the reference list but cited nowhere in the text.",
+          "reference": "Peter Clark, Isaac Cowhey, Oren Etzioni, Tushar Khot, Ashish Sabharwal, Carissa Schoenick, and Oyvind Tafjord. 2018. Think you have solved question answering? Try ARC, the AI2 reasoning challenge. arXiv preprint arXiv:1803.05457.",
+          "ref_key": "clark18"
+        },
+        {
+          "id": "missing-08",
+          "type": "reference_no_year",
+          "section": "References",
+          "reference": "Ivan Stelmakh, Yi Luan, Bhuwan Dhingra, and Ming-Wei Chang. ASQA: Factoid questions meet long-form answers. In Proceedings of the 2022 Conference on Empirical Methods in Natural Language Processing, pages 8273–8288. https://doi.org/10.18653/v1/2022.emnlp-main.566",
+          "detail": "Year omitted from the reference entry (text still cites 2022).",
+          "ref_key": "stelmakh22"
+        },
+        {
+          "id": "missing-09",
+          "type": "reference_truncated_title",
+          "section": "References",
+          "reference": "Gautier Izacard, Patrick Lewis, Maria Lomeli, Lucas Hosseini, Fabio Petroni, Timo Schick, Jane Dwivedi-Yu, Armand Joulin, Sebastian Riedel, and Edouard Grave. 2023. Atlas: Few-shot learning with retrieval augmented. Journal of Machine Learning Research, 24(251):1–43.",
+          "detail": "Title truncated; full title is 'Atlas: Few-shot learning with retrieval augmented language models'.",
+          "ref_key": "izacard23"
+        },
+        {
+          "id": "missing-10",
+          "type": "section_without_citations",
+          "section": "4 Experimental Setup",
+          "detail": "All 29 citations were stripped from 8 paragraphs of this section (datasets, baselines, metrics, implementation are all cited nowhere).",
+          "stripped_keys": [
+            "asai24",
+            "bowman15",
+            "fan19",
+            "gao23alce",
+            "gao23rarr",
+            "hu22",
+            "jiang23f",
+            "jiang23m",
+            "johnson21",
+            "joshi17",
+            "karpukhin20",
+            "kwiatkowski19",
+            "liu19",
+            "min23",
+            "rafailov23",
+            "rashkin23",
+            "reimers19",
+            "stelmakh22",
+            "thorne18",
+            "touvron23",
+            "vaswani17",
+            "williams18",
+            "yang18",
+            "yue23"
+          ]
+        },
+        {
+          "id": "missing-11",
+          "type": "missing_abstract",
+          "section": "Front matter",
+          "detail": "Abstract heading and paragraph removed."
+        },
+        {
+          "id": "missing-12",
+          "type": "mixed_citation_format",
+          "section": "2 Related Work",
+          "sentence": "The probabilistic relevance framework behind BM25 remains the reference lexical baseline [41], and heterogeneous zero-shot evaluation has shown that BM25 is hard to beat outside the training domain of dense models (Thakur et al., 2021).",
+          "reference": "Stephen Robertson and Hugo Zaragoza. 2009. The probabilistic relevance framework: BM25 and beyond. Foundations and Trends in Information Retrieval, 3(4):333–389. https://doi.org/10.1561/1500000019",
+          "detail": "Numeric marker [41] inside an author-year paper (position of the entry in the list).",
+          "ref_key": "robertson09"
+        },
+        {
+          "id": "missing-13",
+          "type": "mixed_citation_format",
+          "section": "2 Related Work",
+          "sentence": "Atlas shows that retrieval-augmented models learn knowledge-intensive tasks from very few examples (Izacard et al., 2023), and RAG marginalizes over retrieved documents during generation (Lewis 2020).",
+          "reference": "Patrick Lewis, Ethan Perez, Aleksandra Piktus, Fabio Petroni, Vladimir Karpukhin, Naman Goyal, Heinrich Küttler, Mike Lewis, Wen-tau Yih, Tim Rocktäschel, Sebastian Riedel, and Douwe Kiela. 2020. Retrieval-augmented generation for knowledge-intensive NLP tasks. In Advances in Neural Information Processing Systems, volume 33, pages 9459–9474.",
+          "detail": "Author-year marker without 'et al.' and without comma: (Lewis 2020).",
+          "ref_key": "lewis20"
+        },
+        {
+          "id": "missing-14",
+          "type": "mixed_citation_format",
+          "section": "1 Introduction",
+          "sentence": "Pre-trained encoders such as BERT showed that deep bidirectional representations obtained by conditioning jointly on left and right context transfer to a wide range of tasks [6], and later work found that BERT was significantly undertrained and that careful choices of hyperparameters and data size close much of the gap to newer models (Liu et al., 2019).",
+          "reference": "Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of deep bidirectional transformers for language understanding. In Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, pages 4171–4186. https://doi.org/10.18653/v1/N19-1423",
+          "detail": "Numeric marker [6] inside an author-year paper.",
+          "ref_key": "devlin19"
+        },
+        {
+          "id": "missing-15",
+          "type": "typo",
+          "section": "1 Introduction",
+          "sentence": "Fluency is not the same as reliabilty.",
+          "detail": "'reliabilty' should be 'reliability'.",
+          "wrong": "reliabilty",
+          "right": "reliability"
+        },
+        {
+          "id": "missing-16",
+          "type": "typo",
+          "section": "3 Method",
+          "sentence": "Working at the window level rather than the passage level matters becuase 100-word passages often contain several unrelated facts, and a verifier that sees the whole passage may accept a sentence on the basis of a loosely related span.",
+          "detail": "'becuase' should be 'because'.",
+          "wrong": "becuase",
+          "right": "because"
+        },
+        {
+          "id": "missing-17",
+          "type": "typo",
+          "section": "5 Results",
+          "sentence": "Vanilla RAG already achieves reasonable corectness, but a large part of its citations are not supported by the passages they point to.",
+          "detail": "'corectness' should be 'correctness'.",
+          "wrong": "corectness",
+          "right": "correctness"
+        },
+        {
+          "id": "missing-18",
+          "type": "typo",
+          "section": "7 Discussion",
+          "sentence": "Verification is cheap relatvie to generation, since it needs one forward pass of a small encoder per claim-citation pair, whereas replacing a citation requires access to passages that the generator did not cite.",
+          "detail": "'relatvie' should be 'relative'.",
+          "wrong": "relatvie",
+          "right": "relative"
+        }
+      ]
+    }
+  }
+}

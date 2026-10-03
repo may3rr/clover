@@ -1,0 +1,57 @@
+# Landing page -> GitHub Pages. Builds app/site (the page plus the web
+# replica of the renderer) and publishes app/site-dist.
+# One-time setup: repo Settings > Pages > Source: GitHub Actions.
+name: pages
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'app/site/**'
+      - 'app/src/renderer/**'
+      - 'app/src/preload/**'
+      - 'app/package*.json'
+      - 'app/tailwind.config.js'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+        env:
+          # the site build only needs vite; skip the Electron binary
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - run: npm run site:build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/site-dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

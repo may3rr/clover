@@ -1,18 +1,50 @@
+# ---- secrets and local config (never commit; *.example files are the templates)
 .env
+.env.*
+!.env.example
 backend/config.toml
+*.pem
+*.key
+
+# ---- Python
 __pycache__/
 *.egg-info
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+# uv resolves per machine; pyproject.toml is the source of truth
+uv.lock
+
+# ---- Node / Electron
 node_modules/
 app/out/
 app/dist/
+app/release/
+app/shots/
+
+# ---- landing page (app/site): build output and recorded videos
+app/site-dist/
+app/site-videos/
+
+# ---- local data and caches
 *.sqlite
-.DS_Store
+*.sqlite-journal
 backend/benchmarks/.cache/
 backend/benchmarks/.build.log
 
-# T10 export artifacts
+# ---- demo: raw pipeline dumps are large and regenerable
+# (run_pipeline.py / curate_showcase.py); the landing page uses the curated
+# copies under app/site/public/data
+demo/*_report*.json
+demo/*_events.json
+
+# ---- T10 export artifacts
 *（引用体检*.docx
 *（Clover*.docx
-app/shots/
-app/release/
+
+# ---- OS / editors / logs
+.DS_Store
+*.log
+.idea/
+.vscode/

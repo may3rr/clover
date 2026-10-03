@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Clover</title>
+    <meta
+      name="description"
+      content="Clover 是一个 macOS 应用：拖入一篇 .docx 论文，核对参考文献的真实性、论断的支持度、引用分布与格式规范，再把问题写成 Word 批注和修订。"
+    />
+    <meta property="og:title" content="Clover: the last mile of the paper" />
+    <meta property="og:description" content="投稿的最后一公里。引用体检，交回你熟悉的 Word 里改。" />
+    <meta property="og:image" content="./og.png" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#191919" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="./icon.svg" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+  </head>
+  <body>
+    <!-- ================================================================ nav -->
+    <header class="nav" id="nav">
+      <a class="brand" href="#top" aria-label="Clover">
+        <img src="./icon.svg" alt="" width="28" height="28" />
+        <span>Clover</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#layers">功能</a>
+        <a href="#export">导出</a>
+        <a href="#principles">原则</a>
+        <a data-link="repo" href="#">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <!-- ============================================================ hero -->
+      <section class="hero">
+        <div class="hero-copy">
+          <h1 class="hero-title">The last mile of the paper</h1>
+          <p class="hero-sub">投稿的最后一公里</p>
+          <div class="downloads">
+            <a class="dl dl-mac" data-link="mac" href="#">
+              <svg class="dl-glyph" viewBox="0 0 20 20" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M13.6 10.6c0-1.9 1.6-2.8 1.6-2.9-.9-1.3-2.2-1.5-2.7-1.5-1.2-.1-2.2.7-2.8.7-.6 0-1.5-.7-2.4-.6-1.3 0-2.4.7-3.1 1.9-1.3 2.3-.3 5.6.9 7.4.6.9 1.3 1.9 2.3 1.8.9 0 1.3-.6 2.4-.6 1.1 0 1.4.6 2.4.6 1 0 1.6-.9 2.2-1.8.7-1 1-2 1-2.1 0 0-1.8-.7-1.8-2.9zM11.8 5c.5-.6.9-1.5.8-2.4-.8 0-1.7.5-2.3 1.1-.5.6-.9 1.5-.8 2.3.9.1 1.7-.4 2.3-1z"
+                />
+              </svg>
+              <span>下载 macOS 版</span>
+            </a>
+            <span class="dl dl-win" aria-disabled="true">
+              <svg class="dl-glyph" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill="currentColor" d="M3 4.6l5.7-.8v5.6H3zm6.4-.9L17 2.6v6.8H9.4zM3 10.1h5.7v5.6L3 14.9zm6.4 0H17v6.9l-7.6-1.1z" />
+              </svg>
+              <span>Windows</span>
+              <span class="dl-note">To be continued</span>
+            </span>
+          </div>
+          <p class="hero-hint">适用于 Apple 芯片的 Mac。下面是 Clover 的真实界面，可以直接点。</p>
+        </div>
+        <div class="hero-window">
+          <div class="window" data-src="app.html?state=report" data-eager></div>
+        </div>
+      </section>
+
+      <!-- ===================================================== the check -->
+      <section class="band" id="check">
+        <div class="lead">
+          <p class="eyebrow"><i class="dot" style="--c: var(--ok)"></i>一次体检</p>
+          <h2>拖进一篇论文，四层检查同时进行</h2>
+          <p class="body">
+            Clover 在本机解析 docx，认出章节、段落、引用标记和参考文献表。四层检查并行推进，左边的论文骨架随结果逐段点亮。选定目标会议后，最后再和这个会议已发表的论文比一比。
+          </p>
+          <button class="ghost" id="replay" type="button">再看一次</button>
+        </div>
+        <div class="window" id="check-window" data-src="app.html?state=empty"></div>
+      </section>
+
+      <!-- ============================================ four layers (sticky) -->
+      <section class="layers" id="layers">
+        <div class="steps">
+          <article class="step" data-state="item:f19">
+            <p class="eyebrow"><i class="dot" style="--c: var(--tile-indigo)"></i>文献真实性</p>
+            <h3>编造的文献，查得出来</h3>
+            <p class="body">
+              每条参考文献都去 Crossref、OpenAlex、Semantic Scholar 和 arXiv 核对。作者、年份、DOI 与数据库记录对不上，Clover 指出差在哪里；几个库都真正应答且都没有记录，才判定为找不到。
+            </p>
+          </article>
+          <article class="step" data-state="item:f4">
+            <p class="eyebrow"><i class="dot" style="--c: var(--tile-blue)"></i>论断支持度</p>
+            <h3>被引文献真的说过这句话吗</h3>
+            <p class="body">
+              Clover 抽出正文中每一组论断与引用，到被引文献的摘要和开放全文里找证据。每个判断都附原文片段，片段必须能在原文中逐字找到，找不到就降级为无法判断。
+            </p>
+          </article>
+          <article class="step" data-state="item:dist-group">
+            <p class="eyebrow"><i class="dot" style="--c: var(--tile-teal)"></i>引用分布</p>
+            <h3>把引用放回领域里看</h3>
+            <p class="body">
+              对照 150 篇 arXiv 计算语言学论文，逐章比较引用密度与引用功能。一句话里堆了七八篇文献，也会单独提出来。
+            </p>
+          </article>
+          <article class="step" data-state="item:v2">
+            <p class="eyebrow"><i class="dot" style="--c: var(--tile-purple)"></i>格式规范</p>
+            <h3>机械性问题，直接给出修订</h3>
+            <p class="body">
+              错别字、文献重新排序和随之变化的引用编号，写成修订，由你逐条接受或拒绝。未被引用的文献、找不到条目的引用，写成批注。
+            </p>
+          </article>
+          <article class="step" data-state="report">
+            <p class="eyebrow"><i class="dot" style="--c: var(--tile-pink)"></i>期刊评审</p>
+            <h3>投之前，先和目标会议比一比</h3>
+            <p class="body">
+              选定 EMNLP、ACL 或 NAACL，Clover 找出该会议已发表的相近论文，从实验规模、分析深度、文献覆盖、引用可靠性和结构完整五个方面给出定位。
+            </p>
+          </article>
+        </div>
+        <div class="stage">
+          <div class="window" id="layers-window" data-src="app.html?state=item:f19"></div>
+          <p class="stage-hint">右侧窗口跟着滚动切换，也可以自己点。</p>
+        </div>
+      </section>
+
+      <!-- ========================================================= export -->
+      <section class="band export" id="export">
+        <div class="lead">
+          <p class="eyebrow"><i class="dot" style="--c: var(--accent)"></i>导出到 Word</p>
+          <h2>改稿，还在 Word 里</h2>
+          <p class="body">
+            一键导出一份新的 docx。实质性问题挂成批注，附上依据和建议；错别字这类机械性问题写成修订。原文件不会被覆盖，每一处改动都可以撤销。
+          </p>
+          <a class="ghost" href="./samples/clover-sample.docx" download="vericite_emnlp（Clover）.docx">下载这份示例</a>
+        </div>
+        <figure class="doc" id="doc" aria-label="导出的 Word 文档示意"></figure>
+      </section>
+
+      <!-- ===================================================== principles -->
+      <section class="principles" id="principles">
+        <h2>几条不会让步的原则</h2>
+        <div class="grid">
+          <div>
+            <h3>证据可追溯</h3>
+            <p>支持或不支持，都附被引文献的原文片段。片段在原文里逐字找不到，判断就不成立。</p>
+          </div>
+          <div>
+            <h3>不确定就说不确定</h3>
+            <p>查不到的文献标为无法核验，不会说成不存在。证据不足的论断标为无法判断。</p>
+          </div>
+          <div>
+            <h3>只替你改机械性问题</h3>
+            <p>Clover 不改写、不续写正文，不删除或替换参考文献，也不推荐该引哪篇。删不删、换不换，由作者决定。</p>
+          </div>
+          <div>
+            <h3>稿件留在本机</h3>
+            <p>全文在你的 Mac 上解析。云端只接收需要复核的论断和证据片段，不上传整篇稿件。</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ qwen -->
+      <section class="band qwen" id="qwen">
+        <div class="lead">
+          <p class="eyebrow"><i class="dot" style="--c: var(--brand-qwen)"></i>模型</p>
+          <h2>全程使用 Qwen</h2>
+          <p class="body">
+            支持度判断用 qwen3.8-flash，存疑的结论交给 qwen3.8-max 复核，模型可以在设置里换。每次调用都有缓存和用量记录，实测一次完整检查约 0.19 元。
+          </p>
+        </div>
+        <div class="window" data-src="app.html?state=settings-model"></div>
+      </section>
+
+      <!-- ============================================================= cta -->
+      <section class="cta">
+        <img src="./icon.svg" alt="" width="112" height="112" />
+        <h2>把最后一公里走完</h2>
+        <div class="downloads">
+          <a class="dl dl-mac" data-link="mac" href="#"><span>下载 macOS 版</span></a>
+          <span class="dl dl-win" aria-disabled="true"><span>Windows</span><span class="dl-note">To be continued</span></span>
+        </div>
+        <p class="hero-hint">应用尚未签名。第一次打开时，在访达里按住 Control 点按 Clover，选择打开。</p>
+      </section>
+    </main>
+
+    <!-- ============================================================ footer -->
+    <footer class="footer">
+      <canvas class="field" id="field" aria-hidden="true"></canvas>
+      <div class="foot">
+        <div class="foot-brand">
+          <p class="foot-name">Clover</p>
+          <p class="foot-tag">The last mile of the paper.</p>
+        </div>
+        <div class="foot-cols">
+          <div>
+            <p class="foot-h">产品</p>
+            <a data-link="mac" href="#">下载 macOS 版</a>
+            <a href="./samples/clover-sample.docx" download="vericite_emnlp（Clover）.docx">示例导出文件</a>
+            <a href="./app.html?state=report" target="_blank">在新窗口打开界面</a>
+          </div>
+          <div>
+            <p class="foot-h">项目</p>
+            <a data-link="repo" href="#">GitHub</a>
+            <a data-link="releases" href="#">版本发布</a>
+          </div>
+          <div>
+            <p class="foot-h">赛事</p>
+            <span>天猫 AI 黑客松</span>
+            <span>效率进化赛道</span>
+            <span>阿里云特别赛题</span>
+          </div>
+        </div>
+      </div>
+      <p class="foot-small">2026 Clover。由 Qwen 驱动。</p>
+    </footer>
+
+    <script type="module" src="./src/landing/main.ts"></script>
+  </body>
+</html>
