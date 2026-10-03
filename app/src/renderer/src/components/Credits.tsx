@@ -28,7 +28,8 @@ interface Line {
   color?: string // css var for group headings
 }
 
-const GROUP_COLORS = ['--tile-teal', '--tile-indigo', '--tile-purple']
+// one per group, in order; the last (特别感谢) glows like the moon
+const GROUP_COLORS = ['--tile-teal', '--tile-indigo', '--tile-purple', '--tile-blue', '--egg-moon']
 
 function script(): Line[][] {
   const cards: Line[][] = [[{ text: APP_NAME, tone: 'title' }, { text: '致谢', tone: 'role' }]]
@@ -85,6 +86,40 @@ function sprite(text: string, tone: Tone, color: string): HTMLCanvasElement {
   return c
 }
 
+/** pixel full moon: a round disc with a few craters and a dithered halo */
+function moonSprite(face: string, shade: string, glow: string): HTMLCanvasElement {
+  const R = 20
+  const HALO = 7
+  const size = (R + HALO) * 2 + 1
+  const c = document.createElement('canvas')
+  c.width = size
+  c.height = size
+  const g = c.getContext('2d')!
+  const mid = R + HALO
+  const craters: [number, number, number][] = [
+    [-7, -5, 4], [6, 3, 5], [-3, 9, 3], [9, -9, 2], [-11, 4, 2],
+  ]
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      const dx = x - mid
+      const dy = y - mid
+      const d = Math.hypot(dx, dy)
+      if (d <= R) {
+        const inCrater = craters.some(([cx, cy, r]) => Math.hypot(dx - cx, dy - cy) <= r)
+        g.fillStyle = inCrater ? shade : face
+        g.fillRect(x, y, 1, 1)
+      } else if (d <= R + HALO && (x + y) % 2 === 0) {
+        // checkerboard halo that thins out with distance
+        g.globalAlpha = 0.55 * (1 - (d - R) / HALO)
+        g.fillStyle = glow
+        g.fillRect(x, y, 1, 1)
+        g.globalAlpha = 1
+      }
+    }
+  }
+  return c
+}
+
 function parseColor(css: string): [number, number, number] {
   const probe = document.createElement('canvas').getContext('2d')!
   probe.fillStyle = css
@@ -120,6 +155,7 @@ export default function Credits({
     const v = (name: string) => cs.getPropertyValue(name).trim()
     const ink = v('--egg-ink')
     const dim = v('--egg-dim')
+    const moon = moonSprite(v('--egg-moon'), v('--egg-moon-shade'), v('--egg-moon-glow'))
 
     const music = shot ? null : new Chiptune()
     music?.start()
@@ -184,6 +220,10 @@ export default function Credits({
     const frame = (now: number) => {
       const t = (now - start) / 1000 + offset
       lc.clearRect(0, 0, W, H)
+
+      // a full moon for Clair de lune — behind the names, breathing 1px
+      const bob = reduced ? 0 : Math.round(Math.sin(t * 0.8))
+      lc.drawImage(moon, Math.round(W * 0.8 - moon.width / 2), Math.round(H * 0.2 - moon.height / 2) + bob)
 
       // starfield drifting along the same 30° line
       for (const s of stars) {

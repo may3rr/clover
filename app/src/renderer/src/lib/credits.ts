@@ -47,8 +47,14 @@ export const CREDITS: { group: string; items: Credit[] }[] = [
   {
     group: '片尾配乐',
     items: [
-      ['Claude Debussy', '《月光》，8-bit 改编', 'https://imslp.org/wiki/Suite_bergamasque_(Debussy%2C_Claude)'],
-      ['Mutopia Project', '公有领域乐谱与 MIDI', 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1778'],
+      ['Mutopia Project', '《月光》的公有领域乐谱与 MIDI', 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1778'],
+    ],
+  },
+  {
+    group: '特别感谢',
+    items: [
+      ['Claude Debussy', '写下《月光》', 'https://imslp.org/wiki/Suite_bergamasque_(Debussy%2C_Claude)'],
+      ['Claude Opus 5.5', '和我们一起写了这个应用', 'https://www.anthropic.com/claude'],
     ],
   },
 ]
