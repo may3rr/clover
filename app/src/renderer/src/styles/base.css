@@ -807,6 +807,7 @@ select {
   grid-auto-columns: 12px;
   gap: 4px;
   justify-content: center;
+  margin-top: 8px;
 }
 .act-cell {
   border-radius: 4px;

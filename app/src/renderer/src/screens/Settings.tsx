@@ -381,7 +381,7 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
   }
 
   return (
-    <div className="card">
+    <>
       <div className="act-grid" role="img" aria-label="体检活动热力图">
         {cells.map((c) => (
           <div
@@ -403,7 +403,7 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
         过去 {WEEKS} 周活跃 {activeDays} 天
         {streak >= 2 ? ` · 连续 ${streak} 天，保持这个节奏` : ''}
       </div>
-    </div>
+    </>
   )
 }
 
