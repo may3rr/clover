@@ -71,3 +71,31 @@ def test_usage_shape_and_config(client):
     assert "judge" in body["models"]
     # the api key is never echoed back
     assert "api_key" not in body and "dashscope_api_key" not in body
+
+
+def test_put_config_returns_settings(tmp_path, monkeypatch):
+    """PUT /config writes config.toml + .env and answers with the new
+    settings as JSON (regression: it once returned an un-awaited coroutine,
+    which crashed FastAPI's encoder after the files were already written)."""
+    import citecheck.config as cfgmod
+    from citecheck.config import get_settings
+
+    cfg = tmp_path / "config.toml"
+    cfg.write_text(cfgmod._CONFIG_EXAMPLE_PATH.read_text(encoding="utf-8"),
+                   encoding="utf-8")
+    monkeypatch.setattr(cfgmod, "_CONFIG_PATH", cfg)
+    monkeypatch.setattr(cfgmod, "_ENV_PATH", tmp_path / ".env")
+    monkeypatch.setenv("CITECHECK_CACHE", str(tmp_path / "t.sqlite"))
+    get_settings.cache_clear()
+    try:
+        r = TestClient(app).put("/config", headers=H, json={
+            "base_url": "https://example.test/compatible-mode/v1",
+            "dashscope_api_key": "sk-test",
+        })
+        assert r.status_code == 200
+        body = r.json()
+        assert body["base_url"] == "https://example.test/compatible-mode/v1"
+        assert body["has_api_key"] is True
+        assert "DASHSCOPE_API_KEY=sk-test" in (tmp_path / ".env").read_text()
+    finally:
+        get_settings.cache_clear()

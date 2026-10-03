@@ -463,7 +463,7 @@ async def put_config(request: Request):
     _llm._cloud_client = None
     _llm._cloud_sem = None
     _llm._cache = None
-    return get_config()
+    return await get_config()
 
 
 @app.get("/models")
