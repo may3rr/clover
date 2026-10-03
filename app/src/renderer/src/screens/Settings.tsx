@@ -345,8 +345,9 @@ function AccountSection({
         )}
       </div>
 
-      <div className="group-label">体检活动</div>
-      {days && <ActivityCard days={days} />}
+      <div className="account-activity">
+        {days && <ActivityCard days={days} />}
+      </div>
     </>
   )
 }
@@ -354,7 +355,9 @@ function AccountSection({
 const WEEKS = 26
 
 /** GitHub-style activity grid: one cell per day, Monday-first weeks,
- *  intensity from model-call count. */
+ *  intensity from model-call count. Month labels sit above the week
+ *  column where the month changes; the year shows on the first label
+ *  and whenever it rolls over. */
 function ActivityCard({ days }: { days: Map<string, number> }) {
   const today = new Date()
   const todayKey = keyOf(today)
@@ -363,11 +366,11 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
   const start = new Date(today)
   start.setDate(start.getDate() - mondayOffset - (WEEKS - 1) * 7)
 
-  const cells: { key: string; calls: number }[] = []
+  const cells: { date: Date; key: string; calls: number }[] = []
   const cursor = new Date(start)
   while (keyOf(cursor) <= todayKey) {
     const k = keyOf(cursor)
-    cells.push({ key: k, calls: days.get(k) ?? 0 })
+    cells.push({ date: new Date(cursor), key: k, calls: days.get(k) ?? 0 })
     cursor.setDate(cursor.getDate() + 1)
   }
   const max = Math.max(...cells.map((c) => c.calls), 1)
@@ -380,24 +383,54 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
     streak++
   }
 
+  const nCols = Math.ceil(cells.length / 7)
+  const monthLabels: (string | null)[] = []
+  for (let w = 0; w < nCols; w++) {
+    const first = cells[w * 7]
+    const prev = w > 0 ? cells[(w - 1) * 7] : null
+    if (!first) {
+      monthLabels.push(null)
+    } else if (!prev || first.date.getMonth() !== prev.date.getMonth()) {
+      const yearTurn =
+        !prev || first.date.getFullYear() !== prev.date.getFullYear()
+      monthLabels.push(
+        yearTurn
+          ? `${first.date.getFullYear()} 年 ${first.date.getMonth() + 1} 月`
+          : `${first.date.getMonth() + 1} 月`
+      )
+    } else {
+      monthLabels.push(null)
+    }
+  }
+
   return (
     <>
-      <div className="act-grid" role="img" aria-label="体检活动热力图">
-        {cells.map((c) => (
-          <div
-            key={c.key}
-            className="act-cell"
-            title={`${c.key} · ${c.calls ? `${c.calls} 次调用` : '没有活动'}`}
-            style={
-              c.calls === 0
-                ? undefined
-                : {
-                    background: 'var(--accent)',
-                    opacity: 0.3 + 0.7 * Math.cbrt(c.calls / max),
-                  }
-            }
-          />
+      <div className="act-months" aria-hidden>
+        {monthLabels.map((label, i) => (
+          <div key={i} className="t13 secondary act-month">
+            {label}
+          </div>
         ))}
+      </div>
+      <div className="act-grid" role="img" aria-label="体检活动热力图">
+        {cells.map((c) => {
+          const label = `${c.date.getMonth() + 1} 月 ${c.date.getDate()} 日`
+          return (
+            <div
+              key={c.key}
+              className="act-cell"
+              title={`${label} · ${c.calls ? `${c.calls} 次调用` : '没有活动'}`}
+              style={
+                c.calls === 0
+                  ? undefined
+                  : {
+                      background: 'var(--accent)',
+                      opacity: 0.3 + 0.7 * Math.cbrt(c.calls / max),
+                    }
+              }
+            />
+          )
+        })}
       </div>
       <div className="t13 secondary act-summary">
         过去 {WEEKS} 周活跃 {activeDays} 天
