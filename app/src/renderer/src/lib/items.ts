@@ -19,6 +19,8 @@ export interface ListItem {
   revision?: Revision
   /** kind 'group': the collapsed reorder revisions */
   revisions?: Revision[]
+  /** kind 'group' (distribution): the collapsed section-level findings */
+  findings?: Finding[]
 }
 
 const SEV_RANK: Record<Severity, number> = { high: 3, medium: 2, low: 1, rev: 0 }
@@ -34,8 +36,20 @@ export function buildItems(report: Report): ListItem[] {
   const paraPos = new Map<string, number>()
   ;(report.paragraphs ?? []).forEach((p, i) => paraPos.set(p.id ?? '', i))
 
+  // section-level distribution findings sit on heading paragraphs; two or
+  // more of them read as one problem ("the spread is off"), so they collapse
+  // into a single item whose detail shows every section side by side
+  const headingIds = new Set(
+    (report.sections ?? []).map((s) => s.heading_paragraph_id).filter(Boolean)
+  )
+  const sectionDist = (report.findings ?? []).filter(
+    (f) => f.layer === 'distribution' && headingIds.has(f.anchor?.paragraph_id)
+  )
+  const collapseDist = sectionDist.length >= 2
+
   const items: ListItem[] = []
   for (const f of report.findings ?? []) {
+    if (collapseDist && sectionDist.includes(f)) continue
     items.push({
       id: f.id ?? '',
       kind: 'finding',
@@ -92,6 +106,34 @@ export function buildItems(report: Report): ListItem[] {
       paragraphId: first?.paragraph_id ?? null,
       start: first?.start ?? 0,
       revisions: reorders,
+    })
+  }
+
+  if (collapseDist) {
+    const sorted = [...sectionDist].sort(
+      (a, b) =>
+        (paraPos.get(a.anchor?.paragraph_id ?? '') ?? 0) -
+        (paraPos.get(b.anchor?.paragraph_id ?? '') ?? 0)
+    )
+    const worst = sorted.reduce<Severity>(
+      (w, f) =>
+        SEV_RANK[(f.severity as Severity) ?? 'low'] > SEV_RANK[w]
+          ? ((f.severity as Severity) ?? 'low')
+          : w,
+      'low'
+    )
+    items.push({
+      id: 'dist-group',
+      kind: 'group',
+      layer: 'distribution',
+      severity: worst,
+      title: `${sorted.length} 个章节的引用分布偏离该领域常见范围`,
+      // one 依据 line per section; DetailLines renders them in order
+      detail: sorted.map((f) => firstLine(f.detail ?? '')).join('\n'),
+      anchors: sorted.map((f) => f.anchor).filter(Boolean) as Anchor[],
+      paragraphId: sorted[0].anchor?.paragraph_id ?? null,
+      start: 0,
+      findings: sorted,
     })
   }
 

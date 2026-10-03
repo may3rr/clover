@@ -38,7 +38,9 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
           >
             {/* the why comes first; the evidence below backs it up */}
             <DetailLines detail={item.detail} />
-            {item.kind === 'group' ? (
+            {item.kind === 'group' && item.layer === 'distribution' ? (
+              <DistributionDetail item={item} report={report} />
+            ) : item.kind === 'group' ? (
               <ReorderDetail item={item} report={report} />
             ) : item.kind === 'revision' ? (
               <RevisionDetail item={item} />
@@ -391,7 +393,9 @@ function DistributionDetail({
 }) {
   const d = report.distribution
   const secs = d ? comparedSections(d) : []
-  const only = item.anchors[0]?.paragraph_id
+  // a single section finding zooms to its section; the collapsed group
+  // shows every compared section together
+  const only = item.kind === 'group' ? undefined : item.anchors[0]?.paragraph_id
   const shown = only
     ? secs.filter((s) => {
         const sec = (report.sections ?? []).find((x) => x.id === s.section_id)

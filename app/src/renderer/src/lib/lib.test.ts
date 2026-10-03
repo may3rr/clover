@@ -413,3 +413,39 @@ describe('reconcileFilter', () => {
     expect(reconcileFilter(items, 'support', null).selectedId).toBeNull()
   })
 })
+
+describe('distribution findings collapse', () => {
+  const sec = (id: string, pid: string) => ({
+    id, title: id, canonical: 'other' as const, heading_paragraph_id: pid,
+  })
+  const para = (id: string) => ({ id, section_id: 's', text: 'x', char_offset: 0 })
+  const f = (id: string, pid: string, severity: 'low' | 'medium') => ({
+    id, layer: 'distribution' as const, severity, title: id,
+    detail: `依据：${id}\n建议：…`,
+    anchor: { paragraph_id: pid, start: 0, end: 1 }, refs: [],
+  })
+  const base = {
+    document: { title: null, filename: null, citation_style: 'numeric' as const, managed_by: null, word_count: 0 },
+    sections: [sec('s1', 'h1'), sec('s2', 'h2')],
+    paragraphs: [para('h1'), para('p1'), para('h2')],
+  }
+
+  it('merges two or more section-level findings into one group item', () => {
+    const items = buildItems({
+      ...base,
+      findings: [f('a', 'h1', 'low'), f('b', 'h2', 'medium'), f('c', 'p1', 'medium')],
+    } as never)
+    const groups = items.filter((i) => i.id === 'dist-group')
+    expect(groups).toHaveLength(1)
+    expect(groups[0].severity).toBe('medium')
+    expect(groups[0].findings).toHaveLength(2)
+    expect(groups[0].detail.split('\n')).toEqual(['依据：a', '依据：b'])
+    // the sentence-level one (not on a heading) stays its own item
+    expect(items.some((i) => i.id === 'c')).toBe(true)
+  })
+
+  it('leaves a single section finding alone', () => {
+    const items = buildItems({ ...base, findings: [f('a', 'h1', 'low')] } as never)
+    expect(items.map((i) => i.id)).toEqual(['a'])
+  })
+})

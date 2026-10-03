@@ -150,7 +150,7 @@ export function applyShotState(state: string, ctx: ShotCtx) {
         firstOf((i) => i.kind === 'finding' && i.layer === layer) ??
         // the sample report has no norms finding — the collapsed reorder
         // group is the same norms surface
-        (layer === 'norms' ? firstOf((i) => i.kind === 'group') : null)
+        (layer === 'norms' ? firstOf((i) => i.id === 'reorder-group') : null)
       ctx.selectItem?.(id)
       return
     }
@@ -161,7 +161,7 @@ export function applyShotState(state: string, ctx: ShotCtx) {
       // reorder group carries the revision detail UI
       ctx.selectItem?.(
         firstOf((i) => i.kind === 'revision') ??
-          firstOf((i) => i.kind === 'group')
+          firstOf((i) => i.id === 'reorder-group')
       )
       return
     }
