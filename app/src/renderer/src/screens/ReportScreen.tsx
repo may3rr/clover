@@ -363,7 +363,7 @@ export default function ReportScreen({
           </div>
         </div>
         <main
-          className={`paper flex-1 overflow-y-auto${selectedId ? ' has-sel' : ''}`}
+          className={`paper flex-1 overflow-y-auto${selectedId ? ' has-sel' : ''}${scrolled ? ' is-scrolled' : ''}`}
           onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
           style={{
             padding: '0 24px 48px',

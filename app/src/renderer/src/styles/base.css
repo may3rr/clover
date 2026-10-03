@@ -381,8 +381,9 @@ select {
 .hl-sel-rev {
   background: color-mix(in srgb, var(--ok) 36%, transparent);
 }
-/* text scrolling under the toolbar fades out instead of being cut */
-.paper {
+/* text scrolling under the toolbar fades out instead of being cut —
+   only once scrolled, so the page icon at the top is never faded */
+.paper.is-scrolled {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 16px);
   mask-image: linear-gradient(to bottom, transparent 0, black 16px);
 }
