@@ -391,10 +391,12 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
     if (!first) {
       monthLabels.push(null)
     } else if (!prev || first.date.getMonth() !== prev.date.getMonth()) {
-      const yearTurn =
-        !prev || first.date.getFullYear() !== prev.date.getFullYear()
+      // year only on the rollover label — the first label sits too close
+      // to the next month for the long form
+      const rollover =
+        prev && first.date.getFullYear() !== prev.date.getFullYear()
       monthLabels.push(
-        yearTurn
+        rollover
           ? `${first.date.getFullYear()} 年 ${first.date.getMonth() + 1} 月`
           : `${first.date.getMonth() + 1} 月`
       )
@@ -414,7 +416,7 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
       </div>
       <div className="act-grid" role="img" aria-label="体检活动热力图">
         {cells.map((c) => {
-          const label = `${c.date.getMonth() + 1} 月 ${c.date.getDate()} 日`
+          const label = `${c.date.getFullYear()} 年 ${c.date.getMonth() + 1} 月 ${c.date.getDate()} 日`
           return (
             <div
               key={c.key}
