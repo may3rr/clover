@@ -293,77 +293,89 @@ function AuthenticityDetail({
     ['DOI', ref?.doi ?? '', theirs('doi'), flag('DOI')],
   ]
 
-  const srcName = matched?.source ? String(matched.source) : ''
+  const SOURCE_NAMES: Record<string, string> = {
+    s2: 'Semantic Scholar',
+    crossref: 'Crossref',
+    openalex: 'OpenAlex',
+    arxiv: 'arXiv',
+  }
+  const rawSrc = matched?.source ? String(matched.source) : ''
+  const srcName = SOURCE_NAMES[rawSrc.toLowerCase()] ?? rawSrc
   const doiUrl = matched?.doi
     ? `https://doi.org/${String(matched.doi).replace(/^https?:\/\/doi.org\//, '')}`
     : ref?.doi
       ? `https://doi.org/${ref.doi.replace(/^https?:\/\/doi.org\//, '')}`
       : null
 
+  const status =
+    check?.status === 'not_found'
+      ? '检索的文献数据库中均未找到这篇文献'
+      : !matched
+        ? '暂时无法完成核验，下面是你写的条目'
+        : `已在 ${srcName || '数据库'} 找到对应记录${
+            rows.some((r) => r[3]) ? '，不一致的字段已标出' : ''
+          }`
+
   return (
     <>
-      <div className="flex gap-2">
-        <div className="card flex-1 min-w-0" style={{ padding: 12 }}>
-          <div className="t13 secondary" style={{ marginBottom: 8 }}>
-            你写的
-          </div>
-          {rows.map(([label, yours, _t, bad]) => (
-            <FieldRow key={label} label={label} value={yours} bad={bad} />
-          ))}
+      <div className="card">
+        <div className="t13 secondary" style={{ marginBottom: 12 }}>
+          {status}
         </div>
-        <div className="card flex-1 min-w-0" style={{ padding: 12 }}>
-          <div className="t13 secondary" style={{ marginBottom: 8 }}>
-            {check?.status === 'not_found' || !matched
-              ? '数据库中查到的'
-              : `数据库中查到的（${srcName}）`}
-          </div>
-          {check?.status === 'not_found' ? (
-            <div className="font-normal">三个数据库均未找到这篇文献</div>
-          ) : matched ? (
-            rows.map(([label, _y, t, bad]) => (
-              <FieldRow key={label} label={label} value={t ?? '—'} bad={bad} />
-            ))
-          ) : (
-            <div className="font-normal">暂无法完成核验</div>
-          )}
+        <div className="flex flex-col" style={{ gap: 12 }}>
+          {rows.map(([label, yours, theirs, bad]) => (
+            <FieldRow
+              key={label}
+              label={label}
+              value={yours}
+              theirs={matched && bad ? theirs ?? '—' : null}
+              bad={!!matched && bad}
+            />
+          ))}
         </div>
       </div>
       {doiUrl && (
         <button
-          className="link-accent font-normal"
+          className="link-accent font-normal t13"
+          style={{ textAlign: 'left', wordBreak: 'break-all' }}
           onClick={() => window.citecheck.openExternal(doiUrl)}
         >
-          {doiUrl}
+          在 doi.org 打开
         </button>
       )}
     </>
   )
 }
 
+/** one bibliographic field: what the paper says, and — only where it
+ * disagrees — what the database has, directly beneath it */
 function FieldRow({
   label,
   value,
+  theirs,
   bad,
 }: {
   label: string
   value: string
+  theirs: string | null
   bad: boolean
 }) {
   return (
-    <div style={{ marginBottom: 4 }}>
-      <div className="t13 secondary">{label}</div>
-      <div
-        className="font-normal"
-        style={{
-          fontSize: 13,
-          background: bad ? 'var(--high-tint)' : 'transparent',
-          borderRadius: 4,
-          padding: '1px 4px',
-          wordBreak: 'break-word',
-        }}
-      >
-        {value || '—'}
+    <div className="min-w-0">
+      <div className="t13 secondary" style={{ marginBottom: 4 }}>
+        {label}
       </div>
+      <div className="font-normal" style={{ wordBreak: 'break-word' }}>
+        <span className={bad ? 'hl hl-high' : undefined}>{value || '—'}</span>
+      </div>
+      {theirs != null && (
+        <div className="t13" style={{ marginTop: 4, wordBreak: 'break-word' }}>
+          <span className="secondary" style={{ marginRight: 8 }}>
+            数据库记录
+          </span>
+          {theirs}
+        </div>
+      )}
     </div>
   )
 }

@@ -194,7 +194,7 @@ export default function Settings({
       </aside>
       <div
         className="flex flex-col h-full"
-        style={{ marginLeft: 200, background: 'var(--bg)' }}
+        style={{ marginLeft: 240, background: 'var(--bg)' }}
       >
         <header
           className="drag-strip bar-solid strip-edge flex items-center"
@@ -920,17 +920,11 @@ function ModelSection() {
               <span>{p.name}</span>
             </button>
           ))}
-        </div>
-        <div className="t13 secondary prov-sub">
-          自定义端点（双击卡片移除）
-        </div>
-        <div className="prov-grid">
-          {customs.map((c, i) => (
+          {customs.map((c) => (
             <button
               key={c.name}
               className={`prov-card${sel === c.name ? ' sel' : ''}`}
               onClick={() => applyCustom(c)}
-              onDoubleClick={() => removeCustom(i)}
             >
               <CustomTile icon={c.icon} size={22} />
               <span className="prov-card-name">{c.name}</span>
@@ -954,9 +948,18 @@ function ModelSection() {
                 <path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z" />
               </svg>
             </span>
-            <span>添加</span>
+            <span>添加端点</span>
           </button>
         </div>
+        {customs.some((c) => c.name === sel) && (
+          <button
+            className="link-accent t13"
+            style={{ marginTop: 8 }}
+            onClick={() => removeCustom(customs.findIndex((c) => c.name === sel))}
+          >
+            移除这个端点
+          </button>
+        )}
         {showAdd && (
           <div className="prov-addform">
             <Field label="名称">

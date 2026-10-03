@@ -750,14 +750,15 @@ select {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 200px;
+  width: 240px;
   z-index: 1;
   background: var(--sidebar-tint);
   box-shadow: 1px 0 0 var(--separator);
 }
 .settings-col {
   width: 100%;
-  max-width: 1080px;
+  /* forms read best at a measured width, like macOS System Settings */
+  max-width: 720px;
   padding: 24px 48px 48px;
   margin: 0 auto;
 }
@@ -837,6 +838,7 @@ select {
 .account-hello {
   font-weight: 600;
   margin: 0;
+  text-align: center;
 }
 .account-hero {
   display: flex;
@@ -1041,7 +1043,7 @@ select {
 }
 .model-fields {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   column-gap: 12px;
 }
 .pill-s {
