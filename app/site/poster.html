@@ -3,13 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <title>Clover cover</title>
-    <!-- Competition cover, 1080 x 1920 (dev only): frame.mjs --template poster -->
+    <!-- Competition cover, 1080 x 1920 (dev only): frame.mjs --template poster.
+         Same pieces as the video's first frame; the app window is rendered
+         tall (1280 x 1600) so every part of the report is on show. -->
   </head>
   <body>
     <main class="poster">
       <p class="hero-event">天猫 AI 黑客松参赛作品</p>
-      <img class="p-logo" src="./icon.svg" alt="" />
-      <h1>The last mile<br />of the paper</h1>
+      <h1><img class="p-logo" src="./icon.svg" alt="" />The last mile of the paper</h1>
       <p class="p-sub">投稿的最后一公里</p>
       <div class="downloads p-dl">
         <span class="dl dl-mac">
@@ -18,15 +19,14 @@
         </span>
         <span class="dl dl-win"><span>Windows</span><span class="dl-note">To be continued</span></span>
       </div>
-      <p class="p-line">查出编造的文献、引错的引用和错别字<br />写回你熟悉的 Word</p>
+      <p class="hero-team p-team">
+        <span><b>参赛队伍</b>我要发顶刊</span>
+        <span><b>赛道</b>效率进化，阿里云特别赛题</span>
+      </p>
       <div class="p-win">
         <div class="window" data-src="app.html?state=report"></div>
       </div>
-      <div class="p-foot">
-        <p><b>参赛队伍</b>我要发顶刊</p>
-        <p><b>参赛赛道</b>效率进化，阿里云特别赛题</p>
-        <p class="p-powered">Powered by<img src="./brand/qwen-color.svg" alt="" width="30" height="30" /><b>千问</b></p>
-      </div>
+      <p class="p-powered">Powered by<img src="./brand/qwen-color.svg" alt="" width="28" height="28" /><b>千问</b></p>
     </main>
     <script type="module" src="./src/landing/poster.ts"></script>
   </body>
