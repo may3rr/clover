@@ -1143,23 +1143,6 @@ select {
   margin: 12px 0 0;
   color: var(--text-secondary);
 }
-.about-card {
-  padding: 4px;
-}
-.about-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 8px;
-  text-align: left;
-  transition: background 160ms var(--ease);
-}
-.about-row:hover {
-  background: var(--fill);
-}
 
 /* the paper keeps proportional figures — it is prose, not UI */
 .paper {
@@ -1368,13 +1351,6 @@ select {
   bottom: 16px;
   color: var(--egg-dim);
 }
-.about-thanks {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-top: 24px;
-}
 
 /* intro title: one line, old-style serif once settled */
 .onboard-shuffle {
@@ -1387,4 +1363,42 @@ select {
 .shuffle-ch {
   display: inline-block;
   text-align: center;
+}
+
+/* about: game-style credits button */
+.about-egg {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 32px;
+}
+.egg-btn {
+  padding: 8px;
+  border-radius: 12px;
+  /* sprite idle: a two-frame hop, like a title-screen mascot */
+  animation: egg-hop 1.6s steps(1) infinite;
+  transition: transform 160ms var(--ease);
+}
+.egg-btn:hover {
+  animation-play-state: paused;
+  transform: scale(1.12) rotate(-8deg);
+}
+.egg-btn:active {
+  transform: scale(0.94);
+}
+@keyframes egg-hop {
+  0%, 70% { transform: translateY(0); }
+  75%, 90% { transform: translateY(-4px); }
+}
+.egg-blink {
+  color: var(--text-secondary);
+  animation: egg-blink 1.2s steps(1) infinite;
+}
+@keyframes egg-blink {
+  0%, 60% { opacity: 1; }
+  61%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .egg-btn, .egg-blink { animation: none; }
 }

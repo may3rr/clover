@@ -20,7 +20,7 @@ import {
   GitHubMarkIcon,
 } from '../components/Icons'
 import AccountChip from '../components/AccountChip'
-import { CREDITS, GITHUB_URL } from '../lib/credits'
+import { GITHUB_URL } from '../lib/credits'
 import { APP_NAME } from '../lib/brand'
 import {
   BrandIcon,
@@ -1294,31 +1294,40 @@ function AboutSection({ onCredits }: { onCredits: () => void }) {
           <span className="font-normal">在 GitHub 上查看源代码</span>
         </button>
       </div>
-      {CREDITS.map(({ group, items }) => (
-        <section key={group}>
-          <div className="group-label">{group}</div>
-          <div className="card about-card">
-            {items.map(([name, role, url]) => (
-              <button
-                key={name}
-                className="about-row"
-                onClick={() => window.citecheck.openExternal(url)}
-              >
-                <span className="font-normal">{name}</span>
-                <span className="t13 secondary">{role}</span>
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
-      <div className="about-thanks">
-        <div className="t13 secondary">
-          感谢这些项目和数据服务，没有它们就没有这个应用。
-        </div>
-        <button className="pill pill-s" onClick={onCredits}>
-          致谢
+      {/* the credits live behind a little game-style button */}
+      <div className="about-egg">
+        <button className="egg-btn" onClick={onCredits} aria-label="播放致谢">
+          <PixelClover />
         </button>
+        <div className="t13 egg-blink">按下开始</div>
       </div>
     </>
+  )
+}
+
+/** a 12×12 pixel four-leaf clover, one leaf per check */
+function PixelClover() {
+  // one leaf (top-left), mirrored into the other three quadrants
+  const leaf = ['.XX.', 'XXXX', 'XXXX', '.XXX']
+  const cells: [number, number][] = []
+  leaf.forEach((row, y) =>
+    [...row].forEach((c, x) => {
+      if (c !== 'X') return
+      const lx = x + 1
+      const ly = y + 1
+      cells.push([lx, ly], [11 - lx, ly], [lx, 11 - ly], [11 - lx, 11 - ly])
+    })
+  )
+  cells.push([5, 5], [6, 5], [5, 6], [6, 6]) // joined centre
+  const shine: [number, number][] = [[2, 2], [9, 2], [2, 9], [9, 9]]
+  return (
+    <svg width={48} height={48} viewBox="0 0 12 12" shapeRendering="crispEdges" aria-hidden>
+      {cells.map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width={1} height={1} fill="var(--egg-clover)" />
+      ))}
+      {shine.map(([x, y]) => (
+        <rect key={`s${x}-${y}`} x={x} y={y} width={1} height={1} fill="var(--egg-clover-shine)" />
+      ))}
+    </svg>
   )
 }

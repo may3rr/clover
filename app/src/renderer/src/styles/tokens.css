@@ -49,6 +49,8 @@
   --egg-bg: #000000;
   --egg-ink: #ffffff;
   --egg-dim: rgba(255, 255, 255, 0.55);
+  --egg-clover: #34c759;          /* 关于页像素四叶草 */
+  --egg-clover-shine: #b8f5c6;
 
   /* 缓动：一次定义，全站共用 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);

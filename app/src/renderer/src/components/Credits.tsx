@@ -3,7 +3,7 @@ import { CREDITS } from '../lib/credits'
 import { Chiptune } from '../lib/chiptune'
 import { APP_NAME } from '../lib/brand'
 
-/** Credits easter egg: a full-screen, game-style staff roll. Every name
+/** Credits easter egg: a window-filling, game-style staff roll. Every name
  * flies from the lower left toward the upper right along a 30° line over
  * a drifting pixel starfield, with an 8-bit loop playing.
  *
@@ -105,7 +105,7 @@ export default function Credits({
   shot = false,
 }: {
   onClose: () => void
-  /** screenshot mode: no audio, no fullscreen, start mid-roll */
+  /** screenshot mode: no audio, start mid-roll */
   shot?: boolean
 }) {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -121,7 +121,6 @@ export default function Credits({
     const ink = v('--egg-ink')
     const dim = v('--egg-dim')
 
-    if (!shot) root.requestFullscreen?.().catch(() => {})
     const music = shot ? null : new Chiptune()
     music?.start()
 
@@ -234,21 +233,23 @@ export default function Credits({
     }
     raf = requestAnimationFrame(frame)
 
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+      else if (e.key === 'm' || e.key === 'M') music?.toggleMute()
+    }
     window.addEventListener('keydown', onKey)
     return () => {
       cancelAnimationFrame(raf)
       window.removeEventListener('resize', fit)
       window.removeEventListener('keydown', onKey)
       music?.stop()
-      if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
     }
   }, [onClose, shot])
 
   return (
     <div ref={rootRef} className="credits" onClick={onClose} role="dialog" aria-label="致谢">
       <canvas ref={cvRef} className="credits-cv" />
-      <div className="credits-hint t13">按 Esc 或点击任意处返回</div>
+      <div className="credits-hint t13">按 M 静音，按 Esc 或点击任意处返回</div>
     </div>
   )
 }
