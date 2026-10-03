@@ -310,7 +310,7 @@ select {
   background: var(--fill);
 }
 .list-row.sel {
-  background: var(--bg);
+  background: var(--fill-strong);
 }
 
 /* group labels (13px secondary) */
@@ -339,18 +339,50 @@ select {
 .hl-rev {
   background: var(--ok-tint);
 }
+/* neighbouring segments join into one continuous mark */
+.hl-jl {
+  padding-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.hl-jr {
+  padding-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.hl {
+  transition: background-color 240ms var(--ease);
+}
+/* while one item is selected the other marks step back */
+.has-sel .hl-high {
+  background: color-mix(in srgb, var(--high) 9%, transparent);
+}
+.has-sel .hl-medium {
+  background: color-mix(in srgb, var(--medium) 10%, transparent);
+}
+.has-sel .hl-low {
+  background: color-mix(in srgb, var(--text-secondary) 7%, transparent);
+}
+.has-sel .hl-rev {
+  background: color-mix(in srgb, var(--ok) 8%, transparent);
+}
 /* selected segment: stronger version of the same semantic color */
 .hl-sel-high {
-  background: color-mix(in srgb, var(--high) 30%, transparent);
+  background: color-mix(in srgb, var(--high) 38%, transparent);
 }
 .hl-sel-medium {
-  background: color-mix(in srgb, var(--medium) 30%, transparent);
+  background: color-mix(in srgb, var(--medium) 45%, transparent);
 }
 .hl-sel-low {
-  background: color-mix(in srgb, var(--text-secondary) 45%, transparent);
+  background: color-mix(in srgb, var(--text-secondary) 30%, transparent);
 }
 .hl-sel-rev {
-  background: color-mix(in srgb, var(--ok) 30%, transparent);
+  background: color-mix(in srgb, var(--ok) 36%, transparent);
+}
+/* text scrolling under the toolbar fades out instead of being cut */
+.paper {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 16px);
+  mask-image: linear-gradient(to bottom, transparent 0, black 16px);
 }
 
 /* detail slide/fade — ends fully opaque */

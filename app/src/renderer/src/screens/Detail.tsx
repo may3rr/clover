@@ -12,13 +12,6 @@ interface Props {
   onBack: () => void
 }
 
-const VERDICT: Record<string, { label: string; cls: string }> = {
-  supported: { label: '支持', cls: 'sem-ok' },
-  partial: { label: '部分支持', cls: 'sem-medium' },
-  unsupported: { label: '不支持', cls: 'sem-high' },
-  undetermined: { label: '无法判断', cls: 'secondary' },
-}
-
 export default function Detail({ item, report, backLabel, onBack }: Props) {
   return (
     <div className="detail-in flex flex-col flex-1 min-h-0" key={item.id}>
@@ -43,6 +36,8 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
             className="flex flex-col"
             style={{ gap: 12, marginTop: 16 }}
           >
+            {/* the why comes first; the evidence below backs it up */}
+            <DetailLines detail={item.detail} />
             {item.kind === 'group' ? (
               <ReorderDetail item={item} report={report} />
             ) : item.kind === 'revision' ? (
@@ -50,7 +45,6 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
             ) : (
               <FindingDetail item={item} report={report} />
             )}
-            <DetailLines detail={item.detail} />
           </div>
         </div>
       </div>
@@ -94,7 +88,6 @@ function FindingDetail({ item, report }: { item: ListItem; report: Report }) {
 
 function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
   const s = supportForFinding(report, item)
-  const verdict = VERDICT[s.label ?? 'undetermined']
   return (
     <>
       {s.sentence && (
@@ -103,17 +96,7 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
             你的论文写道
           </div>
           <div className="font-normal">
-            {s.claim && s.claim.start != null && s.claim.end != null ? (
-              <>
-                {s.sentence.slice(0, s.claim.start)}
-                <span className="font-semibold">
-                  {s.sentence.slice(s.claim.start, s.claim.end)}
-                </span>
-                {s.sentence.slice(s.claim.end)}
-              </>
-            ) : (
-              s.sentence
-            )}
+            <ClaimInSentence sentence={s.sentence} claim={s.claim?.text} />
           </div>
         </div>
       )}
@@ -137,14 +120,20 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
           </div>
         </div>
       )}
-      <div>
-        <span className={`font-semibold ${verdict.cls}`}>{verdict.label}</span>
-        {s.rationale && (
-          <span className="font-normal" style={{ marginLeft: 8 }}>
-            {s.rationale}
-          </span>
-        )}
-      </div>
+    </>
+  )
+}
+
+/** the sentence with the judged claim set in semibold — claim offsets
+ * are paragraph-relative, so locate the claim text in the sentence */
+function ClaimInSentence({ sentence, claim }: { sentence: string; claim?: string | null }) {
+  const i = claim ? sentence.indexOf(claim) : -1
+  if (!claim || i < 0) return <>{sentence}</>
+  return (
+    <>
+      {sentence.slice(0, i)}
+      <span className="font-semibold">{claim}</span>
+      {sentence.slice(i + claim.length)}
     </>
   )
 }
@@ -579,11 +568,6 @@ function RevisionDetail({ item }: { item: ListItem }) {
         >
           {r.new}
         </div>
-        {r.reason && (
-          <div className="t13 secondary" style={{ marginTop: 8 }}>
-            {r.reason}
-          </div>
-        )}
       </div>
       <div className="t13 secondary">
         导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。
@@ -631,6 +615,7 @@ function ReorderDetail({
                 >
                   {leadNumber(r.old)}
                 </span>
+                <span className="t13 secondary" aria-label="改为">→</span>
                 <span
                   className="t13 font-semibold"
                   style={{ minWidth: 28 }}
@@ -645,9 +630,6 @@ function ReorderDetail({
             <div className="t13 secondary">仅正文编号需要更新。</div>
           )}
         </div>
-      </div>
-      <div className="t13 secondary">
-        导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。
       </div>
     </>
   )

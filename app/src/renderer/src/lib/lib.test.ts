@@ -348,8 +348,8 @@ describe('greetings', () => {
         pickGreeting('李明', tuesday, () => i / 60)
       )
     )
-    expect(fri.has('Happy Friday')).toBe(true)
-    expect(tue.has('Happy Friday')).toBe(false)
+    expect(fri.has('周五快乐')).toBe(true)
+    expect(tue.has('周五快乐')).toBe(false)
   })
 })
 

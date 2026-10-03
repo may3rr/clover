@@ -421,7 +421,7 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
             <div
               key={c.key}
               className="act-cell"
-              title={`${label} · ${c.calls ? `${c.calls} 次调用` : '没有活动'}`}
+              title={`${label}：${c.calls ? `${c.calls} 次调用` : '没有活动'}`}
               style={
                 c.calls === 0
                   ? undefined
@@ -436,7 +436,7 @@ function ActivityCard({ days }: { days: Map<string, number> }) {
       </div>
       <div className="t13 secondary act-summary">
         过去 {WEEKS} 周活跃 {activeDays} 天
-        {streak >= 2 ? ` · 连续 ${streak} 天，保持这个节奏` : ''}
+        {streak >= 2 ? `，最近连续 ${streak} 天` : ''}
       </div>
     </>
   )
@@ -650,6 +650,23 @@ const SHOT_USAGE: Usage = {
       cost: 0.0108,
     },
   ],
+}
+
+/** right-aligned secondary figures, spaced apart instead of joined by dots */
+function Stats({ parts }: { parts: string[] }) {
+  return (
+    <span className="t13 secondary flex" style={{ gap: 16, flex: 'none' }}>
+      {parts.map((p, i) => (
+        <span key={i} style={{ fontVariantNumeric: 'tabular-nums' }}>
+          {p}
+        </span>
+      ))}
+    </span>
+  )
+}
+
+function providerName(id: string): string {
+  return PRESETS.find((p) => p.id === id)?.name ?? id
 }
 
 type ProviderKey = 'dashscope' | 'openai' | 'deepseek'
@@ -1137,9 +1154,7 @@ function UsageSection() {
           <div key={doc || '?'} className="usage-doc">
             <div className="usage-row">
               <span className="usage-name">{doc || '未关联文档'}</span>
-              <span className="t13 secondary">
-                {calls} 次 · ¥{yuan(cost)}
-              </span>
+              <Stats parts={[`${calls} 次`, `¥${yuan(cost)}`]} />
             </div>
             <div className="usage-bar">
               <i
@@ -1154,10 +1169,13 @@ function UsageSection() {
                   <ModelGlyph model={r.model} />
                   {r.model}
                 </span>
-                <span className="t13 secondary">
-                  {r.calls} 次 · {tokens(rowTokens(r))} tok · ¥
-                  {yuan(r.cost)}
-                </span>
+                <Stats
+                  parts={[
+                    `${r.calls} 次`,
+                    `${tokens(rowTokens(r))} token`,
+                    `¥${yuan(r.cost)}`,
+                  ]}
+                />
               </div>
             ))}
           </div>
@@ -1170,11 +1188,16 @@ function UsageSection() {
           <div key={i} className="usage-row">
             <span className="usage-name usage-model">
               <ModelGlyph model={r.model} />
-              {r.provider} · {r.model}
+              {r.model}
+              <span className="t13 secondary">{providerName(r.provider ?? "")}</span>
             </span>
-            <span className="t13 secondary">
-              {r.calls} 次 · {tokens(rowTokens(r))} tok · ¥{yuan(r.cost)}
-            </span>
+            <Stats
+              parts={[
+                `${r.calls} 次`,
+                `${tokens(rowTokens(r))} token`,
+                `¥${yuan(r.cost)}`,
+              ]}
+            />
           </div>
         ))}
       </div>
@@ -1186,8 +1209,8 @@ function UsageSection() {
             <div
               key={day}
               className="usage-col"
-              title={`${day} · ${tokens(v.tokens)} token${
-                v.cached ? ` · 缓存 ${v.cached} 次` : ''
+              title={`${day}：${tokens(v.tokens)} token${
+                v.cached ? `，缓存命中 ${v.cached} 次` : ''
               }`}
             >
               <div

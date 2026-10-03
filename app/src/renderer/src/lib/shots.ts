@@ -31,11 +31,14 @@ const SAMPLE_PREFS = {
   comment_initials: '',
 }
 
-const ALL_DONE: LayerUI = {
-  authenticity: { status: 'done', findings: 3 },
-  support: { status: 'done', findings: 11 },
-  distribution: { status: 'done', findings: 7 },
-  norms: { status: 'done', findings: 1 },
+const LAYER_KEYS = ['authenticity', 'support', 'distribution', 'norms']
+
+// per-layer finding counts, so the running page agrees with the report
+function layerCounts(report?: Report): Record<string, number> {
+  const n: Record<string, number> = {}
+  for (const k of LAYER_KEYS) n[k] = 0
+  for (const f of report?.findings ?? []) n[f.layer] = (n[f.layer] ?? 0) + 1
+  return n
 }
 
 /** Debug-only state driver for `npm run shots` (CITECHECK_SHOTS). */
@@ -51,6 +54,9 @@ export function applyShotState(state: string, ctx: ShotCtx) {
     items.find(pred)?.id ?? null
   const outline = report ? outlineFromReport(report) : null
   const anchors = report ? anchorsFromReport(report) : {}
+  const counts = layerCounts(report)
+  const done = (k: string) => ({ status: 'done' as const, findings: counts[k] })
+  const ALL_DONE: LayerUI = Object.fromEntries(LAYER_KEYS.map((k) => [k, done(k)]))
 
   switch (state) {
     case 'empty':
@@ -82,9 +88,9 @@ export function applyShotState(state: string, ctx: ShotCtx) {
         distribution: anchors['distribution'] ?? [],
       })
       ctx.setLayers?.({
-        authenticity: { status: 'done', findings: 3 },
+        authenticity: done('authenticity'),
         support: { status: 'running', findings: 0 },
-        distribution: { status: 'done', findings: 7 },
+        distribution: done('distribution'),
         norms: { status: 'waiting', findings: 0 },
       })
       return

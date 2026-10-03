@@ -50,7 +50,14 @@ export function supportForFinding(
         .map((mid) => markers.find((m) => m.id === mid)?.ref_ids ?? [])
         .flat()
     )
+  // one paragraph can hold several claims citing the same ref — the
+  // finding's anchor span picks the right one
+  const a = f.anchor
+  const overlaps = (c: Claim) =>
+    !!a && c.paragraph_id === a.paragraph_id && c.start < a.end && a.start < c.end
   const claim =
+    claimsInPara.find((c) => overlaps(c) && (!refId || markerRefs(c).has(refId))) ??
+    claimsInPara.find(overlaps) ??
     claimsInPara.find((c) => refId && markerRefs(c).has(refId)) ??
     claimsInPara[0] ??
     null

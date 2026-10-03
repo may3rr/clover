@@ -42,7 +42,11 @@ export default function HistoryRow({
           <span className="hist-row-name">{meta.filename}</span>
           <span className="t13 secondary hist-row-sub">
             {relDay(meta.created_at)}
-            {meta.n_high > 0 && ` · ${meta.n_high} 严重`}
+            {meta.n_high > 0 && (
+              <span className="sem-high" style={{ marginLeft: 8 }}>
+                {meta.n_high} 条严重
+              </span>
+            )}
           </span>
         </span>
       </span>

@@ -58,6 +58,15 @@ interface Props {
   onOpenSettings: () => void
 }
 
+/** 303 → "5 分 3 秒", 20 → "20 秒" */
+function duration(sec: number): string {
+  const t = Math.round(sec)
+  const m = Math.floor(t / 60)
+  const r = t % 60
+  if (!m) return `${r} 秒`
+  return r ? `${m} 分 ${r} 秒` : `${m} 分钟`
+}
+
 export default function ReportScreen({
   report,
   jobId,
@@ -329,7 +338,7 @@ export default function ReportScreen({
           </div>
         </div>
         <main
-          className="paper flex-1 overflow-y-auto"
+          className={`paper flex-1 overflow-y-auto${selectedId ? ' has-sel' : ''}`}
           onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
           style={{
             padding: '0 24px 48px',
@@ -482,7 +491,7 @@ function PaperBody({
               ],
               [
                 '检查用时',
-                `${Math.round(report.meta?.duration_s ?? 0)} 秒`,
+                duration(report.meta?.duration_s ?? 0),
               ],
             ] as [string, string][]
           ).map(([label, value]) => (
@@ -495,11 +504,28 @@ function PaperBody({
         <div className="callout" style={{ marginTop: 24, marginBottom: 40 }}>
           <DocMagnifyIcon size={20} color="var(--accent)" />
           <div className="font-normal">
-            发现{' '}
-            <span className="font-semibold sem-high">{nHigh}</span>{' '}
-            条严重问题，
-            <span className="font-semibold sem-medium">{nMedium}</span>{' '}
-            条需要注意，导出后会以批注和修订出现在 Word 里。
+            {nHigh + nMedium === 0 ? (
+              '没有发现严重问题，其余提示导出后会以批注和修订出现在 Word 里。'
+            ) : (
+              <>
+                发现
+                {nHigh > 0 && (
+                  <>
+                    {' '}
+                    <span className="font-semibold sem-high">{nHigh}</span>{' '}
+                    条严重问题{nMedium > 0 ? '，' : ''}
+                  </>
+                )}
+                {nMedium > 0 && (
+                  <>
+                    {' '}
+                    <span className="font-semibold sem-medium">{nMedium}</span>{' '}
+                    条需要注意
+                  </>
+                )}
+                ，导出后会以批注和修订出现在 Word 里。
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -526,10 +552,13 @@ function PaperBody({
               const cls = s.selected
                 ? HL_SELECTED_CLASS[s.severity]
                 : HL_CLASS[s.severity]
+              // adjacent marks read as one run: no inner padding/radius
+              const jl = segs[i - 1]?.severity != null ? ' hl-jl' : ''
+              const jr = segs[i + 1]?.severity != null ? ' hl-jr' : ''
               return (
                 <span
                   key={i}
-                  className={`hl ${cls}`}
+                  className={`hl ${cls}${jl}${jr}`}
                   ref={(el) => {
                     if (!el) return
                     for (const id of s.itemIds) {

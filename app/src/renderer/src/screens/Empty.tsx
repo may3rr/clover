@@ -3,7 +3,7 @@ import { apiFetch } from '../lib/api'
 import {
   PapersIllustration,
   ChevronDownIcon,
-  SealOkIllustration,
+  LayerTile,
 } from '../components/Icons'
 import AccountChip from '../components/AccountChip'
 import HistoryRow from '../components/HistoryRow'
@@ -30,6 +30,13 @@ interface Bench {
 
 /** Home: the three-pane shell with history in the sidebar and the drop
  *  zone as the reading area — the window never shows a bare whiteboard. */
+const PREVIEW_LAYERS: [string, string][] = [
+  ['authenticity', '文献真实性'],
+  ['support', '论断支持度'],
+  ['distribution', '引用分布'],
+  ['norms', '格式规范'],
+]
+
 export default function Empty({
   benchmark,
   setBenchmark,
@@ -189,9 +196,19 @@ export default function Empty({
           className={active ? undefined : 'drag-strip'}
           style={{ height: 52, flex: 'none' }}
         />
-        <div className="flex-1 flex flex-col items-center justify-center gap-2">
-          <SealOkIllustration size={40} />
-          <div className="t13 secondary">检查结果会出现在这里</div>
+        <div className="flex-1 flex flex-col justify-center" style={{ padding: '0 48px 52px' }}>
+          {/* a quiet preview of the four layers the report will fill */}
+          <div className="flex flex-col" style={{ gap: 12, opacity: 0.55 }}>
+            {PREVIEW_LAYERS.map(([key, name]) => (
+              <div key={key} className="flex items-center gap-3">
+                <LayerTile layer={key} size={20} />
+                <span className="secondary">{name}</span>
+              </div>
+            ))}
+          </div>
+          <div className="t13 secondary" style={{ marginTop: 24 }}>
+            拖入论文后，四项检查的结果会出现在这里。
+          </div>
         </div>
       </aside>
     </div>
