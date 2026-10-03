@@ -49,7 +49,8 @@ const SIZES: Record<Tone, [number, number]> = {
   title: [24, 700],
   group: [15, 700],
   name: [15, 600],
-  role: [12, 400],
+  // CJK hairlines vanish at light weights once thresholded — keep it heavy
+  role: [13, 600],
 }
 
 /** text → hard-edged pixel sprite in one color */
@@ -72,7 +73,8 @@ function sprite(text: string, tone: Tone, color: string): HTMLCanvasElement {
   const out = g.createImageData(w, h)
   const [r, gg, b] = parseColor(color)
   for (let i = 0; i < img.data.length; i += 4) {
-    if (img.data[i + 3] > 100) {
+    // low cut-off: thin horizontal CJK strokes antialias to ~40% alpha
+    if (img.data[i + 3] > 60) {
       out.data[i] = r
       out.data[i + 1] = gg
       out.data[i + 2] = b
