@@ -110,7 +110,7 @@ Clover 建立在这些开源项目、开放数据和设计参考之上。
 | [RapidFuzz](https://github.com/rapidfuzz/RapidFuzz) | 标题与作者的模糊匹配 |
 | [rank-bm25](https://github.com/dorianbrown/rank_bm25) | 证据片段检索 |
 | [pypdf](https://github.com/py-pdf/pypdf) | 读取开放全文 |
-| [pypinyin](https://github.com/mozillazg/python-pinyin) | 中文参考文献按拼音排序 |
+| [pypinyin](https://github.com/mozillazg/python-pinyin) | 中文作者名处理 |
 | [OpenAI Python SDK](https://github.com/openai/openai-python) | 调用 OpenAI 兼容接口 |
 | [uv](https://github.com/astral-sh/uv)、[python-build-standalone](https://github.com/astral-sh/python-build-standalone) | 打进应用的独立 Python 运行时 |
 | [LobeHub Icons](https://github.com/lobehub/lobe-icons) | 设置页的服务商图标 |
@@ -120,7 +120,11 @@ Clover 建立在这些开源项目、开放数据和设计参考之上。
 
 **片尾彩蛋**：[Mutopia Project](https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=1778) 提供德彪西《月光》的公有领域乐谱。
 
-开发过程中使用了 [Claude Code](https://www.anthropic.com/claude-code)（Claude Opus 5.5）协助编程。
+**特别感谢**
+
+- [Qwen3.8-Max](https://qwen.ai)：复核每一条存疑的结论，是 Clover 判断可靠的最后一道关。
+- [Qoder](https://qoder.com)：千问的编程智能体，和我们一起写了这个应用。
+- [Claude Code](https://www.anthropic.com/claude-code)（Claude Opus 5.5）：同样参与了编程。
 
 ## 许可证
 

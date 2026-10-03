@@ -54,6 +54,8 @@ export const CREDITS: { group: string; items: Credit[] }[] = [
     group: '特别感谢',
     items: [
       ['Claude Debussy', '写下《月光》', 'https://imslp.org/wiki/Suite_bergamasque_(Debussy%2C_Claude)'],
+      ['Qwen3.8-Max', '复核每一条存疑的结论', 'https://qwen.ai'],
+      ['Qoder', '千问的编程智能体，和我们一起写了这个应用', 'https://qoder.com'],
       ['Claude Opus 5.5', '和我们一起写了这个应用', 'https://www.anthropic.com/claude'],
     ],
   },
