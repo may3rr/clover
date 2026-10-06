@@ -11,6 +11,7 @@ import asyncio
 import logging
 import re
 import time
+import weakref
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from typing import Any
@@ -27,15 +28,27 @@ OPENALEX = "https://api.openalex.org"
 S2 = "https://api.semanticscholar.org"
 ARXIV_API = "https://export.arxiv.org/api/query"
 
-_arxiv_lock = asyncio.Lock()
+# One lock per event loop: an asyncio.Lock binds to the loop that first
+# waits on it, so a module-level lock breaks the second asyncio.run() in a
+# process (batch scripts, tests). The 3s spacing itself stays process-wide.
+_arxiv_locks: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, asyncio.Lock]" = \
+    weakref.WeakKeyDictionary()
 _arxiv_last = 0.0
+
+
+def _arxiv_lock() -> asyncio.Lock:
+    loop = asyncio.get_running_loop()
+    lock = _arxiv_locks.get(loop)
+    if lock is None:
+        lock = _arxiv_locks[loop] = asyncio.Lock()
+    return lock
 
 
 async def arxiv_throttle() -> None:
     """Process-wide >=3s spacing between arXiv API calls (politeness rule;
     shared by verification and support-source lookups)."""
     global _arxiv_last
-    async with _arxiv_lock:
+    async with _arxiv_lock():
         wait = 3.0 - (time.monotonic() - _arxiv_last)
         if wait > 0:
             await asyncio.sleep(wait)
@@ -212,6 +225,16 @@ def parse_arxiv_feed(xml_text: str) -> list[dict]:
 
 _openalex_budget_warned = False
 
+
+def _retry_after(resp: httpx.Response, attempt: int) -> float:
+    """Seconds to wait after a 429: the server's Retry-After when given
+    (capped), else exponential backoff."""
+    ra = resp.headers.get("retry-after", "")
+    try:
+        return min(max(float(ra), 0.5), 8.0)
+    except ValueError:
+        return min(2.0 ** attempt, 8.0)
+
 # Process-wide cooldown for rate-limited sources: a source that ran out of
 # budget (429) stays skipped for the next runs in this server process too,
 # instead of every run re-learning it with a retry/backoff cycle.
@@ -243,6 +266,8 @@ class RetrievalClient:
         self._down: set[str] = {
             src for src, until in _cooldown_until.items() if until > now}
         self._consecutive_fails: dict[str, int] = {}
+        # 429s per source since its last successful answer
+        self._r429: dict[str, int] = {}
         self._client = httpx.AsyncClient(
             timeout=self._timeout,
             headers={"User-Agent": f"citecheck/0.1 (mailto:{self._mailto})"},
@@ -301,7 +326,11 @@ class RetrievalClient:
         r = await self._do_get(url, params, cache_key, headers, src)
         if not r.ok and ("429" in (r.error or "") or "budget" in (r.error or "")):
             self._down.add(src)
-            _cooldown_until[src] = time.monotonic() + _COOLDOWN_S
+            # carry over to later runs only when the budget itself is gone
+            # (OpenAlex budget message, S2's shared keyless pool); Crossref
+            # throttling clears within seconds
+            if "budget" in (r.error or "") or (src == "s2" and not self._s2_key):
+                _cooldown_until[src] = time.monotonic() + _COOLDOWN_S
         self._track(src, time.monotonic() - t0, cached=False)
         return r
 
@@ -351,17 +380,23 @@ class RetrievalClient:
                             resp.text.strip()[:160])
                         return SourceResult(
                             ok=False, error="openalex budget exhausted")
-                    if retried_429:
-                        # a second 429 in this run means the shared budget
-                        # is gone — take the whole source down rather than
-                        # retry-stamping every remaining request
+                    # Crossref/OpenAlex 429 means "slow down" (too many
+                    # concurrent requests), not "budget gone": back off as
+                    # told and retry. Only a run of 429s with no success in
+                    # between takes the source down for this run. S2 without
+                    # a key shares one global pool — there a repeat 429 is
+                    # the steady state, so it goes down at once.
+                    n429 = self._r429.get(src, 0) + 1
+                    self._r429[src] = n429
+                    limit = 2 if src == "s2" else 6
+                    if n429 >= limit or (src == "s2" and retried_429):
                         self._down.add(src)
                         log.warning(
                             "%s rate-limited — skipping it for the rest "
                             "of this run", src)
                         return SourceResult(ok=False, error="429")
                     retried_429 = True
-                    await asyncio.sleep(2**attempt)
+                    await asyncio.sleep(_retry_after(resp, attempt))
                     last_err = "429"
                     continue
                 if resp.status_code >= 500:
@@ -384,6 +419,7 @@ class RetrievalClient:
                         ok=True, data=None,
                         error=f"HTTP {resp.status_code}")
                 resp.raise_for_status()
+                self._r429[src] = 0
                 data = resp.json()
                 if self._cache is not None:
                     self._cache.set(cache_key, data)
@@ -488,14 +524,21 @@ class RetrievalClient:
 
     # -- arXiv ----------------------------------------------------------
     async def _arxiv_query(
-        self, search_query: str, max_results: int
+        self, search_query: str, max_results: int,
+        id_list: list[str] | None = None,
     ) -> SourceResult:
         """One raw arXiv API call. The Atom body is cached as
         {"xml": ...} so fixtures/tests can seed recorded feeds."""
         if "arxiv" in self._down:
             self._track("arxiv", 0.0, cached=False)
             return SourceResult(ok=False, error="source unavailable")
-        key = make_key("arxiv", "xml", search_query, max_results)
+        params: dict = {"max_results": max_results}
+        if id_list:
+            params["id_list"] = ",".join(id_list)
+            key = make_key("arxiv", "ids", params["id_list"])
+        else:
+            params["search_query"] = search_query
+            key = make_key("arxiv", "xml", search_query, max_results)
         t0 = time.monotonic()
         if self._cache is not None:
             hit = self._cache.get(key)
@@ -515,11 +558,7 @@ class RetrievalClient:
         for attempt in range(2):
             try:
                 async with self._sem("arxiv"):
-                    resp = await self._client.get(
-                        ARXIV_API,
-                        params={"search_query": search_query,
-                                "max_results": max_results},
-                    )
+                    resp = await self._client.get(ARXIV_API, params=params)
                 if resp.status_code == 429 or resp.status_code >= 500:
                     last_err = f"HTTP {resp.status_code}"
                     if attempt == 0:
@@ -543,6 +582,18 @@ class RetrievalClient:
         if self._cache is not None:
             self._cache.set(key, {"xml": xml_text})
         return SourceResult(ok=True, data=xml_text)
+
+    async def arxiv_by_ids(self, ids: list[str]) -> SourceResult:
+        """Direct lookup of explicit arXiv identifiers (new-style
+        ``YYMM.NNNNN``), many per request — the cheapest exact check
+        for preprint references."""
+        ids = sorted(set(ids))
+        if not ids:
+            return SourceResult(ok=True, data=[])
+        r = await self._arxiv_query("", len(ids), id_list=ids)
+        if not r.ok:
+            return r
+        return SourceResult(ok=True, data=parse_arxiv_feed(r.data))
 
     async def arxiv_search(
         self, title: str, author: str | None = None, max_results: int = 5

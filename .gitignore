@@ -50,3 +50,4 @@ demo/*_events.json
 .vscode/
 app/build/python/
 dist/
+demo/latex/raw/

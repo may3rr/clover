@@ -1,0 +1,416 @@
+{
+ "note": "LaTeX 样例集：arXiv 知名论文源码 + 故意注入的错误。build_samples.py 生成 samples/*.zip，evaluate_latex.py 打分。",
+ "papers": [
+  {
+   "name": "attention",
+   "arxiv": "1706.03762",
+   "title": "Attention Is All You Need",
+   "layout": "正文内嵌 thebibliography，数字编号",
+   "drop": [],
+   "injections": [
+    {
+     "id": "att-fake",
+     "kind": "fake_ref",
+     "key": "zhou2016sparse",
+     "snippet": "Sparse recurrent attention was later shown",
+     "edits": [
+      {
+       "file": "background.tex",
+       "find": "computing hidden representations in parallel for all input and output positions.",
+       "replace": "computing hidden representations in parallel for all input and output positions. Sparse recurrent attention was later shown to remove this bottleneck entirely \\citep{zhou2016sparse}."
+      },
+      {
+       "file": "ms.tex",
+       "find": "\\bibitem{hochreiter1997}\n",
+       "replace": "\\bibitem{zhou2016sparse}\nWei Zhou, Lars Nygaard, and Priya Raman.\n\\newblock Sparse recurrent attention for parallel neural transduction.\n\\newblock {\\em Transactions on Neural Sequence Modeling}, 4(2):112--130, 2016.\n\n\\bibitem{hochreiter1997}\n"
+      }
+     ]
+    },
+    {
+     "id": "att-year",
+     "kind": "wrong_year",
+     "key": "hochreiter1997",
+     "edits": [
+      {
+       "file": "ms.tex",
+       "find": "{\\em Neural computation}, 9(8):1735--1780, 1997.",
+       "replace": "{\\em Neural computation}, 9(8):1735--1780, 2003."
+      }
+     ]
+    },
+    {
+     "id": "att-author",
+     "kind": "wrong_author",
+     "key": "bahdanau2014neural",
+     "edits": [
+      {
+       "file": "ms.tex",
+       "find": "Dzmitry Bahdanau, Kyunghyun Cho, and Yoshua Bengio.",
+       "replace": "Tomas Mikolov, Kyunghyun Cho, and Yoshua Bengio."
+      }
+     ]
+    },
+    {
+     "id": "att-misattr",
+     "kind": "misattribution",
+     "key": "layernorm2016",
+     "snippet": "End-to-end memory networks are based on a recurrent attention mechanism",
+     "consequence": "sukhbaatar2015 变为未被引用条目",
+     "edits": [
+      {
+       "file": "background.tex",
+       "find": "simple-language question answering and language modeling tasks \\citep{sukhbaatar2015}.",
+       "replace": "simple-language question answering and language modeling tasks \\citep{layernorm2016}."
+      }
+     ]
+    },
+    {
+     "id": "att-typo1",
+     "kind": "typo",
+     "wrong": "dependancies",
+     "right": "dependencies",
+     "edits": [
+      {
+       "file": "background.tex",
+       "find": "more difficult to learn dependencies between distant positions",
+       "replace": "more difficult to learn dependancies between distant positions"
+      }
+     ]
+    },
+    {
+     "id": "att-typo2",
+     "kind": "typo",
+     "wrong": "constriant",
+     "right": "constraint",
+     "edits": [
+      {
+       "file": "introduction.tex",
+       "find": "The fundamental constraint of sequential computation",
+       "replace": "The fundamental constriant of sequential computation"
+      }
+     ]
+    },
+    {
+     "id": "att-undef",
+     "kind": "undefined_key",
+     "key": "Kuchaiev2017Factorisation",
+     "consequence": "Kuchaiev2017Factorization 变为未被引用条目",
+     "edits": [
+      {
+       "file": "introduction.tex",
+       "find": "\\citep{Kuchaiev2017Factorization}",
+       "replace": "\\citep{Kuchaiev2017Factorisation}"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "bert",
+   "arxiv": "1810.04805",
+   "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+   "layout": "只有编译产物 main.bbl（natbib 作者-年份），没有 .bib",
+   "drop": [
+    "lumiere.bbl"
+   ],
+   "injections": [
+    {
+     "id": "bert-fake",
+     "kind": "fake_ref",
+     "key": "lindqvist-moreau:2017",
+     "snippet": "Bidirectional cloze objectives were already shown",
+     "edits": [
+      {
+       "file": "intro.tex",
+       "find": "inspired by the Cloze task~\\cite{taylor:1953:_cloze}.",
+       "replace": "inspired by the Cloze task~\\cite{taylor:1953:_cloze}. Bidirectional cloze objectives were already shown to outperform left-to-right pre-training for sentence encoders~\\cite{lindqvist-moreau:2017}."
+      },
+      {
+       "file": "main.bbl",
+       "find": "\\bibitem[{Howard and Ruder(2018)}]{howard-ruder:2018}\n",
+       "replace": "\\bibitem[{Lindqvist and Moreau(2017)}]{lindqvist-moreau:2017}\nErik Lindqvist and Camille Moreau. 2017.\n\\newblock Bidirectional cloze pre-training for transferable sentence encoders.\n\\newblock In \\emph{Proceedings of EMNLP}, pages 2211--2222.\n\n\\bibitem[{Howard and Ruder(2018)}]{howard-ruder:2018}\n"
+      }
+     ]
+    },
+    {
+     "id": "bert-year",
+     "kind": "wrong_year",
+     "key": "howard-ruder:2018",
+     "edits": [
+      {
+       "file": "main.bbl",
+       "find": "\\bibitem[{Howard and Ruder(2018)}]{howard-ruder:2018}\nJeremy Howard and Sebastian Ruder. 2018.",
+       "replace": "\\bibitem[{Howard and Ruder(2015)}]{howard-ruder:2018}\nJeremy Howard and Sebastian Ruder. 2015."
+      }
+     ]
+    },
+    {
+     "id": "bert-author",
+     "kind": "wrong_author",
+     "key": "vaswani-etal:2017:_atten",
+     "edits": [
+      {
+       "file": "main.bbl",
+       "find": "Ashish Vaswani, Noam Shazeer, Niki Parmar,",
+       "replace": "Noam Shazeer, Ashish Vaswani, Niki Parmar,"
+      }
+     ]
+    },
+    {
+     "id": "bert-misattr",
+     "kind": "misattribution",
+     "key": "rajpurkar-etal:2016:_squad",
+     "snippet": "every token can only attend to previous tokens in the self-attention layers of the Transformer",
+     "edits": [
+      {
+       "file": "intro.tex",
+       "find": "self-attention layers of the Transformer~\\cite{vaswani-etal:2017:_atten}",
+       "replace": "self-attention layers of the Transformer~\\cite{rajpurkar-etal:2016:_squad}"
+      }
+     ]
+    },
+    {
+     "id": "bert-typo1",
+     "kind": "typo",
+     "wrong": "representaions",
+     "right": "representations",
+     "edits": [
+      {
+       "file": "intro.tex",
+       "find": "that include the pre-trained representations as additional features",
+       "replace": "that include the pre-trained representaions as additional features"
+      }
+     ]
+    },
+    {
+     "id": "bert-typo2",
+     "kind": "typo",
+     "wrong": "unidirectonal",
+     "right": "unidirectional",
+     "edits": [
+      {
+       "file": "intro.tex",
+       "find": "standard language models are unidirectional",
+       "replace": "standard language models are unidirectonal"
+      }
+     ]
+    },
+    {
+     "id": "bert-undef",
+     "kind": "undefined_key",
+     "key": "dolan-brocket:2005:_autom",
+     "edits": [
+      {
+       "file": "intro.tex",
+       "find": "\\cite{dolan-brockett:2005:_autom}",
+       "replace": "\\cite{dolan-brocket:2005:_autom}"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "lora",
+   "arxiv": "2106.09685",
+   "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+   "layout": "两个 .bib（LORA.bib、LoRA1.bib），natbib 作者-年份；去掉 .bbl 模拟 Overleaf 下载",
+   "drop": [
+    "*.bbl"
+   ],
+   "natural_typos": [
+    {
+     "wrong": "instrisic",
+     "right": "intrinsic"
+    },
+    {
+     "wrong": "comtenporary",
+     "right": "contemporary"
+    }
+   ],
+   "injections": [
+    {
+     "id": "lora-fake",
+     "kind": "fake_ref",
+     "key": "marchetti_lowrank_2019",
+     "snippet": "A similar low-rank structure was reported for attention heads",
+     "edits": [
+      {
+       "file": "iclr2022_conference.tex",
+       "find": "which show that the learned over-parametrized models in fact reside on a low intrinsic dimension.",
+       "replace": "which show that the learned over-parametrized models in fact reside on a low intrinsic dimension. A similar low-rank structure was reported for attention heads by \\citet{marchetti_lowrank_2019}."
+      },
+      {
+       "file": "LORA.bib",
+       "append": "\n@inproceedings{marchetti_lowrank_2019,\n\ttitle = {Low-Rank Attention Heads Are All You Need for Transfer},\n\tauthor = {Marchetti, Giulia and Okafor, Daniel},\n\tbooktitle = {Proceedings of the 36th International Conference on Machine Learning},\n\tpages = {4410--4419},\n\tyear = {2019},\n}\n"
+      }
+     ]
+    },
+    {
+     "id": "lora-year",
+     "kind": "wrong_year",
+     "key": "lester_power_2021",
+     "edits": [
+      {
+       "file": "LORA.bib",
+       "find": "author = {Lester, Brian and Al-Rfou, Rami and Constant, Noah},\n\tmonth = apr,\n\tyear = {2021},",
+       "replace": "author = {Lester, Brian and Al-Rfou, Rami and Constant, Noah},\n\tmonth = apr,\n\tyear = {2018},"
+      }
+     ]
+    },
+    {
+     "id": "lora-author",
+     "kind": "wrong_author",
+     "key": "houlsby_parameter-efficient_2019",
+     "edits": [
+      {
+       "file": "LORA.bib",
+       "find": "author = {Houlsby, Neil and Giurgiu, Andrei and",
+       "replace": "author = {Giurgiu, Andrei and Houlsby, Neil and"
+      }
+     ]
+    },
+    {
+     "id": "lora-misattr",
+     "kind": "misattribution",
+     "key": "lester_power_2021",
+     "snippet": "which has only one per block but with an additional LayerNorm",
+     "edits": [
+      {
+       "file": "iclr2022_conference.tex",
+       "find": "with an additional LayerNorm~\\citep{ba2016layer}",
+       "replace": "with an additional LayerNorm~\\citep{lester_power_2021}"
+      }
+     ]
+    },
+    {
+     "id": "lora-typo",
+     "kind": "typo",
+     "wrong": "deploymnet",
+     "right": "deployment",
+     "edits": [
+      {
+       "file": "iclr2022_conference.tex",
+       "find": "to a critical deployment challenge",
+       "replace": "to a critical deploymnet challenge"
+      }
+     ]
+    },
+    {
+     "id": "lora-undef",
+     "kind": "undefined_key",
+     "key": "vaswani2017atention",
+     "edits": [
+      {
+       "file": "iclr2022_conference.tex",
+       "find": "Transformer~\\citep{vaswani2017attention} is a sequence-to-sequence",
+       "replace": "Transformer~\\citep{vaswani2017atention} is a sequence-to-sequence"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "qlora",
+   "arxiv": "2305.14314",
+   "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+   "layout": "references.bib，natbib 数字编号；去掉 .bbl 模拟 Overleaf 下载",
+   "drop": [
+    "*.bbl"
+   ],
+   "injections": [
+    {
+     "id": "qlora-fake",
+     "kind": "fake_ref",
+     "key": "brennan2017rankadapt",
+     "snippet": "Adapters of this kind were first proposed for convolutional vision backbones",
+     "edits": [
+      {
+       "file": "neurips_2023.tex",
+       "find": "which is updated to optimize the loss function.",
+       "replace": "which is updated to optimize the loss function. Adapters of this kind were first proposed for convolutional vision backbones \\citep{brennan2017rankadapt}."
+      },
+      {
+       "file": "references.bib",
+       "append": "\n@article{brennan2017rankadapt,\n  title={RankAdapt: Low-Rank Residual Adapters for Convolutional Vision Backbones},\n  author={Brennan, Sofia and Takeda, Hiroshi and Mwangi, Peter},\n  journal={IEEE Transactions on Visual Representation Learning},\n  volume={3},\n  number={1},\n  pages={45--58},\n  year={2017}\n}\n"
+      }
+     ]
+    },
+    {
+     "id": "qlora-year",
+     "kind": "wrong_year",
+     "key": "hendrycksmeasuring",
+     "edits": [
+      {
+       "file": "references.bib",
+       "find": "booktitle={International Conference on Learning Representations},\n  year={2020},\n}\n\n@article{longpre2023flan,",
+       "replace": "booktitle={International Conference on Learning Representations},\n  year={2016},\n}\n\n@article{longpre2023flan,"
+      }
+     ]
+    },
+    {
+     "id": "qlora-author",
+     "kind": "wrong_author",
+     "key": "wolf2019huggingface",
+     "edits": [
+      {
+       "file": "references.bib",
+       "find": "author={Wolf, Thomas and Debut, Lysandre and",
+       "replace": "author={Sanh, Victor and Debut, Lysandre and"
+      }
+     ]
+    },
+    {
+     "id": "qlora-misattr",
+     "kind": "misattribution",
+     "key": "zhang2022opt",
+     "snippet": "builds on Quantile Quantization",
+     "edits": [
+      {
+       "file": "neurips_2023.tex",
+       "find": "builds on Quantile Quantization \\citep{dettmers2022optimizers}",
+       "replace": "builds on Quantile Quantization \\citep{zhang2022opt}"
+      }
+     ]
+    },
+    {
+     "id": "qlora-typo1",
+     "kind": "typo",
+     "wrong": "paramters",
+     "right": "parameters",
+     "edits": [
+      {
+       "file": "neurips_2023.tex",
+       "find": "while not updating the full model parameters which remain fixed",
+       "replace": "while not updating the full model paramters which remain fixed"
+      }
+     ]
+    },
+    {
+     "id": "qlora-typo2",
+     "kind": "typo",
+     "wrong": "gradeint",
+     "right": "gradient",
+     "edits": [
+      {
+       "file": "neurips_2023.tex",
+       "find": "Gradients during stochastic gradient descent",
+       "replace": "Gradients during stochastic gradeint descent"
+      }
+     ]
+    },
+    {
+     "id": "qlora-undef",
+     "kind": "undefined_key",
+     "key": "vicuna2032",
+     "edits": [
+      {
+       "file": "neurips_2023.tex",
+       "find": "on the Vicuna~\\citep{vicuna2023} benchmark, while being trainable",
+       "replace": "on the Vicuna~\\citep{vicuna2032} benchmark, while being trainable"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

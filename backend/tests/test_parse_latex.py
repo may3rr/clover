@@ -386,3 +386,25 @@ See \cite{b,a}.
     assert d.references[1].title == "Bee Paper"      # from .bib
     assert d.structured_refs == [d.references[1].id]
     assert d.markers[0].raw == "[2,1]"
+
+
+def test_acl_newcite_and_table_citations(tmp_path):
+    """ACL's \\newcite is a citation; a \\cite inside a dropped table still
+    makes the entry cited (no false 未被引用 finding)."""
+    (tmp_path / "main.tex").write_text(r"""\documentclass{article}
+\usepackage{natbib}
+\begin{document}
+\section{Intro}
+As shown by~\newcite{a}, things work.
+\begin{table}\begin{tabular}{l}Model \cite{b} \\\end{tabular}
+\caption{Results.}\end{table}
+\begin{thebibliography}{2}
+\bibitem[{Alpha(2019)}]{a} A. Alpha. 2019. Alpha paper. Venue.
+\bibitem[{Beta(2020)}]{b} B. Beta. 2020. Beta paper. Venue.
+\end{thebibliography}
+\end{document}
+""")
+    d = parse_latex(tmp_path / "main.tex")
+    assert [m.raw for m in d.markers] == ["Alpha (2019)"]
+    assert set(d.cited_keys) == {"a", "b"}
+    assert not [f for f in check_norms(d) if "没有被引用" in f.title]

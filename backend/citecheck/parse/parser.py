@@ -87,6 +87,10 @@ class ParsedDocument(BaseModel):
     latex: LatexMap | None = None
     # 字段来自 .bib 等结构化数据的参考文献 id：无需再交给模型结构化
     structured_refs: list[str] = Field(default_factory=list)
+    # LaTeX: every key cited anywhere in the body — including tables and
+    # figures the text renderer drops — plus \nocite keys. An entry in
+    # this set is cited even when no rendered marker points at it.
+    cited_keys: list[str] = Field(default_factory=list)
 
 
 def _read_part(zf: zipfile.ZipFile, name: str) -> etree._Element | None:

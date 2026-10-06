@@ -57,8 +57,10 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
     cited: set[str] = set()
     for m in parsed.markers:
         cited.update(m.ref_ids)
+    # LaTeX: a \cite inside a table or figure counts too
+    cited_keys = set(parsed.cited_keys)
     for r in refs:
-        if r.id not in cited:
+        if r.id not in cited and not (r.key and r.key in cited_keys):
             findings.append(Finding(
                 id="", layer="norms", severity="medium",
                 anchor=_ref_anchor(r, para_len),

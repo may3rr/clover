@@ -18,9 +18,10 @@ from .source import Builder, Project, Src
 
 # ---------------------------------------------------------------- cite 命令
 
-_TEXTUAL = {"citet", "textcite", "citealt"}
+# newcite / shortcite: ACL 模板（acl_natbib）自带的引用命令
+_TEXTUAL = {"citet", "textcite", "citealt", "newcite", "citeasnoun"}
 _AUTHOR_ONLY = {"citeauthor", "citeauthors"}
-_YEAR_ONLY = {"citeyear", "citeyearpar"}
+_YEAR_ONLY = {"citeyear", "citeyearpar", "shortcite"}
 _PAREN = {
     "cite", "citep", "citealp", "parencite", "autocite", "footcite",
     "smartcite", "supercite", "notecite", "pnotecite", "citenum",

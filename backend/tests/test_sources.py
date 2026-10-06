@@ -131,15 +131,31 @@ async def test_429_retries_once_then_ok(client, no_sleep, monkeypatch):
 
 
 @pytest.mark.asyncio
-async def test_second_429_takes_source_down(client, no_sleep, monkeypatch):
+async def test_429_backs_off_and_recovers(client, no_sleep, monkeypatch):
+    """Crossref/OpenAlex 429 = slow down: honor Retry-After, retry, and
+    keep the source up once it answers."""
+    url = "https://api.crossref.org/works"
+    req = httpx.Request("GET", url)
+    _transport(monkeypatch, client, [
+        httpx.Response(429, headers={"Retry-After": "3"}, request=req),
+        _resp(url, 200, json_body={"message": {"items": []}}),
+    ])
+    r = await client.crossref_search("anything")
+    assert r.ok and no_sleep == [3.0]
+    assert "crossref" not in client._down
+
+
+@pytest.mark.asyncio
+async def test_persistent_429_takes_source_down_for_run_only(
+        client, no_sleep, monkeypatch):
     url = "https://api.openalex.org/works"
     _transport(monkeypatch, client, [
-        _resp(url, 429, text="slow down"),
-        _resp(url, 429, text="slow down"),
-    ])
+        _resp(url, 429, text="slow down")] * 3)
     r = await client.openalex_search("anything")
     assert not r.ok and r.error == "429"
     assert "openalex" in client._down
+    # throttling, not an exhausted budget: the next run starts fresh
+    assert "openalex" not in sources._cooldown_until
 
 
 # ---------------------------------------------------------------- arXiv
@@ -224,3 +240,23 @@ def test_404_answer_is_cached(monkeypatch, tmp_path, no_sleep):
     calls2 = _transport(monkeypatch, again, [])
     r2 = asyncio.run(again.crossref_work("10.1234/missing"))
     assert r2.ok and r2.data is None and calls2 == []
+
+
+def test_arxiv_throttle_survives_new_event_loops(monkeypatch):
+    """Batch scripts call asyncio.run() once per paper; the throttle lock
+    must not stay bound to the first loop."""
+    monkeypatch.setattr(sources, "_arxiv_last", 0.0)
+
+    async def hold_and_wait():
+        # contend for the lock so it actually binds to this loop
+        await asyncio.gather(sources.arxiv_throttle(),
+                             sources.arxiv_throttle())
+
+    real_sleep = asyncio.sleep
+
+    async def fast_sleep(_d):
+        await real_sleep(0)
+
+    monkeypatch.setattr(asyncio, "sleep", fast_sleep)
+    asyncio.run(hold_and_wait())
+    asyncio.run(hold_and_wait())  # used to raise "bound to a different loop"

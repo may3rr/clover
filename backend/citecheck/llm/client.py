@@ -219,10 +219,17 @@ def _get_cache() -> Cache:
     return _cache
 
 
+_cloud_loop: asyncio.AbstractEventLoop | None = None
+
+
 def _get_cloud() -> tuple[AsyncOpenAI, PrioritySemaphore]:
-    global _cloud_client, _cloud_sem
+    global _cloud_client, _cloud_sem, _cloud_loop
     settings = get_settings()
-    if _cloud_client is None:
+    loop = asyncio.get_running_loop()
+    # the client's connection pool belongs to one event loop: a new loop
+    # (another asyncio.run in a batch script) gets a fresh client
+    if _cloud_client is None or _cloud_loop is not loop:
+        _cloud_loop = loop
         _cloud_client = AsyncOpenAI(
             api_key=settings.dashscope_api_key,
             base_url=settings.llm.cloud.base_url,

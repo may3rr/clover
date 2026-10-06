@@ -517,3 +517,106 @@ async def test_doi_other_suppressed_when_matched_record_carries_doi(
     check, _ = await _verify(RAWS["devlin"], recorded_client)
     assert check.status == "verified", check.issues
     assert not any("DOI 解析到另一篇文献" in i for i in check.issues)
+
+
+def test_dropped_subtitle_still_matches():
+    """'A decomposable attention model' (Attention Is All You Need's bib)
+    is the 2016 Parikh paper '... for Natural Language Inference' — a
+    dropped subtitle must not turn a real work into not_found."""
+    from citecheck.refs.verify import _select
+    from citecheck.schema import Reference
+    ref = Reference(id="r1", raw="x", title="A decomposable attention model",
+                    authors=["Ankur Parikh", "Oscar Täckström"], year=2016)
+    full = _hit(title="A Decomposable Attention Model for Natural Language "
+                      "Inference", authors=("Ankur Parikh", "Oscar Täckström"),
+                year=2016, doi="10.18653/v1/D16-1244")
+    matches, _ = _select(ref, [full])
+    assert matches and not matches[0][2]
+    # same leading words but a different first author: not the same work
+    other = _hit(title=full["title"], authors=("Someone Else", "Oscar Täckström"),
+                 year=2016, doi=None)
+    assert _select(ref, [other])[0] == []
+    # too short to be a safe prefix ("Attention models" vs longer title)
+    short = Reference(id="r2", raw="x", title="Attention model",
+                      authors=["Ankur Parikh"], year=2016)
+    assert _select(short, [full])[0] == []
+
+
+def test_grey_literature_is_not_called_nonexistent():
+    """Tech reports, web pages and venue-less entries aren't indexed by the
+    databases: when nothing is found they are unverifiable, never
+    not_found. A fabricated paper with a venue stays not_found."""
+    from citecheck.refs.verify import _conclude
+    from citecheck.schema import Reference
+    responded = {"crossref", "openalex", "arxiv"}
+    gpt = Reference(id="r1", raw="Alec Radford, Karthik Narasimhan. 2018. "
+                    "Improving language understanding with unsupervised "
+                    "learning. Technical report, OpenAI.", lang="en",
+                    title="Improving language understanding", year=2018)
+    quora = Reference(id="r2", raw="Zihan Chen. 2018. Quora question pairs.",
+                      lang="en", title="Quora question pairs", year=2018)
+    fake = Reference(id="r3", raw="Wei Zhou. 2016. Sparse recurrent attention."
+                     " Transactions on Neural Sequence Modeling, 4(2).",
+                     lang="en", title="Sparse recurrent attention", year=2016,
+                     venue="Transactions on Neural Sequence Modeling")
+    assert _conclude(gpt, [], None, responded, 100)[0].status == "unverifiable"
+    assert _conclude(quora, [], None, responded, 100)[0].status == "unverifiable"
+    assert _conclude(fake, [], None, responded, 100)[0].status == "not_found"
+
+
+def test_explicit_arxiv_id_verifies_without_title_search():
+    """'Maskgan: ... filling in the\\_' defeats keyword search; the entry's
+    own arXiv id resolves it exactly, and no title search is spent."""
+    import asyncio
+
+    from citecheck.refs.verify import verify_references
+    from citecheck.schema import Reference
+
+    feed_hit = {"source": "arxiv", "title": "MaskGAN: Better Text "
+                "Generation via Filling in the______",
+                "authors": ["William Fedus", "Ian Goodfellow", "Andrew M. Dai"],
+                "year": 2018, "venue": "arXiv", "doi": None, "url": None,
+                "abstract": None, "pdf_url": None, "arxiv_id": "1801.07736",
+                "alt_year": 2018}
+
+    class Fake:
+        searched = 0
+
+        async def arxiv_by_ids(self, ids):
+            from citecheck.refs.sources import SourceResult
+            assert ids == ["1801.07736"]
+            return SourceResult(ok=True, data=[feed_hit])
+
+        def __getattr__(self, name):  # any title search is a failure here
+            async def boom(*a, **k):
+                Fake.searched += 1
+                raise AssertionError(f"unexpected {name}")
+            return boom
+
+    ref = Reference(
+        id="r1", lang="en", year=2018,
+        raw="William Fedus, Ian Goodfellow, and Andrew M Dai. 2018. Maskgan: "
+            "Better text generation via filling in the_. arXiv preprint "
+            "arXiv:1801.07736.",
+        title="Maskgan: Better text generation via filling in the_",
+        authors=["William Fedus", "Ian Goodfellow", "Andrew M Dai"])
+    checks, _ = asyncio.run(verify_references([ref], [], Fake()))
+    assert checks[0].status == "verified" and Fake.searched == 0
+
+
+def test_retitled_arxiv_paper_matches_by_its_id():
+    """nuQmm was retitled LUT-GEMM on arXiv: the entry's own arXiv id with
+    agreeing first author and year still identifies the work."""
+    from citecheck.refs.verify import _select
+    from citecheck.schema import Reference
+    ref = Reference(id="r1", raw="x arXiv:2206.09557", year=2022,
+                    title="nuQmm: Quantized MatMul for Efficient Inference",
+                    authors=["Gunho Park", "Baeseong Park"])
+    rec = _hit(title="LUT-GEMM: Quantized Matrix Multiplication based on LUTs",
+               authors=("Gunho Park", "Baeseong Park"), year=2022, doi=None,
+               source="arxiv")
+    assert _select(ref, [rec])[0] == []                 # title search: no
+    matches, _ = _select(ref, [{**rec, "via_id": True}])  # by its own id: yes
+    assert matches and not matches[0][2]
+    wrong = {**rec, "via_id": True, "authors": ["Someone Else"]}
+    assert _select(ref, [wrong])[0] == []

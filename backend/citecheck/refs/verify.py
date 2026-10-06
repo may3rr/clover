@@ -328,6 +328,33 @@ class _State:
     doi_other: bool = False
 
 
+_GREY_RE = re.compile(
+    r"technical report|tech\.?\s*rep\b|white\s*paper|\bblog\b|\bopenai\b|"
+    r"github|kaggle|huggingface\.co|https?://|www\.|\bdataset\b|"
+    r"accessed|retrieved from|unpublished|in preparation|"
+    r"personal communication|\bmanuscript\b",
+    re.I)
+
+
+def _grey(ref: Reference) -> bool:
+    """Grey literature the databases don't index, so not_found would
+    claim more than the search showed: report/web/dataset signals, or an
+    entry carrying no publication venue and no DOI at all."""
+    text = f"{ref.raw} {ref.venue or ''}"
+    if _GREY_RE.search(text):
+        return True
+    return not (ref.venue or "").strip() and not ref.doi
+
+
+def _title_prefix(a: str, b: str) -> bool:
+    """One title is the other's leading words (>= 4 words): a dropped
+    subtitle, not a different work."""
+    wa, wb = _norm(a).split(), _norm(b).split()
+    short, long_ = (wa, wb) if len(wa) <= len(wb) else (wb, wa)
+    return len(short) >= 4 and len(long_) > len(short) \
+        and long_[: len(short)] == short
+
+
 def _select(
     ref: Reference, hits: list[dict]
 ) -> tuple[list[tuple[float, dict, list[str]]], dict | None]:
@@ -350,9 +377,22 @@ def _select(
         if (score < _TITLE_MIN and h is doi_hit
                 and fuzz.partial_ratio(_norm(want_title), _norm(h["title"])) >= 95):
             score = _TITLE_MIN
-        if score < _TITLE_MIN:
+        # the manuscript dropped the subtitle ("A decomposable attention
+        # model" for "... for Natural Language Inference"): word-prefix
+        # titles count when first author and year both agree
+        prefix = score < _TITLE_MIN and _title_prefix(want_title, h["title"])
+        # the record the entry's own arXiv id resolves to: arXiv papers
+        # get retitled between versions (nuQmm -> LUT-GEMM), so the id
+        # plus agreeing first author and year identify the work
+        by_id = score < _TITLE_MIN and bool(h.get("via_id"))
+        if score < _TITLE_MIN and not (prefix or by_id):
             continue
         issues, author_diff, year_diff = _evaluate(ref, h)
+        if prefix or by_id:
+            if issues or not (ref.authors and ref.year and h.get("authors")
+                              and h.get("year")):
+                continue
+            score = _TITLE_MIN
         # A record disagreeing on BOTH first author and year is a
         # different work sharing the title — drop it from the pool.
         # A shared DOI overrides: same work, messy metadata.
@@ -416,7 +456,13 @@ def _conclude(
         ]
     else:
         matched = None
-        if ref.lang == "en" and set(_REQUIRED) <= responded:
+        if ref.lang == "en" and set(_REQUIRED) <= responded and _grey(ref):
+            # technical reports, web pages, datasets: real works the
+            # scholarly databases don't index — absence proves nothing
+            status = "unverifiable"
+            issues = ["这条文献是技术报告、网页或数据集一类，或没有发表"
+                      "信息，学术数据库通常不收录，未能核验"]
+        elif ref.lang == "en" and set(_REQUIRED) <= responded:
             status = "not_found"
             answered = "、".join(
                 _SRC_LABEL[s] for s in _SOURCES if s in responded
@@ -534,10 +580,44 @@ async def _adjudicate(ref: Reference, hits: list[dict]) -> dict | None:
     return hit
 
 
+_ARXIV_ID_RE = re.compile(
+    r"(?:arxiv[:\s.]*(?:preprint\s*)?(?:arxiv\s*:\s*)?|arxiv\.org/(?:abs|pdf)/|"
+    r"corr[,\s]*abs/)"
+    r"(\d{4}\.\d{4,5})(?:v\d+)?", re.I)
+
+
+def _arxiv_id(ref: Reference) -> str | None:
+    """Explicit new-style arXiv id written in the entry, e.g.
+    'arXiv preprint arXiv:1801.07736' or an arxiv.org/abs/ URL."""
+    m = _ARXIV_ID_RE.search(f"{ref.raw} {ref.venue or ''}")
+    return m.group(1) if m else None
+
+
+async def _arxiv_id_hits(
+    refs: list[Reference], client: RetrievalClient
+) -> dict[str, dict]:
+    """One batched arXiv id_list lookup for every ref that names its
+    arXiv id: arxiv_id -> record. Odd titles that defeat keyword search
+    ('... filling in the\\_') still resolve exactly this way."""
+    ids = sorted({i for i in (_arxiv_id(r) for r in refs) if i})
+    out: dict[str, dict] = {}
+    for k in range(0, len(ids), 50):
+        r = await client.arxiv_by_ids(ids[k:k + 50])
+        if r.ok:
+            for h in r.data or []:
+                if h.get("arxiv_id"):
+                    # found by the identifier the manuscript itself names
+                    out[h["arxiv_id"]] = {**h, "via_id": True}
+    return out
+
+
 async def _stage1(
-    ref: Reference, client: RetrievalClient
+    ref: Reference, client: RetrievalClient,
+    arxiv_hit: dict | None = None,
 ) -> _State:
-    """Field completion + Crossref/OpenAlex/S2 (+DOI lookups)."""
+    """Field completion + Crossref/OpenAlex/S2 (+DOI lookups). A record
+    found through the ref's own arXiv id that already verifies the ref
+    short-circuits the title searches."""
     if not (ref.title and ref.authors and ref.year):
         filled = await complete_reference_fields(ref.raw)
         ref.title = ref.title or filled.get("title")
@@ -546,7 +626,14 @@ async def _stage1(
         ref.year = ref.year or filled.get("year")
         ref.venue = ref.venue or filled.get("venue")
         ref.doi = ref.doi or filled.get("doi")
+    if arxiv_hit is not None and not ref.doi:
+        matches, _ = _select(ref, [arxiv_hit])
+        if matches and not matches[0][2]:
+            return _State(hits=[arxiv_hit], responded={"arxiv"})
     hits, responded, doi_other = await _gather_hits(ref, client)
+    if arxiv_hit is not None:
+        hits.append(arxiv_hit)
+        responded.add("arxiv")
     return _State(hits=hits, responded=responded, doi_other=doi_other)
 
 
@@ -578,8 +665,14 @@ async def verify_references(
                 await r
 
     try:
+        # explicit arXiv ids: one batched exact lookup, overlapping the
+        # first title searches of refs that don't need it
+        id_task = asyncio.create_task(_arxiv_id_hits(references, client))
+
         async def _s1(ref: Reference) -> None:
-            st = await _stage1(ref, client)
+            aid = _arxiv_id(ref)
+            st = await _stage1(
+                ref, client, (await id_task).get(aid) if aid else None)
             states[ref.id] = st
             title_matches, doi_hit = _select(ref, st.hits)
             # DOI resolving to a different work is conclusive — arXiv

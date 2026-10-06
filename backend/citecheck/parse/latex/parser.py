@@ -966,6 +966,8 @@ def parse_latex(path: str | Path) -> ParsedDocument:
             para_runs=para_runs,
         ),
         structured_refs=[x.ref.id for x in ref_srcs if x.structured],
+        cited_keys=([r.key for r in references if r.key] if "*" in nocite
+                    else list(dict.fromkeys(cite_order + nocite))),
     )
 
 
