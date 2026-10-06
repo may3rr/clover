@@ -171,7 +171,11 @@ def _get_cloud() -> tuple[AsyncOpenAI, asyncio.Semaphore]:
 
 
 def _cache_key(model: str, messages: list[dict]) -> str:
-    return make_key(model, json.dumps(messages, ensure_ascii=False, sort_keys=True))
+    # cache_version is part of the key: bump it in config.toml to
+    # invalidate every cached verdict after a model upgrade / prompt fix
+    return make_key(
+        model, get_settings().cache_version,
+        json.dumps(messages, ensure_ascii=False, sort_keys=True))
 
 
 @dataclass

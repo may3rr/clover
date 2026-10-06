@@ -1,7 +1,12 @@
 """SQLite key-value cache for retrieval and LLM results (AGENTS.md §5.2).
 
-Values are stored as JSON. Cache keys are produced by make_key(), a sha256
-of the joined parts — e.g. sha256(model_name + prompt) for LLM calls.
+Values are stored as JSON. Cache keys are produced by make_key(): a
+readable ``"<first-part>|"`` prefix (the source or model name) followed by
+a sha256 of the joined parts — e.g. ``"qwen3.8-flash|<digest>"`` for LLM
+calls, ``"crossref|<digest>"`` for retrieval calls. The prefix drives
+per-class TTLs: retrieval records go stale (databases correct their
+metadata), LLM verdicts are kept until deliberately invalidated via
+``cache_version`` in config.toml.
 """
 
 from __future__ import annotations
@@ -10,9 +15,18 @@ import hashlib
 import json
 import sqlite3
 import threading
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+# Retrieval results expire: Crossref/OpenAlex/S2/arXiv records get corrected
+# upstream, and a stale cached "no hit" must not block a later verification.
+_RETRIEVAL_TTL = 30 * 86400  # seconds
+# Key prefixes that identify retrieval entries (LLM keys start with the
+# model name and never expire — bump settings.cache_version to clear them).
+_TTL_PREFIXES = ("crossref|", "openalex|", "s2|", "arxiv", "pdftext|",
+                 "anthology-volume|")
 
 
 def make_key(*parts: object) -> str:
@@ -20,7 +34,8 @@ def make_key(*parts: object) -> str:
     for part in parts:
         h.update(str(part).encode("utf-8"))
         h.update(b"\x00")
-    return h.hexdigest()
+    digest = h.hexdigest()
+    return f"{parts[0]}|{digest}" if parts else digest
 
 
 class Cache:
@@ -35,6 +50,13 @@ class Cache:
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
         )
+        cols = {r[1] for r in self._conn.execute("PRAGMA table_info(kv)")}
+        if "created_at" not in cols:
+            self._conn.execute(
+                "ALTER TABLE kv ADD COLUMN created_at INTEGER")
+            # rows written before the column existed: treat as fresh
+            self._conn.execute(
+                "UPDATE kv SET created_at = ?", (int(time.time()),))
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS llm_usage ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -65,21 +87,35 @@ class Cache:
             "report_json TEXT NOT NULL)")
         self._conn.commit()
 
+    def _expired(self, key: str, created_at: int | None) -> bool:
+        """Retrieval keys older than their TTL are stale; everything else
+        (LLM verdicts) lives until cache_version invalidates it."""
+        if created_at is None or not key.startswith(_TTL_PREFIXES):
+            return False
+        return time.time() - created_at > _RETRIEVAL_TTL
+
     def get(self, key: str) -> Any | None:
         with self._lock:
             row = self._conn.execute(
-                "SELECT value FROM kv WHERE key = ?", (key,)
+                "SELECT value, created_at FROM kv WHERE key = ?", (key,)
             ).fetchone()
         if row is None:
             return None
-        return json.loads(row[0])
+        value, created_at = row
+        if self._expired(key, created_at):
+            with self._lock:
+                self._conn.execute("DELETE FROM kv WHERE key = ?", (key,))
+                self._conn.commit()
+            return None
+        return json.loads(value)
 
     def set(self, key: str, value: Any) -> None:
         payload = json.dumps(value, ensure_ascii=False, default=str)
         with self._lock:
             self._conn.execute(
-                "INSERT OR REPLACE INTO kv (key, value) VALUES (?, ?)",
-                (key, payload),
+                "INSERT OR REPLACE INTO kv (key, value, created_at) "
+                "VALUES (?, ?, ?)",
+                (key, payload, int(time.time())),
             )
             self._conn.commit()
 

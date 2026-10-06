@@ -108,7 +108,16 @@ async def _gather_hits(
             responded.add(src)
             if r.data:  # 404 -> data None: resolved endpoint, no work
                 hits.append(r.data)
-        if not hits:
+        if hits:
+            # the DOI resolved — if the resolved record's title clearly is
+            # not the ref's title, the DOI is attached to a different work
+            want = _norm(ref.title or ref.raw[:120])
+            doi_other = any(
+                h.get("title")
+                and fuzz.token_sort_ratio(want, _norm(h["title"])) < _TITLE_MIN
+                for h in hits
+            )
+        else:
             # DOI didn't resolve anywhere -> fall back to title search
             title_hits, title_responded = await _title_hits(ref, client)
             hits += title_hits
@@ -211,6 +220,31 @@ def _evaluate(
             issues.append(
                 f"首作者不一致：文中写 {ref.authors[0]}，数据库记录为 {hit['authors'][0]}"
             )
+    # with >=2 authors on both sides, a wrong second author (swapped order,
+    # miscredited co-author) is a strong signal the first-author check
+    # alone can't see. arXiv preprint records are exempt: their author
+    # lists drift between versions (e.g. the word2vec preprint omits a
+    # co-author the proceedings version has), while venue records are
+    # authoritative
+    hit_authors = hit.get("authors") or []
+    if (hit.get("source") != "arxiv"
+            and len(ref.authors) >= 2 and len(hit_authors) >= 2):
+        ref_s2 = _surname(ref.authors[1])
+        hit_s2 = _surname(hit_authors[1])
+        if ref_s2 and hit_s2 and bool(_CJK.search(ref_s2)) == bool(
+            _CJK.search(hit_s2)
+        ):
+            if _CJK.search(ref_s2):
+                ok2 = hit_s2.startswith(ref_s2) or ref_s2.startswith(hit_s2)
+            else:
+                a, b = _norm(ref_s2), _norm(hit_s2)
+                ok2 = (fuzz.ratio(a, b) >= _SURNAME_MIN
+                       or a.split()[-1:] == b.split()[-1:])
+            if not ok2:
+                issues.append(
+                    f"第二作者不一致：文中写 {ref.authors[1]}，"
+                    f"数据库记录为 {hit_authors[1]}"
+                )
     if ref.year and hit.get("year"):
         # a reprint's record year can postdate the work; the arXiv version's
         # year (alt_year) is an acceptable match too. An arXiv preprint may
@@ -226,8 +260,13 @@ def _evaluate(
             issues.append(
                 f"年份不一致：文中写 {ref.year}，数据库记录为 {hit['year']}"
             )
-    if ref.doi and hit.get("doi") and ref.doi.lower() != str(hit["doi"]).lower():
-        issues.append(f"DOI 不一致：文中写 {ref.doi}，数据库记录为 {hit['doi']}")
+    if ref.doi and hit.get("doi"):
+        hit_doi = str(hit["doi"])
+        # a preprint record's arXiv resolver DOI (10.48550/arXiv.*) must
+        # not contradict the journal DOI written in the manuscript
+        if (not hit_doi.lower().startswith("10.48550/arxiv.")
+                and ref.doi.lower() != hit_doi.lower()):
+            issues.append(f"DOI 不一致：文中写 {ref.doi}，数据库记录为 {hit['doi']}")
     return issues, author_diff, year_diff
 
 
@@ -266,6 +305,9 @@ class _State:
     """Per-ref candidate pool + which sources really answered."""
     hits: list[dict] = field(default_factory=list)
     responded: set[str] = field(default_factory=set)
+    # True when the ref's explicit DOI resolved to a record whose title
+    # clearly is not the ref's title (DOI 张冠李戴)
+    doi_other: bool = False
 
 
 def _select(
@@ -309,6 +351,7 @@ def _conclude(
     doi_hit: dict | None,
     responded: set[str],
     para_len: int,
+    doi_other: bool = False,
 ) -> tuple[RefCheck, Finding | None]:
     """Status assignment + optional authenticity finding."""
     want_title = ref.title or ref.raw[:120]
@@ -332,10 +375,19 @@ def _conclude(
         if (
             ref.doi and matched.get("doi")
             and ref.doi.lower() != str(matched["doi"]).lower()
+            and not str(matched["doi"]).lower().startswith("10.48550/arxiv.")
         ):
             issues.append(
                 f"DOI 不一致：文中写 {ref.doi}，数据库记录为 {matched['doi']}"
             )
+        # the DOI resolved to a record with a clearly different title —
+        # unless the matched record itself carries that DOI (same work,
+        # messy metadata), the manuscript DOI points at another work
+        if doi_other and matched is not doi_hit and not (
+            matched.get("doi")
+            and ref.doi.lower() == str(matched["doi"]).lower()
+        ):
+            issues.append("DOI 解析到另一篇文献")
         status = "mismatch" if issues else "verified"
     elif doi_hit is not None:
         matched = doi_hit
@@ -408,7 +460,9 @@ async def _finalize(
             issues, _a, _y = _evaluate(ref, rescued)
             title_matches = [(_GRAY_MIN, rescued, issues)]
 
-    return _conclude(ref, title_matches, doi_hit, st.responded, para_len)
+    return _conclude(
+        ref, title_matches, doi_hit, st.responded, para_len,
+        doi_other=st.doi_other)
 
 
 _GRAY_MIN = 70.0
@@ -474,8 +528,8 @@ async def _stage1(
         ref.year = ref.year or filled.get("year")
         ref.venue = ref.venue or filled.get("venue")
         ref.doi = ref.doi or filled.get("doi")
-    hits, responded, _ = await _gather_hits(ref, client)
-    return _State(hits=hits, responded=responded)
+    hits, responded, doi_other = await _gather_hits(ref, client)
+    return _State(hits=hits, responded=responded, doi_other=doi_other)
 
 
 async def verify_references(
@@ -516,7 +570,8 @@ async def verify_references(
             if (title_matches and not title_matches[0][2]) or conclusive:
                 check, finding = _conclude(
                     ref, title_matches, doi_hit, st.responded,
-                    para_len.get(ref.paragraph_id or "", 0))
+                    para_len.get(ref.paragraph_id or "", 0),
+                    doi_other=st.doi_other)
                 await _emit(ref, check, finding)
             else:
                 pending.append(ref)

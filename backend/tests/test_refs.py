@@ -18,7 +18,7 @@ from citecheck.refs.sources import (
     parse_arxiv_feed,
 )
 from citecheck.refs.structure import parse_reference
-from citecheck.refs.verify import verify_references
+from citecheck.refs.verify import _evaluate, verify_references
 from citecheck.schema import Paragraph, Reference
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -400,3 +400,120 @@ async def test_arxiv_batch_one_request(tmp_path, monkeypatch):
     assert 'ti:"BERT: pre-training"' in calls[0]
     assert " OR " in calls[0]
     await client.close()
+
+
+# ------------------------------------------- code-review fixes: _evaluate
+
+BERT_TITLE = ("BERT: Pre-training of deep bidirectional transformers for "
+              "language understanding")
+
+
+def _hit(title=BERT_TITLE, authors=("Jacob Devlin", "Ming-Wei Chang"),
+         doi="10.18653/v1/N19-1423", source="crossref", year=2019) -> dict:
+    return {"source": source, "title": title, "authors": list(authors),
+            "year": year, "venue": "NAACL", "doi": doi, "url": None,
+            "abstract": None, "pdf_url": None, "arxiv_id": None,
+            "alt_year": None}
+
+
+def test_second_author_mismatch_flagged():
+    """A wrong SECOND author used to pass unnoticed (only the first-author
+    surname was compared)."""
+    ref = make_ref(RAWS["devlin"])  # Devlin, Chang, Lee, Toutanova
+    hit = _hit(authors=("Jacob Devlin", "Kenton Lee"))  # 2nd author wrong
+    issues, author_diff, _ = _evaluate(ref, hit)
+    assert any("第二作者不一致" in i for i in issues)
+    assert author_diff is False  # first-author logic untouched
+
+
+def test_second_author_match_no_issue():
+    ref = make_ref(RAWS["devlin"])
+    issues, _, _ = _evaluate(ref, _hit())
+    assert not any("第二作者" in i for i in issues)
+
+
+def test_arxiv_record_exempt_from_second_author_check():
+    """arXiv preprint author lists drift between versions (the word2vec
+    preprint omits Sutskever) — the venue record is authoritative."""
+    ref = make_ref(RAWS["devlin"])
+    hit = _hit(source="arxiv", authors=("Jacob Devlin", "Kenton Lee"))
+    issues, _, _ = _evaluate(ref, hit)
+    assert not any("第二作者" in i for i in issues)
+
+
+def test_arxiv_resolver_doi_not_a_mismatch():
+    """A preprint record whose doi is arXiv's own resolver DOI must not
+    contradict the journal DOI written in the manuscript."""
+    ref = make_ref(RAWS["devlin"])  # doi 10.18653/v1/N19-1423
+    hit = _hit(doi="10.48550/arXiv.1810.04805", source="arxiv")
+    issues, _, _ = _evaluate(ref, hit)
+    assert not any("DOI 不一致" in i for i in issues)
+    # case-insensitive resolver prefix
+    hit = _hit(doi="10.48550/ARXIV.1810.04805", source="crossref")
+    issues, _, _ = _evaluate(ref, hit)
+    assert not any("DOI 不一致" in i for i in issues)
+
+
+def test_real_doi_mismatch_still_flagged():
+    ref = make_ref(RAWS["devlin"])
+    issues, _, _ = _evaluate(ref, _hit(doi="10.18653/v1/N19-9999"))
+    assert any("DOI 不一致" in i for i in issues)
+
+
+# --------------------------- code-review fixes: DOI resolves to other work
+
+def _doi_result(hit):
+    async def f(*a, **kw):
+        return SourceResult(ok=True, data=hit)
+
+    return f
+
+
+def _search_result(hit):
+    async def f(*a, **kw):
+        return SourceResult(ok=True, data=[hit] if hit else [])
+
+    return f
+
+
+@pytest.mark.asyncio
+async def test_doi_resolves_to_other_work_mismatch(recorded_client, paras,
+                                                   monkeypatch):
+    """The manuscript DOI resolves to a record with a clearly different
+    title while another record matches the title: mismatch, and the issue
+    says the DOI points at another work."""
+    global paras_fixture
+    paras_fixture = paras
+    other = _hit(title="Neural architectures for part-of-speech tagging",
+                 authors=("Smith J", "Lee K"), year=2019,
+                 doi="10.18653/v1/N19-1423")
+    real = _hit(doi="10.48550/arXiv.1810.04805", source="openalex")
+    monkeypatch.setattr(recorded_client, "crossref_work",
+                        _doi_result(other))
+    monkeypatch.setattr(recorded_client, "openalex_doi", _doi_result(real))
+    for name in ("arxiv_search_batch", "arxiv_loose_search", "arxiv_search"):
+        monkeypatch.setattr(recorded_client, name, _search_result(None))
+    check, findings = await _verify(RAWS["devlin"], recorded_client)
+    assert check.status == "mismatch"
+    assert any("DOI 解析到另一篇文献" in i for i in check.issues)
+    assert findings and findings[0].severity == "medium"
+
+
+@pytest.mark.asyncio
+async def test_doi_other_suppressed_when_matched_record_carries_doi(
+        recorded_client, paras, monkeypatch):
+    """Guard against the DOI-relaxed title path: the title-matched record
+    itself has the manuscript DOI (same work, messy metadata) — no
+    'DOI 解析到另一篇文献'."""
+    global paras_fixture
+    paras_fixture = paras
+    same = _hit(doi="10.18653/v1/N19-1423")  # carries the manuscript DOI
+    junk = _hit(title="Completely unrelated proceedings volume",
+                doi="10.18653/v1/N19-1423")
+    monkeypatch.setattr(recorded_client, "crossref_work", _doi_result(junk))
+    monkeypatch.setattr(recorded_client, "openalex_doi", _doi_result(same))
+    for name in ("arxiv_search_batch", "arxiv_loose_search", "arxiv_search"):
+        monkeypatch.setattr(recorded_client, name, _search_result(None))
+    check, _ = await _verify(RAWS["devlin"], recorded_client)
+    assert check.status == "verified", check.issues
+    assert not any("DOI 解析到另一篇文献" in i for i in check.issues)

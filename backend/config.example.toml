@@ -1,5 +1,8 @@
 # citecheck configuration — copy to config.toml and adjust.
 # Model names are read from here; never hard-code model names in code.
+# Bump cache_version to invalidate all cached LLM verdicts (retrieval
+# cache entries expire on their own 30-day TTL).
+cache_version = "1"
 
 [llm]
 temperature = 0

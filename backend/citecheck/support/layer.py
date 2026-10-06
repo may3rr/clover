@@ -51,6 +51,10 @@ class SupportRun:
         self._queued: set[tuple[str, str]] = set()
         self._queue_tasks: list[asyncio.Task] = []
         self._judge_tasks: list[asyncio.Task] = []
+        # bounds how many judge coroutines are in flight at once — a
+        # citation-dense paper queues hundreds of (claim, ref) pairs and
+        # must not stampede the shared cloud semaphore
+        self._judge_sem = asyncio.Semaphore(8)
         # claim extraction doesn't need verification — start immediately
         self._claims_task = asyncio.create_task(self._extract())
 
@@ -109,8 +113,9 @@ class SupportRun:
         self._judge_tasks.append(asyncio.create_task(self._do(c, rid)))
 
     async def _do(self, c: Claim, rid: str) -> None:
-        self._out[(c.id, rid)] = await _judge_pair(
-            c, rid, self._matched.get(rid), self._cache, self._http)
+        async with self._judge_sem:
+            self._out[(c.id, rid)] = await _judge_pair(
+                c, rid, self._matched.get(rid), self._cache, self._http)
 
     async def finish(
         self,

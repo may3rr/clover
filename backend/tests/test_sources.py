@@ -1,0 +1,198 @@
+"""RetrievalClient HTTP behavior: status-code classification, retry
+backoff, and circuit-breaker rules. No network — the transport is
+stubbed and asyncio.sleep/arxiv_throttle are no-ops."""
+
+import asyncio
+
+import httpx
+import pytest
+
+from citecheck.cache import Cache
+from citecheck.refs import sources
+from citecheck.refs.sources import ARXIV_API, RetrievalClient
+
+FEED = (
+    '<?xml version="1.0"?>'
+    '<feed xmlns="http://www.w3.org/2005/Atom">'
+    "<entry><id>http://arxiv.org/abs/1706.03762v7</id>"
+    "<title>Attention Is All You Need</title>"
+    "<published>2017-06-12T00:00:00Z</published>"
+    "<author><name>Ashish Vaswani</name></author>"
+    "<summary>Attention paper.</summary></entry>"
+    "</feed>"
+)
+
+
+@pytest.fixture
+def client(tmp_path):
+    return RetrievalClient(cache=Cache(tmp_path / "s.sqlite"))
+
+
+@pytest.fixture
+def no_sleep(monkeypatch):
+    """Record sleep durations instead of actually sleeping."""
+    calls: list[float] = []
+
+    async def fake_sleep(delay):
+        calls.append(delay)
+
+    async def noop_throttle():
+        return None
+
+    monkeypatch.setattr(asyncio, "sleep", fake_sleep)
+    monkeypatch.setattr(sources, "arxiv_throttle", noop_throttle)
+    return calls
+
+
+def _transport(monkeypatch, client, responses):
+    """Stub client._client.get to yield the given responses/exceptions."""
+    calls: list[dict] = []
+    it = iter(responses)
+
+    async def fake_get(url, params=None, headers=None, **kw):
+        calls.append({"url": url, "params": params or {}})
+        r = next(it)
+        if isinstance(r, Exception):
+            raise r
+        return r
+
+    monkeypatch.setattr(client._client, "get", fake_get)
+    return calls
+
+
+def _resp(url, status, json_body=None, text=""):
+    req = httpx.Request("GET", url)
+    if json_body is not None:
+        return httpx.Response(status, json=json_body, request=req)
+    return httpx.Response(status, text=text, request=req)
+
+
+# ---------------------------------------------------------------- 4xx
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("status", [400, 403, 404])
+async def test_4xx_no_retry_no_breaker(client, no_sleep, monkeypatch,
+                                       status):
+    """A 4xx (non-429) means the source answered: 'record absent' or
+    'invalid query'. One attempt, no backoff, no circuit-breaker count."""
+    url = "https://api.crossref.org/works"
+    calls = _transport(monkeypatch, client,
+                       [_resp(url, status, text="nope")])
+    r = await client.crossref_search("anything")
+    assert r.ok and r.data is None
+    assert len(calls) == 1
+    assert no_sleep == []
+    assert client._consecutive_fails.get("crossref", 0) == 0
+    assert "crossref" not in client._down
+
+
+@pytest.mark.asyncio
+async def test_4xx_doi_lookup_means_resolved_no_work(client, monkeypatch):
+    """On a DOI lookup a 404 is 'resolved endpoint, no work': ok=True with
+    data=None, so verify.py counts the source as answered."""
+    url = "https://api.crossref.org/works/10.x/abc"
+    _transport(monkeypatch, client, [_resp(url, 404, text="nope")])
+    r = await client.crossref_work("10.x/abc")
+    assert r.ok and r.data is None
+    assert "crossref" not in client._down
+
+
+# ---------------------------------------------------------------- 5xx
+
+@pytest.mark.asyncio
+async def test_5xx_retries_with_backoff(client, no_sleep, monkeypatch):
+    url = "https://api.crossref.org/works"
+    calls = _transport(monkeypatch, client,
+                       [_resp(url, 500, text="boom")] * 3)
+    r = await client.crossref_search("anything")
+    assert not r.ok and r.error == "HTTP 500"
+    assert len(calls) == 3  # 1 try + 2 retries
+    # backoff before each follow-up attempt, like transport errors (the
+    # existing pattern also sleeps once after the final failed attempt)
+    assert no_sleep == [1, 2, 4]
+    assert client._consecutive_fails["crossref"] == 1
+    assert "crossref" not in client._down  # one burst != two failures
+
+
+# ---------------------------------------------------------------- 429
+
+@pytest.mark.asyncio
+async def test_429_retries_once_then_ok(client, no_sleep, monkeypatch):
+    url = "https://api.openalex.org/works"
+    calls = _transport(monkeypatch, client, [
+        _resp(url, 429, text="slow down"),
+        _resp(url, 200, json_body={"results": []}),
+    ])
+    r = await client.openalex_search("anything")
+    assert r.ok and r.data == []
+    assert len(calls) == 2
+    assert no_sleep == [1]  # single 429 backoff, then success
+    assert "openalex" not in client._down
+
+
+@pytest.mark.asyncio
+async def test_second_429_takes_source_down(client, no_sleep, monkeypatch):
+    url = "https://api.openalex.org/works"
+    _transport(monkeypatch, client, [
+        _resp(url, 429, text="slow down"),
+        _resp(url, 429, text="slow down"),
+    ])
+    r = await client.openalex_search("anything")
+    assert not r.ok and r.error == "429"
+    assert "openalex" in client._down
+
+
+# ---------------------------------------------------------------- arXiv
+
+@pytest.mark.asyncio
+async def test_arxiv_single_failure_no_breaker(client, no_sleep,
+                                               monkeypatch):
+    """One transport failure + success after the retry: source stays up."""
+    calls = _transport(monkeypatch, client, [
+        httpx.ConnectError("offline"),
+        _resp(ARXIV_API, 200, text=FEED),
+    ])
+    r = await client.arxiv_search("Attention Is All You Need")
+    assert r.ok and len(r.data) == 1
+    assert len(calls) == 2  # one retry
+    assert no_sleep == [1]  # backoff after the throttle gap
+    assert client._consecutive_fails.get("arxiv", 0) == 0
+    assert "arxiv" not in client._down
+
+
+@pytest.mark.asyncio
+async def test_arxiv_two_consecutive_failures_breaker(client, no_sleep,
+                                                      monkeypatch):
+    """Aligned with the other sources: a single failed query only counts
+    toward the breaker; two consecutive failed queries take arXiv down."""
+    calls = _transport(monkeypatch, client,
+                       [_resp(ARXIV_API, 429, text="slow down")] * 4)
+    r1 = await client.arxiv_search("Attention Is All You Need")
+    assert not r1.ok
+    assert "arxiv" not in client._down
+    assert client._consecutive_fails["arxiv"] == 1
+
+    r2 = await client.arxiv_search("BERT pre-training")
+    assert not r2.ok
+    assert "arxiv" in client._down
+    assert len(calls) == 4  # 2 attempts per query, no third try
+
+    # fail fast from now on
+    r3 = await client.arxiv_search("something else")
+    assert not r3.ok and r3.error == "source unavailable"
+    assert len(calls) == 4
+
+
+@pytest.mark.asyncio
+async def test_arxiv_success_resets_breaker_count(client, no_sleep,
+                                                  monkeypatch):
+    _transport(monkeypatch, client, [
+        httpx.ConnectError("offline"),
+        _resp(ARXIV_API, 200, text=FEED),
+        httpx.ConnectError("offline"),
+        _resp(ARXIV_API, 200, text=FEED),
+    ])
+    for _ in range(2):
+        r = await client.arxiv_search("Attention Is All You Need")
+        assert r.ok
+    assert "arxiv" not in client._down

@@ -110,3 +110,39 @@ async def test_usage_log_records_cache_hits(monkeypatch):
     assert rows[0]["calls"] == 1 and rows[0]["cached_calls"] == 1
     assert rows[0]["provider"] == "dashscope"
     assert rows[0]["prompt"] == 0 and rows[0]["completion"] == 0
+
+
+def test_cache_key_uses_cache_version(monkeypatch):
+    """Bumping settings.cache_version invalidates every cached verdict —
+    the version is part of the key."""
+    msgs = [{"role": "user", "content": "x"}]
+    base = get_settings()
+    monkeypatch.setattr(
+        llm, "get_settings",
+        lambda: base.model_copy(update={"cache_version": "1"}))
+    k1 = llm._cache_key("qwen-plus", msgs)
+    monkeypatch.setattr(
+        llm, "get_settings",
+        lambda: base.model_copy(update={"cache_version": "2"}))
+    k2 = llm._cache_key("qwen-plus", msgs)
+    assert k1 != k2
+    assert k1.startswith("qwen-plus|") and k2.startswith("qwen-plus|")
+
+
+@pytest.mark.asyncio
+async def test_cache_version_bump_invalidates_verdicts(monkeypatch):
+    """End to end: same prompt cached under v1 is a miss under v2."""
+    async def fake_cloud(model, messages, task):
+        return '{"label": "ok"}'
+
+    monkeypatch.setattr(llm, "_cloud_call", fake_cloud)
+    base = get_settings()
+    monkeypatch.setattr(
+        llm, "get_settings",
+        lambda: base.model_copy(update={"cache_version": "1"}))
+    r1 = await llm.chat_json("judge", [{"role": "user", "content": "hi"}], Out)
+    monkeypatch.setattr(
+        llm, "get_settings",
+        lambda: base.model_copy(update={"cache_version": "2"}))
+    r2 = await llm.chat_json("judge", [{"role": "user", "content": "hi"}], Out)
+    assert not r1.cached and r2.cached is False

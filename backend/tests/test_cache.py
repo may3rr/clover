@@ -7,7 +7,10 @@ from citecheck.cache import Cache, make_key
 def test_make_key_stable():
     k1 = make_key("qwen-plus", "prompt text")
     k2 = make_key("qwen-plus", "prompt text")
-    assert k1 == k2 and len(k1) == 64
+    # readable prefix + sha256 digest — the prefix drives cache TTLs
+    assert k1 == k2
+    prefix, _, digest = k1.partition("|")
+    assert prefix == "qwen-plus" and len(digest) == 64
     assert make_key("a", "b") != make_key("ab")
 
 
@@ -48,6 +51,59 @@ def test_creates_parent_dirs(tmp_path):
     with Cache(p) as cache:
         cache.set("x", 1)
     assert Path(p).exists()
+
+
+# ----------------------------------------------------------- TTL
+
+def test_retrieval_key_expires_and_is_deleted(tmp_path, monkeypatch):
+    """Retrieval entries (crossref|/openalex|/s2|/arxiv| prefixes) live
+    30 days; a stale hit reads as a miss and is deleted."""
+    import time as time_mod
+
+    with Cache(tmp_path / "c.sqlite") as cache:
+        key = make_key("crossref", "work", "10.x/abc")
+        cache.set(key, {"message": {}})
+        stale = int(time_mod.time()) - 31 * 86400
+        cache._conn.execute(
+            "UPDATE kv SET created_at = ? WHERE key = ?", (stale, key))
+        cache._conn.commit()
+        assert cache.get(key) is None
+        row = cache._conn.execute(
+            "SELECT 1 FROM kv WHERE key = ?", (key,)).fetchone()
+        assert row is None  # expired entry was removed
+
+
+def test_llm_key_never_expires(tmp_path):
+    """LLM verdicts have no TTL — they are invalidated deliberately via
+    cache_version, not by age."""
+    import time as time_mod
+
+    with Cache(tmp_path / "c.sqlite") as cache:
+        key = make_key("qwen-plus", "prompt text")
+        cache.set(key, {"label": "ok"})
+        stale = int(time_mod.time()) - 400 * 86400
+        cache._conn.execute(
+            "UPDATE kv SET created_at = ? WHERE key = ?", (stale, key))
+        cache._conn.commit()
+        assert cache.get(key) == {"label": "ok"}
+
+
+def test_created_at_migrated_for_existing_db(tmp_path):
+    """A kv table from before the TTL migration opens cleanly: existing
+    rows are backfilled with 'now' and keep hitting."""
+    import sqlite3
+
+    p = tmp_path / "old.sqlite"
+    conn = sqlite3.connect(p)
+    conn.execute(
+        "CREATE TABLE kv (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
+    conn.execute("INSERT INTO kv VALUES ('k', '{\"a\": 1}')")
+    conn.commit()
+    conn.close()
+    with Cache(p) as cache:
+        assert cache.get("k") == {"a": 1}
+        cache.set("k2", 2)  # new writes carry a timestamp too
+        assert cache.get("k2") == 2
 
 
 def test_usage_log_aggregates(tmp_path):

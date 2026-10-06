@@ -125,6 +125,10 @@ class Settings(BaseModel):
     crossref_mailto: str | None = None
     openalex_api_key: str | None = None
     s2_api_key: str | None = None
+    # Bumped into every LLM cache key: change it to invalidate all cached
+    # model verdicts after a model upgrade or a prompt fix (retrieval
+    # entries expire on their own 30-day TTL).
+    cache_version: str = "1"
     llm: LLMSettings = Field(default_factory=LLMSettings)
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
     cache: CacheSettings = Field(default_factory=CacheSettings)
@@ -147,6 +151,7 @@ def _load_settings() -> Settings:
         crossref_mailto=os.environ.get("CROSSREF_MAILTO") or env.get("CROSSREF_MAILTO"),
         openalex_api_key=os.environ.get("OPENALEX_API_KEY") or env.get("OPENALEX_API_KEY"),
         s2_api_key=os.environ.get("S2_API_KEY") or env.get("S2_API_KEY"),
+        cache_version=str(data.get("cache_version", "1")),
         llm=LLMSettings(**data.get("llm", {})),
         retrieval=RetrievalSettings(**data.get("retrieval", {})),
         cache=CacheSettings(**data.get("cache", {})),

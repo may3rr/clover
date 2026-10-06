@@ -341,10 +341,19 @@ class RetrievalClient:
                     continue
                 if resp.status_code >= 500:
                     last_err = f"HTTP {resp.status_code}"
+                    await asyncio.sleep(min(2**attempt, 4))
                     continue
-                if resp.status_code == 404:
+                if 400 <= resp.status_code < 500:
+                    # 4xx (non-429): the source answered — the record does
+                    # not exist (404) or the query itself is invalid (400/
+                    # 403, e.g. a DOI with illegal characters). Not a
+                    # transport failure: no retry, no circuit-breaker
+                    # count. Callers read ok=True + data=None as
+                    # "responded, no result".
                     self._note_result(src, True)
-                    return SourceResult(ok=True, data=None, error="404")
+                    return SourceResult(
+                        ok=True, data=None,
+                        error=f"HTTP {resp.status_code}")
                 resp.raise_for_status()
                 data = resp.json()
                 if self._cache is not None:
@@ -468,25 +477,39 @@ class RetrievalClient:
                 self._track("arxiv", 0.0, cached=True)
                 return SourceResult(ok=True, data=hit["xml"])
         await arxiv_throttle()
-        try:
-            async with self._sem:
-                resp = await self._client.get(
-                    ARXIV_API,
-                    params={"search_query": search_query,
-                            "max_results": max_results},
-                )
-            if resp.status_code == 429 or resp.status_code >= 500:
-                self._track("arxiv", time.monotonic() - t0, cached=False)
-                if resp.status_code == 429:
-                    self._down.add("arxiv")
-                return SourceResult(ok=False, error=f"HTTP {resp.status_code}")
-            resp.raise_for_status()
-            xml_text = resp.text
-        except httpx.HTTPError as e:
-            self._track("arxiv", time.monotonic() - t0, cached=False)
-            self._note_result("arxiv", False)
-            return SourceResult(ok=False, error=str(e))
+        # one retry (like the other sources): the throttle lock already
+        # enforces the >=3s gap, backoff sleeps on top of it. A single
+        # failure only counts toward the circuit breaker (_note_result) —
+        # two consecutive fails take arXiv down for this run.
+        xml_text: str | None = None
+        last_err: str | None = None
+        for attempt in range(2):
+            try:
+                async with self._sem:
+                    resp = await self._client.get(
+                        ARXIV_API,
+                        params={"search_query": search_query,
+                                "max_results": max_results},
+                    )
+                if resp.status_code == 429 or resp.status_code >= 500:
+                    last_err = f"HTTP {resp.status_code}"
+                    if attempt == 0:
+                        await asyncio.sleep(min(2**attempt, 4))
+                        continue
+                    break
+                resp.raise_for_status()
+                xml_text = resp.text
+                break
+            except httpx.HTTPError as e:
+                last_err = str(e)
+                if attempt == 0:
+                    await asyncio.sleep(min(2**attempt, 4))
+                    continue
+                break
         self._track("arxiv", time.monotonic() - t0, cached=False)
+        if xml_text is None:
+            self._note_result("arxiv", False)
+            return SourceResult(ok=False, error=last_err)
         self._note_result("arxiv", True)
         if self._cache is not None:
             self._cache.set(key, {"xml": xml_text})

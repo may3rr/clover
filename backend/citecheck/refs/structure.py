@@ -328,4 +328,12 @@ async def structure_references(refs: list) -> int:
         return changed
 
     chunks = [refs[i:i + _BATCH] for i in range(0, len(refs), _BATCH)]
-    return sum(await asyncio.gather(*(one(c) for c in chunks)))
+    # bound concurrent LLM batches — a long reference list must not fan
+    # out one cloud call per chunk at the same time
+    sem = asyncio.Semaphore(4)
+
+    async def guarded(chunk: list) -> int:
+        async with sem:
+            return await one(chunk)
+
+    return sum(await asyncio.gather(*(guarded(c) for c in chunks)))
