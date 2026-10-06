@@ -106,7 +106,7 @@ export default function App() {
         fd.append('venue', venue)
         const r = await apiFetch('/analyze', { method: 'POST', body: fd })
         if (!r.ok) {
-          setJobError('无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。')
+          setJobError('无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目文件夹。')
           return
         }
         const { job_id } = (await r.json()) as { job_id: string }
@@ -178,8 +178,9 @@ export default function App() {
   // -------------------------------------------------------------- menu
   useEffect(() => {
     const offFile = window.citecheck.onOpenFile((p) => {
-      if (p.toLowerCase().endsWith('.docx')) analyze(p)
-      else setJobError('无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。')
+      const lp = p.toLowerCase()
+      if (lp.endsWith('.docx') || lp.endsWith('.tex')) analyze(p)
+      else setJobError('无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目文件夹。')
     })
     const offMenu = window.citecheck.onMenu((cmd) => {
       if (cmd === 'open') openDialog()
@@ -192,10 +193,13 @@ export default function App() {
     }
   }, [analyze, openDialog, reset])
 
-  // 导出到 Word is only enabled on the report screen
+  // 导出到 Word is only enabled on the report screen (docx only)
   useEffect(() => {
-    window.citecheck.setMenuState({ exportEnabled: screen === 'report' })
-  }, [screen])
+    window.citecheck.setMenuState({
+      exportEnabled:
+        screen === 'report' && report?.document.source_format !== 'tex',
+    })
+  }, [screen, report])
 
   // --------------------------------------------------------- shots hook
   useEffect(() => {

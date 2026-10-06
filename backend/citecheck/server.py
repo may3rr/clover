@@ -152,7 +152,7 @@ async def analyze(
         src = dest
     elif path:
         src = Path(path)
-        if not src.is_file():
+        if not src.exists():
             return JSONResponse({"detail": "文件不存在"}, status_code=400)
     else:
         return JSONResponse(
@@ -308,6 +308,10 @@ async def export(job_id: str):
         return JSONResponse({"detail": job.error}, status_code=500)
     if job.report is None:
         return JSONResponse({"detail": "job still running"}, status_code=409)
+    if job.src_path.is_dir() or job.src_path.suffix.lower() != ".docx":
+        return JSONResponse(
+            {"detail": "LaTeX 项目暂不支持导出修订文档；请根据报告直接修改源码。"},
+            status_code=400)
     try:
         from .export import export_report
         author, initials = _comment_identity(_prefs())

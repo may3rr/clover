@@ -192,7 +192,9 @@ def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
     # references are anchored at their citing paragraph and must never
     # move or renumber (their mark text is virtual)
     refs = [r for r in parsed.references if r.origin == "list"]
-    if not refs or parsed.document.managed_by:
+    # LaTeX: bib order is decided at compile time, no paragraph moves
+    if not refs or parsed.document.managed_by \
+            or parsed.document.source_format != "docx":
         return []
     list_ids = {r.id for r in refs}
     para_text = {p.id: p.text for p in parsed.paragraphs}

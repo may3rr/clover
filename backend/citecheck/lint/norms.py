@@ -82,7 +82,23 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
             ))
 
     # ---- markers without a matching entry ----------------------------
+    bib_keys = {r.key for r in refs if r.key}
     for m in parsed.markers:
+        if m.kind == "cite_key":
+            missing = [k for k in m.keys if k not in bib_keys]
+            if missing:
+                findings.append(Finding(
+                    id="", layer="norms", severity="high",
+                    anchor=Anchor(paragraph_id=m.paragraph_id,
+                                  start=m.start, end=m.end),
+                    title="正文引用找不到对应的参考文献条目",
+                    detail=f"依据：引用命令中的键 "
+                           f"{', '.join(missing)} 没有对应的 \\bibitem "
+                           "或 .bib 条目，编译后会显示为 [?]。\n"
+                           "建议：核对键名拼写，或补全缺失的参考文献条目。",
+                    refs=[],
+                ))
+            continue
         if m.kind not in {"numeric", "superscript", "endnote"}:
             continue
         nums = unresolved_numeric(m.raw, refs)

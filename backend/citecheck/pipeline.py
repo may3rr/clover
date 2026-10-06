@@ -31,12 +31,8 @@ from .lint.reorder import plan_reorder
 from .lint.typos import check_typos
 from .llm.client import doc_scope, stats_scope
 from .parse.bibguess import guess_bibliography_start
-from .parse.parser import (
-    ParsedDocument,
-    apply_bibliography_start,
-    parse_docx,
-    relink_markers,
-)
+from .parse import ParsedDocument, apply_bibliography_start, parse_document
+from .parse.parser import relink_markers
 from .refs.structure import structure_references
 from .refs.sources import RetrievalClient
 from .refs.verify import verify_references
@@ -55,7 +51,7 @@ log = logging.getLogger(__name__)
 
 LAYER_ORDER = ["authenticity", "support", "distribution", "norms"]
 
-PARSE_ERROR = "无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。"
+PARSE_ERROR = "无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目（.tex 或项目文件夹）。"
 
 
 class PipelineError(Exception):
@@ -158,9 +154,9 @@ async def run_pipeline(
             ev["anchors"] = anchors
         send(ev)
 
-    # ---- parse (threaded; docx XML work) -------------------------------
+    # ---- parse (threaded; docx XML / latex source work) ----------------
     try:
-        parsed = await asyncio.to_thread(parse_docx, path)
+        parsed = await asyncio.to_thread(parse_document, path)
     except Exception as e:
         log.warning("parse failed for %s: %s", path, e)
         for layer in LAYER_ORDER:

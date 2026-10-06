@@ -326,6 +326,11 @@ export default function ReportScreen({
               <span className="t13 secondary">已导出到 {exported}</span>
             )}
             {exportErr && <span className="t13 secondary">{exportErr}</span>}
+            {report.document.source_format === 'tex' ? (
+              <span className="t13 secondary">
+                LaTeX 项目暂不支持导出修订
+              </span>
+            ) : (
             <button
               className="pill-accent"
               onClick={doExport}
@@ -361,6 +366,7 @@ export default function ReportScreen({
               )}
               {exporting ? '正在导出' : '导出到 Word'}
             </button>
+            )}
           </div>
         </div>
         <main
