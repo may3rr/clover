@@ -51,3 +51,5 @@ demo/*_events.json
 app/build/python/
 dist/
 demo/latex/raw/
+demo/latex/reports/
+demo/latex/export/

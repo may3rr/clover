@@ -1,0 +1,294 @@
+{
+ "summary": {
+  "detected": 24,
+  "total": 27,
+  "by_kind": {
+   "fake_ref": "4/4",
+   "wrong_year": "4/4",
+   "wrong_author": "4/4",
+   "misattribution": "1/4",
+   "typo": "7/7",
+   "undefined_key": "4/4"
+  }
+ },
+ "papers": {
+  "attention": {
+   "rows": [
+    {
+     "id": "att-fake",
+     "kind": "fake_ref",
+     "detected": true,
+     "evidence": "not_found"
+    },
+    {
+     "id": "att-year",
+     "kind": "wrong_year",
+     "detected": true,
+     "evidence": "mismatch: 年份不一致：文中写 2003，数据库记录为 1997"
+    },
+    {
+     "id": "att-author",
+     "kind": "wrong_author",
+     "detected": true,
+     "evidence": "mismatch: 首作者不一致：文中写 Tomas Mikolov，数据库记录为 Dzmitry Bahdanau"
+    },
+    {
+     "id": "att-misattr",
+     "kind": "misattribution",
+     "detected": true,
+     "evidence": "[('unsupported', False)]"
+    },
+    {
+     "id": "att-typo1",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "dependancies → dependencies"
+    },
+    {
+     "id": "att-typo2",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "constriant → constraint"
+    },
+    {
+     "id": "att-undef",
+     "kind": "undefined_key",
+     "detected": true,
+     "evidence": "已报告"
+    }
+   ],
+   "natural_typos": [],
+   "unexplained_high": [],
+   "duration_s": 4.0,
+   "export": {
+    "path": "export/attention（Clover）.zip",
+    "patch_applies": true
+   }
+  },
+  "bert": {
+   "rows": [
+    {
+     "id": "bert-fake",
+     "kind": "fake_ref",
+     "detected": true,
+     "evidence": "not_found"
+    },
+    {
+     "id": "bert-year",
+     "kind": "wrong_year",
+     "detected": true,
+     "evidence": "mismatch: 年份不一致：文中写 2015，数据库记录为 2018"
+    },
+    {
+     "id": "bert-author",
+     "kind": "wrong_author",
+     "detected": true,
+     "evidence": "mismatch: 首作者不一致：文中写 Noam Shazeer，数据库记录为 Ashish Vaswani"
+    },
+    {
+     "id": "bert-misattr",
+     "kind": "misattribution",
+     "detected": false,
+     "evidence": "[('undetermined', True)]（只提示了可能引错文献，不计入检出）"
+    },
+    {
+     "id": "bert-typo1",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "representaions → representations"
+    },
+    {
+     "id": "bert-typo2",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "unidirectonal → unidirectional"
+    },
+    {
+     "id": "bert-undef",
+     "kind": "undefined_key",
+     "detected": true,
+     "evidence": "已报告"
+    }
+   ],
+   "natural_typos": [],
+   "unexplained_high": [
+    {
+     "id": "f14",
+     "layer": "authenticity",
+     "title": "未能在数据库中找到这篇文献",
+     "loc": "bert/main.bbl:22"
+    }
+   ],
+   "duration_s": 1.2,
+   "export": {
+    "path": "export/bert（Clover）.zip",
+    "patch_applies": true
+   }
+  },
+  "lora": {
+   "rows": [
+    {
+     "id": "lora-fake",
+     "kind": "fake_ref",
+     "detected": true,
+     "evidence": "not_found"
+    },
+    {
+     "id": "lora-year",
+     "kind": "wrong_year",
+     "detected": true,
+     "evidence": "mismatch: 年份不一致：文中写 2018，数据库记录为 2021"
+    },
+    {
+     "id": "lora-author",
+     "kind": "wrong_author",
+     "detected": true,
+     "evidence": "mismatch: 首作者不一致：文中写 Giurgiu, Andrei，数据库记录为 Neil Houlsby"
+    },
+    {
+     "id": "lora-misattr",
+     "kind": "misattribution",
+     "detected": false,
+     "evidence": "[('undetermined', False)]"
+    },
+    {
+     "id": "lora-typo",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "deploymnet → deployment"
+    },
+    {
+     "id": "lora-undef",
+     "kind": "undefined_key",
+     "detected": true,
+     "evidence": "已报告"
+    }
+   ],
+   "natural_typos": [
+    {
+     "wrong": "instrisic",
+     "detected": true
+    },
+    {
+     "wrong": "comtenporary",
+     "detected": true
+    }
+   ],
+   "unexplained_high": [
+    {
+     "id": "f13",
+     "layer": "support",
+     "title": "被引文献不支持这条论断",
+     "loc": "lora/iclr2022_conference.tex:352"
+    },
+    {
+     "id": "f14",
+     "layer": "support",
+     "title": "被引文献不支持这条论断",
+     "loc": "lora/iclr2022_conference.tex:352"
+    },
+    {
+     "id": "f33",
+     "layer": "authenticity",
+     "title": "未能在数据库中找到这篇文献",
+     "loc": "lora/LoRA1.bib:246"
+    }
+   ],
+   "duration_s": 17.3,
+   "export": {
+    "path": "export/lora（Clover）.zip",
+    "patch_applies": true
+   }
+  },
+  "qlora": {
+   "rows": [
+    {
+     "id": "qlora-fake",
+     "kind": "fake_ref",
+     "detected": true,
+     "evidence": "not_found"
+    },
+    {
+     "id": "qlora-year",
+     "kind": "wrong_year",
+     "detected": true,
+     "evidence": "mismatch: 年份不一致：文中写 2016，数据库记录为 2021"
+    },
+    {
+     "id": "qlora-author",
+     "kind": "wrong_author",
+     "detected": true,
+     "evidence": "mismatch: 首作者不一致：文中写 Sanh, Victor，数据库记录为 Thomas Wolf"
+    },
+    {
+     "id": "qlora-misattr",
+     "kind": "misattribution",
+     "detected": false,
+     "evidence": "[('undetermined', True)]（只提示了可能引错文献，不计入检出）"
+    },
+    {
+     "id": "qlora-typo1",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "paramters → parameters"
+    },
+    {
+     "id": "qlora-typo2",
+     "kind": "typo",
+     "detected": true,
+     "evidence": "gradeint → gradient"
+    },
+    {
+     "id": "qlora-undef",
+     "kind": "undefined_key",
+     "detected": true,
+     "evidence": "已报告"
+    }
+   ],
+   "natural_typos": [],
+   "unexplained_high": [
+    {
+     "id": "f4",
+     "layer": "support",
+     "title": "被引文献不支持这条论断",
+     "loc": "qlora/neurips_2023.tex:103"
+    },
+    {
+     "id": "f12",
+     "layer": "support",
+     "title": "被引文献不支持这条论断",
+     "loc": "qlora/neurips_2023.tex:308"
+    },
+    {
+     "id": "f18",
+     "layer": "support",
+     "title": "被引文献不支持这条论断",
+     "loc": "qlora/neurips_2023.tex:603"
+    },
+    {
+     "id": "f21",
+     "layer": "support",
+     "title": "被引文献不支持这条论断",
+     "loc": "qlora/neurips_2023.tex:656"
+    },
+    {
+     "id": "f25",
+     "layer": "authenticity",
+     "title": "未能在数据库中找到这篇文献",
+     "loc": "qlora/references.bib:1886"
+    },
+    {
+     "id": "f38",
+     "layer": "authenticity",
+     "title": "未能在数据库中找到这篇文献",
+     "loc": "qlora/references.bib:1168"
+    }
+   ],
+   "duration_s": 26.5,
+   "export": {
+    "path": "export/qlora（Clover）.zip",
+    "patch_applies": true
+   }
+  }
+ }
+}

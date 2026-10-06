@@ -33,15 +33,17 @@ _cache: Cache | None = None
 _cloud_client: AsyncOpenAI | None = None
 _cloud_sem: "PrioritySemaphore | None" = None
 
-# Who goes first when every cloud slot is busy (lower = sooner). Reference
-# structuring gates authenticity, distribution and claim pairing; claim
-# extraction and judging are the support layer's critical path; typo
-# checks (one call per paragraph, the bulk of all calls) can wait.
+# Who goes first when every cloud slot is busy (lower = sooner). Only
+# reference structuring jumps the queue: it gates authenticity,
+# distribution and claim pairing. The layers' own calls share one level
+# (FIFO) — ranking typo checks below judging starved the norms layer
+# until support finished and made it the new critical path. The overview
+# critic runs last anyway.
 _PRIORITY = {
     "structure": 0, "bibguess": 0,
     "extract": 1, "judge": 1, "review": 1, "review_fallback": 1,
-    "function": 2, "profile": 2, "overview": 2,
-    "typo": 3,
+    "function": 1, "typo": 1,
+    "profile": 2, "overview": 2,
 }
 
 
