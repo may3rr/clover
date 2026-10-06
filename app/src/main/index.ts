@@ -40,6 +40,7 @@ let port = 8765
 const pendingOpenFiles: string[] = []
 let rendererReady = false
 let exportEnabled = false
+let exportLabel = '导出到 Word'
 
 // ---------------------------------------------------------------- backend
 
@@ -142,9 +143,11 @@ ipcMain.handle('citecheck:info', () => ({
 ipcMain.handle('citecheck:open-docx', async () => {
   if (!win) return null
   const r = await dialog.showOpenDialog(win, {
-    // LaTeX 稿件是一个文件夹：允许同时选文件或目录
+    // LaTeX 稿件可以是压缩包、文件夹或主 .tex：允许同时选文件或目录
     properties: ['openFile', 'openDirectory'],
-    filters: [{ name: '论文', extensions: ['docx', 'tex'] }],
+    filters: [
+      { name: '论文', extensions: ['docx', 'zip', 'gz', 'tgz', 'tex'] },
+    ],
   })
   return r.canceled || !r.filePaths.length ? null : r.filePaths[0]
 })
@@ -182,12 +185,17 @@ ipcMain.on('citecheck:renderer-ready', () => {
   flushOpenFiles()
 })
 
-ipcMain.on('citecheck:menu-state', (_e, s: { exportEnabled: boolean }) => {
-  if (s.exportEnabled !== exportEnabled) {
-    exportEnabled = s.exportEnabled
-    buildMenu()
+ipcMain.on(
+  'citecheck:menu-state',
+  (_e, s: { exportEnabled: boolean; exportLabel?: string }) => {
+    const label = s.exportLabel ?? '导出到 Word'
+    if (s.exportEnabled !== exportEnabled || label !== exportLabel) {
+      exportEnabled = s.exportEnabled
+      exportLabel = label
+      buildMenu()
+    }
   }
-})
+)
 
 // sample report + shot capture (only used under CITECHECK_SHOTS)
 ipcMain.handle('citecheck:sample-report', () => {
@@ -342,7 +350,7 @@ function buildMenu() {
           click: menuClick('open'),
         },
         {
-          label: '导出到 Word',
+          label: exportLabel,
           accelerator: 'CmdOrCtrl+E',
           enabled: exportEnabled,
           click: menuClick('export'),

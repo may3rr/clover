@@ -1,13 +1,15 @@
 from pathlib import Path
 
 from .latex import parse_latex
+from .latex.archive import is_archive
 from .parser import ParsedDocument, apply_bibliography_start, parse_docx
 
 
 def parse_document(path: str | Path) -> ParsedDocument:
-    """按输入类型分发：目录、.tex 或 .zip 走 LaTeX 解析，其余走 docx。"""
+    """按输入类型分发：目录、.tex 或压缩包（.zip/.tar.gz/.tgz/.gz）走
+    LaTeX 解析，其余走 docx。"""
     p = Path(path)
-    if p.is_dir() or p.suffix.lower() in {".tex", ".zip"}:
+    if p.is_dir() or p.suffix.lower() == ".tex" or is_archive(p):
         return parse_latex(p)
     return parse_docx(p)
 

@@ -19,7 +19,7 @@ export interface CitecheckApi {
   onBackendError(cb: (msg: string) => void): () => void
   rendererReady(): void
   /** Menu enablement, e.g. 导出到 Word only on the report screen. */
-  setMenuState(s: { exportEnabled: boolean }): void
+  setMenuState(s: { exportEnabled: boolean; exportLabel?: string }): void
   /** Debug hooks — used by shots/E2E modes only. */
   shotsMode: boolean
   /** Built-in sample data instead of the backend (settings usage/config)

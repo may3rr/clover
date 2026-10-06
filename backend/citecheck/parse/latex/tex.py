@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable
 
+from .source import Builder, Project, Src
+
 # ---------------------------------------------------------------- cite 命令
 
 _TEXTUAL = {"citet", "textcite", "citealt"}
@@ -59,7 +61,23 @@ _DROP_ARG = {
 }
 
 # 丢弃命令本体及第一个参数，第二个参数文本照常流出（href、textcolor 等）
-_DROP_FIRST_ARG = {"href", "textcolor", "colorlink"}
+_DROP_FIRST_ARG = {"href", "textcolor", "colorlink", "resizebox", "scalebox",
+                   "rotatebox", "colorbox"}
+
+# 丢弃命令及其后 N 个 {...} 参数（中间可夹 [...]）：设置类命令，参数
+# 不是正文
+_DROP_N_ARGS = {
+    "setlength": 2, "addtolength": 2, "setcounter": 2, "addtocounter": 2,
+    "definecolor": 3, "hypersetup": 1, "captionsetup": 1, "newcommand": 2,
+    "renewcommand": 2, "providecommand": 2, "newenvironment": 3,
+    "renewenvironment": 3, "newtheorem": 2, "setcitestyle": 1,
+    "graphicspath": 1, "pagestyle": 1, "thispagestyle": 1, "fontsize": 2,
+    "selectfont": 0, "titlespacing": 4, "newif": 0, "vskip": 0, "hskip": 0,
+}
+# TeX 赋值：\looseness=-1、\parskip=3pt、\vskip 2pt
+_ASSIGN_RE = re.compile(
+    r"\s*=?\s*-?\s*(?:\d+\.?\d*|\.\d+)\s*(?:pt|em|ex|cm|mm|in|bp|sp|mu|"
+    r"\\[a-zA-Z]+)?(?:\s*(?:plus|minus)\s*-?\d*\.?\d*\s*(?:pt|em|ex|fil+)?)*")
 
 # 单个字符命令 / 符号命令 → 字面字符
 _SYMBOLS = {
@@ -128,6 +146,19 @@ class RenderedMarker:
     keys: list[str] = field(default_factory=list)
 
 
+@dataclass
+class Macro:
+    """\\newcommand / \\def 定义的文本宏。"""
+    nargs: int
+    default: str | None  # 第一个参数可选时的默认值
+    body: str
+
+
+# 渲染位置映射：(渲染文本位置, 源码位置, 是否逐字)。逐字段内渲染位置
+# 每 +1，源码位置也 +1；非逐字段整段指向同一个源码位置。
+PosRun = tuple[int, int, bool]
+
+
 def _skip_ws(src: str, i: int) -> int:
     while i < len(src) and src[i] in " \t\n":
         i += 1
@@ -178,13 +209,71 @@ def _read_cite_args(src: str, i: int, multi: bool) -> tuple[list[str], int]:
     return keys, i
 
 
-def _render_math(s: str) -> str:
+def _read_macro_args(src: str, i: int, m: Macro) -> tuple[list[str], int]:
+    """按宏定义读取实参：可选首参 [..]，其余 {..} 或单个记号。"""
+    args: list[str] = []
+    n = m.nargs
+    if m.default is not None and n:
+        j = _skip_ws(src, i)
+        r = _read_balanced(src, j, "[", "]") if j < len(src) and src[j] == "[" else None
+        if r:
+            args.append(r[0])
+            i = r[1]
+        else:
+            args.append(m.default)
+        n -= 1
+    for _ in range(n):
+        j = _skip_ws(src, i)
+        if j >= len(src):
+            args.append("")
+            continue
+        r = _read_balanced(src, j, "{", "}")
+        if r:
+            args.append(r[0])
+            i = r[1]
+            continue
+        cm = _CMD_RE.match(src, j)
+        if src[j] == "\\" and cm:
+            args.append(cm.group(0))
+            i = cm.end()
+        else:
+            args.append(src[j])
+            i = j + 1
+    return args, i
+
+
+def _substitute(body: str, args: list[str]) -> str:
+    def repl(mm: re.Match) -> str:
+        k = int(mm.group(1)) - 1
+        return args[k] if 0 <= k < len(args) else ""
+    return re.sub(r"#([1-9])", repl, body)
+
+
+def _render_math(s: str, macros: dict[str, Macro] | None = None) -> str:
     """数学内容扁平化：\\frac{a}{b}→a/b，希腊字母/符号换 unicode，
-    其余命令名丢弃、分组括号去掉。"""
+    其余命令名丢弃、分组括号去掉。零参数宏先展开（最多三轮）。"""
+    if macros:
+        for _ in range(3):
+            changed = False
+
+            def mrepl(mm: re.Match) -> str:
+                nonlocal changed
+                mac = macros.get(mm.group(1))
+                if mac is None or mac.nargs:
+                    return mm.group(0)
+                changed = True
+                return mac.body
+            s = re.sub(r"\\([a-zA-Z]+)(?![a-zA-Z])", mrepl, s)
+            if not changed:
+                break
     s = re.sub(
         r"\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}", r"\1/\2", s
     )
     s = re.sub(r"\\sqrt\s*\{([^{}]*)\}", r"√(\1)", s)
+    # \mathrm{x} \text{x} \operatorname{x}：保留参数文本
+    s = re.sub(r"\\(?:mathrm|mathit|mathbf|mathsf|mathtt|mathcal|mathbb|"
+               r"text|textrm|textit|textbf|operatorname|boldsymbol|bm)\s*",
+               "", s)
 
     def repl(m: re.Match) -> str:
         name = m.group(1)
@@ -197,65 +286,76 @@ def _render_math(s: str) -> str:
     return s.replace("{", "").replace("}", "")
 
 
-def _collapse(text: str) -> tuple[str, list[int]]:
-    """压缩连续空白为一个空格。返回 (新文本, fwd)；fwd[i] 是原文本位置
-    i 之前已产出的字符数，用于把旧偏移映射到新文本。"""
-    out: list[str] = []
-    fwd = [0] * (len(text) + 1)
-    prev_ws = False
-    for i, ch in enumerate(text):
-        fwd[i] = len(out)
-        if ch in " \t\n":
-            if not prev_ws:
-                out.append(" ")
-            prev_ws = True
-        else:
-            out.append(ch)
-            prev_ws = False
-    fwd[len(text)] = len(out)
-    return "".join(out), fwd
+_MAX_DEPTH = 12
+_MAX_EXPANSION = 20000
 
 
 def render(
     src: str,
     cite_render: Callable[[str, list[str]], str] | None = None,
+    macros: dict[str, Macro] | None = None,
 ) -> tuple[str, list[RenderedMarker]]:
     """渲染 latex 源码为纯文本；返回 (text, markers)。
 
     cite_render(name, keys) 给出 \\cite 命令的替换文本；为 None 时引用
     命令不产出文本也不记 marker。
     """
+    text, marks, _ = render_mapped(src, cite_render, macros)
+    return text, marks
+
+
+def render_mapped(
+    src: str,
+    cite_render: Callable[[str, list[str]], str] | None = None,
+    macros: dict[str, Macro] | None = None,
+    _depth: int = 0,
+) -> tuple[str, list[RenderedMarker], list[PosRun]]:
+    """render() 加位置映射：第三个返回值把渲染文本的每个位置映射回
+    src 中的位置（见 PosRun）。"""
     out: list[str] = []
+    # 与 out 中每个字符平行：源码位置与是否逐字
+    o_src: list[int] = []
+    o_exact: list[bool] = []
     marks: list[RenderedMarker] = []
     i, n = 0, len(src)
     pos = 0
+    macros = macros or {}
 
-    def emit(s: str) -> None:
+    def emit(s: str, at: int, exact: bool = False) -> None:
         nonlocal pos
+        if not s:
+            return
         out.append(s)
         pos += len(s)
+        if exact:
+            o_src.extend(range(at, at + len(s)))
+            o_exact.extend([True] * len(s))
+        else:
+            o_src.extend([at] * len(s))
+            o_exact.extend([False] * len(s))
 
     while i < n:
         ch = src[i]
 
         # ---- 引号与连字符 -------------------------------------------
-        for lit, rep in (("``", "“"), ("''", "”"), ("---", "—"),
-                         ("--", "–"), ("`", "‘"), ("'", "’")):
-            if src.startswith(lit, i):
-                emit(rep)
-                i += len(lit)
-                break
-        else:
-            lit = None
-        if lit is not None:
-            continue
+        if ch in "`'-":
+            hit = None
+            for lit, rep in (("``", "“"), ("''", "”"), ("---", "—"),
+                             ("--", "–"), ("`", "‘"), ("'", "’")):
+                if src.startswith(lit, i):
+                    hit = (lit, rep)
+                    break
+            if hit is not None:
+                emit(hit[1], i)
+                i += len(hit[0])
+                continue
 
         # ---- 数学 ----------------------------------------------------
         if ch == "$":
             if src.startswith("$$", i):
                 j = src.find("$$", i + 2)
                 j = n - 2 if j < 0 else j
-                emit(_render_math(src[i + 2 : j]))
+                emit(_render_math(src[i + 2 : j], macros), i)
                 i = j + 2
             else:
                 j = i + 1
@@ -263,7 +363,7 @@ def render(
                     if src[j] == "$" and src[j - 1] != "\\":
                         break
                     j += 1
-                emit(_render_math(src[i + 1 : min(j, n)]))
+                emit(_render_math(src[i + 1 : min(j, n)], macros), i)
                 i = j + 1
             continue
 
@@ -271,12 +371,8 @@ def render(
         if ch in "{}":
             i += 1
             continue
-        if ch == "~":
-            emit(" ")
-            i += 1
-            continue
-        if ch == "&":
-            emit(" ")
+        if ch == "~" or ch == "&":
+            emit(" ", i)
             i += 1
             continue
 
@@ -295,20 +391,20 @@ def render(
                     closer = "\\)" if name == "(" else "\\]"
                     k = src.find(closer, j)
                     k = n if k < 0 else k
-                    emit(_render_math(src[j:k]))
+                    emit(_render_math(src[j:k], macros), i)
                     i = k + (2 if k < n else 0)
                 elif name == "\\":
-                    emit(" ")
+                    emit(" ", i)
                     i = j
                 elif name in _ACCENTS:
                     inner, j2 = _accent_arg(src, j)
-                    emit(unicodedata.normalize("NFC", inner + _ACCENTS[name]))
+                    emit(unicodedata.normalize("NFC", inner + _ACCENTS[name]), i)
                     i = j2
                 elif name in _SPACERS:
-                    emit(_SPACERS[name])
+                    emit(_SPACERS[name], i)
                     i = j
                 else:
-                    emit(_SYMBOLS.get(name, ""))
+                    emit(_SYMBOLS.get(name, ""), i)
                     i = j
                 continue
 
@@ -318,7 +414,7 @@ def render(
                 if j < n:
                     delim = src[j]
                     k = src.find(delim, j + 1)
-                    emit(src[j + 1 : k if k > 0 else n])
+                    emit(src[j + 1 : k if k > 0 else n], j + 1, True)
                     i = n if k < 0 else k + 1
                 else:
                     i = j
@@ -329,23 +425,37 @@ def render(
                 keys, j2 = _read_cite_args(src, j, norm in _MULTI)
                 rep = cite_render(ck + ":" + norm, keys) if cite_render else ""
                 start = pos
-                emit(rep)
+                emit(rep, i)
                 if cite_render and rep:
                     marks.append(RenderedMarker(start, pos, norm, keys))
                 i = j2
                 continue
 
+            mac = macros.get(name.rstrip("*")) if macros else None
+            if mac is not None and _depth < _MAX_DEPTH:
+                args, j2 = _read_macro_args(src, j, mac)
+                body = _substitute(mac.body, args)[:_MAX_EXPANSION]
+                sub, sub_marks, _ = render_mapped(
+                    body, cite_render, macros, _depth + 1)
+                base = pos
+                emit(sub, i)
+                for sm in sub_marks:
+                    marks.append(RenderedMarker(
+                        base + sm.start, base + sm.end, sm.name, sm.keys))
+                i = j2
+                continue
+
             if norm in _SPACERS:
-                emit(_SPACERS[norm])
+                emit(_SPACERS[norm], i)
                 i = j
                 continue
             if norm in _GREEK or norm in _SYMBOLS:
-                emit(_GREEK.get(norm) or _SYMBOLS.get(norm) or "")
+                emit(_GREEK.get(norm) or _SYMBOLS.get(norm) or "", i)
                 i = j
                 continue
             if norm in _ACCENTS:
                 inner, j2 = _accent_arg(src, j)
-                emit(unicodedata.normalize("NFC", inner + _ACCENTS[norm]))
+                emit(unicodedata.normalize("NFC", inner + _ACCENTS[norm]), i)
                 i = j2
                 continue
             if norm in _DROP_FIRST_ARG:
@@ -363,25 +473,70 @@ def render(
                 r = _read_balanced(src, k, "{", "}")
                 i = r[1] if r else j
                 continue
+            if norm in _DROP_N_ARGS:
+                k = j
+                if norm in {"newcommand", "renewcommand", "providecommand"}:
+                    # \newcommand\foo[1]{..}：名字可不带括号
+                    k = _skip_ws(src, k)
+                    cm = _CMD_RE.match(src, k)
+                    if cm:
+                        k = cm.end()
+                        need = 1
+                    else:
+                        need = 2
+                else:
+                    need = _DROP_N_ARGS[norm]
+                for _ in range(need):
+                    k = _skip_ws(src, k)
+                    while k < n and src[k] == "[":
+                        r = _read_balanced(src, k, "[", "]")
+                        if r is None:
+                            break
+                        k = _skip_ws(src, r[1])
+                    r = _read_balanced(src, k, "{", "}")
+                    if r is None:
+                        cm = _CMD_RE.match(src, k) if k < n and src[k] == "\\" else None
+                        k = cm.end() if cm else k
+                        continue
+                    k = r[1]
+                am = _ASSIGN_RE.match(src, k) if need == 0 else None
+                i = am.end() if am else k
+                continue
             if norm == "item":
-                emit("• ")
+                k = _skip_ws(src, j)
+                if k < n and src[k] == "[":  # \item[label]
+                    r = _read_balanced(src, k, "[", "]")
+                    if r:
+                        lab, _ = render(r[0], None, macros)
+                        emit(lab + " ", i)
+                        i = r[1]
+                        continue
+                emit("• ", i)
                 i = j
                 continue
             if norm == "footnote":  # 脚注内联进段落，与上文隔一个空格
-                emit(" ")
+                emit(" ", i)
                 i = j
                 continue
-            # 未知命令：只丢命令本身，参数文本照常流出（\\textbf{x}→x）
+            # 未知命令：只丢命令本身，参数文本照常流出（\\textbf{x}→x）。
+            # 命令后的空格照常输出：\\xspace 之类被丢弃后仍要留出词间距。
+            # 紧跟 =数值 的是 TeX 寄存器赋值（\\looseness=-1），一并丢弃
+            if j < n and src[j] == "=":
+                am = _ASSIGN_RE.match(src, j)
+                if am and am.end() > j + 1:
+                    j = am.end()
             i = j
             continue
 
         # ---- 普通字符 -------------------------------------------------
-        emit(ch)
+        emit(ch, i, True)
         i += 1
 
-    text, fwd = _collapse("".join(out))
+    joined = "".join(out)
+    text, back = _collapse(joined)
     stripped = text.strip()
     lead = len(text) - len(text.lstrip())
+    fwd = _forward(back, len(joined))
     final_marks = [
         RenderedMarker(
             max(fwd[m.start] - lead, 0),
@@ -390,7 +545,64 @@ def render(
         )
         for m in marks
     ]
-    return stripped, final_marks
+    runs: list[PosRun] = []
+    for k in range(lead, lead + len(stripped)):
+        o = back[k]
+        s, ex = o_src[o], o_exact[o]
+        t = k - lead
+        if runs:
+            pt, ps, pex = runs[-1]
+            if ex and pex and ps + (t - pt) == s:
+                continue
+            if not ex and not pex and ps == s:
+                continue
+        runs.append((t, s, ex))
+    return stripped, final_marks, runs
+
+
+def _collapse(text: str) -> tuple[str, list[int]]:
+    """压缩连续空白为一个空格。返回 (新文本, back)；back[k] 是新文本
+    位置 k 对应的原文本位置。"""
+    out: list[str] = []
+    back: list[int] = []
+    prev_ws = False
+    for i, ch in enumerate(text):
+        if ch in " \t\n":
+            if not prev_ws:
+                out.append(" ")
+                back.append(i)
+            prev_ws = True
+        else:
+            out.append(ch)
+            back.append(i)
+            prev_ws = False
+    return "".join(out), back
+
+
+def _forward(back: list[int], n: int) -> list[int]:
+    """back 的逆：原文本位置 i → 新文本中第一个 >= i 的位置。"""
+    fwd = [len(back)] * (n + 1)
+    k = len(back) - 1
+    for i in range(n, -1, -1):
+        while k >= 0 and back[k] >= i:
+            k -= 1
+        fwd[i] = k + 1
+    return fwd
+
+
+def map_position(runs: list[PosRun], t: int) -> tuple[int, bool]:
+    """渲染位置 → (源码位置, 是否逐字)。"""
+    if not runs:
+        return 0, False
+    lo, hi = 0, len(runs) - 1
+    while lo < hi:
+        mid = (lo + hi + 1) // 2
+        if runs[mid][0] <= t:
+            lo = mid
+        else:
+            hi = mid - 1
+    rt, rs, ex = runs[lo]
+    return (rs + (t - rt), True) if ex else (rs, False)
 
 
 def _accent_arg(src: str, i: int) -> tuple[str, int]:
@@ -403,9 +615,65 @@ def _accent_arg(src: str, i: int) -> tuple[str, int]:
     if i < len(src):
         m = _CMD_RE.match(src, i)
         if m:
-            return _SYMBOLS.get(m.group(1), m.group(1)), i + m.end()
+            return _SYMBOLS.get(m.group(1), m.group(1)), m.end()
         return src[i], i + 1
     return "", i
+
+
+# ------------------------------------------------------------ 宏定义收集
+
+_DEF_RE = re.compile(
+    r"\\(?:newcommand|renewcommand|providecommand|DeclareRobustCommand)\*?"
+    r"\s*\{?\s*\\([a-zA-Z@]+)\s*\}?\s*(?:\[(\d)\])?\s*(\[)?")
+_TEXDEF_RE = re.compile(r"\\[gex]?def\s*\\([a-zA-Z@]+)\s*((?:#\d\s*)*)\{")
+# 这些名字由块扫描器或 render 的专门分支处理，用户重定义它们不当文本宏
+_RESERVED = {
+    "section", "subsection", "subsubsection", "chapter", "part",
+    "paragraph", "subparagraph", "begin", "end", "item", "cite",
+    "input", "include", "bibliography", "bibitem", "caption", "label",
+    "ref", "footnote", "title", "author", "maketitle", "newblock",
+}
+
+
+def collect_macros(src: str) -> dict[str, Macro]:
+    """收集 \\newcommand / \\def 文本宏（参数个数 ≤ 9）。宏体里出现
+    \\begin、\\section 这类结构命令的不收（展开后会破坏块结构）。"""
+    macros: dict[str, Macro] = {}
+    for m in _DEF_RE.finditer(src):
+        name = m.group(1)
+        nargs = int(m.group(2) or 0)
+        k = m.end()
+        default = None
+        if m.group(3):  # 可选首参默认值
+            r = _read_balanced(src, k - 1, "[", "]")
+            if r is None:
+                continue
+            default, k = r[0], r[1]
+        k = _skip_ws(src, k)
+        r = _read_balanced(src, k, "{", "}")
+        if r is None:
+            continue
+        _add_macro(macros, name, Macro(nargs, default, r[0]))
+    for m in _TEXDEF_RE.finditer(src):
+        name = m.group(1)
+        nargs = len(re.findall(r"#\d", m.group(2)))
+        r = _read_balanced(src, m.end() - 1, "{", "}")
+        if r is None:
+            continue
+        _add_macro(macros, name, Macro(nargs, None, r[0]))
+    return macros
+
+
+def _add_macro(macros: dict[str, Macro], name: str, mac: Macro) -> None:
+    if name in _RESERVED or "@" in name:
+        return
+    if re.search(r"\\(?:begin|end|section|subsection|chapter|par\b|"
+                 r"def|newcommand|renewcommand|let|input|include|"
+                 r"makeatletter|usepackage|setlength|vspace)", mac.body):
+        return
+    if cite_kind(name.lower()) is not None:
+        return
+    macros.setdefault(name, mac)
 
 
 # ------------------------------------------------------------ 项目展开
@@ -413,75 +681,142 @@ def _accent_arg(src: str, i: int) -> tuple[str, int]:
 _VERB_LINE_RE = re.compile(r"\\verb\*?([^a-zA-Z])")
 
 
-def strip_comments(text: str) -> str:
-    """去掉 % 到行尾的注释；\\% 转义、\\verb|..| 行内 verbatim 保留。"""
-    lines = []
-    for line in text.split("\n"):
-        verb_spans = []
-        for m in _VERB_LINE_RE.finditer(line):
-            d = m.group(1)
-            end = line.find(d, m.end())
-            verb_spans.append((m.start(), len(line) if end < 0 else end + 1))
-        i = 0
-        while True:
-            j = line.find("%", i)
-            if j < 0:
-                break
-            if any(a <= j < b for a, b in verb_spans):
+def comment_spans(text: str) -> list[tuple[int, int]]:
+    """% 注释区间（含行尾换行与下一行行首空白，即 TeX 的语义）；
+    \\% 转义、\\verb|..| 行内 verbatim 不算注释。"""
+    spans: list[tuple[int, int]] = []
+    n = len(text)
+    line_start = 0
+    while line_start <= n:
+        line_end = text.find("\n", line_start)
+        if line_end < 0:
+            line_end = n
+        line = text[line_start:line_end]
+        if "%" in line:
+            verb_spans = []
+            for m in _VERB_LINE_RE.finditer(line):
+                d = m.group(1)
+                end = line.find(d, m.end())
+                verb_spans.append((m.start(), len(line) if end < 0 else end + 1))
+            i = 0
+            while True:
+                j = line.find("%", i)
+                if j < 0:
+                    break
+                if any(a <= j < b for a, b in verb_spans):
+                    i = j + 1
+                    continue
+                k, bs = j, 0
+                while k > 0 and line[k - 1] == "\\":
+                    k -= 1
+                    bs += 1
+                if bs % 2 == 0:
+                    a = line_start + j
+                    b = line_end + 1 if line_end < n else n
+                    # 整行注释保留换行（不吞掉段落间空行）；行尾注释
+                    # 吞掉换行与下一行行首空白
+                    if line[:j].strip():
+                        while b < n and text[b] in " \t":
+                            b += 1
+                    else:
+                        b = line_end
+                    spans.append((a, b))
+                    break
                 i = j + 1
-                continue
-            k, bs = j, 0
-            while k > 0 and line[k - 1] == "\\":
-                k -= 1
-                bs += 1
-            if bs % 2 == 0:
-                line = line[:j]
-                break
-            i = j + 1
-        lines.append(line)
-    return "\n".join(lines)
+        line_start = line_end + 1
+    return spans
+
+
+def strip_comments(text: str) -> str:
+    """去掉 % 注释（见 comment_spans）。"""
+    out, cur = [], 0
+    for a, b in comment_spans(text):
+        out.append(text[cur:a])
+        cur = b
+    out.append(text[cur:])
+    return "".join(out)
+
+
+def read_text(path: Path) -> str:
+    raw = path.read_bytes()
+    for enc in ("utf-8-sig", "latin-1"):
+        try:
+            return raw.decode(enc)
+        except UnicodeDecodeError:
+            continue
+    return raw.decode("utf-8", errors="replace")
 
 
 def read_tex(path: Path) -> str:
-    try:
-        return strip_comments(path.read_text(encoding="utf-8"))
-    except UnicodeDecodeError:
-        return strip_comments(path.read_text(encoding="latin-1"))
+    return strip_comments(read_text(path))
 
 
-def _resolve_tex(base: Path, name: str) -> Path | None:
-    name = name.strip()
-    for cand in (base / name, base / (name + ".tex")):
-        if cand.is_file():
-            return cand.resolve()
+def read_src(path: Path, project: Project) -> Src:
+    """读文件 → 去注释后的 Src（映射指向原文件）。"""
+    text = read_text(path)
+    fidx = project.add(path, text)
+    src = Src.of_file(text, fidx)
+    return src.edit([(a, b, "") for a, b in comment_spans(text)])
+
+
+def _resolve_tex(base: Path, name: str, root: Path | None = None) -> Path | None:
+    name = name.strip().strip('"')
+    bases = [base] if root is None or root == base else [base, root]
+    for b in bases:
+        for cand in (b / name, b / (name + ".tex")):
+            if cand.is_file():
+                return cand.resolve()
     return None
 
 
 _INPUT_RE = re.compile(
-    r"\\(?:input|include|subfile|subfileinclude)\s*\{([^}]*)\}"
+    r"\\(input|include|subfile|subfileinclude)\s*\{([^}]*)\}"
 )
 # TeX 原语写法 \input file（空格/行尾收尾，不带括号）
-_INPUT_BARE_RE = re.compile(r"\\input\s+([^\s{]+)")
+_INPUT_BARE_RE = re.compile(r"\\(input)\s+([^\s{\\]+)")
 
 
 def expand_inputs(src: str, base: Path, depth: int = 0,
                   seen: set[Path] | None = None) -> str:
-    """递归展开 \\input/\\include/\\subfile（含 \\input file 无括号写法），
-    深度上限 8，防循环。"""
+    """纯文本版本（不带映射），供只需要文本的调用方使用。"""
+    project = Project(base)
+    s = Src.of_file(src, project.add(base / "__inline__.tex", src))
+    return expand_inputs_src(s, base, project, base, depth, seen).text
+
+
+def expand_inputs_src(src: Src, base: Path, project: Project,
+                      root: Path | None = None, depth: int = 0,
+                      seen: set[Path] | None = None) -> Src:
+    """递归展开 \\input/\\include/\\subfile（含 \\input file 无括号
+    写法），深度上限 8，防循环。子文件路径先相对当前文件、再相对项目
+    根目录解析（LaTeX 以主文件目录为当前目录）。"""
     seen = seen if seen is not None else set()
     if depth > 8:
         return src
-
-    def repl(m: re.Match) -> str:
-        f = _resolve_tex(base, m.group(1))
-        if f is None or f in seen:
-            return ""
-        seen.add(f)
-        sub = read_tex(f)
-        return "\n\n" + expand_inputs(sub, f.parent, depth + 1, seen) + "\n\n"
-
-    src = _INPUT_RE.sub(repl, src)
-    return _INPUT_BARE_RE.sub(repl, src)
+    root = root or base
+    edits: list[tuple[int, int, str | Src]] = []
+    taken: list[tuple[int, int]] = []
+    for rx in (_INPUT_RE, _INPUT_BARE_RE):
+        for m in rx.finditer(src.text):
+            if any(a <= m.start() < b for a, b in taken):
+                continue
+            taken.append((m.start(), m.end()))
+            f = _resolve_tex(base, m.group(2), root) or \
+                _resolve_tex(root, m.group(2), root)
+            if f is None or f in seen:
+                edits.append((m.start(), m.end(), ""))
+                continue
+            seen.add(f)
+            sub = expand_inputs_src(
+                read_src(f, project), f.parent, project, root, depth + 1, seen)
+            sep = "\n\n" if m.group(1) == "include" else "\n"
+            fi, fp, _ = src.origin(m.start())
+            bld = Builder()
+            bld.add_text(sep, fi, fp)
+            bld.add(sub, 0, len(sub))
+            bld.add_text(sep, fi, fp)
+            edits.append((m.start(), m.end(), bld.build()))
+    return src.edit(edits)
 
 
 def iter_cite_keys(src: str) -> list[str]:

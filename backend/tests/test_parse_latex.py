@@ -46,7 +46,7 @@ def test_styles(numeric, authoryear):
 # ---------------------------------------------------------------- structure
 
 def test_include_expanded_and_sections(numeric):
-    titled = [s for s in numeric.sections if s.title]
+    titled = [s for s in numeric.sections if s.title and s.title != "Abstract"]
     assert [s.title for s in titled] == [
         "Introduction", "Method", "Results", "References"]
     assert [s.canonical for s in titled[:3]] == ["intro", "method", "experiment"]
@@ -109,8 +109,9 @@ def test_marker_rendering(numeric, authoryear):
     assert "[?]" in num_raws
     # author_year：\\citep → (Name, year)，\\citet → Name (year)
     ay = {m.raw for m in authoryear.markers}
-    assert "(Lewis & Perez, 2020)" in ay
-    assert "Vaswani & Shazeer" in ay  # \citeauthor 只出名字
+    # natbib 的 \bibitem[Short(Year)] 标签就是 LaTeX 实际印出的文本
+    assert "(Lewis et al., 2020)" in ay
+    assert "Vaswani et al." in ay     # \citeauthor 只出名字
     assert "2017" in ay               # \citeyear 只出年份
     assert "(?)" in ay                # 未定义键
 
@@ -206,3 +207,182 @@ def test_filecontents_embedded_bib(tmp_path):
     d = parse_latex(tmp_path)
     assert [r.key for r in d.references] == ["a1"]
     assert d.markers[0].ref_ids == ["r1"]
+
+
+# ---------------------------------------------------------------- archives
+
+import io
+import tarfile
+import zipfile as _zip
+
+from citecheck.parse.latex.archive import ArchiveError, extract_archive
+from citecheck.parse.latex.locate import Locator
+
+
+def _zip_project(tmp_path, files: dict[str, str], name="paper.zip"):
+    z = tmp_path / name
+    with _zip.ZipFile(z, "w") as zf:
+        for rel, text in files.items():
+            zf.writestr(rel, text)
+    return z
+
+
+@pytest.fixture
+def cache_dir(tmp_path, monkeypatch):
+    """Archives extract under the cache dir — keep tests out of the real one."""
+    from citecheck.parse.latex import archive
+    base = tmp_path / "extract"
+    real = archive.extract_archive
+    monkeypatch.setattr(
+        "citecheck.parse.latex.parser.extract_archive",
+        lambda p: real(p, base))
+    return base
+
+
+def test_zip_with_wrapper_folder(tmp_path, cache_dir):
+    """Typical Overleaf download: one top-level folder, main file inside."""
+    src = FIXTURES / "latex_numeric"
+    files = {f"proj/{p.name}": p.read_text() for p in src.iterdir()}
+    files["proj/figs/plot.tex"] = "\\begin{tikzpicture}\\end{tikzpicture}"
+    d = parse_document(_zip_project(tmp_path, files))
+    assert d.document.source_format == "tex"
+    assert d.document.filename == "paper.zip"
+    assert d.document.title == "Measuring Citation Recall"
+    assert d.latex.main == "proj/main.tex"
+    assert len(d.references) == 3
+
+
+def test_targz_and_single_gz(tmp_path, cache_dir):
+    main = (FIXTURES / "latex_authoryear.tex").read_bytes()
+    tgz = tmp_path / "2101.00001.tar.gz"
+    with tarfile.open(tgz, "w:gz") as tf:
+        info = tarfile.TarInfo("ms.tex")
+        info.size = len(main)
+        tf.addfile(info, io.BytesIO(main))
+    assert parse_document(tgz).document.title == "An Author-Year Study"
+    import gzip
+    gz = tmp_path / "2101.00002.gz"   # arXiv single-file e-print
+    gz.write_bytes(gzip.compress(main))
+    assert parse_document(gz).document.title == "An Author-Year Study"
+
+
+def test_zip_slip_and_symlinks_skipped(tmp_path):
+    z = tmp_path / "evil.zip"
+    with _zip.ZipFile(z, "w") as zf:
+        zf.writestr("../escape.tex", "x")
+        zf.writestr("/abs.tex", "x")
+        zf.writestr("__MACOSX/._main.tex", "x")
+        link = _zip.ZipInfo("link.tex")
+        link.external_attr = (0o120777 << 16)
+        zf.writestr(link, "/etc/passwd")
+        zf.writestr("main.tex", "\\documentclass{article}")
+    out = extract_archive(z, tmp_path / "x")
+    names = sorted(p.relative_to(out).as_posix()
+                   for p in out.rglob("*") if p.is_file())
+    assert names == [".clover-extracted", "main.tex"]
+    assert not (tmp_path / "escape.tex").exists()
+
+
+def test_bad_archive(tmp_path):
+    bad = tmp_path / "broken.zip"
+    bad.write_bytes(b"PK\x03\x04 not really")
+    with pytest.raises(ArchiveError):
+        extract_archive(bad, tmp_path / "x")
+
+
+# ---------------------------------------------------------------- mapping
+
+def test_source_mapping_points_at_original_text(numeric):
+    """Every rendered character of plain prose maps back to the same
+    character in the original file — including through \\input."""
+    loc = Locator(numeric.latex)
+    root = Path(numeric.latex.root)
+    checked = 0
+    ref_paras = {r.paragraph_id for r in numeric.references}
+    for p in numeric.paragraphs:
+        if p.id in ref_paras:
+            continue
+        for word in ("Transformer", "Numbers", "approach", "twist"):
+            k = p.text.find(word)
+            if k < 0:
+                continue
+            rel, fpos, exact = loc.offset(p.id, k)
+            assert exact
+            assert (root / rel).read_text()[fpos:fpos + len(word)] == word
+            checked += 1
+    assert checked == 4
+    marker = next(m for m in numeric.markers if m.keys == ["lewis2020"])
+    assert loc.loc(marker.paragraph_id, marker.start) == "method.tex:2"
+
+
+def test_macros_comments_and_assignments(tmp_path):
+    (tmp_path / "main.tex").write_text(r"""\documentclass{article}
+\newcommand{\method}{CiteGuard}
+\newcommand{\term}[1]{\emph{#1}}
+\begin{document}
+\section{Intro}
+\looseness=-1 We present \method{}, a % trailing comment
+  tool for \term{citation checking}.\setlength{\parskip}{2pt}
+\end{document}
+""")
+    d = parse_latex(tmp_path / "main.tex")
+    body = next(p.text for p in d.paragraphs if "present" in p.text)
+    assert body == "We present CiteGuard, a tool for citation checking."
+
+
+def test_bbl_only_project(tmp_path):
+    """arXiv sources often ship the compiled .bbl without the .bib."""
+    (tmp_path / "ms.tex").write_text(r"""\documentclass{article}
+\usepackage{natbib}
+\begin{document}
+\section{Intro}
+Attention \citep{vaswani2017} and BERT \citet{devlin2019}.
+\bibliographystyle{acl_natbib}
+\bibliography{custom}
+\end{document}
+""")
+    (tmp_path / "ms.bbl").write_text(r"""\begin{thebibliography}{2}
+\bibitem[{Devlin et~al.(2019)Devlin, Chang, Lee, and Toutanova}]{devlin2019}
+Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019.
+\newblock BERT: Pre-training of deep bidirectional transformers.
+\newblock In \emph{NAACL}.
+
+\bibitem[{Vaswani et~al.(2017)Vaswani, Shazeer, Parmar}]{vaswani2017}
+Ashish Vaswani, Noam Shazeer, and Niki Parmar. 2017.
+\newblock Attention is all you need.
+\newblock In \emph{NeurIPS}.
+\end{thebibliography}
+""")
+    d = parse_latex(tmp_path / "ms.tex")
+    assert [r.key for r in d.references] == ["devlin2019", "vaswani2017"]
+    assert d.references[1].title == "Attention is all you need"
+    raws = [m.raw for m in d.markers]
+    assert raws == ["(Vaswani et al., 2017)", "Devlin et al. (2019)"]
+    assert all(m.ref_ids for m in d.markers)
+    assert d.structured_refs == []  # bbl text → model still structures it
+    loc = Locator(d.latex)
+    r = d.references[0]
+    assert loc.loc(r.paragraph_id, 0) == "ms.bbl:2"
+
+
+def test_bib_plus_bbl_merges(tmp_path):
+    """.bib gives fields, .bbl gives print order and entries the .bib lacks."""
+    (tmp_path / "main.tex").write_text(r"""\documentclass{article}
+\usepackage[numbers]{natbib}
+\begin{document}
+See \cite{b,a}.
+\bibliographystyle{plain}
+\bibliography{refs}
+\end{document}
+""")
+    (tmp_path / "refs.bib").write_text(
+        "@article{b, title={Bee Paper}, author={Zed, Z.}, year={2020}}\n")
+    (tmp_path / "main.bbl").write_text(r"""\begin{thebibliography}{2}
+\bibitem{a} A. Alpha. Alpha paper. 2019.
+\bibitem{b} Z. Zed. Bee paper. 2020.
+\end{thebibliography}""")
+    d = parse_latex(tmp_path / "main.tex")
+    assert [r.key for r in d.references] == ["a", "b"]
+    assert d.references[1].title == "Bee Paper"      # from .bib
+    assert d.structured_refs == [d.references[1].id]
+    assert d.markers[0].raw == "[2,1]"

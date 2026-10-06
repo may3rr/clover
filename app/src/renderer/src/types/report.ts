@@ -2,6 +2,7 @@
 
 export type Title = string | null;
 export type Filename = string | null;
+export type SourceFormat = "docx" | "tex";
 export type CitationStyle = "numeric" | "author_year" | "mixed" | "unknown";
 export type ManagedBy = ("zotero" | "endnote") | null;
 export type WordCount = number;
@@ -20,8 +21,9 @@ export type ParagraphId = string;
 export type Start = number;
 export type End = number;
 export type Raw = string;
-export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year" | "footnote") | null;
+export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year" | "footnote" | "cite_key") | null;
 export type RefIds = string[];
+export type Keys = string[];
 export type Markers = CitationMarker[];
 export type Id3 = string;
 export type Raw1 = string;
@@ -34,6 +36,7 @@ export type Lang = "en" | "zh" | "other";
 export type ParagraphId1 = string | null;
 export type Label = string | null;
 export type Origin = "list" | "footnote";
+export type Key = string | null;
 export type References = Reference[];
 export type RefId = string;
 export type Status = "verified" | "mismatch" | "not_found" | "unverifiable";
@@ -92,6 +95,7 @@ export type Severity = "high" | "medium" | "low";
 export type ParagraphId3 = string;
 export type Start2 = number;
 export type End2 = number;
+export type Loc = string | null;
 export type Title4 = string;
 export type Detail = string;
 export type Refs = string[];
@@ -108,7 +112,7 @@ export type VenueId = string;
 export type VenueName = string;
 export type Overall = "below" | "near" | "at" | "above" | "na";
 export type Comment = string;
-export type Key = string;
+export type Key1 = string;
 export type Label2 = string;
 export type Tier = "below" | "near" | "at" | "above" | "na";
 export type Note1 = string;
@@ -144,6 +148,7 @@ export interface Report {
 export interface Document {
   title?: Title;
   filename?: Filename;
+  source_format?: SourceFormat;
   citation_style?: CitationStyle;
   managed_by?: ManagedBy;
   word_count?: WordCount;
@@ -168,6 +173,7 @@ export interface CitationMarker {
   raw: Raw;
   kind?: Kind;
   ref_ids?: RefIds;
+  keys?: Keys;
 }
 export interface Reference {
   id: Id3;
@@ -181,6 +187,7 @@ export interface Reference {
   paragraph_id?: ParagraphId1;
   label?: Label;
   origin?: Origin;
+  key?: Key;
 }
 export interface RefCheck {
   ref_id: RefId;
@@ -263,6 +270,7 @@ export interface Anchor {
   paragraph_id: ParagraphId3;
   start: Start2;
   end: End2;
+  loc?: Loc;
 }
 export interface Revision {
   id: Id6;
@@ -290,7 +298,7 @@ export interface Overview {
   note?: Note2;
 }
 export interface OverviewDim {
-  key: Key;
+  key: Key1;
   label: Label2;
   tier?: Tier;
   note?: Note1;

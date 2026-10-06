@@ -239,21 +239,18 @@ async def export_stored_report(report_id: str):
     if isinstance(row, JSONResponse):
         return row
     src = Path(row["src_path"])
-    if not src.is_file():
+    if not src.exists():
         return JSONResponse(
             {"detail": "原文件已移动或删除，无法导出。请重新体检这篇论文。"},
             status_code=400,
         )
     try:
-        from .export import export_report
         from .schema import Report
         rep = Report.model_validate(json.loads(row["report_json"]))
-        author, initials = _comment_identity(_prefs())
-        out = await asyncio.to_thread(
-            export_report, src, rep, None, author, initials)
+        out = await _export(src, rep)
     except Exception as e:  # noqa: BLE001
         log.exception("export failed for stored report %s", report_id)
-        return JSONResponse({"detail": str(e)}, status_code=500)
+        return JSONResponse({"detail": _export_error(e)}, status_code=500)
     return {"path": str(out)}
 
 
@@ -308,20 +305,30 @@ async def export(job_id: str):
         return JSONResponse({"detail": job.error}, status_code=500)
     if job.report is None:
         return JSONResponse({"detail": "job still running"}, status_code=409)
-    if job.src_path.is_dir() or job.src_path.suffix.lower() != ".docx":
-        return JSONResponse(
-            {"detail": "LaTeX 项目暂不支持导出修订文档；请根据报告直接修改源码。"},
-            status_code=400)
     try:
-        from .export import export_report
-        author, initials = _comment_identity(_prefs())
-        out = await asyncio.to_thread(
-            export_report, job.src_path, job.report,
-            None, author, initials)
+        out = await _export(job.src_path, job.report)
     except Exception as e:  # noqa: BLE001
         log.exception("export failed for job %s", job.id)
-        return JSONResponse({"detail": str(e)}, status_code=500)
+        return JSONResponse({"detail": _export_error(e)}, status_code=500)
     return {"path": str(out)}
+
+
+async def _export(src: Path, rep) -> Path:
+    """docx → 带批注与修订的新 docx；LaTeX → 批注版项目 zip。"""
+    author, initials = _comment_identity(_prefs())
+    if rep.document.source_format == "tex":
+        from .export.latex import export_latex
+        return await asyncio.to_thread(export_latex, src, rep, None, author)
+    from .export import export_report
+    return await asyncio.to_thread(
+        export_report, src, rep, None, author, initials)
+
+
+def _export_error(e: Exception) -> str:
+    from .export.latex import LatexExportError
+    if isinstance(e, LatexExportError):
+        return str(e)
+    return f"导出失败：{e}"
 
 
 # ---------------------------------------------------------------- prefs

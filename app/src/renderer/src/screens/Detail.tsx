@@ -4,6 +4,7 @@ import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
 import { ChevronLeftIcon } from '../components/Icons'
+import { formatLoc } from '../lib/accept'
 
 interface Props {
   item: ListItem
@@ -32,6 +33,11 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
           <div className="font-semibold detail-title" style={{ fontSize: 17 }}>
             {item.title}
           </div>
+          {formatLoc(item.anchors[0]?.loc) && (
+            <div className="t13 secondary" style={{ marginTop: 4 }}>
+              源码位置 {formatLoc(item.anchors[0]?.loc)}
+            </div>
+          )}
           <div
             className="flex flex-col"
             style={{ gap: 12, marginTop: 16 }}
@@ -43,7 +49,10 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
             ) : item.kind === 'group' ? (
               <ReorderDetail item={item} report={report} />
             ) : item.kind === 'revision' ? (
-              <RevisionDetail item={item} />
+              <RevisionDetail
+                item={item}
+                tex={report.document.source_format === 'tex'}
+              />
             ) : (
               <FindingDetail item={item} report={report} />
             )}
@@ -548,7 +557,7 @@ function NormsDetail({ item, report }: { item: ListItem; report: Report }) {
   )
 }
 
-function RevisionDetail({ item }: { item: ListItem }) {
+function RevisionDetail({ item, tex }: { item: ListItem; tex: boolean }) {
   const r = item.revision
   if (!r) return null
   return (
@@ -586,7 +595,9 @@ function RevisionDetail({ item }: { item: ListItem }) {
         </div>
       </div>
       <div className="t13 secondary">
-        导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。
+        {tex
+          ? '导出后写入 clover-revisions.patch，可以在编辑器里逐块审阅后应用。'
+          : '导出后在 Word 中以修订形式出现，可以逐条接受或拒绝。'}
       </div>
     </>
   )

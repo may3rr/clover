@@ -19,6 +19,7 @@ class BibEntry:
     key: str
     type: str
     fields: dict[str, str] = field(default_factory=dict)
+    pos: int = 0  # '@' 在 .bib 文本中的偏移（导出时把批注写到条目上方）
 
 
 def _skip_ws(s: str, i: int) -> int:
@@ -125,6 +126,7 @@ def parse_bib(text: str) -> list[BibEntry]:
             i += 1
             continue
         etype = m.group(1).lower()
+        at = i
         open_i = i + m.end() - 1
         open_c, close_c = ("(", ")") if m.group(2) == "(" else ("{", "}")
         r = _read_balanced(text, open_i, open_c, close_c)
@@ -143,7 +145,8 @@ def parse_bib(text: str) -> list[BibEntry]:
         key = body[:comma].strip()
         if not key:
             continue
-        entries.append(BibEntry(key, etype, _parse_fields(body[comma + 1 :], strings)))
+        entries.append(BibEntry(
+            key, etype, _parse_fields(body[comma + 1 :], strings), at))
     return entries
 
 
@@ -205,3 +208,45 @@ def _format_raw(e: BibEntry, authors: list[str], title: str | None,
     if doi:
         parts.append(f"doi:{doi}")
     return " ".join(parts) or f"@{e.type}{{{e.key}}}"
+
+
+# ------------------------------------------------------- biblatex .bbl
+
+_BBL_ENTRY_RE = re.compile(r"\\entry\s*\{([^}]*)\}\s*\{([^}]*)\}")
+_BBL_FIELD_RE = re.compile(r"\\field\s*\{([a-zA-Z]+)\}\s*\{")
+_BBL_VERB_RE = re.compile(
+    r"\\verb\s*\{([a-zA-Z]+)\}\s*\n\s*\\verb\s?(.*?)\n\s*\\endverb", re.S)
+_BBL_NAME_RE = re.compile(r"\\name\s*\{author\}\s*\{\d+\}\s*\{[^}]*\}\s*\{")
+
+
+def parse_biblatex_bbl(text: str) -> list[BibEntry]:
+    """biblatex 生成的 .bbl（\\entry{key}{type}{} … \\endentry）→
+    BibEntry。arXiv 上用 biblatex 的投稿常常只带 .bbl 不带 .bib。"""
+    entries: list[BibEntry] = []
+    for m in _BBL_ENTRY_RE.finditer(text):
+        end = text.find("\\endentry", m.end())
+        body = text[m.end(): end if end > 0 else len(text)]
+        fields: dict[str, str] = {}
+        for fm in _BBL_FIELD_RE.finditer(body):
+            r = _read_balanced(body, fm.end() - 1, "{", "}")
+            if r:
+                fields.setdefault(fm.group(1).lower(), r[0])
+        for vm in _BBL_VERB_RE.finditer(body):
+            fields.setdefault(vm.group(1).lower(), vm.group(2).strip())
+        nm = _BBL_NAME_RE.search(body)
+        if nm:
+            r = _read_balanced(body, nm.end() - 1, "{", "}")
+            if r:
+                names = []
+                for person in re.finditer(r"family=\{((?:[^{}]|\{[^{}]*\})*)\}"
+                                          r"(?:.*?given=\{((?:[^{}]|\{[^{}]*\})*)\})?",
+                                          r[0], re.S):
+                    fam, given = person.group(1), person.group(2)
+                    names.append(f"{fam}, {given}" if given else fam)
+                if names:
+                    fields["author"] = " and ".join(names)
+        if "year" not in fields and fields.get("date"):
+            fields["year"] = fields["date"][:4]
+        entries.append(BibEntry(m.group(1).strip(), m.group(2).lower(),
+                                fields, m.start()))
+    return entries

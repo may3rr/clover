@@ -12,6 +12,7 @@ import { applyShotState, type ShotCtx } from './lib/shots'
 import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
+import { ACCEPT_ERROR, isPaperPath, looksLikeFolder } from './lib/accept'
 
 const VENUE_KEY = 'clover.venue'
 const VENUES = ['emnlp', 'acl', 'naacl', 'findings-emnlp', '']
@@ -106,7 +107,7 @@ export default function App() {
         fd.append('venue', venue)
         const r = await apiFetch('/analyze', { method: 'POST', body: fd })
         if (!r.ok) {
-          setJobError('无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目文件夹。')
+          setJobError(ACCEPT_ERROR)
           return
         }
         const { job_id } = (await r.json()) as { job_id: string }
@@ -178,9 +179,8 @@ export default function App() {
   // -------------------------------------------------------------- menu
   useEffect(() => {
     const offFile = window.citecheck.onOpenFile((p) => {
-      const lp = p.toLowerCase()
-      if (lp.endsWith('.docx') || lp.endsWith('.tex')) analyze(p)
-      else setJobError('无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目文件夹。')
+      if (isPaperPath(p) || looksLikeFolder(p)) analyze(p)
+      else setJobError(ACCEPT_ERROR)
     })
     const offMenu = window.citecheck.onMenu((cmd) => {
       if (cmd === 'open') openDialog()
@@ -193,11 +193,14 @@ export default function App() {
     }
   }, [analyze, openDialog, reset])
 
-  // 导出到 Word is only enabled on the report screen (docx only)
+  // export is only enabled on the report screen; LaTeX exports sources
   useEffect(() => {
     window.citecheck.setMenuState({
-      exportEnabled:
-        screen === 'report' && report?.document.source_format !== 'tex',
+      exportEnabled: screen === 'report',
+      exportLabel:
+        report?.document.source_format === 'tex'
+          ? '导出批注版源码'
+          : '导出到 Word',
     })
   }, [screen, report])
 

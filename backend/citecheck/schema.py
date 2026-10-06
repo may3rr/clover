@@ -15,6 +15,8 @@ class Anchor(BaseModel):
     paragraph_id: str
     start: int
     end: int
+    # LaTeX 源码位置 "sections/intro.tex:42"（docx 为 None）
+    loc: str | None = None
 
 
 CanonicalSection = Literal[

@@ -9,6 +9,7 @@ import AccountChip from '../components/AccountChip'
 import HistoryRow from '../components/HistoryRow'
 import { useReports } from '../lib/useReports'
 import type { Prefs } from '../lib/prefs'
+import { ACCEPT_ERROR, isPaperPath } from '../lib/accept'
 
 interface Props {
   benchmark: string
@@ -79,8 +80,10 @@ export default function Empty({
       setDrag(false)
       const file = e.dataTransfer.files?.[0]
       if (!file) return
-      if (!file.name.toLowerCase().endsWith('.docx')) {
-        setErr('无法读取这个文件。请确认它是 .docx 格式，然后重新拖入。')
+      // a LaTeX project may arrive as a folder: only the entry knows
+      const entry = e.dataTransfer.items?.[0]?.webkitGetAsEntry?.()
+      if (entry?.isDirectory !== true && !isPaperPath(file.name)) {
+        setErr(ACCEPT_ERROR)
         return
       }
       setErr(null)
@@ -160,7 +163,8 @@ export default function Empty({
               把论文拖到这里
             </button>
             <div className="secondary" style={{ marginTop: 8 }}>
-              支持英文论文的 .docx 文件。全文在本机解析，不会上传。
+              支持英文论文的 .docx 文件，或 LaTeX 项目的 .zip
+              压缩包、文件夹。全文在本机解析，不会上传。
             </div>
             {(err || dropError) && (
               <div className="font-normal" style={{ marginTop: 12 }}>

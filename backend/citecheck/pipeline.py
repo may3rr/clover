@@ -51,7 +51,8 @@ log = logging.getLogger(__name__)
 
 LAYER_ORDER = ["authenticity", "support", "distribution", "norms"]
 
-PARSE_ERROR = "无法读取这个文件。请拖入 .docx 文件或 LaTeX 项目（.tex 或项目文件夹）。"
+PARSE_ERROR = ("无法读取这个文件。请拖入 .docx 文件，或 LaTeX 项目的 .zip"
+               " 压缩包、文件夹、主 .tex 文件。")
 
 
 class PipelineError(Exception):
@@ -167,7 +168,8 @@ async def run_pipeline(
     # last resort for the bibliography: no heading, no ZOTERO_BIBL field,
     # no trailing numbered run -> ask the cheap model where the list
     # starts and accept only a deterministically-verifiable span (T1e)
-    if not parsed.references and parsed.paragraphs:
+    if (not parsed.references and parsed.paragraphs
+            and parsed.document.source_format == "docx"):
         try:
             start = await guess_bibliography_start(parsed)
         except Exception as e:  # noqa: BLE001 — guessing is optional
@@ -182,8 +184,11 @@ async def run_pipeline(
     # wrong on unfamiliar styles); fields must be grounded in the entry text
     if parsed.references:
         try:
+            # .bib-derived LaTeX entries are already structured data
+            done = set(parsed.structured_refs)
             changed = await structure_references(
-                [r for r in parsed.references if r.origin == "list"])
+                [r for r in parsed.references
+                 if r.origin == "list" and r.id not in done])
         except Exception as e:  # noqa: BLE001 — regex fields stand
             log.warning("reference structuring failed: %s", e)
             changed = 0
@@ -290,6 +295,12 @@ async def run_pipeline(
             ))
             for i, f in enumerate(findings, 1):
                 f.id = f"f{i}"
+            if parsed.latex is not None:
+                from .parse.latex.locate import annotate_locations
+                annotate_locations(
+                    parsed.latex,
+                    [f.anchor for f in findings] +
+                    [r.anchor for r in revisions])
             for i, r in enumerate(revisions, 1):
                 r.id = f"v{i}"
 

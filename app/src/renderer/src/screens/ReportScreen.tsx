@@ -88,6 +88,7 @@ export default function ReportScreen({
   const [scrolled, setScrolled] = useState(false)
   const [exported, setExported] = useState<string | null>(null)
   const [exportErr, setExportErr] = useState<string | null>(null)
+  const isTex = report.document.source_format === 'tex'
   const segRefs = useRef(new Map<string, HTMLElement[]>())
 
   const shown = useMemo(
@@ -326,11 +327,6 @@ export default function ReportScreen({
               <span className="t13 secondary">已导出到 {exported}</span>
             )}
             {exportErr && <span className="t13 secondary">{exportErr}</span>}
-            {report.document.source_format === 'tex' ? (
-              <span className="t13 secondary">
-                LaTeX 项目暂不支持导出修订
-              </span>
-            ) : (
             <button
               className="pill-accent"
               onClick={doExport}
@@ -364,9 +360,12 @@ export default function ReportScreen({
               ) : (
                 <ArrowUpDocFillIcon size={15} color="white" />
               )}
-              {exporting ? '正在导出' : '导出到 Word'}
+              {exporting
+                ? '正在导出'
+                : isTex
+                  ? '导出批注版源码'
+                  : '导出到 Word'}
             </button>
-            )}
           </div>
         </div>
         <main
@@ -462,6 +461,10 @@ function PaperBody({
   segRefs: React.MutableRefObject<Map<string, HTMLElement[]>>
   onPick: (itemIds: string[]) => void
 }) {
+  const exportWhere =
+    report.document.source_format === 'tex'
+      ? '导出后会以注释写进 LaTeX 源码，修订另附补丁文件'
+      : '导出后会以批注和修订出现在 Word 里'
   const headingIds = useMemo(
     () =>
       new Set(
@@ -540,7 +543,7 @@ function PaperBody({
           <DocMagnifyIcon size={20} color="var(--accent)" />
           <div className="font-normal">
             {nHigh + nMedium === 0 ? (
-              '没有发现严重问题，其余提示导出后会以批注和修订出现在 Word 里。'
+              `没有发现严重问题，其余提示${exportWhere}。`
             ) : (
               <>
                 发现
@@ -558,7 +561,7 @@ function PaperBody({
                     条需要注意
                   </>
                 )}
-                ，导出后会以批注和修订出现在 Word 里。
+                ，{exportWhere}。
               </>
             )}
           </div>

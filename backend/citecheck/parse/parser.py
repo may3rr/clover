@@ -41,6 +41,36 @@ _DC_TITLE = "{http://purl.org/dc/elements/1.1/}title"
 _CITE_LABEL_RE = re.compile(r"^\s*[\[\(（【]?\d{1,3}[\]\)）】]?[\.、]?\s+\S")
 
 
+class LatexMap(BaseModel):
+    """LaTeX 来源映射：段落文本位置 → 源文件偏移（不进 Report）。
+
+    para_runs[pid] 是 (段内位置, 文件序号, 文件偏移, 是否逐字) 的分段
+    表：逐字段里位置每 +1 偏移也 +1；非逐字段（宏展开、引用渲染、
+    合成的参考文献条目）整段指向同一个源码位置。"""
+
+    root: str
+    main: str
+    files: list[str] = Field(default_factory=list)
+    para_runs: dict[str, list[tuple[int, int, int, bool]]] = Field(
+        default_factory=dict)
+
+    def locate(self, pid: str, pos: int) -> tuple[str, int, bool] | None:
+        """段落位置 → (相对路径, 文件偏移, 是否逐字)。"""
+        runs = self.para_runs.get(pid)
+        if not runs:
+            return None
+        k = 0
+        for i, r in enumerate(runs):
+            if r[0] <= pos:
+                k = i
+            else:
+                break
+        t, f, fp, ex = runs[k]
+        if f < 0 or f >= len(self.files):
+            return None
+        return self.files[f], (fp + (pos - t) if ex else fp), ex
+
+
 class ParsedDocument(BaseModel):
     """Everything the downstream layers and the docx exporter need."""
 
@@ -53,6 +83,10 @@ class ParsedDocument(BaseModel):
     # absent = none). Downstream edits must not treat these virtual
     # labels as literal text — Word renumbers them on its own.
     auto_labels: dict[str, str] = Field(default_factory=dict)
+    # LaTeX 来源映射（docx 为 None）
+    latex: LatexMap | None = None
+    # 字段来自 .bib 等结构化数据的参考文献 id：无需再交给模型结构化
+    structured_refs: list[str] = Field(default_factory=list)
 
 
 def _read_part(zf: zipfile.ZipFile, name: str) -> etree._Element | None:
@@ -355,15 +389,17 @@ def apply_bibliography_start(parsed: ParsedDocument, start: int) -> int:
 
 def relink_markers(parsed: ParsedDocument) -> None:
     """Re-resolve list-reference markers after reference fields changed
-    (model re-structuring). Footnote links are positional and kept."""
+    (model re-structuring). Footnote links are positional and kept;
+    LaTeX cite_key links are exact key lookups and never change."""
+    keep = {"footnote", "cite_key"}
     det = [
         DetectedMarker(start=m.start, end=m.end, raw=m.raw,
                        kind=m.kind or "numeric")
-        for m in parsed.markers if m.kind != "footnote"
+        for m in parsed.markers if m.kind not in keep
     ]
     lists = link_markers(det, [r for r in parsed.references
                                if r.origin == "list"])
     it = iter(lists)
     for m in parsed.markers:
-        if m.kind != "footnote":
+        if m.kind not in keep:
             m.ref_ids = next(it)

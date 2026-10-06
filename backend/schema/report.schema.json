@@ -13,6 +13,18 @@
         "end": {
           "title": "End",
           "type": "integer"
+        },
+        "loc": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Loc"
         }
       },
       "required": [
@@ -54,7 +66,8 @@
                 "superscript",
                 "numeric",
                 "author_year",
-                "footnote"
+                "footnote",
+                "cite_key"
               ],
               "type": "string"
             },
@@ -70,6 +83,13 @@
             "type": "string"
           },
           "title": "Ref Ids",
+          "type": "array"
+        },
+        "keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Keys",
           "type": "array"
         }
       },
@@ -240,6 +260,15 @@
           ],
           "default": null,
           "title": "Filename"
+        },
+        "source_format": {
+          "default": "docx",
+          "enum": [
+            "docx",
+            "tex"
+          ],
+          "title": "Source Format",
+          "type": "string"
         },
         "citation_style": {
           "default": "unknown",
@@ -754,6 +783,18 @@
           ],
           "title": "Origin",
           "type": "string"
+        },
+        "key": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Key"
         }
       },
       "required": [

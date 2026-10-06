@@ -50,6 +50,11 @@
         "ext": "docx",
         "name": "Word Document",
         "role": "Viewer"
+      },
+      {
+        "ext": "tex",
+        "name": "LaTeX Source",
+        "role": "Viewer"
       }
     ],
     "extraResources": [
