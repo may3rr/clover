@@ -15,11 +15,15 @@ export type Id1 = string;
 export type SectionId = string;
 export type Text = string;
 export type CharOffset = number;
+export type Start = number;
+export type End = number;
+export type Runs = [unknown, unknown][];
+export type Math = MathSpan[];
 export type Paragraphs = Paragraph[];
 export type Id2 = string;
 export type ParagraphId = string;
-export type Start = number;
-export type End = number;
+export type Start1 = number;
+export type End1 = number;
 export type Raw = string;
 export type Kind = ("zotero" | "endnote" | "superscript" | "numeric" | "author_year" | "footnote" | "cite_key") | null;
 export type RefIds = string[];
@@ -48,8 +52,8 @@ export type Answered = string[];
 export type RefChecks = RefCheck[];
 export type Id4 = string;
 export type ParagraphId2 = string;
-export type Start1 = number;
-export type End1 = number;
+export type Start2 = number;
+export type End2 = number;
 export type Text1 = string;
 export type MarkerIds = string[];
 export type Sentence = string | null;
@@ -93,9 +97,11 @@ export type Id5 = string;
 export type Layer = "authenticity" | "support" | "distribution" | "norms";
 export type Severity = "high" | "medium" | "low";
 export type ParagraphId3 = string;
-export type Start2 = number;
-export type End2 = number;
+export type Start3 = number;
+export type End3 = number;
 export type Loc = string | null;
+export type Snippet = string | null;
+export type SnippetHl = [unknown, unknown] | null;
 export type Title4 = string;
 export type Detail = string;
 export type Refs = string[];
@@ -164,12 +170,22 @@ export interface Paragraph {
   section_id: SectionId;
   text: Text;
   char_offset: CharOffset;
+  math?: Math;
+}
+/**
+ * LaTeX inline math inside Paragraph.text[start:end] (flattened text).
+ * runs is the display form: (text, "" | "sub" | "sup") pieces.
+ */
+export interface MathSpan {
+  start: Start;
+  end: End;
+  runs?: Runs;
 }
 export interface CitationMarker {
   id: Id2;
   paragraph_id: ParagraphId;
-  start: Start;
-  end: End;
+  start: Start1;
+  end: End1;
   raw: Raw;
   kind?: Kind;
   ref_ids?: RefIds;
@@ -199,8 +215,8 @@ export interface RefCheck {
 export interface Claim {
   id: Id4;
   paragraph_id: ParagraphId2;
-  start: Start1;
-  end: End1;
+  start: Start2;
+  end: End2;
   text: Text1;
   marker_ids?: MarkerIds;
   sentence?: Sentence;
@@ -268,9 +284,11 @@ export interface Finding {
 }
 export interface Anchor {
   paragraph_id: ParagraphId3;
-  start: Start2;
-  end: End2;
+  start: Start3;
+  end: End3;
   loc?: Loc;
+  snippet?: Snippet;
+  snippet_hl?: SnippetHl;
 }
 export interface Revision {
   id: Id6;

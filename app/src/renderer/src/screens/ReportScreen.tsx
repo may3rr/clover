@@ -20,6 +20,7 @@ import {
   HL_CLASS,
   HL_SELECTED_CLASS,
 } from '../lib/highlight'
+import { mathPieces, type Piece } from '../lib/math'
 import { apiFetch } from '../lib/api'
 import { morph } from '../lib/vt'
 import type { Prefs } from '../lib/prefs'
@@ -587,7 +588,10 @@ function PaperBody({
             }}
           >
             {segs.map((s, i) => {
-              if (s.severity === null) return <span key={i}>{s.text}</span>
+              const body = renderPieces(
+                mathPieces(ptext, s.start, s.end, p.math)
+              )
+              if (s.severity === null) return <span key={i}>{body}</span>
               const cls = s.selected
                 ? HL_SELECTED_CLASS[s.severity]
                 : HL_CLASS[s.severity]
@@ -611,7 +615,7 @@ function PaperBody({
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
                 >
-                  {s.text}
+                  {body}
                 </span>
               )
             })}
@@ -619,6 +623,29 @@ function PaperBody({
         )
       })}
     </>
+  )
+}
+
+/** LaTeX inline math keeps its sub/superscripts in the reading view; the
+ *  flattened text stays the anchor coordinate system. */
+function renderPieces(pieces: Piece[]): React.ReactNode {
+  if (pieces.length === 1 && pieces[0].kind === 'text') return pieces[0].text
+  return pieces.map((x, i) =>
+    x.kind === 'text' ? (
+      x.text
+    ) : (
+      <span key={i} className="math" title={x.text}>
+        {x.runs.map(([t, style], j) =>
+          style === 'sub' ? (
+            <sub key={j}>{t}</sub>
+          ) : style === 'sup' ? (
+            <sup key={j}>{t}</sup>
+          ) : (
+            t
+          )
+        )}
+      </span>
+    )
   )
 }
 

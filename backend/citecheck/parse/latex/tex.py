@@ -301,7 +301,7 @@ def render(
     cite_render(name, keys) 给出 \\cite 命令的替换文本；为 None 时引用
     命令不产出文本也不记 marker。
     """
-    text, marks, _ = render_mapped(src, cite_render, macros)
+    text, marks, _, _ = render_mapped(src, cite_render, macros)
     return text, marks
 
 
@@ -310,17 +310,27 @@ def render_mapped(
     cite_render: Callable[[str, list[str]], str] | None = None,
     macros: dict[str, Macro] | None = None,
     _depth: int = 0,
-) -> tuple[str, list[RenderedMarker], list[PosRun]]:
+) -> tuple[str, list[RenderedMarker], list[PosRun],
+           list[tuple[int, int, str]]]:
     """render() 加位置映射：第三个返回值把渲染文本的每个位置映射回
-    src 中的位置（见 PosRun）。"""
+    src 中的位置（见 PosRun）；第四个是行内公式 (起, 止, LaTeX 源码)，
+    坐标是渲染文本的位置，阅读区据此把公式排成上下标。"""
     out: list[str] = []
     # 与 out 中每个字符平行：源码位置与是否逐字
     o_src: list[int] = []
     o_exact: list[bool] = []
     marks: list[RenderedMarker] = []
+    # inline math: (start, end, latex source) in pre-collapse coordinates
+    maths: list[tuple[int, int, str]] = []
     i, n = 0, len(src)
     pos = 0
     macros = macros or {}
+
+    def emit_math(body: str, at: int) -> None:
+        start = pos
+        emit(_render_math(body, macros), at)
+        if pos > start:
+            maths.append((start, pos, body))
 
     def emit(s: str, at: int, exact: bool = False) -> None:
         nonlocal pos
@@ -356,7 +366,7 @@ def render_mapped(
             if src.startswith("$$", i):
                 j = src.find("$$", i + 2)
                 j = n - 2 if j < 0 else j
-                emit(_render_math(src[i + 2 : j], macros), i)
+                emit_math(src[i + 2 : j], i)
                 i = j + 2
             else:
                 j = i + 1
@@ -364,7 +374,7 @@ def render_mapped(
                     if src[j] == "$" and src[j - 1] != "\\":
                         break
                     j += 1
-                emit(_render_math(src[i + 1 : min(j, n)], macros), i)
+                emit_math(src[i + 1 : min(j, n)], i)
                 i = j + 1
             continue
 
@@ -392,7 +402,7 @@ def render_mapped(
                     closer = "\\)" if name == "(" else "\\]"
                     k = src.find(closer, j)
                     k = n if k < 0 else k
-                    emit(_render_math(src[j:k], macros), i)
+                    emit_math(src[j:k], i)
                     i = k + (2 if k < n else 0)
                 elif name == "\\":
                     emit(" ", i)
@@ -436,7 +446,7 @@ def render_mapped(
             if mac is not None and _depth < _MAX_DEPTH:
                 args, j2 = _read_macro_args(src, j, mac)
                 body = _substitute(mac.body, args)[:_MAX_EXPANSION]
-                sub, sub_marks, _ = render_mapped(
+                sub, sub_marks, _, _ = render_mapped(
                     body, cite_render, macros, _depth + 1)
                 base = pos
                 emit(sub, i)
@@ -546,6 +556,11 @@ def render_mapped(
         )
         for m in marks
     ]
+    final_math = []
+    for a, b, body in maths:
+        fa, fb = max(fwd[a] - lead, 0), min(fwd[b] - lead, len(stripped))
+        if fb > fa:
+            final_math.append((fa, fb, body))
     runs: list[PosRun] = []
     for k in range(lead, lead + len(stripped)):
         o = back[k]
@@ -558,7 +573,54 @@ def render_mapped(
             if not ex and not pex and ps == s:
                 continue
         runs.append((t, s, ex))
-    return stripped, final_marks, runs
+    return stripped, final_marks, runs, final_math
+
+
+def math_runs(body: str, macros: dict[str, Macro] | None = None
+              ) -> list[tuple[str, str]]:
+    """行内公式 → [(文本, 样式)]，样式 '' | 'sub' | 'sup'。只做上下标
+    这一层结构，其余与 _render_math 的扁平化一致。"""
+    out: list[tuple[str, str]] = []
+    buf: list[str] = []
+
+    def flush() -> None:
+        if buf:
+            t = _render_math("".join(buf), macros)
+            if t:
+                out.append((t, ""))
+            buf.clear()
+
+    i, n = 0, len(body)
+    while i < n:
+        c = body[i]
+        if c in "_^":
+            j = _skip_ws(body, i + 1)
+            if j < n and body[j] == "{":
+                r = _read_balanced(body, j, "{", "}")
+                inner, k = (r[0], r[1]) if r else (body[j + 1:], n)
+            elif j < n and body[j] == "\\":
+                m = _CMD_RE.match(body, j)
+                inner, k = (m.group(0), m.end()) if m else (body[j], j + 1)
+            elif j < n:
+                inner, k = body[j], j + 1
+            else:
+                inner, k = "", n
+            flush()
+            t = _render_math(inner, macros).strip()
+            if t:
+                out.append((t, "sub" if c == "_" else "sup"))
+            i = k
+            continue
+        if c == "\\":
+            m = _CMD_RE.match(body, i)
+            if m:
+                buf.append(m.group(0))
+                i = m.end()
+                continue
+        buf.append(c)
+        i += 1
+    flush()
+    return out
 
 
 def _collapse(text: str) -> tuple[str, list[int]]:

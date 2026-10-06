@@ -1422,3 +1422,21 @@ select {
 @media (prefers-reduced-motion: reduce) {
   .egg-btn, .egg-blink { animation: none; }
 }
+
+/* LaTeX: inline math in the reading view keeps sub/superscripts without
+   pushing the line apart */
+.math sub,
+.math sup {
+  line-height: 0;
+}
+
+/* LaTeX: source line(s) behind a finding, in the detail view */
+.src-snippet {
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  background: var(--fill);
+  border-radius: 8px;
+  padding: 8px 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text);
+}

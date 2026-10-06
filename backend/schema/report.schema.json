@@ -25,6 +25,40 @@
           ],
           "default": null,
           "title": "Loc"
+        },
+        "snippet": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snippet"
+        },
+        "snippet_hl": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Snippet Hl"
         }
       },
       "required": [
@@ -471,6 +505,47 @@
       "title": "LayerStatus",
       "type": "object"
     },
+    "MathSpan": {
+      "description": "LaTeX inline math inside Paragraph.text[start:end] (flattened text).\nruns is the display form: (text, \"\" | \"sub\" | \"sup\") pieces.",
+      "properties": {
+        "start": {
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "title": "End",
+          "type": "integer"
+        },
+        "runs": {
+          "items": {
+            "maxItems": 2,
+            "minItems": 2,
+            "prefixItems": [
+              {
+                "type": "string"
+              },
+              {
+                "enum": [
+                  "",
+                  "sub",
+                  "sup"
+                ],
+                "type": "string"
+              }
+            ],
+            "type": "array"
+          },
+          "title": "Runs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "MathSpan",
+      "type": "object"
+    },
     "Overview": {
       "description": "Venue-level read of the manuscript: where it sits against a few\nrecent papers of the target venue. A coarse tier plus a direction —\ndeliberately not edit-level advice (AGENTS §2).",
       "properties": {
@@ -614,6 +689,13 @@
         "char_offset": {
           "title": "Char Offset",
           "type": "integer"
+        },
+        "math": {
+          "items": {
+            "$ref": "#/$defs/MathSpan"
+          },
+          "title": "Math",
+          "type": "array"
         }
       },
       "required": [

@@ -25,6 +25,7 @@ from ...refs.structure import parse_authors, parse_reference
 from ...schema import (
     CitationMarker,
     Document,
+    MathSpan,
     Paragraph,
     Reference,
     Section,
@@ -852,6 +853,7 @@ def parse_latex(path: str | Path) -> ParsedDocument:
     heading_levels: list[int | None] = []
     markers: list[CitationMarker] = []
     para_runs: dict[str, list[tuple[int, int, int, bool]]] = {}
+    para_math: dict[str, list[MathSpan]] = {}
 
     sections: list[Section] = []
     cur: Section | None = None
@@ -904,11 +906,16 @@ def parse_latex(path: str | Path) -> ParsedDocument:
         for a, e in b.ranges:
             bld.add(body, a, e)
         block_src = bld.build()
-        t, ms, runs = tex.render_mapped(block_src.text, render_cite, macros)
+        t, ms, runs, maths = tex.render_mapped(
+            block_src.text, render_cite, macros)
         if not t:
             continue
         pid = add_para(t, heading=b.level if b.kind == "heading" else None)
         para_runs[pid] = _compose(runs, len(t), block_src)
+        if maths:
+            para_math[pid] = [
+                MathSpan(start=a, end=e, runs=tex.math_runs(body, macros))
+                for a, e, body in maths]
         for m in ms:
             markers.append(CitationMarker(
                 id=f"m{len(markers)}", paragraph_id=pid,
@@ -945,7 +952,8 @@ def parse_latex(path: str | Path) -> ParsedDocument:
 
     paragraphs = [
         Paragraph(id=p_ids[i], section_id=para_section[i], text=texts[i],
-                  char_offset=char_offsets[i])
+                  char_offset=char_offsets[i],
+                  math=para_math.get(p_ids[i], []))
         for i in range(len(texts))
     ]
 

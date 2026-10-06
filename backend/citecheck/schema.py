@@ -17,6 +17,10 @@ class Anchor(BaseModel):
     end: int
     # LaTeX 源码位置 "sections/intro.tex:42"（docx 为 None）
     loc: str | None = None
+    # LaTeX only: the source line(s) the anchor covers, and the anchored
+    # range inside that snippet when it maps verbatim
+    snippet: str | None = None
+    snippet_hl: tuple[int, int] | None = None
 
 
 CanonicalSection = Literal[
@@ -31,11 +35,22 @@ class Section(BaseModel):
     heading_paragraph_id: str | None = None  # None for the leading untitled section
 
 
+class MathSpan(BaseModel):
+    """LaTeX inline math inside Paragraph.text[start:end] (flattened text).
+    runs is the display form: (text, "" | "sub" | "sup") pieces."""
+    start: int
+    end: int
+    runs: list[tuple[str, Literal["", "sub", "sup"]]] = Field(
+        default_factory=list)
+
+
 class Paragraph(BaseModel):
     id: str
     section_id: str
     text: str
     char_offset: int
+    # LaTeX only: inline math spans for the reading view
+    math: list[MathSpan] = Field(default_factory=list)
 
 
 MarkerKind = Literal[

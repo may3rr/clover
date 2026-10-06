@@ -408,3 +408,40 @@ As shown by~\newcite{a}, things work.
     assert [m.raw for m in d.markers] == ["Alpha (2019)"]
     assert set(d.cited_keys) == {"a", "b"}
     assert not [f for f in check_norms(d) if "没有被引用" in f.title]
+
+
+def test_inline_math_spans_and_runs(tmp_path):
+    (tmp_path / "main.tex").write_text(r"""\documentclass{article}
+\begin{document}
+We update $c_{t+1} = (c_t, a_t)$ with $10^3$ steps.
+\end{document}
+""")
+    d = parse_latex(tmp_path / "main.tex")
+    p = next(p for p in d.paragraphs if p.text.startswith("We update"))
+    assert [p.text[m.start:m.end] for m in p.math] == [
+        "c_t+1 = (c_t, a_t)", "10^3"]
+    assert p.math[0].runs[:2] == [("c", ""), ("t+1", "sub")]
+    assert p.math[1].runs == [("10", ""), ("3", "sup")]
+
+
+def test_anchor_snippet_points_at_source(numeric):
+    from citecheck.parse.latex.locate import annotate_locations
+    from citecheck.schema import Anchor
+    p = next(p for p in numeric.paragraphs if "twist" in p.text)
+    k = p.text.index("twist")
+    a = Anchor(paragraph_id=p.id, start=k, end=k + 5)
+    annotate_locations(numeric.latex, [a])
+    assert a.loc == "method.tex:2"
+    assert a.snippet.startswith("Our approach follows \\citet{lewis2020}")
+    s, e = a.snippet_hl
+    assert a.snippet[s:e] == "twist"
+
+
+def test_snippet_highlights_whole_cite_command(numeric):
+    from citecheck.parse.latex.locate import annotate_locations
+    from citecheck.schema import Anchor
+    m = next(m for m in numeric.markers if m.keys == ["lewis2020"])
+    a = Anchor(paragraph_id=m.paragraph_id, start=m.start, end=m.end)
+    annotate_locations(numeric.latex, [a])
+    s, e = a.snippet_hl
+    assert a.snippet[s:e] == "\\citet{lewis2020}"

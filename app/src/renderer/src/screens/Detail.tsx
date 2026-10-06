@@ -5,6 +5,7 @@ import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
 import { ChevronLeftIcon } from '../components/Icons'
 import { formatLoc } from '../lib/accept'
+import { HL_CLASS } from '../lib/highlight'
 
 interface Props {
   item: ListItem
@@ -44,6 +45,7 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
           >
             {/* the why comes first; the evidence below backs it up */}
             <DetailLines detail={item.detail} />
+            <SourceSnippet item={item} />
             {item.kind === 'group' && item.layer === 'distribution' ? (
               <DistributionDetail item={item} report={report} />
             ) : item.kind === 'group' ? (
@@ -59,6 +61,30 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+/** LaTeX reports: the source line(s) behind the anchor, with the
+ *  anchored text tinted — what the author will actually edit. */
+function SourceSnippet({ item }: { item: ListItem }) {
+  const a = item.anchors[0]
+  if (!a?.snippet) return null
+  const text = a.snippet
+  // generated from a tuple schema: [start, end] within the snippet
+  const hl = a.snippet_hl as [number, number] | null | undefined
+  const tint = HL_CLASS[item.severity]
+  return (
+    <div className="src-snippet t13">
+      {hl ? (
+        <>
+          {text.slice(0, hl[0])}
+          <span className={`hl ${tint}`}>{text.slice(hl[0], hl[1])}</span>
+          {text.slice(hl[1])}
+        </>
+      ) : (
+        text
+      )}
     </div>
   )
 }
