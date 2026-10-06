@@ -212,11 +212,21 @@ def parse_arxiv_feed(xml_text: str) -> list[dict]:
 
 _openalex_budget_warned = False
 
+# Process-wide cooldown for rate-limited sources: a source that ran out of
+# budget (429) stays skipped for the next runs in this server process too,
+# instead of every run re-learning it with a retry/backoff cycle.
+_COOLDOWN_S = 600.0
+_cooldown_until: dict[str, float] = {}
+
 
 class RetrievalClient:
     def __init__(self, cache: Cache | None = None):
         s = get_settings()
-        self._sem = asyncio.Semaphore(s.retrieval.concurrency)
+        # one semaphore per source: Crossref being slow must not hold
+        # OpenAlex / S2 requests in the queue behind it
+        self._sems: dict[str, asyncio.Semaphore] = {}
+        self._default_conc = s.retrieval.concurrency
+        self._per_source = dict(s.retrieval.per_source)
         self._timeout = s.retrieval.timeout
         self._retries = s.retrieval.retries
         self._mailto = s.crossref_mailto
@@ -229,13 +239,23 @@ class RetrievalClient:
         # exhausted budget — or keeps timing out — is down for the rest
         # of this run; remaining calls fail fast instead of every one
         # burning the full retry loop (~45s at timeout=15, retries=2)
-        self._down: set[str] = set()
+        now = time.monotonic()
+        self._down: set[str] = {
+            src for src, until in _cooldown_until.items() if until > now}
         self._consecutive_fails: dict[str, int] = {}
         self._client = httpx.AsyncClient(
             timeout=self._timeout,
             headers={"User-Agent": f"citecheck/0.1 (mailto:{self._mailto})"},
             follow_redirects=True,
         )
+
+    def _sem(self, src: str) -> asyncio.Semaphore:
+        sem = self._sems.get(src)
+        if sem is None:
+            sem = asyncio.Semaphore(
+                self._per_source.get(src, self._default_conc))
+            self._sems[src] = sem
+        return sem
 
     async def close(self) -> None:
         await self._client.aclose()
@@ -265,14 +285,24 @@ class RetrievalClient:
             else url
         )
         t0 = time.monotonic()
-        cached = self._cache is not None and self._cache.get(cache_key) is not None
+        if self._cache is not None:
+            hit = self._cache.get(cache_key)
+            if hit is not None:
+                self._track(src, 0.0, cached=True)
+                if isinstance(hit, dict) and "__error__" in hit:
+                    return SourceResult(ok=False, error=hit["__error__"])
+                if isinstance(hit, dict) and "__empty__" in hit:
+                    return SourceResult(
+                        ok=True, data=None, error=f"HTTP {hit['__empty__']}")
+                return SourceResult(ok=True, data=hit)
         if src in self._down:
             self._track(src, 0.0, cached=False)
             return SourceResult(ok=False, error="source unavailable")
         r = await self._do_get(url, params, cache_key, headers, src)
         if not r.ok and ("429" in (r.error or "") or "budget" in (r.error or "")):
             self._down.add(src)
-        self._track(src, time.monotonic() - t0, cached=cached)
+            _cooldown_until[src] = time.monotonic() + _COOLDOWN_S
+        self._track(src, time.monotonic() - t0, cached=False)
         return r
 
     def _note_result(self, src: str, ok: bool) -> None:
@@ -293,19 +323,14 @@ class RetrievalClient:
         self, url: str, params: dict, cache_key: str,
         headers: dict | None = None, src: str = "",
     ) -> SourceResult:
-        if self._cache is not None:
-            hit = self._cache.get(cache_key)
-            if isinstance(hit, dict) and "__error__" in hit:
-                return SourceResult(ok=False, error=hit["__error__"])
-            if hit is not None:
-                return SourceResult(ok=True, data=hit)
+        """Network path only — _get() already served cache hits."""
         last_err: str | None = None
         retried_429 = False
         for attempt in range(self._retries + 1):
             if src in self._down:
                 return SourceResult(ok=False, error="source unavailable")
             try:
-                async with self._sem:
+                async with self._sem(src):
                     if src in self._down:
                         return SourceResult(
                             ok=False, error="source unavailable")
@@ -351,6 +376,10 @@ class RetrievalClient:
                     # count. Callers read ok=True + data=None as
                     # "responded, no result".
                     self._note_result(src, True)
+                    # a definitive "no such record" — cache it like a hit
+                    if self._cache is not None:
+                        self._cache.set(
+                            cache_key, {"__empty__": resp.status_code})
                     return SourceResult(
                         ok=True, data=None,
                         error=f"HTTP {resp.status_code}")
@@ -485,7 +514,7 @@ class RetrievalClient:
         last_err: str | None = None
         for attempt in range(2):
             try:
-                async with self._sem:
+                async with self._sem("arxiv"):
                     resp = await self._client.get(
                         ARXIV_API,
                         params={"search_query": search_query,

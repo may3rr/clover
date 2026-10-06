@@ -180,23 +180,6 @@ async def run_pipeline(
                 apply_bibliography_start, parsed, start)
             log.info("llm bibliography boundary -> %d references", added)
 
-    # every entry is re-structured by the model (regex can be confidently
-    # wrong on unfamiliar styles); fields must be grounded in the entry text
-    if parsed.references:
-        try:
-            # .bib-derived LaTeX entries are already structured data
-            done = set(parsed.structured_refs)
-            changed = await structure_references(
-                [r for r in parsed.references
-                 if r.origin == "list" and r.id not in done])
-        except Exception as e:  # noqa: BLE001 — regex fields stand
-            log.warning("reference structuring failed: %s", e)
-            changed = 0
-        if changed:
-            relink_markers(parsed)
-            log.info("model re-structured %d references; markers relinked",
-                     changed)
-
     para_by_id = {p.id: p for p in parsed.paragraphs}
     t_parsed = time.monotonic()
     send({"type": "parsed", "outline": _outline(parsed)})
@@ -209,6 +192,35 @@ async def run_pipeline(
         own_retrieval = retrieval is None
         cache = cache or Cache(get_settings().cache_path)
         retrieval = retrieval or RetrievalClient(cache=cache)
+
+        async def _structure() -> None:
+            # every entry is re-structured by the model (regex can be
+            # confidently wrong on unfamiliar styles); fields must be
+            # grounded in the entry text. .bib-derived LaTeX entries are
+            # already structured data. Runs concurrently with the work
+            # that doesn't read reference fields (typos, claim extraction);
+            # authenticity, distribution and claim->ref pairing wait for it.
+            if not parsed.references:
+                return
+            done = set(parsed.structured_refs)
+            try:
+                changed = await structure_references(
+                    [r for r in parsed.references
+                     if r.origin == "list" and r.id not in done])
+            except Exception as e:  # noqa: BLE001 — regex fields stand
+                log.warning("reference structuring failed: %s", e)
+                changed = 0
+            if changed:
+                relink_markers(parsed)
+                log.info("model re-structured %d references; markers "
+                         "relinked", changed)
+
+        structured = asyncio.create_task(_structure())
+        # let the structuring batches reach the cloud semaphore before the
+        # layers queue their calls: priority orders waiters, but cannot
+        # take back a slot already handed to a claim-extraction call
+        for _ in range(3):
+            await asyncio.sleep(0)
         try:
             auth_checks, auth_findings = [], []
             claims, support_checks, sup_findings = [], [], []
@@ -225,8 +237,10 @@ async def run_pipeline(
                 # RefCheck lands (on_ref), overlapping auth and support.
                 _layer("support", "running")
                 sup = SupportRun(
-                    parsed, cache=cache, http=retrieval._client)
+                    parsed, cache=cache, http=retrieval._client,
+                    refs_ready=structured)
                 _layer("authenticity", "running")
+                await structured
                 try:
                     auth_checks, auth_findings = await verify_references(
                         parsed.references, parsed.paragraphs, retrieval,
@@ -251,6 +265,7 @@ async def run_pipeline(
             async def _distribution() -> None:
                 nonlocal dist, dist_findings
                 _layer("distribution", "running")
+                await structured
                 try:
                     dist, dist_findings = await run_distribution(
                         parsed, bench_path=benchmark_path(benchmark_id))
@@ -264,9 +279,13 @@ async def run_pipeline(
             async def _norms() -> None:
                 nonlocal norm_findings, revisions
                 _layer("norms", "running")
+                # typos read paragraph text only — no need to wait for
+                # reference structuring
+                typo_task = asyncio.create_task(check_typos(parsed))
                 try:
+                    await structured
                     norm_findings = check_norms(parsed)
-                    typo_findings, typo_revs = await check_typos(parsed)
+                    typo_findings, typo_revs = await typo_task
                     norm_findings += typo_findings
                     reorder_revs = await asyncio.to_thread(plan_reorder, parsed)
                     revisions = typo_revs + reorder_revs
@@ -279,9 +298,12 @@ async def run_pipeline(
 
             # overview prep (venue exemplars + shape reading) needs no
             # findings — it overlaps the four layers
-            prep_task = asyncio.create_task(run_overview_safe(
-                prepare(parsed, venue_id, retrieval._client, cache))
-            ) if venue_id else None
+            async def _prep():
+                await structured
+                return await prepare(parsed, venue_id, retrieval._client, cache)
+
+            prep_task = asyncio.create_task(run_overview_safe(_prep())) \
+                if venue_id else None
 
             await asyncio.gather(
                 _auth_then_support(), _distribution(), _norms())

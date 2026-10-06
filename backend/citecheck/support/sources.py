@@ -90,7 +90,7 @@ def _looks_like_ref_entry(window: str) -> bool:
 _inflight: dict[str, asyncio.Task] = {}
 
 
-async def _shared(key: str, factory) -> str:
+async def _shared(key: str, factory) -> str | None:
     """Run factory() once per key; concurrent callers share the task."""
     if key in _inflight:
         return await _inflight[key]
@@ -102,27 +102,46 @@ async def _shared(key: str, factory) -> str:
         _inflight.pop(key, None)
 
 
+# Whole-download deadline. httpx timeouts are per read, so a host that
+# trickles bytes could hold a PDF (and every judge waiting on it) for
+# minutes; past the deadline the pair falls back to the abstract.
+_PDF_DEADLINE = 20.0
+
+
+async def _download_pdf(url: str, client: httpx.AsyncClient) -> bytes | None:
+    # unreachable hosts fail at connect time instead of after 30s
+    timeout = httpx.Timeout(30, connect=8)
+    async with client.stream("GET", url, timeout=timeout) as resp:
+        if resp.status_code != 200:
+            return None
+        cl = resp.headers.get("content-length")
+        if cl and int(cl) > _MAX_PDF_BYTES:
+            return None
+        chunks: list[bytes] = []
+        size = 0
+        async for chunk in resp.aiter_bytes():
+            size += len(chunk)
+            if size > _MAX_PDF_BYTES:
+                return None
+            chunks.append(chunk)
+    return b"".join(chunks)
+
+
 async def _fetch_pdf_uncached(
     url: str, client: httpx.AsyncClient
-) -> str:
-    """Download + parse; returns '' on any failure."""
+) -> str | None:
+    """Download + parse; '' on a definitive failure (bad status, too big,
+    unparseable), None on a timeout — transient, so not cached."""
     try:
-        async with client.stream("GET", url, timeout=30) as resp:
-            if resp.status_code != 200:
-                return ""
-            cl = resp.headers.get("content-length")
-            if cl and int(cl) > _MAX_PDF_BYTES:
-                return ""
-            chunks: list[bytes] = []
-            size = 0
-            async for chunk in resp.aiter_bytes():
-                size += len(chunk)
-                if size > _MAX_PDF_BYTES:
-                    return ""
-                chunks.append(chunk)
-        data = b"".join(chunks)
+        data = await asyncio.wait_for(_download_pdf(url, client), _PDF_DEADLINE)
+    except asyncio.TimeoutError:
+        log.warning("pdf fetch exceeded %.0fs, using the abstract: %s",
+                    _PDF_DEADLINE, url)
+        return None
     except httpx.HTTPError as e:
         log.warning("pdf fetch failed %s: %s", url, e)
+        return ""
+    if data is None:
         return ""
     try:
         import io
@@ -147,8 +166,11 @@ async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> 
     if hit is not None:
         return hit or None
     # dedup + cache '' so a failing PDF costs one fetch per run, once ever
+    # (timeouts are not cached — the next run tries again)
     text = await _shared(f"pdf:{url}",
                          lambda: _fetch_pdf_uncached(url, client))
+    if text is None:
+        return None
     cache.set(key, text)
     return text or None
 
@@ -264,6 +286,14 @@ async def build_source(
     own_client = client is None
     client = client or httpx.AsyncClient(follow_redirects=True)
     try:
+        # the PDF download (slowest step) starts right away and overlaps
+        # the abstract lookups below
+        pdf_url = matched.get("pdf_url")
+        if not pdf_url and matched.get("arxiv_id"):
+            pdf_url = f"https://arxiv.org/pdf/{matched['arxiv_id']}"
+        pdf_task = asyncio.create_task(
+            _fetch_pdf_text(pdf_url, client, cache)) if pdf_url else None
+
         # gather abstract candidates up front: verified hit first, then
         # sibling records of the same work, then arXiv (id, then title)
         candidates = [matched.get("abstract")]
@@ -283,11 +313,8 @@ async def build_source(
             abstract = _strip_jats(abstract)[:_EXCERPT_LIMIT]
 
         # 1. open-access full text: abstract + top BM25 passages
-        pdf_url = matched.get("pdf_url")
-        if not pdf_url and matched.get("arxiv_id"):
-            pdf_url = f"https://arxiv.org/pdf/{matched['arxiv_id']}"
-        if pdf_url:
-            fulltext = await _fetch_pdf_text(pdf_url, client, cache)
+        if pdf_task is not None:
+            fulltext = await pdf_task
             if fulltext:
                 passages = _bm25_excerpt(fulltext, claim_text,
                                          _FULLTEXT_EXCERPT_LIMIT)

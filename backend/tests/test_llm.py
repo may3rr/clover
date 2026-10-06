@@ -146,3 +146,34 @@ async def test_cache_version_bump_invalidates_verdicts(monkeypatch):
         lambda: base.model_copy(update={"cache_version": "2"}))
     r2 = await llm.chat_json("judge", [{"role": "user", "content": "hi"}], Out)
     assert not r1.cached and r2.cached is False
+
+
+def test_priority_semaphore_orders_waiters():
+    """A freed slot goes to the most urgent waiter, FIFO within a level;
+    cancelled waiters don't leak slots."""
+    import asyncio
+
+    from citecheck.llm.client import PrioritySemaphore
+
+    async def run():
+        sem = PrioritySemaphore(1)
+        order: list[str] = []
+        await sem.acquire(0)  # hold the only slot
+
+        async def worker(name, prio):
+            async with sem.slot(prio):
+                order.append(name)
+
+        tasks = [asyncio.create_task(worker(n, p)) for n, p in
+                 [("typo1", 3), ("typo2", 3), ("judge", 1), ("struct", 0)]]
+        doomed = asyncio.create_task(worker("cancelled", 0))
+        await asyncio.sleep(0)
+        doomed.cancel()
+        await asyncio.sleep(0)
+        sem.release()
+        await asyncio.gather(*tasks)
+        assert order == ["struct", "judge", "typo1", "typo2"]
+        # all slots returned: an immediate acquire succeeds
+        await asyncio.wait_for(sem.acquire(2), 0.1)
+
+    asyncio.run(run())

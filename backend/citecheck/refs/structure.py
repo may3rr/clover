@@ -231,11 +231,13 @@ async def complete_reference_fields(raw: str) -> dict[str, Any]:
 #
 # The regex path above is fast but can be confidently wrong (an ACL author
 # list read as a title); the per-entry fallback only fires on blank fields.
-# So every bibliography goes through the cheap model, ten entries a call,
+# So every bibliography goes through the cheap model, five entries a call,
 # and the model's fields replace the regex ones — but only fields that can
 # be found in the entry itself, so the model can restructure, never invent.
 
-_BATCH = 10
+# Output tokens set the latency (~100 per entry): five entries a call
+# keeps each call ~4s, and the batches run side by side.
+_BATCH = 5
 
 _BATCH_PROMPT = (
     "下面是一篇论文参考文献列表中的若干条目，每条前有编号。逐条解析为 JSON。\n"
@@ -330,7 +332,7 @@ async def structure_references(refs: list) -> int:
     chunks = [refs[i:i + _BATCH] for i in range(0, len(refs), _BATCH)]
     # bound concurrent LLM batches — a long reference list must not fan
     # out one cloud call per chunk at the same time
-    sem = asyncio.Semaphore(4)
+    sem = asyncio.Semaphore(8)
 
     async def guarded(chunk: list) -> int:
         async with sem:

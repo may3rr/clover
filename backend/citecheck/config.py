@@ -111,7 +111,14 @@ class LLMSettings(BaseModel):
 
 
 class RetrievalSettings(BaseModel):
+    # default in-flight requests per source; each source has its own
+    # limit so a slow host never queues the others behind it
     concurrency: int = 4
+    # per-source overrides, sized to each API's published limits:
+    # Crossref polite pool (mailto) ~3 concurrent, OpenAlex 10 req/s,
+    # Semantic Scholar 1 req/s without a key
+    per_source: dict[str, int] = Field(default_factory=lambda: {
+        "crossref": 3, "openalex": 6, "s2": 1, "arxiv": 1})
     timeout: float = 15
     retries: int = 2
 

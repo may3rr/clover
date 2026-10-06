@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Awaitable
 from typing import Any
 
 import httpx
@@ -41,8 +42,13 @@ class SupportRun:
         *,
         cache: Cache | None = None,
         http: httpx.AsyncClient | None = None,
+        refs_ready: Awaitable[Any] | None = None,
     ):
         self._parsed = parsed
+        # claim extraction reads paragraph text and marker positions only;
+        # the (claim, ref) pairing reads marker.ref_ids, which reference
+        # structuring may still relink — pairing waits on this
+        self._refs_ready = refs_ready
         self._cache = cache or Cache(get_settings().cache_path)
         self._own_http = http is None
         self._http = http or httpx.AsyncClient(follow_redirects=True)
@@ -75,6 +81,8 @@ class SupportRun:
         claims: list[Claim] = [c for lst in claim_lists for c in lst]
         for i, c in enumerate(claims):
             c.id = f"c{i}"
+        if self._refs_ready is not None:
+            await self._refs_ready
         # (claim, ref) job list in claims order — shared by add_check and
         # finish() so each pair is judged exactly once
         marker_by_id = {m.id: m for m in parsed.markers}
@@ -113,9 +121,15 @@ class SupportRun:
         self._judge_tasks.append(asyncio.create_task(self._do(c, rid)))
 
     async def _do(self, c: Claim, rid: str) -> None:
+        # the source fetch (abstract lookups, PDF download — network-bound,
+        # deduplicated per URL) runs outside the judge semaphore: a slow
+        # PDF host must not hold a slot that a ready judge call could use
+        matched = self._matched.get(rid)
+        source = await build_source(
+            matched, c.text, cache=self._cache, client=self._http)
         async with self._judge_sem:
-            self._out[(c.id, rid)] = await _judge_pair(
-                c, rid, self._matched.get(rid), self._cache, self._http)
+            self._out[(c.id, rid)] = await _judge_with_source(
+                c, rid, matched, source)
 
     async def finish(
         self,
@@ -308,6 +322,12 @@ async def _judge_pair(
     claim: Claim, ref_id: str, matched: dict | None, cache: Cache, http
 ) -> SupportCheck:
     source = await build_source(matched, claim.text, cache=cache, client=http)
+    return await _judge_with_source(claim, ref_id, matched, source)
+
+
+async def _judge_with_source(
+    claim: Claim, ref_id: str, matched: dict | None, source
+) -> SupportCheck:
     if source.kind == "none" or not source.excerpt:
         return SupportCheck(
             claim_id=claim.id, ref_id=ref_id, label="undetermined",

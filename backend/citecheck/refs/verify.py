@@ -131,34 +131,52 @@ async def _gather_hits(
 
 async def _title_hits(ref: Reference, client: RetrievalClient) -> tuple[list[dict], set[str]]:
     """Crossref + OpenAlex + S2 only — arXiv runs separately (batched) for
-    refs these three don't verify."""
+    refs these three don't verify.
+
+    Per source: an unfiltered title search first; a second, year-filtered
+    search only when the first returned no record with a matching title
+    and year. Canonical records (e.g. the 2017 Transformer paper) can be
+    pushed out of plain search results by later same-titled works — the
+    filtered pass pulls them back — but most references match on the
+    first query, so the fallback halves the request count. arXiv has no
+    year filter (the preprint may predate the cited venue year anyway)."""
     query = ref.title or ref.raw[:200]
-    calls = [
-        client.crossref_search(query),
-        client.openalex_search(query),
-        client.s2_search(query),
-    ]
-    # a second, year-filtered pass: canonical records (e.g. the 2017
-    # Transformer paper) can be pushed out of search results by later
-    # same-titled works. arXiv has no year filter — the preprint may
-    # predate the cited venue year anyway.
-    if ref.year:
-        calls += [
-            client.crossref_search(query, year=ref.year),
-            client.openalex_search(query, year=ref.year),
-            client.s2_search(query, year=ref.year),
-        ]
-        srcs = _SOURCES[:3] * 2
-    else:
-        srcs = _SOURCES[:3]
-    results = await asyncio.gather(*calls)
+    want = _norm(query)
+
+    def settled(data: list[dict] | None) -> bool:
+        for h in data or []:
+            if not h.get("title"):
+                continue
+            if fuzz.token_sort_ratio(want, _norm(h["title"])) < _TITLE_MIN:
+                continue
+            years = {y for y in (h.get("year"), h.get("alt_year")) if y}
+            if not ref.year or not years or any(
+                    abs(y - ref.year) <= 1 for y in years):
+                return True
+        return False
+
+    async def one(search) -> list:
+        first = await search(query)
+        if not (ref.year and first.ok and not settled(first.data)):
+            return [first]
+        return [first, await search(query, year=ref.year)]
+
+    # Crossref + OpenAlex first. Semantic Scholar (1 req/s without a key,
+    # frequent 429s) is a fallback only for refs those two can't place —
+    # querying it for every ref serialized the whole stage behind it.
+    cr, oa = await asyncio.gather(
+        one(client.crossref_search), one(client.openalex_search))
+    per_source = [cr, oa]
+    if not any(r.ok and settled(r.data) for r in cr + oa):
+        per_source.append(await one(client.s2_search))
     hits: list[dict] = []
     responded: set[str] = set()
-    for src, r in zip(srcs, results):
-        if not r.ok:
-            continue
-        responded.add(src)
-        hits += r.data or []
+    for src, results in zip(_SOURCES[:3], per_source):
+        for r in results:
+            if not r.ok:
+                continue
+            responded.add(src)
+            hits += r.data or []
     return hits, responded
 
 

@@ -196,3 +196,31 @@ async def test_arxiv_success_resets_breaker_count(client, no_sleep,
         r = await client.arxiv_search("Attention Is All You Need")
         assert r.ok
     assert "arxiv" not in client._down
+
+
+def test_429_cooldown_spans_runs(monkeypatch, tmp_path, no_sleep):
+    """A source that hit its rate limit stays skipped for the next client
+    (next pipeline run) in this process, without a request."""
+    first = RetrievalClient(cache=Cache(tmp_path / "a.sqlite"))
+    calls = _transport(monkeypatch, first, [
+        httpx.Response(429, text="slow down"),
+        httpx.Response(429, text="slow down"),
+    ])
+    r = asyncio.run(first.s2_search("Attention is all you need"))
+    assert not r.ok and len(calls) == 2
+    second = RetrievalClient(cache=Cache(tmp_path / "b.sqlite"))
+    calls2 = _transport(monkeypatch, second, [])
+    r2 = asyncio.run(second.s2_search("Attention is all you need"))
+    assert not r2.ok and r2.error == "source unavailable" and calls2 == []
+
+
+def test_404_answer_is_cached(monkeypatch, tmp_path, no_sleep):
+    cache = Cache(tmp_path / "c.sqlite")
+    client = RetrievalClient(cache=cache)
+    calls = _transport(monkeypatch, client, [httpx.Response(404)])
+    r = asyncio.run(client.crossref_work("10.1234/missing"))
+    assert r.ok and r.data is None and len(calls) == 1
+    again = RetrievalClient(cache=cache)
+    calls2 = _transport(monkeypatch, again, [])
+    r2 = asyncio.run(again.crossref_work("10.1234/missing"))
+    assert r2.ok and r2.data is None and calls2 == []

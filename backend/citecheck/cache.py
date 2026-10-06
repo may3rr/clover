@@ -47,6 +47,13 @@ class Cache:
         self._lock = threading.Lock()
         self._conn = sqlite3.connect(str(self.path), check_same_thread=False)
         self._conn.execute("PRAGMA journal_mode=WAL")
+        # WAL + NORMAL: commits no longer fsync (only checkpoints do). A
+        # crash can lose the last few cache rows, never corrupt the file —
+        # fine for a cache, and every set() stops stalling the event loop
+        self._conn.execute("PRAGMA synchronous=NORMAL")
+        # several Cache instances (server, LLM client, pipeline) share the
+        # file; wait for a writer instead of failing with "locked"
+        self._conn.execute("PRAGMA busy_timeout=5000")
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
         )

@@ -8,6 +8,7 @@ call counting live here. No business module imports openai/mlx directly.
 from __future__ import annotations
 
 import asyncio
+import heapq
 import json
 import logging
 from contextvars import ContextVar
@@ -30,7 +31,68 @@ Route = Literal["local", "cloud"]
 
 _cache: Cache | None = None
 _cloud_client: AsyncOpenAI | None = None
-_cloud_sem: asyncio.Semaphore | None = None
+_cloud_sem: "PrioritySemaphore | None" = None
+
+# Who goes first when every cloud slot is busy (lower = sooner). Reference
+# structuring gates authenticity, distribution and claim pairing; claim
+# extraction and judging are the support layer's critical path; typo
+# checks (one call per paragraph, the bulk of all calls) can wait.
+_PRIORITY = {
+    "structure": 0, "bibguess": 0,
+    "extract": 1, "judge": 1, "review": 1, "review_fallback": 1,
+    "function": 2, "profile": 2, "overview": 2,
+    "typo": 3,
+}
+
+
+class PrioritySemaphore:
+    """Bounded concurrency whose waiters are released by priority (FIFO
+    within one priority). A released slot is handed straight to the next
+    waiter, so a late high-priority call never starves behind a queue of
+    low-priority ones."""
+
+    def __init__(self, value: int):
+        self._value = value
+        self._waiters: list[tuple[int, int, asyncio.Future]] = []
+        self._seq = 0
+
+    async def acquire(self, priority: int = 2) -> None:
+        if self._value > 0 and not any(
+                not f.done() for _p, _s, f in self._waiters):
+            self._value -= 1
+            return
+        fut = asyncio.get_running_loop().create_future()
+        self._seq += 1
+        heapq.heappush(self._waiters, (priority, self._seq, fut))
+        try:
+            await fut
+        except asyncio.CancelledError:
+            # the slot was handed over just before the cancel landed
+            if fut.done() and not fut.cancelled():
+                self.release()
+            raise
+
+    def release(self) -> None:
+        while self._waiters:
+            _p, _s, fut = heapq.heappop(self._waiters)
+            if not fut.done():
+                fut.set_result(None)
+                return
+        self._value += 1
+
+    def slot(self, priority: int = 2) -> "_Slot":
+        return _Slot(self, priority)
+
+
+class _Slot:
+    def __init__(self, sem: PrioritySemaphore, priority: int):
+        self._sem, self._priority = sem, priority
+
+    async def __aenter__(self) -> None:
+        await self._sem.acquire(self._priority)
+
+    async def __aexit__(self, *exc: object) -> None:
+        self._sem.release()
 
 
 class LLMStats:
@@ -157,7 +219,7 @@ def _get_cache() -> Cache:
     return _cache
 
 
-def _get_cloud() -> tuple[AsyncOpenAI, asyncio.Semaphore]:
+def _get_cloud() -> tuple[AsyncOpenAI, PrioritySemaphore]:
     global _cloud_client, _cloud_sem
     settings = get_settings()
     if _cloud_client is None:
@@ -166,7 +228,7 @@ def _get_cloud() -> tuple[AsyncOpenAI, asyncio.Semaphore]:
             base_url=settings.llm.cloud.base_url,
             timeout=settings.llm.cloud.timeout,
         )
-        _cloud_sem = asyncio.Semaphore(settings.llm.cloud.max_concurrency)
+        _cloud_sem = PrioritySemaphore(settings.llm.cloud.max_concurrency)
     return _cloud_client, _cloud_sem  # type: ignore[return-value]
 
 
@@ -198,7 +260,7 @@ async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
     client, sem = _get_cloud()
     settings = get_settings()
     try:
-        async with sem:
+        async with sem.slot(_PRIORITY.get(task, 2)):
             resp = await client.chat.completions.create(
                 model=model,
                 messages=_ensure_json_word(messages),
