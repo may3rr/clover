@@ -12,6 +12,8 @@ export interface CitecheckApi {
   /** Image picker for the user avatar; returns a data URL or null. */
   pickAvatar(): Promise<string | null>
   revealInFinder(path: string): void
+  /** Open with the default app; resolves to '' or an error message. */
+  openPath(path: string): Promise<string>
   openExternal(url: string): void
   /** macOS open-file events; events fired before subscribe are queued. */
   onOpenFile(cb: (path: string) => void): () => void
@@ -39,6 +41,7 @@ const api: CitecheckApi = {
   openDocxDialog: () => ipcRenderer.invoke('citecheck:open-docx'),
   pickAvatar: () => ipcRenderer.invoke('citecheck:pick-avatar'),
   revealInFinder: (p) => ipcRenderer.invoke('citecheck:reveal', p),
+  openPath: (p) => ipcRenderer.invoke('citecheck:open-path', p),
   openExternal: (url) => ipcRenderer.invoke('citecheck:open-external', url),
   onOpenFile: (cb) => {
     const h = (_e: unknown, p: string) => cb(p)

@@ -28,6 +28,9 @@ import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
 import AccountChip from '../components/AccountChip'
 import HistoryRow from '../components/HistoryRow'
+import ExportDone from '../components/ExportDone'
+import PaperSearch from '../components/PaperSearch'
+import { MagnifierIcon } from '../components/Icons'
 import OverviewCard from '../components/OverviewCard'
 import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
@@ -92,6 +95,27 @@ export default function ReportScreen({
   const [exportErr, setExportErr] = useState<string | null>(null)
   const isTex = report.document.source_format === 'tex'
   const segRefs = useRef(new Map<string, HTMLElement[]>())
+  const paperRef = useRef<HTMLElement>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchTick, setSearchTick] = useState(0)
+  const [sideTab, setSideTab] = useState<'toc' | 'history'>(() => {
+    try {
+      return localStorage.getItem('cc-side-tab') === 'history'
+        ? 'history'
+        : 'toc'
+    } catch {
+      return 'toc'
+    }
+  })
+  const pickSideTab = (t: 'toc' | 'history') => {
+    setSideTab(t)
+    try {
+      localStorage.setItem('cc-side-tab', t)
+    } catch {
+      // per-viewer convenience only
+    }
+  }
+  const [activeSection, setActiveSection] = useState<string | null>(null)
 
   const shown = useMemo(
     () => (filter ? items.filter((i) => i.layer === filter) : items),
@@ -102,6 +126,64 @@ export default function ReportScreen({
     for (const i of items) c[i.layer] = (c[i.layer] ?? 0) + 1
     return c
   }, [items])
+
+  // sidebar outline: titled sections, with their high/medium issue count
+  const docTitle = (report.document.title ?? '').trim()
+  const outline = useMemo(() => {
+    const secOf = new Map<string, string>()
+    for (const p of report.paragraphs ?? [])
+      if (p.id) secOf.set(p.id, p.section_id ?? '')
+    const n: Record<string, number> = {}
+    for (const i of items) {
+      if (i.severity === 'low' || !i.paragraphId) continue
+      const sid = secOf.get(i.paragraphId)
+      if (sid) n[sid] = (n[sid] ?? 0) + 1
+    }
+    return (report.sections ?? [])
+      .filter((x) => {
+        const t = (x.title ?? '').trim()
+        // the paper title is shown once in the page header, not as a heading
+        return t && x.heading_paragraph_id && t !== docTitle
+      })
+      .map((x) => ({
+        id: x.id,
+        title: (x.title ?? '').trim(),
+        pid: x.heading_paragraph_id as string,
+        issues: n[x.id] ?? 0,
+      }))
+  }, [report, items, docTitle])
+
+  const jumpTo = useCallback((pid: string) => {
+    const root = paperRef.current
+    const el = root?.querySelector<HTMLElement>(`[data-pid="${pid}"]`)
+    if (!root || !el) return
+    const top =
+      el.getBoundingClientRect().top - root.getBoundingClientRect().top
+    root.scrollTo({
+      top: root.scrollTop + top - 16,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+        ? 'auto'
+        : 'smooth',
+    })
+  }, [])
+
+  // scroll spy: the last section heading above the top third of the pane
+  const spyFrame = useRef(0)
+  const onPaperScroll = (root: HTMLElement) => {
+    setScrolled(root.scrollTop > 0)
+    if (spyFrame.current) return
+    spyFrame.current = requestAnimationFrame(() => {
+      spyFrame.current = 0
+      const line = root.getBoundingClientRect().top + root.clientHeight / 3
+      let cur: string | null = null
+      for (const o of outline) {
+        const el = root.querySelector(`[data-pid="${o.pid}"]`)
+        if (el && el.getBoundingClientRect().top <= line) cur = o.id
+        else if (el) break
+      }
+      setActiveSection(cur)
+    })
+  }
 
   const selected = items.find((i) => i.id === selectedId) ?? null
   const detail = items.find((i) => i.id === detailId) ?? null
@@ -121,10 +203,8 @@ export default function ReportScreen({
         return
       }
       const { path } = (await r.json()) as { path: string }
-      setExported(path.split('/').pop() ?? path)
-      window.citecheck.revealInFinder(path)
+      setExported(path)
       onExported(path)
-      setTimeout(() => setExported(null), 4000)
     } catch {
       setExportErr('导出失败。请确认本地服务仍在运行。')
     }
@@ -181,6 +261,8 @@ export default function ReportScreen({
     []
   )
 
+  const closeExported = useCallback(() => setExported(null), [])
+
   const closeDetail = useCallback(() => {
     morph(() => setDetailId(null))
   }, [])
@@ -217,6 +299,12 @@ export default function ReportScreen({
   // --------------------------------------------------------------- keys
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'f') {
+        e.preventDefault()
+        setSearchOpen(true)
+        setSearchTick((t) => t + 1)
+        return
+      }
       const tag = (e.target as HTMLElement)?.tagName
       if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
@@ -288,26 +376,65 @@ export default function ReportScreen({
             />
           ))}
         </nav>
-        <div className="group-label" style={{ fontWeight: 600, marginTop: 16 }}>
-          最近检查
+        <div className="side-tabs" role="tablist">
+          {(
+            [
+              ['toc', '目录'],
+              ['history', '最近检查'],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              role="tab"
+              aria-selected={sideTab === key}
+              className={`side-tab${sideTab === key ? ' on' : ''}`}
+              onClick={() => pickSideTab(key)}
+            >
+              {label}
+            </button>
+          ))}
         </div>
         <div
           className="flex-1 overflow-y-auto flex flex-col gap-1"
           style={{ padding: '0 8px 8px' }}
         >
-          <button className="side-row" onClick={onReset}>
-            <SideIcon name="plus" />
-            <span className="font-normal">检查另一篇</span>
-          </button>
-          {historyList.map((h) => (
-            <HistoryRow
-              key={h.id}
-              meta={h}
-              active={h.id === jobId}
-              onOpen={() => onOpenReport(h.id)}
-              onDelete={() => removeReport(h.id)}
-            />
-          ))}
+          {sideTab === 'toc' ? (
+            outline.length ? (
+              outline.map((o) => (
+                <button
+                  key={o.id}
+                  className={`side-row toc-row${activeSection === o.id ? ' sel' : ''}`}
+                  onClick={() => jumpTo(o.pid)}
+                  title={o.title}
+                >
+                  <span className="flex-1 truncate">{o.title}</span>
+                  {o.issues > 0 && (
+                    <span className="t13 secondary">{o.issues}</span>
+                  )}
+                </button>
+              ))
+            ) : (
+              <div className="t13 secondary" style={{ padding: '4px 12px' }}>
+                这篇论文没有识别出章节标题。
+              </div>
+            )
+          ) : (
+            <>
+              <button className="side-row" onClick={onReset}>
+                <SideIcon name="plus" />
+                <span className="font-normal">检查另一篇</span>
+              </button>
+              {historyList.map((h) => (
+                <HistoryRow
+                  key={h.id}
+                  meta={h}
+                  active={h.id === jobId}
+                  onOpen={() => onOpenReport(h.id)}
+                  onDelete={() => removeReport(h.id)}
+                />
+              ))}
+            </>
+          )}
         </div>
         <div style={{ padding: '0 12px 12px' }}>
           <AccountChip prefs={prefs} onOpen={onOpenSettings} />
@@ -323,10 +450,35 @@ export default function ReportScreen({
           className={`drag-strip bar-solid strip-edge flex items-center justify-between${scrolled ? ' scrolled' : ''}`}
           style={{ height: 52, flex: 'none', padding: '0 24px' }}
         >
-          <div className="font-semibold">{filterName}</div>
-          <div className="flex items-center gap-3">
+          {searchOpen ? (
+            <PaperSearch
+              rootRef={paperRef}
+              focusTick={searchTick}
+              onClose={() => setSearchOpen(false)}
+            />
+          ) : (
+            <div className="font-semibold">{filterName}</div>
+          )}
+          <div className="relative flex items-center gap-3">
+            {!searchOpen && (
+              <button
+                className="icon-btn"
+                aria-label="在正文中查找"
+                title="在正文中查找 ⌘F"
+                onClick={() => {
+                  setSearchOpen(true)
+                  setSearchTick((t) => t + 1)
+                }}
+              >
+                <MagnifierIcon size={15} />
+              </button>
+            )}
             {exported && (
-              <span className="t13 secondary">已导出到 {exported}</span>
+              <ExportDone
+                path={exported}
+                tex={isTex}
+                onClose={closeExported}
+              />
             )}
             {exportErr && <span className="t13 secondary">{exportErr}</span>}
             <button
@@ -372,7 +524,8 @@ export default function ReportScreen({
         </div>
         <main
           className={`paper flex-1 overflow-y-auto${selectedId ? ' has-sel' : ''}${scrolled ? ' is-scrolled' : ''}`}
-          onScroll={(e) => setScrolled(e.currentTarget.scrollTop > 0)}
+          ref={paperRef}
+          onScroll={(e) => onPaperScroll(e.currentTarget)}
           style={{
             padding: '0 24px 48px',
             background: 'var(--bg)',
@@ -663,7 +816,7 @@ function PaperBody({
           .filter(Boolean) as string[]
         if (imgs.length || p.caption)
           return (
-            <figure key={p.id} className="paper-fig">
+            <figure key={p.id} data-pid={p.id} className="paper-fig">
               {imgs.length > 0 && (
                 <div className="paper-fig-row">
                   {imgs.map((src) => (
@@ -687,6 +840,7 @@ function PaperBody({
         return (
           <p
             key={p.id}
+            data-pid={p.id}
             className={isRef ? 'paper-refs' : undefined}
             style={{
               fontWeight: isHeading ? 600 : 400,

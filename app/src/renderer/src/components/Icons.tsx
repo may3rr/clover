@@ -301,6 +301,38 @@ export function ChevronLeftIcon({ size = 18, color = 'currentColor' }: IconProps
   )
 }
 
+export function ChevronUpIcon({ size = 18, color = 'currentColor' }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      style={{ flex: 'none', display: 'block' }}
+    >
+      <path d="M7 14.5 12 9.5 17 14.5" />
+    </svg>
+  )
+}
+
+/** magnifyingglass — ring (evenodd hole) plus a rounded handle */
+export function MagnifierIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d="M10.5 3a7.5 7.5 0 1 0 0 15a7.5 7.5 0 1 0 0-15Zm0 2.2a5.3 5.3 0 1 1 0 10.6a5.3 5.3 0 1 1 0-10.6Z"
+      />
+      <path d="M15.6 14.1l5 5a1.1 1.1 0 0 1-1.55 1.55l-5-5Z" />
+    </Fill>
+  )
+}
+
 export function ChevronDownIcon({ size = 18, color = 'currentColor' }: IconProps) {
   return (
     <svg

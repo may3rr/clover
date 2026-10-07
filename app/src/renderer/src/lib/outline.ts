@@ -223,7 +223,7 @@ export function outlineFromReport(report: Report): Outline {
       title: s.title ?? '',
       canonical: s.canonical ?? 'other',
       paragraphs: (report.paragraphs ?? [])
-        .filter((p) => p.section_id === s.id)
+        .filter((p) => p.section_id === s.id && !p.cell)
         .map((p) => ({
           id: p.id ?? '',
           length: (p.text ?? '').length,

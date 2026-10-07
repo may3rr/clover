@@ -210,6 +210,10 @@ const api: CitecheckApi = {
   revealInFinder: (p) => {
     if (!flags.quietExport) download(SAMPLE_DOCX, p.split('/').pop() ?? 'clover.docx')
   },
+  openPath: async (p) => {
+    if (!flags.quietExport) download(SAMPLE_DOCX, p.split('/').pop() ?? 'clover.docx')
+    return ''
+  },
   openExternal: (url) => window.open(url, '_blank', 'noopener'),
   onOpenFile: noop,
   onMenu: noop,

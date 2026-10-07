@@ -174,6 +174,14 @@ ipcMain.handle('citecheck:reveal', (_e, p: string) => {
   shell.showItemInFolder(p)
 })
 
+// exported file → its default app (Word for .docx, Archive Utility for .zip)
+ipcMain.handle('citecheck:open-path', async (_e, p: string) => {
+  if (typeof p !== 'string' || !path.isAbsolute(p) || !fs.existsSync(p)) {
+    return '文件已不在原位置。'
+  }
+  return shell.openPath(p)
+})
+
 ipcMain.handle('citecheck:open-external', (_e, url: string) => {
   if (typeof url === 'string' && url.startsWith('https://')) {
     shell.openExternal(url)

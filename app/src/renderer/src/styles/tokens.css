@@ -61,6 +61,9 @@
 
   /* 论文插图的衬底：插图按白纸绘制，深色模式也垫浅底 */
   --figure-bg: #ffffff;
+  /* 正文查找：全部匹配与当前匹配（强调色系，不占用语义色） */
+  --search-tint: rgba(35, 131, 226, 0.16);
+  --search-current: rgba(35, 131, 226, 0.4);
 
   /* 缓动：一次定义，全站共用 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -70,6 +73,8 @@
     --bg: #191919;
     --bg-subtle: #202020;
     --figure-bg: #e8e8e6;
+    --search-tint: rgba(82, 156, 202, 0.24);
+    --search-current: rgba(82, 156, 202, 0.55);
     --text: rgba(255, 255, 255, 0.87);
     --text-secondary: rgba(255, 255, 255, 0.48);
     --accent: #529cca;

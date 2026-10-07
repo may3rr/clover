@@ -18,7 +18,7 @@
 
 用户在自己熟悉的 Word 里完成修改，这是本产品"提效"的落点。
 
-**LaTeX 稿件**：也可以拖入 LaTeX 项目（.zip / .tar.gz 压缩包、文件夹或主 .tex），四层体检相同。解析在 `parse/latex/`，每个渲染字符都能追溯到源文件位置，报告里的问题标注 `文件:行号`。导出为新的项目 zip：问题写成 `%` 注释插在对应源码行上方，错别字修正放进 `clover-revisions.patch` 由作者审阅后应用，源码本身不被静默修改。参考文献重排不适用于 LaTeX（顺序由编译决定）。样例集见 `demo/latex/`。
+**LaTeX 稿件**：也可以拖入 LaTeX 项目（.zip / .tar.gz 压缩包、文件夹或主 .tex），四层体检相同。解析在 `parse/latex/`，每个渲染字符都能追溯到源文件位置，报告里的问题标注 `文件:行号`。导出为新的项目 zip：问题写成 `%` 注释插在对应源码行上方，错别字修正放进 `clover-revisions.patch` 由作者审阅后应用，源码本身不被静默修改。参考文献重排不适用于 LaTeX（顺序由编译决定）。样例集见 `demo/latex/`。表格逐格成为带坐标的段落、插图挂在题注段落上，阅读区按表格和图片显示；单元格不参与论断抽取与引用堆砌检查。
 
 **当前版本只支持英文论文。** 中文论文（GB/T 7714、中文文献核验、中文对标语料）作为后续工作，现有中文解析代码保留但不再扩展，界面与演示均以英文论文为准。
 
@@ -89,7 +89,9 @@ citecheck/
 
 ```python
 class Section:        id, title, canonical  # canonical ∈ intro|related|method|experiment|discussion|conclusion|other
-class Paragraph:      id, section_id, text, char_offset
+class Paragraph:      id, section_id, text, char_offset, math, cell, images, caption
+                      # cell = {table, row, col, colspan, header} | None：表格单元格段落
+                      # images：插图资源名，由 GET /assets/{Document.assets}/{name} 提供
 class CitationMarker: id, paragraph_id, start, end, raw, ref_ids: list[str]
 class Reference:      id, raw, title, authors, year, venue, doi, lang  # lang ∈ en|zh|other
 class RefCheck:       ref_id, status, matched: dict | None, issues: list[str]

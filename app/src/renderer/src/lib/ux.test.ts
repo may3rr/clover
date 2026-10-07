@@ -3,6 +3,7 @@ import { mathPieces } from './math'
 import { formatLoc, isPaperPath, looksLikeFolder } from './accept'
 import { layerFrac, overallProgress } from './progress'
 import { assetUrl, layoutBlocks } from './layout'
+import { findMatches } from './search'
 
 const text = 'Let o_t ∈ O and x^2 hold.'
 const math = [
@@ -122,5 +123,22 @@ describe('layoutBlocks', () => {
     expect(assetUrl('http://127.0.0.1:8765', 'k', 'x1', 'a b.png')).toBe(
       'http://127.0.0.1:8765/assets/x1/a%20b.png?token=k'
     )
+  })
+})
+
+describe('findMatches', () => {
+  it('is case-insensitive and non-overlapping', () => {
+    expect(findMatches('BERT and bert, Bertology', 'bert')).toEqual([
+      [0, 4],
+      [9, 13],
+      [15, 19],
+    ])
+    expect(findMatches('aaaa', 'aa')).toEqual([
+      [0, 2],
+      [2, 4],
+    ])
+  })
+  it('ignores a blank query', () => {
+    expect(findMatches('text', '  ')).toEqual([])
   })
 })
