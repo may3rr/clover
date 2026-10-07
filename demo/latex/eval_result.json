@@ -59,7 +59,7 @@
    ],
    "natural_typos": [],
    "unexplained_high": [],
-   "duration_s": 4.0,
+   "duration_s": 8.9,
    "export": {
     "path": "export/attention（Clover）.zip",
     "patch_applies": true
@@ -119,7 +119,7 @@
      "loc": "bert/main.bbl:22"
     }
    ],
-   "duration_s": 1.2,
+   "duration_s": 7.5,
    "export": {
     "path": "export/bert（Clover）.zip",
     "patch_applies": true
@@ -194,7 +194,7 @@
      "loc": "lora/LoRA1.bib:246"
     }
    ],
-   "duration_s": 17.3,
+   "duration_s": 6.0,
    "export": {
     "path": "export/lora（Clover）.zip",
     "patch_applies": true
@@ -284,7 +284,7 @@
      "loc": "qlora/references.bib:1168"
     }
    ],
-   "duration_s": 26.5,
+   "duration_s": 15.7,
    "export": {
     "path": "export/qlora（Clover）.zip",
     "patch_applies": true

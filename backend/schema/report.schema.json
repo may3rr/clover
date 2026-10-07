@@ -304,6 +304,18 @@
           "title": "Source Format",
           "type": "string"
         },
+        "assets": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assets"
+        },
         "citation_style": {
           "default": "unknown",
           "enum": [
@@ -696,6 +708,29 @@
           },
           "title": "Math",
           "type": "array"
+        },
+        "cell": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TableCell"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "images": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Images",
+          "type": "array"
+        },
+        "caption": {
+          "default": false,
+          "title": "Caption",
+          "type": "boolean"
         }
       },
       "required": [
@@ -1300,6 +1335,40 @@
         "rationale"
       ],
       "title": "SupportCheck",
+      "type": "object"
+    },
+    "TableCell": {
+      "description": "Where a paragraph sits in a table (several paragraphs may share a\ncell). Tables are rendered as grids in the reading view; every cell\nparagraph is still a normal Paragraph for anchors and checks.",
+      "properties": {
+        "table": {
+          "title": "Table",
+          "type": "string"
+        },
+        "row": {
+          "title": "Row",
+          "type": "integer"
+        },
+        "col": {
+          "title": "Col",
+          "type": "integer"
+        },
+        "colspan": {
+          "default": 1,
+          "title": "Colspan",
+          "type": "integer"
+        },
+        "header": {
+          "default": false,
+          "title": "Header",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "table",
+        "row",
+        "col"
+      ],
+      "title": "TableCell",
       "type": "object"
     }
   },

@@ -113,7 +113,10 @@ async def check_typos(
         markers_by_para.setdefault(m.paragraph_id, []).append((m.start, m.end))
 
     async def one(p: Paragraph):
-        if p.id in ref_paras or _skippable(p.text):
+        # table cells are mostly numbers and labels: only prose-length
+        # cells are worth a model call
+        if p.id in ref_paras or _skippable(p.text) or (
+                p.cell is not None and len(p.text) < 60):
             return [], []
         res = await chat_json(
             "typo",

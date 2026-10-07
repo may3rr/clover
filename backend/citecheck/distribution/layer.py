@@ -167,6 +167,8 @@ async def run_distribution(
     citing_counts: list[int] = []
     stacked: list[tuple[str, int, int, int]] = []  # (para_id, start, end, n)
     for pid, ms in markers_by_para.items():
+        if para_by_id[pid].cell is not None:  # table cells aren't sentences
+            continue
         text = para_by_id[pid].text
         for sent in split_sentences(text):
             ids: set[str] = set()
@@ -309,7 +311,7 @@ async def run_distribution(
         if s.canonical in {"intro", "related", "discussion"}
     }
     for p in parsed.paragraphs:
-        if no_citations or p.section_id not in cue_secs:
+        if no_citations or p.section_id not in cue_secs or p.cell or p.caption:
             continue
         ms = markers_by_para.get(p.id, [])
         for sent in split_sentences(p.text):

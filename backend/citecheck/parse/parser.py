@@ -26,6 +26,8 @@ from pydantic import BaseModel, Field
 
 from ..refs.structure import parse_reference
 from ..schema import CitationMarker, Document, Paragraph, Reference, Section
+from .assets import Bundle, bundle_id
+from . import docx_layout as dl
 from . import docx_xml as dx
 from . import headings as hd
 from . import notes as nt
@@ -185,11 +187,14 @@ def parse_docx(path: str | Path) -> ParsedDocument:
         note_bodies = nt.load_note_bodies(zf)
         core_title = _core_title(zf)
 
-    p_elems: list[etree._Element] = []
-    p_ids: list[str] = []
-    for pid, p in dx.iter_paragraphs(root):
-        p_ids.append(pid)
-        p_elems.append(p)
+        p_elems: list[etree._Element] = []
+        p_ids: list[str] = []
+        for pid, p in dx.iter_paragraphs(root):
+            p_ids.append(pid)
+            p_elems.append(p)
+        bundle = Bundle(bundle_id("d", path.read_bytes()))
+        images = dl.paragraph_images(zf, p_elems, bundle)
+    cells = dl.table_cells(root, p_elems)
 
     prefixes = paragraph_prefixes(p_elems, numbering, styles)
     note_marks, note_refs = nt.paragraph_note_refs(p_elems)
@@ -332,7 +337,10 @@ def parse_docx(path: str | Path) -> ParsedDocument:
 
     paragraphs = [
         Paragraph(id=p_ids[i], section_id=para_section[i], text=texts[i],
-                  char_offset=char_offsets[i])
+                  char_offset=char_offsets[i], cell=cells[i],
+                  images=images[i],
+                  caption=cells[i] is None and i not in ref_para_idx
+                  and dl.is_caption(p_elems[i], texts[i], styles))
         for i in range(len(texts))
     ]
 
@@ -343,6 +351,7 @@ def parse_docx(path: str | Path) -> ParsedDocument:
             citation_style=citation_style,  # type: ignore[arg-type]
             managed_by=managed_by,  # type: ignore[arg-type]
             word_count=word_count,
+            assets=bundle.id if bundle.used else None,
         ),
         sections=sections,
         paragraphs=paragraphs,

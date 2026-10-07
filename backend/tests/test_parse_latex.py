@@ -389,8 +389,8 @@ See \cite{b,a}.
 
 
 def test_acl_newcite_and_table_citations(tmp_path):
-    """ACL's \\newcite is a citation; a \\cite inside a dropped table still
-    makes the entry cited (no false 未被引用 finding)."""
+    """ACL's \\newcite is a citation; a \\cite inside a table is a marker in
+    a cell paragraph and makes the entry cited (no false 未被引用 finding)."""
     (tmp_path / "main.tex").write_text(r"""\documentclass{article}
 \usepackage{natbib}
 \begin{document}
@@ -405,7 +405,9 @@ As shown by~\newcite{a}, things work.
 \end{document}
 """)
     d = parse_latex(tmp_path / "main.tex")
-    assert [m.raw for m in d.markers] == ["Alpha (2019)"]
+    assert [m.raw for m in d.markers] == ["Alpha (2019)", "(Beta, 2020)"]
+    cell = next(p for p in d.paragraphs if p.id == d.markers[1].paragraph_id)
+    assert cell.cell is not None and cell.text == "Model (Beta, 2020)"
     assert set(d.cited_keys) == {"a", "b"}
     assert not [f for f in check_norms(d) if "没有被引用" in f.title]
 
@@ -445,3 +447,83 @@ def test_snippet_highlights_whole_cite_command(numeric):
     annotate_locations(numeric.latex, [a])
     s, e = a.snippet_hl
     assert a.snippet[s:e] == "\\citet{lewis2020}"
+
+
+def test_tables_become_cell_paragraphs(tmp_path):
+    (tmp_path / "main.tex").write_text(r"""\documentclass{article}
+\begin{document}
+\section{Results}
+Body text.
+\begin{table}[t]
+\caption{Main results.}
+\resizebox{\linewidth}{!}{\begin{tabular*}{\linewidth}{l|cc}
+\toprule
+& \multicolumn{2}{c}{BLEU} \\
+Model & EN-DE & EN-FR \\
+\midrule
+\multirow{2}{*}{Base} & 27.3\rule{0pt}{2ex} & 38.1 \\
+ & & 39.2 \\[2pt]
+Big \& wide & \textbf{28.4} & 41.0 \\
+\bottomrule
+\end{tabular*}}
+\end{table}
+After the table.
+\end{document}
+""")
+    d = parse_latex(tmp_path / "main.tex")
+    cap = next(p for p in d.paragraphs if p.caption)
+    assert cap.text == "Main results." and cap.cell is None
+    cells = [(p.cell.row, p.cell.col, p.cell.colspan, p.cell.header, p.text)
+             for p in d.paragraphs if p.cell]
+    assert cells == [
+        (0, 1, 2, True, "BLEU"),
+        (1, 0, 1, True, "Model"), (1, 1, 1, True, "EN-DE"),
+        (1, 2, 1, True, "EN-FR"),
+        (2, 0, 1, False, "Base"), (2, 1, 1, False, "27.3"),
+        (2, 2, 1, False, "38.1"),
+        (3, 2, 1, False, "39.2"),
+        (4, 0, 1, False, "Big & wide"), (4, 1, 1, False, "28.4"),
+        (4, 2, 1, False, "41.0"),
+    ]
+    assert {p.cell.table for p in d.paragraphs if p.cell} == {"t0"}
+    assert d.paragraphs[-1].text == "After the table."
+    # cell text maps back to the source like any paragraph
+    lm = d.latex
+    big = next(p for p in d.paragraphs if p.text == "EN-FR")
+    f, off, exact = lm.locate(big.id, 0)
+    src = (tmp_path / "main.tex").read_text()
+    assert exact and src[off:off + 5] == "EN-FR"
+
+
+def test_figures_attach_images_to_captions(tmp_path, monkeypatch):
+    monkeypatch.setenv("CITECHECK_CACHE", str(tmp_path / "c" / "cache.sqlite"))
+    (tmp_path / "figs").mkdir()
+    png = bytes.fromhex(
+        "89504e470d0a1a0a0000000d4948445200000001000000010806000000"
+        "1f15c4890000000b49444154789c6360000200000500017a5eab3f0000"
+        "000049454e44ae426082")
+    (tmp_path / "figs" / "arch.png").write_bytes(png)
+    (tmp_path / "figs" / "left.png").write_bytes(png)
+    (tmp_path / "main.tex").write_text(r"""\documentclass{article}
+\graphicspath{{figs/}}
+\begin{document}
+\begin{figure}
+\centering\includegraphics[width=.5\linewidth]{arch}
+\caption{The architecture.}
+\end{figure}
+\begin{figure}
+\includegraphics{figs/left.png}\includegraphics{missing}
+\end{figure}
+\end{document}
+""")
+    from citecheck.parse.assets import asset_path
+
+    d = parse_latex(tmp_path / "main.tex")
+    cap = next(p for p in d.paragraphs if p.caption)
+    assert cap.text == "The architecture." and len(cap.images) == 1
+    bare = [p for p in d.paragraphs if p.images and not p.text]
+    assert len(bare) == 1 and len(bare[0].images) == 1  # missing one skipped
+    assert d.document.assets
+    path = asset_path(d.document.assets, cap.images[0])
+    assert path is not None and path.read_bytes() == png
+    assert asset_path(d.document.assets, "../cache.sqlite") is None

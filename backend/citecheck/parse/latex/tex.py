@@ -74,6 +74,7 @@ _DROP_N_ARGS = {
     "renewenvironment": 3, "newtheorem": 2, "setcitestyle": 1,
     "graphicspath": 1, "pagestyle": 1, "thispagestyle": 1, "fontsize": 2,
     "selectfont": 0, "titlespacing": 4, "newif": 0, "vskip": 0, "hskip": 0,
+    "rule": 2, "cellcolor": 1, "rowcolor": 1, "columncolor": 1,
 }
 # TeX 赋值：\looseness=-1、\parskip=3pt、\vskip 2pt
 _ASSIGN_RE = re.compile(

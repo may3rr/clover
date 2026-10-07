@@ -68,6 +68,11 @@ def manuscript_profile(parsed: ParsedDocument) -> tuple[dict, str]:
     """(local stats, the short excerpt the reader model may see)."""
     texts = [p.text for p in parsed.paragraphs]
     n_tables, n_figs = count_captions(texts)
+    # parsed tables/figures (LaTeX captions carry no "Table 3:" label)
+    n_tables = max(n_tables, len({p.cell.table for p in parsed.paragraphs
+                                  if p.cell}))
+    n_figs = max(n_figs, sum(1 for p in parsed.paragraphs
+                             if p.images and p.cell is None))
     captions = [t[:240] for t in texts if _TABLE_CAP.match(t) or _FIG_CAP.match(t)]
     titles = [s.title for s in parsed.sections if s.title]
     lower = " ".join(titles).lower()

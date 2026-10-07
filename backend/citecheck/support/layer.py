@@ -75,7 +75,9 @@ class SupportRun:
         by_para: dict[str, list] = {}
         for m in parsed.markers:
             by_para.setdefault(m.paragraph_id, []).append(m)
-        todo = [(pid, ms) for pid, ms in by_para.items() if pid in para_by_id]
+        # a citation in a table cell labels a row, it doesn't make a claim
+        todo = [(pid, ms) for pid, ms in by_para.items()
+                if pid in para_by_id and para_by_id[pid].cell is None]
         n_ext = 0
 
         async def extract(pid, ms):

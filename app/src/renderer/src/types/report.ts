@@ -3,6 +3,7 @@
 export type Title = string | null;
 export type Filename = string | null;
 export type SourceFormat = "docx" | "tex";
+export type Assets = string | null;
 export type CitationStyle = "numeric" | "author_year" | "mixed" | "unknown";
 export type ManagedBy = ("zotero" | "endnote") | null;
 export type WordCount = number;
@@ -19,6 +20,13 @@ export type Start = number;
 export type End = number;
 export type Runs = [unknown, unknown][];
 export type Math = MathSpan[];
+export type Table = string;
+export type Row = number;
+export type Col = number;
+export type Colspan = number;
+export type Header = boolean;
+export type Images = string[];
+export type Caption = boolean;
 export type Paragraphs = Paragraph[];
 export type Id2 = string;
 export type ParagraphId = string;
@@ -155,6 +163,7 @@ export interface Document {
   title?: Title;
   filename?: Filename;
   source_format?: SourceFormat;
+  assets?: Assets;
   citation_style?: CitationStyle;
   managed_by?: ManagedBy;
   word_count?: WordCount;
@@ -171,6 +180,9 @@ export interface Paragraph {
   text: Text;
   char_offset: CharOffset;
   math?: Math;
+  cell?: TableCell | null;
+  images?: Images;
+  caption?: Caption;
 }
 /**
  * LaTeX inline math inside Paragraph.text[start:end] (flattened text).
@@ -180,6 +192,18 @@ export interface MathSpan {
   start: Start;
   end: End;
   runs?: Runs;
+}
+/**
+ * Where a paragraph sits in a table (several paragraphs may share a
+ * cell). Tables are rendered as grids in the reading view; every cell
+ * paragraph is still a normal Paragraph for anchors and checks.
+ */
+export interface TableCell {
+  table: Table;
+  row: Row;
+  col: Col;
+  colspan?: Colspan;
+  header?: Header;
 }
 export interface CitationMarker {
   id: Id2;

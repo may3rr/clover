@@ -59,6 +59,9 @@
   --egg-clover: #34c759;          /* 关于页像素四叶草 */
   --egg-clover-shine: #b8f5c6;
 
+  /* 论文插图的衬底：插图按白纸绘制，深色模式也垫浅底 */
+  --figure-bg: #ffffff;
+
   /* 缓动：一次定义，全站共用 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -66,6 +69,7 @@
   :root {
     --bg: #191919;
     --bg-subtle: #202020;
+    --figure-bg: #e8e8e6;
     --text: rgba(255, 255, 255, 0.87);
     --text-secondary: rgba(255, 255, 255, 0.48);
     --accent: #529cca;

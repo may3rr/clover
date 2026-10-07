@@ -44,6 +44,17 @@ class MathSpan(BaseModel):
         default_factory=list)
 
 
+class TableCell(BaseModel):
+    """Where a paragraph sits in a table (several paragraphs may share a
+    cell). Tables are rendered as grids in the reading view; every cell
+    paragraph is still a normal Paragraph for anchors and checks."""
+    table: str
+    row: int
+    col: int
+    colspan: int = 1
+    header: bool = False
+
+
 class Paragraph(BaseModel):
     id: str
     section_id: str
@@ -51,6 +62,12 @@ class Paragraph(BaseModel):
     char_offset: int
     # LaTeX only: inline math spans for the reading view
     math: list[MathSpan] = Field(default_factory=list)
+    cell: TableCell | None = None
+    # image assets shown above this paragraph's text (Document.assets
+    # names the bundle they are served from)
+    images: list[str] = Field(default_factory=list)
+    # figure/table caption: shown in the secondary caption style
+    caption: bool = False
 
 
 MarkerKind = Literal[
@@ -79,6 +96,8 @@ class Document(BaseModel):
     title: str | None = None
     filename: str | None = None
     source_format: Literal["docx", "tex"] = "docx"
+    # image bundle id: GET /assets/{assets}/{name} serves Paragraph.images
+    assets: str | None = None
     citation_style: CitationStyle = "unknown"
     managed_by: RefManager | None = None
     word_count: int = 0

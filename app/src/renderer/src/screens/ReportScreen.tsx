@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
 } from 'react'
-import type { Report } from '../types/report'
+import type { Paragraph, Report } from '../types/report'
 import {
   buildItems,
   firstLine,
@@ -21,7 +21,8 @@ import {
   HL_SELECTED_CLASS,
 } from '../lib/highlight'
 import { mathPieces, type Piece } from '../lib/math'
-import { apiFetch } from '../lib/api'
+import { apiFetch, getInfo } from '../lib/api'
+import { assetUrl, layoutBlocks } from '../lib/layout'
 import { morph } from '../lib/vt'
 import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
@@ -503,6 +504,62 @@ function PaperBody({
   const nMedium = items.filter(
     (i) => i.severity === 'medium' || i.severity === 'low'
   ).length
+  const blocks = useMemo(
+    () => layoutBlocks(report.paragraphs ?? []),
+    [report.paragraphs]
+  )
+  const [server, setServer] = useState<{
+    baseUrl: string
+    token: string
+  } | null>(null)
+  const bundle = report.document.assets
+  useEffect(() => {
+    if (!bundle) return
+    let live = true
+    getInfo().then((i) => live && setServer(i))
+    return () => {
+      live = false
+    }
+  }, [bundle])
+  const figureUrl = (name: string): string | null =>
+    bundle && server
+      ? assetUrl(server.baseUrl, server.token, bundle, name)
+      : null
+
+  // paragraph text with highlight marks (prose, table cells and captions)
+  const textOf = (p: Paragraph): React.ReactNode => {
+    const ptext = p.text ?? ''
+    const segs = segmentsForParagraph(ptext, p.id ?? '', visible, selectedId)
+    return segs.map((s, i) => {
+      const body = renderPieces(mathPieces(ptext, s.start, s.end, p.math))
+      if (s.severity === null) return <span key={i}>{body}</span>
+      const cls = s.selected
+        ? HL_SELECTED_CLASS[s.severity]
+        : HL_CLASS[s.severity]
+      // adjacent marks read as one run: no inner padding/radius
+      const jl = segs[i - 1]?.severity != null ? ' hl-jl' : ''
+      const jr = segs[i + 1]?.severity != null ? ' hl-jr' : ''
+      return (
+        <span
+          key={i}
+          className={`hl ${cls}${jl}${jr}`}
+          ref={(el) => {
+            if (!el) return
+            for (const id of s.itemIds) {
+              const arr = segRefs.current.get(id) ?? []
+              if (!arr.includes(el)) segRefs.current.set(id, [...arr, el])
+            }
+          }}
+          onClick={() => onPick(s.itemIds)}
+          role="button"
+          tabIndex={0}
+          onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
+        >
+          {body}
+        </span>
+      )
+    })
+  }
 
   return (
     <>
@@ -569,12 +626,64 @@ function PaperBody({
         </div>
         <OverviewCard overview={report.overview} style={{ marginBottom: 40 }} />
       </div>
-      {(report.paragraphs ?? []).map((p) => {
+      {blocks.map((b) => {
+        if (b.kind === 'table')
+          return (
+            <div key={b.id} className="paper-table-wrap">
+              <table className="paper-table">
+                <tbody>
+                  {b.rows.map((row, r) => (
+                    <tr
+                      key={r}
+                      className={row[0]?.header ? 'head' : undefined}
+                    >
+                      {row.map((c) => (
+                        <td
+                          key={c.col}
+                          colSpan={c.colspan > 1 ? c.colspan : undefined}
+                        >
+                          {c.paras.map((p, k) => (
+                            <div key={p.id ?? k}>{textOf(p)}</div>
+                          ))}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        const p = b.p
         const ptext = p.text ?? ''
         if (title && ptext.trim() === title) return null // shown once above
         const isHeading = headingIds.has(p.id ?? '')
         const isRef = refParaIds.has(p.id ?? '')
-        const segs = segmentsForParagraph(ptext, p.id ?? '', visible, selectedId)
+        const imgs = (p.images ?? [])
+          .map((name) => figureUrl(name))
+          .filter(Boolean) as string[]
+        if (imgs.length || p.caption)
+          return (
+            <figure key={p.id} className="paper-fig">
+              {imgs.length > 0 && (
+                <div className="paper-fig-row">
+                  {imgs.map((src) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt=""
+                      loading="lazy"
+                      draggable={false}
+                    />
+                  ))}
+                </div>
+              )}
+              {ptext && (
+                <figcaption className="t13 secondary">
+                  {textOf(p)}
+                </figcaption>
+              )}
+            </figure>
+          )
         return (
           <p
             key={p.id}
@@ -587,38 +696,7 @@ function PaperBody({
               marginBottom: 16,
             }}
           >
-            {segs.map((s, i) => {
-              const body = renderPieces(
-                mathPieces(ptext, s.start, s.end, p.math)
-              )
-              if (s.severity === null) return <span key={i}>{body}</span>
-              const cls = s.selected
-                ? HL_SELECTED_CLASS[s.severity]
-                : HL_CLASS[s.severity]
-              // adjacent marks read as one run: no inner padding/radius
-              const jl = segs[i - 1]?.severity != null ? ' hl-jl' : ''
-              const jr = segs[i + 1]?.severity != null ? ' hl-jr' : ''
-              return (
-                <span
-                  key={i}
-                  className={`hl ${cls}${jl}${jr}`}
-                  ref={(el) => {
-                    if (!el) return
-                    for (const id of s.itemIds) {
-                      const arr = segRefs.current.get(id) ?? []
-                      if (!arr.includes(el))
-                        segRefs.current.set(id, [...arr, el])
-                    }
-                  }}
-                  onClick={() => onPick(s.itemIds)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
-                >
-                  {body}
-                </span>
-              )
-            })}
+            {textOf(p)}
           </p>
         )
       })}

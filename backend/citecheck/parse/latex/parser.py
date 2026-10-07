@@ -29,12 +29,15 @@ from ...schema import (
     Paragraph,
     Reference,
     Section,
+    TableCell,
 )
+from ..assets import Bundle, bundle_id
 from ..headings import canonical_for
 from ..parser import LatexMap, ParsedDocument
 from . import tex
 from .archive import archive_stem, extract_archive, is_archive
 from .bib import BibEntry, entry_fields, parse_bib, parse_biblatex_bbl
+from .floats import TABULAR_ENVS, scan_float
 from .source import Builder, Project, Src
 
 # 整个丢弃的环境（figure/table 会抢救 \\caption 出来当独立段落）
@@ -73,6 +76,9 @@ class Block:
     level: int = 0
     text: str = ""   # 非源码块（如 Abstract 标题）的直接文本
     at: int = 0      # 块起点在正文中的位置（文本块用它定位）
+    cell: tuple[str, int, int, int, bool] | None = None  # 表格单元格坐标
+    caption: bool = False
+    images: list[str] = field(default_factory=list)      # \includegraphics 路径
 
 
 # ------------------------------------------------------------ 主文件定位
@@ -138,9 +144,6 @@ def _find_main_tex(d: Path) -> Path:
 
 _END_THEBIB_RE = re.compile(r"\\end\s*\{thebibliography\}")
 _CMD_TOKEN_RE = re.compile(r"\\([a-zA-Z]+\*?)|\n[ \t]*\n")
-_CAPTION_RE = re.compile(r"\\caption\s*(?:\[[^\]]*\])?\s*\{")
-
-
 def _match_env_end(src: str, start: int, env: str) -> int:
     """找与 \\begin{env} 配对的 \\end{env} 的结束位置（嵌套同名计深）。"""
     tok = re.compile(r"\\(begin|end)\s*\{" + re.escape(env) + r"\}")
@@ -157,7 +160,7 @@ def _scan_blocks(body: str) -> tuple[list[Block], dict]:
     (blocks, meta)；meta 含 title_src、bib_files、bib_style、nocite。"""
     blocks: list[Block] = []
     meta: dict = {"title_src": None, "bib_files": [], "bib_style": None,
-                  "bib_at": None}
+                  "bib_at": None, "tables": 0}
     buf: list[tuple[int, int]] = []
 
     def flush() -> None:
@@ -207,12 +210,13 @@ def _scan_blocks(body: str) -> tuple[list[Block], dict]:
             if env in _DROP_ENVS:
                 flush()
                 end_i = _match_env_end(body, j, env)
-                if env in _CAPTION_ENVS:
-                    for cm in _CAPTION_RE.finditer(body, j, end_i):
-                        g = tex._read_balanced(body, cm.end() - 1, "{", "}")
-                        if g:
-                            blocks.append(Block(
-                                "para", [(cm.end(), g[1] - 1)], at=cm.end()))
+                if env in _CAPTION_ENVS or env in TABULAR_ENVS:
+                    parts, meta["tables"] = scan_float(
+                        body, m.start(), end_i, meta["tables"])
+                    for p in parts:
+                        blocks.append(Block(
+                            "para", p.ranges, at=p.at, cell=p.cell,
+                            caption=p.kind == "caption", images=p.images))
                 i = end_i
                 continue
             # 其它环境：丢掉 begin 标记（含可选参数），内容正常流出
@@ -854,6 +858,10 @@ def parse_latex(path: str | Path) -> ParsedDocument:
     markers: list[CitationMarker] = []
     para_runs: dict[str, list[tuple[int, int, int, bool]]] = {}
     para_math: dict[str, list[MathSpan]] = {}
+    para_cell: dict[str, TableCell] = {}
+    para_images: dict[str, list[str]] = {}
+    para_caption: set[str] = set()
+    figures = _Figures(src.text, main.parent, root)
 
     sections: list[Section] = []
     cur: Section | None = None
@@ -908,9 +916,22 @@ def parse_latex(path: str | Path) -> ParsedDocument:
         block_src = bld.build()
         t, ms, runs, maths = tex.render_mapped(
             block_src.text, render_cite, macros)
-        if not t:
+        imgs = [n for n in (figures.add(x) for x in b.images) if n]
+        if not t and not imgs:
             continue
         pid = add_para(t, heading=b.level if b.kind == "heading" else None)
+        if b.cell:
+            tid, row, col, span, head = b.cell
+            para_cell[pid] = TableCell(table=tid, row=row, col=col,
+                                       colspan=span, header=head)
+        if imgs:
+            para_images[pid] = imgs
+        if b.caption:
+            para_caption.add(pid)
+        if not t:
+            f, fp, _ = body.origin(b.at)
+            para_runs[pid] = [(0, f, fp, False)]
+            continue
         para_runs[pid] = _compose(runs, len(t), block_src)
         if maths:
             para_math[pid] = [
@@ -953,7 +974,10 @@ def parse_latex(path: str | Path) -> ParsedDocument:
     paragraphs = [
         Paragraph(id=p_ids[i], section_id=para_section[i], text=texts[i],
                   char_offset=char_offsets[i],
-                  math=para_math.get(p_ids[i], []))
+                  math=para_math.get(p_ids[i], []),
+                  cell=para_cell.get(p_ids[i]),
+                  images=para_images.get(p_ids[i], []),
+                  caption=p_ids[i] in para_caption)
         for i in range(len(texts))
     ]
 
@@ -962,6 +986,7 @@ def parse_latex(path: str | Path) -> ParsedDocument:
             title=title, filename=filename, source_format="tex",
             citation_style=style,  # type: ignore[arg-type]
             word_count=word_count,
+            assets=figures.bundle.id if figures.bundle.used else None,
         ),
         sections=sections,
         paragraphs=paragraphs,
@@ -977,6 +1002,42 @@ def parse_latex(path: str | Path) -> ParsedDocument:
         cited_keys=([r.key for r in references if r.key] if "*" in nocite
                     else list(dict.fromkeys(cite_order + nocite))),
     )
+
+
+_GRAPHICSPATH_RE = re.compile(r"\\graphicspath\s*\{((?:\s*\{[^{}]*\})+)\s*\}")
+_GRAPHIC_EXTS = (".pdf", ".png", ".jpg", ".jpeg", ".eps", ".gif")
+
+
+class _Figures:
+    """\\includegraphics 路径 → 资源包里的图片名（按 \\graphicspath 与
+    LaTeX 的扩展名顺序查找；项目外与找不到的路径跳过）。"""
+
+    def __init__(self, text: str, base: Path, root: Path):
+        self.base, self.root = base, root
+        self.dirs = [""]
+        for m in _GRAPHICSPATH_RE.finditer(text):
+            self.dirs += re.findall(r"\{([^{}]*)\}", m.group(1))
+        self.bundle = Bundle(bundle_id("x", str(root.resolve())))
+        self._seen: dict[str, str | None] = {}
+
+    def _resolve(self, name: str) -> Path | None:
+        name = name.strip().strip('"')
+        for d in self.dirs:
+            p = self.base / d / name
+            cands = [p] if p.suffix.lower() in _GRAPHIC_EXTS else []
+            cands += [p.with_name(p.name + e) for e in _GRAPHIC_EXTS]
+            for c in cands:
+                if c.is_file() and _under(c, self.root):
+                    return c
+        return None
+
+    def add(self, name: str) -> str | None:
+        if name not in self._seen:
+            p = self._resolve(name)
+            stem = p.resolve().relative_to(self.root.resolve()).with_suffix(
+                "").as_posix() if p else ""
+            self._seen[name] = self.bundle.add_file(p, stem) if p else None
+        return self._seen[name]
 
 
 def _under(p: Path, root: Path) -> bool:

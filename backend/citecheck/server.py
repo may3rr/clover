@@ -29,7 +29,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from sse_starlette.sse import EventSourceResponse
 
 from .cache import Cache
@@ -118,6 +118,17 @@ def _comment_identity(p: dict) -> tuple[str, str]:
 @app.get("/health")
 async def health() -> dict:
     return {"ok": True}
+
+
+@app.get("/assets/{bundle}/{name}")
+async def asset(bundle: str, name: str):
+    """论文里的插图（阅读区 <img> 不能带请求头，鉴权走 ?token=）。"""
+    from .parse.assets import asset_path
+
+    path = asset_path(bundle, name)
+    if path is None:
+        return JSONResponse({"error": "not found"}, status_code=404)
+    return FileResponse(path, headers={"Cache-Control": "private, max-age=86400"})
 
 
 @app.get("/benchmarks")

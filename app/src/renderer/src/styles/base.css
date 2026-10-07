@@ -97,6 +97,63 @@ select {
   line-height: 1.6;
 }
 
+/* tables: a quiet tinted grid, header row on a stronger fill, no rules */
+.paper-table-wrap {
+  margin: 0 0 24px;
+  /* also clips the header fill to the rounded corners */
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--bg-subtle);
+}
+.paper-table {
+  border-spacing: 0;
+  min-width: 100%;
+  font-size: 15px;
+  line-height: 1.5;
+  font-variant-numeric: tabular-nums;
+}
+.paper-table td {
+  padding: 8px 12px;
+  vertical-align: top;
+  text-align: left;
+}
+.paper-table tr.head td {
+  font-weight: 600;
+  background: var(--fill);
+}
+.paper-table td > div + div {
+  margin-top: 4px;
+}
+
+/* figures: images centred, caption in the secondary style below */
+.paper-fig {
+  margin: 8px 0 24px;
+}
+.paper-fig-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.paper-fig-row img {
+  display: block;
+  max-width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 8px;
+  padding: 8px;
+  /* figures are usually drawn for white paper */
+  background: var(--figure-bg);
+}
+.paper-fig-row:has(img + img) img {
+  max-width: calc(50% - 8px);
+}
+.paper-fig figcaption {
+  line-height: 1.6;
+}
+
 /* type scale helpers */
 .t13 {
   font-size: 13px;

@@ -78,7 +78,8 @@ def _outline(parsed: ParsedDocument) -> dict:
             round(m.start / para_len.get(m.paragraph_id, 1), 4))
     paras_by_section: dict[str, list] = {}
     for p in parsed.paragraphs:
-        paras_by_section.setdefault(p.section_id, []).append(p)
+        if p.cell is None:  # the skeleton draws prose lines, not table grids
+            paras_by_section.setdefault(p.section_id, []).append(p)
     heading_ids = {s.heading_paragraph_id for s in parsed.sections}
     return {
         "title": parsed.document.title,
