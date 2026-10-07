@@ -1,18 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { eventsUrl } from '../lib/api'
-import {
-  CheckCircleFillIcon,
-  ExclaimCircleFillIcon,
-} from '../components/Icons'
+import { CheckCircleFillIcon, ExclaimCircleFillIcon } from '../components/Icons'
 import Mascot, { type MascotState } from '../components/Mascot'
 import { AGENT_COLOR } from '../lib/mascot'
 import SkeletonPaper from '../components/Skeleton'
 import type { Outline, SkAnchor } from '../lib/outline'
+import { layerFrac, overallProgress, type LayerProgress } from '../lib/progress'
 
 export interface LayerState {
   status: 'waiting' | 'running' | 'done' | 'failed'
   findings: number
   error?: string
+  /** backend `progress` fraction while running */
+  frac?: number
 }
 export type LayerUI = Record<string, LayerState>
 /** venue overview stage, driven by the SSE `overview` event */
@@ -25,6 +25,11 @@ const LAYERS: { key: string; name: string }[] = [
   { key: 'norms', name: '格式规范' },
 ]
 const OVERVIEW_NAME = '期刊评审'
+/** one column for title, progress, skeleton and layer rows: the width of
+ *  the skeleton backdrop holding four page thumbnails (4×124 + 3×12 + 24) */
+const COL_W = 556
+/** after `done`, the bar visibly reaches 100% before the report opens */
+const FINISH_HOLD_MS = 600
 
 interface Props {
   jobId: string
@@ -64,6 +69,10 @@ export default function Running({
   const [overview, setOverview] = useState<OverviewRun>('waiting')
   const [outline, setOutline] = useState<Outline | null>(null)
   const [anchors, setAnchors] = useState<Record<string, SkAnchor[]>>({})
+  const [finished, setFinished] = useState(false)
+  const [step, setStep] = useState<string | null>(null)
+  // the overall bar never moves backwards (layers report independently)
+  const shownPct = useRef(0)
 
   useEffect(() => {
     if (overrideLayers) return // shots mode drives the rows directly
@@ -86,12 +95,23 @@ export default function Running({
             error: d.error,
           },
         }))
+        if (d.status === 'running') setStep(null)
         if (d.anchors?.length) {
           setAnchors((prev) => ({
             ...prev,
             [d.layer]: [...(prev[d.layer] ?? []), ...d.anchors],
           }))
         }
+      })
+      es.addEventListener('progress', (ev) => {
+        const d = JSON.parse((ev as MessageEvent).data)
+        setLayers((prev) => {
+          const cur = prev[d.layer]
+          if (!cur || cur.status !== 'running') return prev
+          if ((cur.frac ?? 0) >= d.frac) return prev
+          return { ...prev, [d.layer]: { ...cur, frac: d.frac } }
+        })
+        if (d.label) setStep(d.label)
       })
       es.addEventListener('overview', (ev) => {
         const d = JSON.parse((ev as MessageEvent).data)
@@ -104,7 +124,12 @@ export default function Running({
       })
       es.addEventListener('done', () => {
         es?.close()
-        onDone()
+        // let the bar land on 100% before the report replaces this screen
+        setFinished(true)
+        const reduce = window.matchMedia(
+          '(prefers-reduced-motion: reduce)'
+        ).matches
+        setTimeout(onDone, reduce ? 0 : FINISH_HOLD_MS)
       })
       es.addEventListener('failed', (ev) => {
         es?.close()
@@ -132,6 +157,41 @@ export default function Running({
       ? overview
       : null
 
+  const rows: { key: string; name: string; s: LayerState }[] = LAYERS.map(
+    ({ key, name }) => ({
+      key,
+      name,
+      s: shown[key] ?? { status: 'waiting', findings: 0 },
+    })
+  )
+  const ovLayer: LayerState | null = ovStatus
+    ? {
+        status:
+          ovStatus === 'ok' || ovStatus === 'unavailable' ? 'done' : ovStatus,
+        findings: 0,
+      }
+    : null
+  const progressInput: Record<string, LayerProgress> = Object.fromEntries(
+    rows.map((r) => [r.key, r.s])
+  )
+  if (ovLayer) progressInput.overview = ovLayer
+  const pct = Math.max(
+    shownPct.current,
+    Math.round(
+      overallProgress(
+        progressInput,
+        finished ||
+          (overrideLayers != null && rows.every((r) => r.s.status === 'done'))
+      ) * 100
+    )
+  )
+  shownPct.current = pct
+  const stepText = finished
+    ? '检查完成，正在打开报告'
+    : !skOutline
+      ? '正在解析论文'
+      : (step ?? '正在检查')
+
   return (
     <div
       className="relative h-full flex flex-col items-center justify-center"
@@ -141,103 +201,111 @@ export default function Running({
         className="drag-strip"
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 52 }}
       />
-      <div className="t26 font-semibold">{fileName}</div>
-      <div className="secondary" style={{ marginTop: 8 }}>
-        正在检查，通常需要一两分钟。
-      </div>
-      <div
-        className="flex items-start"
-        style={{ gap: 32, marginTop: 32 }}
-      >
+      <div className="run-col flex flex-col" style={{ width: COL_W }}>
+        <div className="t26 font-semibold truncate">{fileName}</div>
+        <div className="secondary" style={{ marginTop: 8 }}>
+          正在检查，通常需要一两分钟。
+        </div>
+
+        {/* overall progress: weighted over the layers, 0 → 100 */}
+        <div style={{ marginTop: 24 }}>
+          <div className="flex items-center justify-between t13 secondary">
+            <span className="truncate">{stepText}</span>
+            <span style={{ marginLeft: 12 }}>{pct}%</span>
+          </div>
+          <div
+            className="run-track"
+            style={{ marginTop: 8 }}
+            role="progressbar"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={pct}
+          >
+            <div
+              className="run-fill"
+              style={{ transform: `scaleX(${pct / 100})` }}
+            />
+          </div>
+        </div>
+
         {/* document skeleton: page thumbnails light up as layers land */}
-        <div style={{ paddingTop: 8 }}>
+        <div style={{ marginTop: 24 }}>
           <SkeletonPaper outline={skOutline} lit={skAnchors} />
         </div>
+
         <div
           className="flex flex-col run-panel"
           style={{
-            width: 380,
+            marginTop: 16,
             background: 'var(--bg-subtle)',
             borderRadius: 12,
             padding: '4px 16px',
             viewTransitionName: 'cc-panel',
           }}
         >
-          {LAYERS.map(({ key, name }) => {
-            const s = shown[key] ?? { status: 'waiting', findings: 0 }
-            return (
-              <div
-                key={key}
-                className="flex items-center justify-between"
-                style={{ height: 44 }}
-              >
-                <span
-                  className="flex items-center"
-                  style={{ fontWeight: 500, gap: 12 }}
-                >
-                  <RunMascot agent={key} status={s.status} />
-                  {name}
-                </span>
-                <span className="secondary flex items-center gap-2">
-                  <StatusMark s={s} />
-                  <StatusLabel s={s} />
-                </span>
-              </div>
-            )
-          })}
-          {ovStatus && (
-            <div
-              className="flex items-center justify-between"
-              style={{ height: 44 }}
-            >
-              <span
-                className="flex items-center"
-                style={{ fontWeight: 500, gap: 12 }}
-              >
-                <RunMascot
-                  agent="overview"
-                  status={
-                    ovStatus === 'ok' || ovStatus === 'unavailable'
-                      ? 'done'
-                      : ovStatus
-                  }
-                />
-                {OVERVIEW_NAME}
-              </span>
-              <span className="secondary flex items-center gap-2">
-                <StatusMark
-                  s={{
-                    status:
-                      ovStatus === 'ok'
-                        ? 'done'
-                        : ovStatus === 'running'
-                          ? 'running'
-                          : 'waiting',
-                    findings: 0,
-                  }}
-                />
-                {{
+          {rows.map(({ key, name, s }) => (
+            <LayerRow key={key} agent={key} name={name} s={s} />
+          ))}
+          {ovLayer && ovStatus && (
+            <LayerRow
+              agent="overview"
+              name={OVERVIEW_NAME}
+              s={ovLayer}
+              label={
+                {
                   waiting: '等待',
                   running: '进行中',
                   ok: '已完成',
                   unavailable: '暂无对标',
-                }[ovStatus]}
-              </span>
-            </div>
+                }[ovStatus]
+              }
+            />
           )}
         </div>
+        {error && (
+          <div
+            className="flex flex-col items-center gap-3"
+            style={{ marginTop: 16 }}
+          >
+            <div className="font-normal">{error}</div>
+            <button className="pill" onClick={onReset}>
+              重新选择文件
+            </button>
+          </div>
+        )}
       </div>
-      {error && (
+    </div>
+  )
+}
+
+/** one layer: agent, name, its own thin progress bar, status on the right */
+function LayerRow({
+  agent,
+  name,
+  s,
+  label,
+}: {
+  agent: string
+  name: string
+  s: LayerState
+  label?: string
+}) {
+  const frac =
+    s.status === 'running' ? Math.max(layerFrac(s), 0.03) : layerFrac(s)
+  return (
+    <div className="run-row">
+      <RunMascot agent={agent} status={s.status} />
+      <span style={{ fontWeight: 500 }}>{name}</span>
+      <div className="run-track thin">
         <div
-          className="flex flex-col items-center gap-3"
-          style={{ marginTop: 16 }}
-        >
-          <div className="font-normal">{error}</div>
-          <button className="pill" onClick={onReset}>
-            重新选择文件
-          </button>
-        </div>
-      )}
+          className={`run-fill${s.status === 'done' ? ' ok' : ''}${s.status === 'failed' ? ' failed' : ''}`}
+          style={{ transform: `scaleX(${frac})` }}
+        />
+      </div>
+      <span className="secondary flex items-center justify-end gap-2">
+        <StatusMark s={s} />
+        {label ?? <StatusLabel s={s} />}
+      </span>
     </div>
   )
 }
@@ -311,8 +379,7 @@ function StatusMark({ s }: { s: LayerState }) {
       </svg>
     )
   }
-  if (s.status === 'done')
-    return <CheckCircleFillIcon size={14} draw />
+  if (s.status === 'done') return <CheckCircleFillIcon size={14} draw />
   if (s.status === 'failed') return <ExclaimCircleFillIcon size={14} />
   return null
 }
@@ -353,7 +420,7 @@ function StatusLabel({ s }: { s: LayerState }) {
     case 'waiting':
       return <>等待</>
     case 'running':
-      return <>进行中</>
+      return <span>{Math.round(Math.min(s.frac ?? 0, 1) * 100)}%</span>
     case 'done':
       return <>{count > 0 ? `${count} 个问题` : '未发现问题'}</>
     case 'failed':

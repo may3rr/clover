@@ -285,7 +285,7 @@ def _grounded(field: str, value: Any, raw: str) -> bool:
     return bool(v) and (v in flat or fuzz.partial_ratio(v, flat) >= 95)
 
 
-async def structure_references(refs: list) -> int:
+async def structure_references(refs: list, progress=None) -> int:
     """Re-structure every reference with the model (batched, cached via
     chat_json). Returns how many references had authors or year changed —
     the caller relinks citation markers when that is non-zero."""
@@ -334,8 +334,16 @@ async def structure_references(refs: list) -> int:
     # out one cloud call per chunk at the same time
     sem = asyncio.Semaphore(8)
 
+    done = 0
+
     async def guarded(chunk: list) -> int:
+        nonlocal done
         async with sem:
-            return await one(chunk)
+            try:
+                return await one(chunk)
+            finally:
+                done += 1
+                if progress is not None:
+                    progress(done, len(chunks))
 
     return sum(await asyncio.gather(*(guarded(c) for c in chunks)))

@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Awaitable
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 import httpx
@@ -43,8 +43,13 @@ class SupportRun:
         cache: Cache | None = None,
         http: httpx.AsyncClient | None = None,
         refs_ready: Awaitable[Any] | None = None,
+        progress: Callable[[float, str], None] | None = None,
     ):
         self._parsed = parsed
+        # progress(frac, label): claim extraction is the first quarter,
+        # judging the (claim, ref) pairs the rest
+        self._progress = progress
+        self._judged = 0
         # claim extraction reads paragraph text and marker positions only;
         # the (claim, ref) pairing reads marker.ref_ids, which reference
         # structuring may still relink — pairing waits on this
@@ -70,14 +75,21 @@ class SupportRun:
         by_para: dict[str, list] = {}
         for m in parsed.markers:
             by_para.setdefault(m.paragraph_id, []).append(m)
-        claim_lists = await asyncio.gather(
-            *[
-                extract_claims(
+        todo = [(pid, ms) for pid, ms in by_para.items() if pid in para_by_id]
+        n_ext = 0
+
+        async def extract(pid, ms):
+            nonlocal n_ext
+            try:
+                return await extract_claims(
                     para_by_id[pid], sorted(ms, key=lambda m: m.start))
-                for pid, ms in by_para.items()
-                if pid in para_by_id
-            ]
-        )
+            finally:
+                n_ext += 1
+                self._report(0.25 * n_ext / max(len(todo), 1),
+                             f"抽取论断 {n_ext}/{len(todo)} 段")
+
+        claim_lists = await asyncio.gather(
+            *[extract(pid, ms) for pid, ms in todo])
         claims: list[Claim] = [c for lst in claim_lists for c in lst]
         for i, c in enumerate(claims):
             c.id = f"c{i}"
@@ -130,6 +142,14 @@ class SupportRun:
         async with self._judge_sem:
             self._out[(c.id, rid)] = await _judge_with_source(
                 c, rid, matched, source)
+        self._judged += 1
+        total = max(len(self._jobs), 1)
+        self._report(0.25 + 0.75 * self._judged / total,
+                     f"判定论断与文献 {self._judged}/{len(self._jobs)} 对")
+
+    def _report(self, frac: float, label: str) -> None:
+        if self._progress is not None:
+            self._progress(min(frac, 1.0), label)
 
     async def finish(
         self,

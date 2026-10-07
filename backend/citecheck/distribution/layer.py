@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+from collections.abc import Callable
 
 from pydantic import BaseModel, Field
 
@@ -106,7 +107,10 @@ async def run_distribution(
     bench_path: str | None = None,
     classify: bool = True,
     route: str = "auto",
+    progress: Callable[[int, int], None] | None = None,
 ) -> tuple[Distribution, list[Finding]]:
+    """progress(done, total) fires as each paragraph's citation functions
+    are classified."""
     bench = load_benchmark(bench_path)
     bench_sections: dict[str, dict] = bench.get("sections", {})
     bench_lang = bench.get("language", "en")
@@ -219,8 +223,19 @@ async def run_distribution(
                     marker_functions[it.marker_id] = it.function
                     functions[it.function] += 1
 
+        n_done, n_total = 0, len(markers_by_para)
+
+        async def _counted(pid, ms):
+            nonlocal n_done
+            try:
+                await _classify_para(pid, ms)
+            finally:
+                n_done += 1
+                if progress is not None:
+                    progress(n_done, n_total)
+
         await asyncio.gather(
-            *[_classify_para(pid, ms) for pid, ms in markers_by_para.items()]
+            *[_counted(pid, ms) for pid, ms in markers_by_para.items()]
         )
 
     dist = Distribution(

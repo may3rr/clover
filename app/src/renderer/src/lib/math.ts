@@ -23,7 +23,8 @@ export function mathPieces(
   let cur = start
   for (const m of inside) {
     if (m.start < cur) continue
-    if (m.start > cur) out.push({ kind: 'text', text: text.slice(cur, m.start) })
+    if (m.start > cur)
+      out.push({ kind: 'text', text: text.slice(cur, m.start) })
     out.push({
       kind: 'math',
       text: text.slice(m.start, m.end),

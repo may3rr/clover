@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import re
 import unicodedata
+from collections.abc import Callable
 
 from pydantic import BaseModel, Field
 from rapidfuzz.distance import Levenshtein
@@ -103,7 +104,9 @@ async def check_typos(
     parsed: ParsedDocument,
     *,
     route: str = "auto",
+    progress: Callable[[int, int], None] | None = None,
 ) -> tuple[list[Finding], list[Revision]]:
+    """progress(done, total) fires as each paragraph finishes."""
     ref_paras = {r.paragraph_id for r in parsed.references if r.paragraph_id}
     markers_by_para: dict[str, list[tuple[int, int]]] = {}
     for m in parsed.markers:
@@ -154,7 +157,19 @@ async def check_typos(
                 ))
         return findings, revs
 
-    results = await asyncio.gather(*[one(p) for p in parsed.paragraphs])
+    total = len(parsed.paragraphs)
+    done = 0
+
+    async def counted(p: Paragraph):
+        nonlocal done
+        try:
+            return await one(p)
+        finally:
+            done += 1
+            if progress is not None:
+                progress(done, total)
+
+    results = await asyncio.gather(*[counted(p) for p in parsed.paragraphs])
     findings = [f for fl, _ in results for f in fl]
     revisions = [r for _, rl in results for r in rl]
     for i, f in enumerate(findings):

@@ -105,6 +105,18 @@ async def test_pipeline_full(tmp_path, monkeypatch):
     # every layer ran and finished
     for layer in ("authenticity", "support", "distribution", "norms"):
         assert report.meta.layers[layer].status == "done"
+    # progress events: per-layer fractions never go backwards, carry a
+    # label, and the layers that do per-item work report reaching 1
+    by_layer: dict[str, list[float]] = {}
+    for e in events:
+        if e["type"] == "progress":
+            assert e["label"]
+            by_layer.setdefault(e["layer"], []).append(e["frac"])
+    for layer, fr in by_layer.items():
+        assert fr == sorted(fr), layer
+        assert 0 <= fr[0] and fr[-1] <= 1
+    assert by_layer["authenticity"][-1] == 1
+    assert by_layer["norms"][-1] == 1
     # all sources responded empty -> english refs are not_found
     assert all(c.status in {"not_found", "unverifiable"}
                for c in report.ref_checks)

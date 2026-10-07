@@ -7,7 +7,7 @@ overview 的评审者汇总给出整体定位（可选，venue_id 为 None 时�
 全部 undetermined / source_kind=none）。
 
 emit(dict) 回调收到 {type:"layer", layer, status, findings, anchors}
-事件；解析成功后先发 {type:"parsed", outline}（前端骨架图用）；结束
+事件与 {type:"progress", layer, frac, label} 进度事件；解析成功后先发 {type:"parsed", outline}（前端骨架图用）；结束
 时 {type:"done"}，或解析失败 / 致命错误时 {type:"failed", error}。
 """
 
@@ -136,6 +136,17 @@ async def run_pipeline(
 
     layer_start: dict[str, float] = {}
     layer_times: dict[str, float] = {}
+    progress_at: dict[str, float] = {}
+
+    def _progress(layer: str, frac: float, label: str) -> None:
+        """{type:"progress"} events for the running screen's bars; at most
+        one per layer every 0.25s, except the final one."""
+        now = time.monotonic()
+        if frac < 1 and now - progress_at.get(layer, 0.0) < 0.25:
+            return
+        progress_at[layer] = now
+        send({"type": "progress", "layer": layer,
+              "frac": round(min(max(frac, 0.0), 1.0), 3), "label": label})
 
     def _layer(layer: str, status: str, n: int = 0, error: str | None = None,
                anchors: list[dict] | None = None):
@@ -206,7 +217,10 @@ async def run_pipeline(
             try:
                 changed = await structure_references(
                     [r for r in parsed.references
-                     if r.origin == "list" and r.id not in done])
+                     if r.origin == "list" and r.id not in done],
+                    progress=lambda d, t: _progress(
+                        "authenticity", 0.15 * d / max(t, 1),
+                        f"整理参考文献 {d}/{t} 批"))
             except Exception as e:  # noqa: BLE001 — regex fields stand
                 log.warning("reference structuring failed: %s", e)
                 changed = 0
@@ -238,13 +252,24 @@ async def run_pipeline(
                 _layer("support", "running")
                 sup = SupportRun(
                     parsed, cache=cache, http=retrieval._client,
-                    refs_ready=structured)
+                    refs_ready=structured,
+                    progress=lambda f, lb: _progress("support", f, lb))
+                n_refs = len(parsed.references)
+                n_checked = 0
+
+                def on_ref(check):
+                    nonlocal n_checked
+                    n_checked += 1
+                    _progress("authenticity",
+                              0.15 + 0.85 * n_checked / max(n_refs, 1),
+                              f"核验参考文献 {n_checked}/{n_refs} 篇")
+                    return sup.add_check(check)
                 _layer("authenticity", "running")
                 await structured
                 try:
                     auth_checks, auth_findings = await verify_references(
                         parsed.references, parsed.paragraphs, retrieval,
-                        on_ref=sup.add_check)
+                        on_ref=on_ref)
                 except Exception as e:  # noqa: BLE001
                     log.warning("authenticity layer failed: %s", e)
                     _layer("authenticity", "failed", error=_short_error(e))
@@ -268,7 +293,10 @@ async def run_pipeline(
                 await structured
                 try:
                     dist, dist_findings = await run_distribution(
-                        parsed, bench_path=benchmark_path(benchmark_id))
+                        parsed, bench_path=benchmark_path(benchmark_id),
+                        progress=lambda d, t: _progress(
+                            "distribution", d / max(t, 1),
+                            f"分类引用功能 {d}/{t} 段"))
                 except Exception as e:  # noqa: BLE001
                     log.warning("distribution layer failed: %s", e)
                     _layer("distribution", "failed", error=_short_error(e))
@@ -281,7 +309,9 @@ async def run_pipeline(
                 _layer("norms", "running")
                 # typos read paragraph text only — no need to wait for
                 # reference structuring
-                typo_task = asyncio.create_task(check_typos(parsed))
+                typo_task = asyncio.create_task(check_typos(
+                    parsed, progress=lambda d, t: _progress(
+                        "norms", d / max(t, 1), f"检查错别字 {d}/{t} 段")))
                 try:
                     await structured
                     norm_findings = check_norms(parsed)
