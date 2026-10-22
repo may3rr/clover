@@ -34,10 +34,7 @@ def squash_cjk_spaces(text: str) -> str:
 
 def clean_page(text: str) -> str:
     """One page of pypdf output -> readable running text."""
-    # fullwidth ＡＢＣ / ［Ｊ］ / １２ in older typesetting -> ASCII; Chinese
-    # punctuation （，。：） stays as the author wrote it
-    text = _FULLWIDTH_RE.sub(lambda m: unicodedata.normalize("NFKC", m.group(0)),
-                             text).replace("\N{SOFT HYPHEN}", "")
+    text = text.replace("\N{SOFT HYPHEN}", "")
     text = re.sub(r"(?<=[a-z])-\n(?=[a-z])", "", text)  # de-hyphenate
     lines = [ln.strip() for ln in text.split("\n")]
     out: list[str] = []
@@ -50,7 +47,11 @@ def clean_page(text: str) -> str:
             out[-1] += " " + ln
         else:
             out.append(ln)
-    return re.sub(r"[ \t]{2,}", " ", squash_cjk_spaces("".join(out))).strip()
+    # squash first (fullwidth ［ Ｊ ］ counts as CJK), then fold fullwidth
+    # ＡＢＣ / ［Ｊ］ / １２ to ASCII; Chinese punctuation （，。：） stays
+    text = squash_cjk_spaces("".join(out))
+    text = _FULLWIDTH_RE.sub(lambda m: unicodedata.normalize("NFKC", m.group(0)), text)
+    return re.sub(r"[ \t]{2,}", " ", text).strip()
 
 
 def squash(text: str) -> str:

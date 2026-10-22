@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 _MAX_PDF_BYTES = 80 * 1024 * 1024
 _MIN_TEXT_CHARS = 200  # first three pages; less = scanned / image-only
-_CACHE_VERSION = "4"
+_CACHE_VERSION = "5"
 
 _DOI_RE = re.compile(r"\b(10\.\d{4,9}/[^\s\"<>，。；)）\]]+)")
 _DOI_LABEL_RE = re.compile(r"DOI\s*[:：]\s*(10\s*\.\s*\d{4,9}\s*/\s*[0-9a-z]+(?:\s*[./\-_]\s*[0-9a-z][0-9A-Za-z]*)*)")
