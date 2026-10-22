@@ -49,6 +49,7 @@ export type ParagraphId1 = string | null;
 export type Label = string | null;
 export type Origin = "list" | "footnote";
 export type Key = string | null;
+export type Translation = string | null;
 export type References = Reference[];
 export type RefId = string;
 export type Status = "verified" | "mismatch" | "not_found" | "unverifiable";
@@ -228,6 +229,7 @@ export interface Reference {
   label?: Label;
   origin?: Origin;
   key?: Key;
+  translation?: Translation;
 }
 export interface RefCheck {
   ref_id: RefId;

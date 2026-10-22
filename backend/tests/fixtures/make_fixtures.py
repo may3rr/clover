@@ -1007,6 +1007,78 @@ def make_unstyled_doc():
     print("wrote unstyled.docx (3 markers, 3 refs)")
 
 
+# DAKD-style Chinese manuscript: unstyled numbered headings with an
+# ideographic space, superscript bracket markers, author/affiliation
+# superscripts in the front matter, "参考文献：" with a colon, bilingual
+# GB/T 7714 entries and back matter (支撑数据 [1]…) after the list.
+DAKD_REFS = [
+    "[1] 王静静, 叶鹰. 生成式AI及其GPT类技术应用对信息管理与传播的变革探析[J]. 中国图书馆学报, 2023, 49(6): 41-50. (Wang Jingjing, Ye Ying. A Probe into the Generative AI[J]. Journal of Library Science in China, 2023, 49(6): 41-50.)",
+    "[2] Ji Z, Lee N, Frieske R, et al. Survey of Hallucination in Natural Language Generation[J]. ACM Computing Surveys, 2023, 55(12): 1-38.",
+    "[3] 曾子明, 徐康. 面向古典文学问答领域的大语言模型对抗幻觉优化方法研究[J/OL]. 数据分析与知识发现, (2026-09-24).[2026-09-25]. https://link.cnki.net/urlid/10.1478.G2.20260924.1200.002. (Zeng Ziming, Xu Kang. Hallucination Mitigation for Classical Literature QA[J/OL]. Data Analysis and Knowledge Discovery.)",
+    "[4] Yang A, Li A, Yang B, et al. Qwen3 Technical Report[EB/OL]. (2025-05-14).[2026-09-23]. https://arxiv.org/abs/2505.09388.",
+    "[5] 韩明星, 高宏宇, 许莉薇, 等. 融合蕴含树和LLM的事实核查研究[J/OL]. 数据分析与知识发现, (2026-04-01).[2026-09-25]. https://link.cnki.net/urlid/10.1478.G2.20260401.1036.002. (Han Mingxing, Gao Hongyu, Xu Liwei, et al. Research on Fact Checking with Entailment Trees and LLM[J/OL]. Data Analysis and Knowledge Discovery.)",
+]
+
+
+def make_dakd_zh():
+    doc = Document()
+    add_para(doc, [("面向可信内容生成的声明验证模型评测", {})])
+    add_para(doc, [("张三", {}), ("1，2", {"sup": True}), ("，李四", {}),
+                   ("1", {"sup": True})])
+    add_para(doc, [("1", {"sup": True}), ("(某某大学信息管理学院\u3000南京\u3000210000)", {})])
+    add_para(doc, [("2", {"sup": True}), ("(某某大学数据科学研究院\u3000南京\u3000210000)", {})])
+    add_para(doc, [("摘要：", {})])
+    add_para(doc, [("[目的]比较不同类型的声明验证模型。", {})])
+    add_para(doc, [("Zhang San", {}), ("1,2", {"sup": True}), (", Li Si", {}),
+                   ("1", {"sup": True})])
+    add_para(doc, [("1\u3000引言", {})])
+    add_para(doc, [
+        ("生成式人工智能正在改变信息管理与知识服务的生产方式", {}),
+        ("[1]", {"sup": True}),
+        ("。模型会写出没有依据的内容", {}),
+        ("[2-3]", {"sup": True}),
+        ("。", {}),
+    ])
+    add_para(doc, [("2\u3000相关研究", {})])
+    add_para(doc, [
+        ("开源模型的推理能力持续提升", {}),
+        ("[4]", {"sup": True}),
+        ("，事实核查方法也在发展", {}),
+        ("[3, 5]", {"sup": True}),
+        ("。", {}),
+    ])
+    add_para(doc, [("3\u3000研究设计", {})])
+    add_para(doc, [("本文在五个数据集上评测验证模型", {}), ("[5]", {"sup": True}), ("。", {})])
+    add_para(doc, [("参考文献：", {})])
+    for raw in DAKD_REFS:
+        add_para(doc, [(raw, {})])
+    add_para(doc, [("通讯作者（Corresponding author）：李四（Li Si），E-mail：lisi@example.edu.cn。", {})])
+    add_para(doc, [("作者贡献声明：", {})])
+    add_para(doc, [("张三：提出研究思路，撰写论文初稿；", {})])
+    add_para(doc, [("支撑数据：", {})])
+    add_para(doc, [("[1] 张三. 评测集案例编号与各模型预测结果.", {})])
+    add_para(doc, [("[2] 张三. 评测代码. https://example.org/eval.", {})])
+    save(doc, "dakd_zh.docx", {
+        "citation_style": "numeric",
+        "managed_by": None,
+        "reference_count": 5,
+        "sections": [
+            {"title": "摘要：", "canonical": "other"},
+            {"title": "1\u3000引言", "canonical": "intro"},
+            {"title": "2\u3000相关研究", "canonical": "related"},
+            {"title": "3\u3000研究设计", "canonical": "method"},
+            {"title": "参考文献：", "canonical": "other"},
+        ],
+        "markers": [
+            {"raw": "[1]", "ref_ids": ["r1"]},
+            {"raw": "[2-3]", "ref_ids": ["r2", "r3"]},
+            {"raw": "[4]", "ref_ids": ["r4"]},
+            {"raw": "[3, 5]", "ref_ids": ["r3", "r5"]},
+            {"raw": "[5]", "ref_ids": ["r5"]},
+        ],
+    })
+
+
 if __name__ == "__main__":
     make_numeric_en()
     make_authoryear_en()
@@ -1016,3 +1088,4 @@ if __name__ == "__main__":
     make_autonum_refs_doc()
     make_footnote_cites_doc()
     make_unstyled_doc()
+    make_dakd_zh()

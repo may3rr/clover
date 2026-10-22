@@ -124,7 +124,7 @@ def _find_ref_span(
         if lvl is not None and hd.is_ref_heading(t):
             end = len(p_elems)
             for j in range(i + 1, len(p_elems)):
-                if heading_levels[j] is not None:
+                if heading_levels[j] is not None or hd.is_back_matter(texts[j]):
                     end = j
                     break
             return i + 1, end
@@ -144,6 +144,12 @@ def _find_ref_span(
     if len(texts) - tail >= 3:
         return tail, len(texts)
     return None
+
+
+def _is_front_matter_line(text: str) -> bool:
+    """Author / affiliation lines: short and without a sentence."""
+    t = text.strip()
+    return len(t) <= 200 and not re.search(r"[。！？]|[.!?](\s|$)", t.rstrip(".)） "))
 
 
 def _classify_marker_style(m: DetectedMarker) -> str:
@@ -171,6 +177,7 @@ def _list_reference(idx: int, para_id: str, text: str) -> Reference:
         paragraph_id=para_id,
         label=info["label"],
         origin="list",
+        translation=info.get("translation"),
     )
 
 
@@ -232,12 +239,22 @@ def parse_docx(path: str | Path) -> ParsedDocument:
             cur = new_section("", "other", None)  # text before the first heading
         para_section.append(cur.id)
 
+    # front matter ends at the first recognised body heading (引言 /
+    # Introduction …); author and affiliation lines above it carry
+    # superscript affiliation numbers ("吕浩博1，2"), not citations
+    body_start = next(
+        (i for i, t in enumerate(texts)
+         if heading_levels[i] == 1 and hd.canonical_for(t) != "other"), 0)
+
     # ---- reference list ----------------------------------------------
     ref_span = _find_ref_span(p_elems, texts, heading_levels)
     ref_para_idx: set[int] = set()
     references: list[Reference] = []
+    back_start = len(texts)  # 通讯作者 / 支撑数据 … after the list: no citations
     if ref_span:
         start, end = ref_span
+        if end < len(texts) and hd.is_back_matter(texts[end]):
+            back_start = end
         for i in range(start, end):
             if not texts[i].strip():
                 continue
@@ -249,7 +266,7 @@ def parse_docx(path: str | Path) -> ParsedDocument:
     detected: list[tuple[int, DetectedMarker]] = []
     managed_by: str | None = None
     for i, p in enumerate(p_elems):
-        if i in ref_para_idx:
+        if i in ref_para_idx or i >= back_start:
             continue
         ms, managed = detect_markers(
             p, texts[i], seg_maps[i],
@@ -270,6 +287,9 @@ def parse_docx(path: str | Path) -> ParsedDocument:
                 raw=texts[i][seg.start:seg.end], kind="footnote",
                 items=[(nid, kind)])))
     detected.sort(key=lambda t: (t[0], t[1].start))
+    detected = [(i, m) for i, m in detected
+                if not (m.kind == "superscript" and i < body_start
+                        and _is_front_matter_line(texts[i]))]
 
     # ---- footnote/endnote bodies -> references ------------------------
     note_ref: dict[tuple[str, str], str] = {}

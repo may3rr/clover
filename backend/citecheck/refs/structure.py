@@ -14,7 +14,11 @@ _DOI_RE = re.compile(r"10\.\d{4,9}/[^\s\"<>，。；]+")
 _YEAR_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})[a-z]?(?!\d)")
 _LABEL_RE = re.compile(r"^\s*[\[\(（【]?(\d{1,3})[\]\)）】]?[\.、]?\s+")
 _CJK_RE = re.compile(r"[一-鿿]")
-_TYPE_TAG_RE = re.compile(r"\[[JMDPCRNSZOA](/[A-Z]{1,2})?\]")
+# GB/T 7714-2015 document type codes: [J] [M] [C] [EB/OL] [DB/OL] [J/OL] …
+_TYPE_TAG_RE = re.compile(r"\[(?:[JMDPCRNSZOAG]|EB|DB|CP|DS)(/[A-Z]{1,2})?\]")
+# Chinese journals (DAKD, 情报学报 …) append an English rendering to every
+# Chinese entry: "…[J]. 刊名, 2023, 49(6): 41-50. (Wang Jingjing, …)".
+_TRANSLATION_RE = re.compile(r"[\s.。]\s*[(（]\s*([A-Z][^()（）]*?(?:\([^()]*\)[^()（）]*?)*)\s*[)）]\s*\.?\s*$")
 
 # ACL / EMNLP: "Given Surname, Given Surname, and Given Surname. 2020.
 # Title. In Venue, pages 1–9." — the year is its own sentence after the
@@ -123,7 +127,7 @@ def parse_reference(raw: str) -> dict:
     """Best-effort field extraction. Returns a dict with keys:
     label, title, authors, year, venue, doi, lang."""
     out: dict = {"label": None, "title": None, "authors": [], "year": None,
-                 "venue": None, "doi": None, "lang": "other"}
+                 "venue": None, "doi": None, "lang": "other", "translation": None}
     body = raw.strip()
     m = _LABEL_RE.match(body)
     if m:
@@ -135,6 +139,11 @@ def parse_reference(raw: str) -> dict:
         out["doi"] = doi.group(0).rstrip(".,;)")
 
     out["lang"] = detect_lang(body)
+    if out["lang"] == "zh":
+        tr = _TRANSLATION_RE.search(body)
+        if tr and not _CJK_RE.search(tr.group(1)):
+            out["translation"] = tr.group(1).strip()
+            body = body[: tr.start()].rstrip() + "."
 
     acl = _ACL_RE.match(body)
     if acl and out["lang"] != "zh" and _looks_like_author_list(
@@ -184,7 +193,7 @@ def parse_reference(raw: str) -> dict:
     for j in range(idx + 1, len(chunks)):
         venue = re.split(r"[,，]", chunks[j])[0]
         venue = _TYPE_TAG_RE.sub("", venue).strip()
-        if not venue or re.fullmatch(r"[\d\s:()\-–—,，./]+", venue):
+        if not venue or re.fullmatch(r"[\d\s:()\[\]\-–—,，./]+", venue):
             continue
         if re.fullmatch(r"\d+(版|st|nd|rd|th)\.?", venue):
             continue

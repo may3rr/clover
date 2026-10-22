@@ -15,7 +15,7 @@ from citecheck.parse import parse_docx
 
 FIXTURES = Path(__file__).parent / "fixtures"
 NAMES = ["numeric_en", "authoryear_en", "gbt_zh", "zotero_numeric",
-         "autonum_refs", "footnote_cites", "unstyled"]
+         "autonum_refs", "footnote_cites", "unstyled", "dakd_zh"]
 
 
 @pytest.fixture(params=NAMES, ids=NAMES, scope="module")
@@ -105,3 +105,15 @@ def test_chinese_refs_tagged_zh():
     doc = parse_docx(FIXTURES / "gbt_zh.docx")
     assert all(r.lang == "zh" for r in doc.references)
     assert all(r.year for r in doc.references)
+
+
+def test_dakd_bilingual_entries_and_back_matter():
+    doc = parse_docx(FIXTURES / "dakd_zh.docx")
+    by_id = {r.id: r for r in doc.references}
+    assert by_id["r1"].title == "生成式AI及其GPT类技术应用对信息管理与传播的变革探析"
+    assert by_id["r1"].venue == "中国图书馆学报"
+    assert by_id["r1"].translation.startswith("Wang Jingjing, Ye Ying.")
+    assert by_id["r2"].translation is None  # English entries carry none
+    assert by_id["r4"].title == "Qwen3 Technical Report"  # [EB/OL] stripped
+    # affiliation superscripts and 支撑数据 [1] [2] are not citations
+    assert len(doc.markers) == 5

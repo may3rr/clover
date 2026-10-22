@@ -912,6 +912,18 @@
           ],
           "default": null,
           "title": "Key"
+        },
+        "translation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Translation"
         }
       },
       "required": [

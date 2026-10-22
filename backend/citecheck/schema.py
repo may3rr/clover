@@ -123,6 +123,9 @@ class Reference(BaseModel):
     # fallback resolution) must ignore non-"list" entries.
     origin: Literal["list", "footnote"] = "list"
     key: str | None = None  # bib cite key (latex sources only)
+    # English rendering appended to a Chinese entry (GB/T 7714 journals
+    # such as DAKD require one); None when absent
+    translation: str | None = None
 
 
 RefStatus = Literal["verified", "mismatch", "not_found", "unverifiable"]

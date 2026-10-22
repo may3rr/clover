@@ -33,6 +33,9 @@ CANONICAL_KEYWORDS: dict[str, list[str]] = {
         "研究现状",
         "文献综述",
         "研究背景",
+        "相关研究",
+        "国内外研究",
+        "理论基础",
     ],
     "method": [
         "methodology",
@@ -45,6 +48,10 @@ CANONICAL_KEYWORDS: dict[str, list[str]] = {
         "模型",
         "方法概述",
         "系统设计",
+        "研究设计",
+        "研究方法",
+        "研究框架",
+        "数据与方法",
     ],
     "experiment": [
         "experiment",
@@ -209,7 +216,7 @@ def heading_level(
     m = _NUMBERED_HEADING_RE.match(stripped)
     # the title part must be words, not more numbers ("56.4", "12 0.3")
     if (m and m.group(1).count(".") <= 4 and _HAS_WORD_RE.search(m.group(2))
-            and not m.group(2)[0].isdigit()):
+            and not m.group(2)[0].isdigit() and m.group(2)[0] not in "(（"):
         # avoid "3.14 is the value of pi"-style prose: heading titles do not
         # end with a sentence terminator
         if not re.search(r"[。．.!！?？]$", stripped):
@@ -234,4 +241,22 @@ def is_ref_heading(text: str) -> bool:
     """True for '参考文献' / 'References' / 'Bibliography' / 'Works Cited'
     headings (with optional numbering stripped first)."""
     t = re.sub(r"^\s*[\d一二三四五六七八九十百\.、．\s]*", "", text).strip()
-    return bool(REF_HEADING_RE.match(t))
+    return bool(REF_HEADING_RE.match(t.rstrip(":：").strip()))
+
+
+# Back matter that Chinese journals print after the reference list
+# (DAKD, 情报学报 …): a paragraph opening with one of these labels ends
+# the bibliography even when it is not styled as a heading.
+_BACK_MATTER_RE = re.compile(
+    r"^\s*(通讯作者|基金项目|作者贡献声明|利益冲突声明|支撑数据|收稿日期|"
+    r"作者简介|致谢|附录|Corresponding\s+author|Funding|Author\s+contributions?|"
+    r"Conflicts?\s+of\s+interest|Data\s+availability|Acknowledge?ments?|Appendix)"
+    r"\s*(（[^）]*）|\([^)]*\))?\s*[:：]",
+    re.IGNORECASE,
+)
+
+
+def is_back_matter(text: str) -> bool:
+    """True for '通讯作者：…' / '基金项目：…' / 'Funding: …' paragraphs that
+    close a reference list."""
+    return bool(_BACK_MATTER_RE.match(text))
