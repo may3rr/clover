@@ -6,6 +6,7 @@
 - 参考文献条目重复（归一化标题 token_sort_ratio >= 95）；
 - 同一篇论文混用数字编号与作者-年份两种引用格式；
 - GB/T 类型标识混用（部分条目有 [J]/[M] 等标签，部分没有）；
+- GB/T 7714 期刊条目（[J]，网络首发 [J/OL] 除外）缺少卷期或页码；
 - Zotero/EndNote 管理的文献顺序与首次引用顺序不一致（只提示，
   不产生修订——排序由管理软件负责）。
 """
@@ -20,6 +21,16 @@ from ..parse.links import author_year_items, _numeric_items, unresolved_numeric
 from ..parse.parser import ParsedDocument
 from ..refs.structure import _TYPE_TAG_RE
 from ..schema import Anchor, Finding, Reference
+
+
+# "[J]" exactly: online-first [J/OL] entries have no volume/pages yet
+_JOURNAL_TAG_RE = re.compile(r"[\[［]\s*J\s*[\]］]")
+_VOLUME_RE = re.compile(r"(?:19|20)\d{2}\s*[,，]\s*(?:\d+|[(（]\s*\d+)|\d+\s*[(（]\s*[\dS]")
+_PAGES_RE = re.compile(r"[:：]\s*[A-Za-z]?\d+(?:\s*[-–—~,，]\s*[A-Za-z]?\d+)*\s*[.．]?\s*(?:$|DOI|doi|https?://|\()", re.M)
+
+
+def _strip_label(raw: str) -> str:
+    return re.sub(r"^\s*[\[［(（]?\d{1,3}[\]］)）.]?\s*", "", raw).lower()
 
 
 def _norm_title(t: str) -> str:
@@ -143,7 +154,11 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
         t2 = _norm_title(r2.title or "")
         for i1, r1 in keyed[:j]:
             t1 = _norm_title(r1.title or "")
-            if t1 and fuzz.token_sort_ratio(t1, t2) >= 95:
+            # the entries as a whole must agree too: a corporate author
+            # parsed as the title ("Qwen Team. Qwen3.5 …" / "Qwen Team.
+            # Qwen3.8 …") is not a duplicate
+            if (t1 and fuzz.token_sort_ratio(t1, t2) >= 95
+                    and fuzz.token_sort_ratio(_strip_label(r1.raw), _strip_label(r2.raw)) >= 75):
                 findings.append(Finding(
                     id="", layer="norms", severity="medium",
                     anchor=_ref_anchor(r2, para_len),
@@ -187,6 +202,27 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
                            "建议：统一补齐或统一去掉类型标识。",
                     refs=[r.id],
                 ))
+
+    # ---- GB/T 7714 journal entries: 年, 卷(期): 页码 -----------------
+    for r in refs:
+        if r.origin != "list" or not _JOURNAL_TAG_RE.search(r.raw):
+            continue
+        body = r.raw[: r.raw.find("(" + r.translation)] if r.translation and ("(" + r.translation) in r.raw else r.raw
+        missing = []
+        if not _VOLUME_RE.search(body):
+            missing.append("卷或期")
+        if not _PAGES_RE.search(body):
+            missing.append("页码")
+        if missing:
+            findings.append(Finding(
+                id="", layer="norms", severity="low",
+                anchor=_ref_anchor(r, para_len),
+                title="这条期刊文献缺少" + "和".join(missing),
+                detail="依据：GB/T 7714 要求期刊文献著录为“年, 卷(期): 起止页码”，"
+                       "本条缺少" + "和".join(missing) + "。\n"
+                       "建议：查阅原文补齐；尚未分期的网络首发论文应标为 [J/OL] 并写明网址。",
+                refs=[r.id],
+            ))
 
     # ---- managed list out of first-appearance order -------------------
     if parsed.document.managed_by in {"zotero", "endnote"} and refs:

@@ -425,3 +425,27 @@ async def test_typos_skips_ref_and_short_paragraphs():
     p.references.append(Reference(id="r1", raw="x", paragraph_id="p0"))
     f, revs = await _run_typos(p, {"items": []})
     assert f == [] and revs == []
+
+
+def test_gbt_journal_volume_pages_and_corporate_duplicates():
+    from citecheck.lint.norms import check_norms
+    from citecheck.parse.parser import ParsedDocument
+    from citecheck.refs.structure import parse_reference
+    from citecheck.schema import Document, Reference
+
+    raws = [
+        "[1] 王静静, 叶鹰. 生成式AI的变革探析[J]. 中国图书馆学报, 2023, 49(6): 41-50. (Wang Jingjing, Ye Ying. A Probe[J]. Journal of Library Science in China, 2023, 49(6): 41-50.)",
+        "[2] 张三. 知识图谱研究[J]. 情报学报, 2020.",
+        "[3] 曾子明, 徐康. 对抗幻觉优化方法研究[J/OL]. 数据分析与知识发现, (2026-09-24).[2026-09-25]. https://link.cnki.net/urlid/10.1478.G2.20260924.1200.002.",
+        "[4] Qwen Team. Qwen3.5: Towards Native Multimodal Agents[EB/OL]. (2026-02-16). https://qwen.ai/blog.",
+        "[5] Qwen Team. Qwen3.8-27B[EB/OL]. (2026-08-14). https://huggingface.co/Qwen/Qwen3.8-27B.",
+    ]
+    refs = []
+    for i, raw in enumerate(raws, 1):
+        info = parse_reference(raw)
+        refs.append(Reference(id=f"r{i}", raw=raw, title=info["title"], year=info["year"],
+                              lang=info["lang"], translation=info["translation"]))
+    parsed = ParsedDocument(document=Document(), references=refs)
+    titles = {(f.title, tuple(f.refs)) for f in check_norms(parsed)
+              if f.title != "这篇参考文献在正文中没有被引用"}
+    assert titles == {("这条期刊文献缺少卷或期和页码", ("r2",))}
