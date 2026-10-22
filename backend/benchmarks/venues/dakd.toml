@@ -1,0 +1,16 @@
+# 《数据分析与知识发现》投稿要求（依据该刊《参考文献著录规范》《结构式文摘写作要求》
+# 与投稿指南整理）。内置基线 dakd.json 由 scripts/build_venue_benchmark.py 从该刊
+# 2025—2026 年已刊与网络首发论文统计得到，只含统计量，不含论文内容。
+id = "dakd"
+name = "数据分析与知识发现"
+aliases = ["Data Analysis and Knowledge Discovery", "数据分析与知识发现"]
+# 稿件里能认出目标期刊的痕迹：期刊模板自带的 DOI 前缀、ISSN、CN 号
+detect = ["10.11925/infotech", "2096-3467", "10-1478/G2"]
+
+[rules]
+min_refs = 6
+recent_years = 3
+recent_share = [0.5, 0.8]           # 一般情况下近三年文献占 50%～80%
+translation_required = true         # 中文文献须附英文译文
+statements = ["作者贡献声明", "利益冲突声明"]
+abstract_labels = ["目的", "方法", "结果", "结论"]  # 结构式摘要，局限/文献范围/应用背景依类型而定

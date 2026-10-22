@@ -239,6 +239,17 @@ class SentenceRefs(BaseModel):
     bench_ge5: Stat | None = None
 
 
+class VenueStat(BaseModel):
+    """A journal-level indicator: the manuscript vs the target journal's
+    papers (share values are fractions, unit "%")."""
+    key: str
+    label: str
+    unit: str
+    value: float | None = None
+    bench: Stat | None = None
+    flag: DistFlag = "na"
+
+
 class Distribution(BaseModel):
     benchmark_id: str
     benchmark_name: str
@@ -249,6 +260,11 @@ class Distribution(BaseModel):
     sentence_refs: SentenceRefs | None = None
     functions: dict[str, int] | None = None
     marker_functions: dict[str, str] = Field(default_factory=dict)
+    # Chinese journal benchmarking: target journal and where its baseline
+    # came from (the reference folder's exemplars or the built-in one)
+    venue: str | None = None
+    venue_source: Literal["exemplars", "builtin"] | None = None
+    venue_stats: list[VenueStat] = Field(default_factory=list)
 
 
 LayerStatusValue = Literal["pending", "running", "done", "failed"]

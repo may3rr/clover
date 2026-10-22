@@ -258,6 +258,41 @@
           },
           "title": "Marker Functions",
           "type": "object"
+        },
+        "venue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue"
+        },
+        "venue_source": {
+          "anyOf": [
+            {
+              "enum": [
+                "exemplars",
+                "builtin"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue Source"
+        },
+        "venue_stats": {
+          "items": {
+            "$ref": "#/$defs/VenueStat"
+          },
+          "title": "Venue Stats",
+          "type": "array"
         }
       },
       "required": [
@@ -1619,6 +1654,64 @@
         "col"
       ],
       "title": "TableCell",
+      "type": "object"
+    },
+    "VenueStat": {
+      "description": "A journal-level indicator: the manuscript vs the target journal's\npapers (share values are fractions, unit \"%\").",
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "bench": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "flag": {
+          "default": "na",
+          "enum": [
+            "below",
+            "within",
+            "above",
+            "na"
+          ],
+          "title": "Flag",
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "unit"
+      ],
+      "title": "VenueStat",
       "type": "object"
     }
   },

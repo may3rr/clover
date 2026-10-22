@@ -149,6 +149,19 @@ _LIBRARY_HINT = ("没有找到文献文件夹。请把论文 .docx 放在文件�
                  "被引文献的 PDF 放进同级的 ref 文件夹，然后重新拖入。")
 
 
+@app.get("/venues")
+async def venues() -> list[dict]:
+    """Chinese journals the registry knows (rules, maybe a built-in baseline)."""
+    from .distribution.registry import builtin_baseline, load_venues
+
+    out = []
+    for v in load_venues():
+        b = builtin_baseline(v)
+        out.append({"id": v["id"], "name": v["name"],
+                    "n_papers": b["n_papers"] if b else 0})
+    return out
+
+
 @app.post("/library/scan")
 async def library_scan(
     path: str = Form(...),
@@ -178,7 +191,20 @@ async def library_scan(
         return JSONResponse({"detail": "无法读取论文文件。请确认它是 .docx 格式，然后重新拖入。"},
                             status_code=400)
     lib, _local, _pdfs = await build_library(parsed.references, lib_dir)
+    from .distribution.registry import builtin_baseline, detect_from_manuscript, find_venue
+    from .distribution.venue import MIN_EXEMPLARS
+
+    entry = find_venue(lib.venue) or detect_from_manuscript(parsed)
+    n_ex = len(lib.exemplar_ids)
+    if lib.venue and n_ex >= MIN_EXEMPLARS:
+        baseline = {"source": "exemplars", "name": lib.venue, "n_papers": n_ex}
+    elif (b := builtin_baseline(entry)) is not None:
+        baseline = {"source": "builtin", "name": entry["name"], "n_papers": b["n_papers"]}
+    else:
+        baseline = {"source": None, "name": lib.venue or (entry["name"] if entry else None),
+                    "n_papers": n_ex}
     return {
+        "baseline": baseline,
         "paper": str(layout.paper),
         "candidates": [str(p) for p in layout.candidates],
         "kind": layout.kind,

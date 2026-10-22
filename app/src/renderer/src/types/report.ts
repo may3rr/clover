@@ -104,6 +104,14 @@ export type ShareGe5 = number;
 export type Functions = {
   [k: string]: number | undefined;
 } | null;
+export type Venue1 = string | null;
+export type VenueSource = ("exemplars" | "builtin") | null;
+export type Key1 = string;
+export type Label2 = string;
+export type Unit = string;
+export type Value = number | null;
+export type Flag = "below" | "within" | "above" | "na";
+export type VenueStats = VenueStat[];
 export type Id5 = string;
 export type Layer = "authenticity" | "support" | "distribution" | "norms";
 export type Severity = "high" | "medium" | "low";
@@ -129,8 +137,8 @@ export type VenueId = string;
 export type VenueName = string;
 export type Overall = "below" | "near" | "at" | "above" | "na";
 export type Comment = string;
-export type Key1 = string;
-export type Label2 = string;
+export type Key2 = string;
+export type Label3 = string;
 export type Tier = "below" | "near" | "at" | "above" | "na";
 export type Note1 = string;
 export type Dims = OverviewDim[];
@@ -149,7 +157,7 @@ export type Readable = boolean;
 export type Source = "cnki_cover" | "cnki_citation" | "layout" | "doi" | "filename";
 export type Title6 = string | null;
 export type Authors1 = string[];
-export type Venue1 = string | null;
+export type Venue2 = string | null;
 export type Year2 = number | null;
 export type Doi1 = string | null;
 export type ArxivId = string | null;
@@ -161,7 +169,7 @@ export type Score = number;
 export type Status2 = "auto" | "review" | "confirmed";
 export type Links = LibraryLink[];
 export type ExemplarIds = string[];
-export type Venue2 = string | null;
+export type Venue3 = string | null;
 export type Unsupported = string[];
 export type Local = number;
 export type Cloud = number;
@@ -297,6 +305,9 @@ export interface Distribution {
   sentence_refs?: SentenceRefs | null;
   functions?: Functions;
   marker_functions?: MarkerFunctions;
+  venue?: Venue1;
+  venue_source?: VenueSource;
+  venue_stats?: VenueStats;
 }
 export interface SectionDist {
   section_id: SectionId1;
@@ -326,6 +337,18 @@ export interface SentenceRefs {
 }
 export interface MarkerFunctions {
   [k: string]: string | undefined;
+}
+/**
+ * A journal-level indicator: the manuscript vs the target journal's
+ * papers (share values are fractions, unit "%").
+ */
+export interface VenueStat {
+  key: Key1;
+  label: Label2;
+  unit: Unit;
+  value?: Value;
+  bench?: Stat | null;
+  flag?: Flag;
 }
 export interface Finding {
   id: Id5;
@@ -370,8 +393,8 @@ export interface Overview {
   note?: Note2;
 }
 export interface OverviewDim {
-  key: Key1;
-  label: Label2;
+  key: Key2;
+  label: Label3;
   tier?: Tier;
   note?: Note1;
 }
@@ -396,7 +419,7 @@ export interface Library {
   docs?: Docs;
   links?: Links;
   exemplar_ids?: ExemplarIds;
-  venue?: Venue2;
+  venue?: Venue3;
   unsupported?: Unsupported;
 }
 /**
@@ -411,7 +434,7 @@ export interface LibraryDoc {
   source?: Source;
   title?: Title6;
   authors?: Authors1;
-  venue?: Venue1;
+  venue?: Venue2;
   year?: Year2;
   doi?: Doi1;
   arxiv_id?: ArxivId;

@@ -28,7 +28,10 @@ from .distribution.bench import _DEFAULT as _DEFAULT_BENCH
 from .distribution.layer import run_distribution
 from .lint.norms import check_norms
 from .lint.reorder import plan_reorder
+from .distribution.registry import builtin_baseline, detect_from_manuscript, find_venue
+from .distribution.venue import MIN_EXEMPLARS, build_venue_benchmark
 from .library import build_library, scan_folder
+from .lint.venue_rules import check_venue_rules
 from .lint.typos import check_typos
 from .llm.client import doc_scope, stats_scope
 from .parse.bibguess import guess_bibliography_start
@@ -260,6 +263,33 @@ async def run_pipeline(
             return lib, local, pdfs
 
         library_task = asyncio.create_task(_library())
+
+        async def _venue():
+            """(registry entry or None, benchmark dict or None, source):
+            the target journal and the baseline to compare against —
+            exemplars from the folder first, the built-in baseline next,
+            the default benchmark otherwise (distribution falls back)."""
+            lib, _local, pdfs = await library_task
+            await structured
+            entry = (find_venue(library_venue) or find_venue(lib.venue if lib else None)
+                     or detect_from_manuscript(parsed))
+            name = library_venue or (lib.venue if lib else None) or (
+                entry["name"] if entry else None)
+            if lib and len(lib.exemplar_ids) >= MIN_EXEMPLARS:
+                by_id = {p.doc.id: p for p in pdfs}
+                ex = [by_id[i] for i in lib.exemplar_ids if i in by_id]
+                try:
+                    bench = await asyncio.to_thread(
+                        build_venue_benchmark, ex, lib.venue, cache)
+                except Exception as e:  # noqa: BLE001
+                    log.warning("venue benchmark failed: %s", e)
+                    bench = None
+                if bench is not None:
+                    return entry, name, bench, "exemplars"
+            bench = builtin_baseline(entry)
+            return entry, name, bench, "builtin" if bench else None
+
+        venue_task = asyncio.create_task(_venue())
         # let the structuring batches reach the cloud semaphore before the
         # layers queue their calls: priority orders waiters, but cannot
         # take back a slot already handed to a claim-extraction call
@@ -323,9 +353,11 @@ async def run_pipeline(
                 nonlocal dist, dist_findings
                 _layer("distribution", "running")
                 await structured
+                _entry, vname, vbench, vsource = await venue_task
                 try:
                     dist, dist_findings = await run_distribution(
                         parsed, bench_path=benchmark_path(benchmark_id),
+                        bench=vbench, venue=vname, venue_source=vsource,
                         progress=lambda d, t: _progress(
                             "distribution", d / max(t, 1),
                             f"分类引用功能 {d}/{t} 段"))
@@ -347,6 +379,9 @@ async def run_pipeline(
                 try:
                     await structured
                     norm_findings = check_norms(parsed)
+                    entry = (await venue_task)[0]
+                    if entry is not None:
+                        norm_findings += check_venue_rules(parsed, entry)
                     typo_findings, typo_revs = await typo_task
                     norm_findings += typo_findings
                     reorder_revs = await asyncio.to_thread(plan_reorder, parsed)

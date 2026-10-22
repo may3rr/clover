@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 from ..llm.client import chat_json
 from ..parse.parser import ParsedDocument
 from ..schema import (
+    VenueStat,
     Anchor,
     Distribution,
     Finding,
@@ -105,13 +106,16 @@ async def run_distribution(
     parsed: ParsedDocument,
     *,
     bench_path: str | None = None,
+    bench: dict | None = None,
+    venue: str | None = None,
+    venue_source: str | None = None,
     classify: bool = True,
     route: str = "auto",
     progress: Callable[[int, int], None] | None = None,
 ) -> tuple[Distribution, list[Finding]]:
     """progress(done, total) fires as each paragraph's citation functions
     are classified."""
-    bench = load_benchmark(bench_path)
+    bench = bench or load_benchmark(bench_path)
     bench_sections: dict[str, dict] = bench.get("sections", {})
     bench_lang = bench.get("language", "en")
     para_section = {p.id: p.section_id for p in parsed.paragraphs}
@@ -245,7 +249,11 @@ async def run_distribution(
         n_papers=bench.get("n_papers", 0), comparable_density=comparable,
         note=note, sections=dist_sections, sentence_refs=sentence_refs,
         functions=functions, marker_functions=marker_functions,
+        venue=venue, venue_source=venue_source,  # type: ignore[arg-type]
     )
+    venue_findings: list[Finding] = []
+    if bench.get("venue_stats"):
+        dist.venue_stats, venue_findings = _venue_stats(parsed, bench, venue)
 
     # ---- findings --------------------------------------------------------
     findings: list[Finding] = []
@@ -332,6 +340,42 @@ async def run_distribution(
                 refs=[],
             ))
 
+    findings += venue_findings
     for i, f in enumerate(findings):
         f.id = f"dist-{i}"
     return dist, findings
+
+
+def _fmt(v: float, unit: str) -> str:
+    return f"{v:.0%}" if unit == "%" else f"{v:.0f} {unit}"
+
+
+def _venue_stats(parsed: ParsedDocument, bench: dict,
+                 venue: str | None) -> tuple[list[VenueStat], list[Finding]]:
+    """Journal-level indicators vs the target journal's papers. Outside
+    the interquartile range is a low-priority note, never advice on what
+    to cite (AGENTS §2)."""
+    from .venue import VENUE_STATS, manuscript_stats
+
+    mine = manuscript_stats(parsed)
+    stats: list[VenueStat] = []
+    findings: list[Finding] = []
+    who = f"《{venue}》" if venue else bench.get("name", "目标期刊")
+    for key, (label, unit) in VENUE_STATS.items():
+        st = _stat((bench.get("venue_stats") or {}).get(key))
+        val = mine.get(key)
+        flag = _flag(val, st) if val is not None else "na"
+        stats.append(VenueStat(key=key, label=label, unit=unit, value=val,
+                               bench=st, flag=flag))  # type: ignore[arg-type]
+        if flag in {"below", "above"} and st is not None:
+            side = "低于" if flag == "below" else "高于"
+            findings.append(Finding(
+                id="", layer="distribution", severity="low", anchor=None,
+                title=f"{label}{side}{who}论文的常见范围",
+                detail=f"依据：本文{label}为 {_fmt(val, unit)}，{who} "
+                       f"{bench.get('n_papers', 0)} 篇论文的中位数为 {_fmt(st.median, unit)}"
+                       f"（四分位 {_fmt(st.q1, unit)}～{_fmt(st.q3, unit)}）。\n"
+                       "建议：作为投稿前的参照，由作者判断是否需要调整。",
+                refs=[],
+            ))
+    return stats, findings

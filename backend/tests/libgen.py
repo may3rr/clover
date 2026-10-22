@@ -130,3 +130,30 @@ def build_library(root: Path) -> Path:
     scanned(ref / "scan.pdf")
     (ref / "old.caj").write_bytes(b"CAJ")
     return ref
+
+
+def cnki_article(path: Path, title: str, authors: str, venue: str, date: str,
+                 n_refs: int, recent: int):
+    """A full online-first article: cover, structured abstract, numbered
+    sections with citation markers, a reference list (``recent`` of the
+    ``n_refs`` entries from 2025-2026, the rest from 2015)."""
+    c = _canvas(path)
+    _lines(c, [f"《{venue}》网络首发论文", f"题目： {title}", f"作者： {authors}",
+               f"网络首发日期： {date}"])
+    c.showPage()
+    y = _lines(c, [title, "摘要：[目的]比较方法。[方法]设计实验。[结果]效果更好。[结论]可以推广。",
+                   "关键词：大语言模型"], size=11)
+    body = [
+        "1 引言", "大语言模型发展迅速[1]。已有研究提出多种方法[2,3]。",
+        "2 相关研究", "检索增强方法被广泛采用[4-6]。知识图谱方法也有进展[7]。",
+        "多智能体方法近年兴起[8]。", "3 研究方法", "本文设计了新的框架，见图1和表1。",
+        "4 实验", "实验采用公开数据集[9]，结果见表2。", "5 结论", "本文方法有效。",
+    ]
+    _lines(c, body, y=y - 20)
+    c.showPage()
+    refs = ["参考文献："]
+    for i in range(1, n_refs + 1):
+        year = 2026 if i <= recent else 2015
+        refs.append(f"[{i}] 作者{i}. 文献题名{i}[J]. 情报学报, {year}, 1(2): 3-4.")
+    _lines(c, refs, size=9)
+    c.save()
