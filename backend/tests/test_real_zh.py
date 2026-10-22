@@ -29,3 +29,19 @@ def test_real_paper_parses():
     # every reference is cited somewhere, no marker points outside the list
     cited = {rid for m in doc.markers for rid in m.ref_ids}
     assert cited == {r.id for r in doc.references}
+
+
+needs_library = pytest.mark.skipif(
+    not LIBRARY or not Path(LIBRARY).exists(), reason="CLOVER_ZH_LIBRARY not set")
+
+
+@needs_library
+def test_real_library_metadata(tmp_path):
+    from citecheck.cache import Cache
+    from citecheck.library.scan import scan_folder
+
+    pdfs = scan_folder(LIBRARY, Cache(tmp_path / "c.sqlite"))
+    # every CNKI download yields title + authors from the cover or 引用本文
+    cnki = [p for p in pdfs if p.doc.source in {"cnki_cover", "cnki_citation"}]
+    assert len(cnki) >= len(pdfs) - 1
+    assert all(p.doc.title and p.doc.authors and p.doc.year for p in cnki)

@@ -109,7 +109,9 @@ def parse_authors(part: str, lang: str) -> list[str]:
         return []
     if lang == "zh":
         raw = re.split(r"[,，、;；]\s*|\s+和\s*", c)
-        return [a.strip() for a in raw if a.strip() and a.strip() != "等"]
+        raw = [re.sub(r"等$", "", a.strip()) if len(a.strip()) > 2 else a.strip()
+               for a in raw]
+        return [a for a in raw if a and a != "等"]
     raw = re.split(r"\s+et\s+al\.?\s*", c)[0]
     if re.search(r"[A-Z][a-z]+,\s*[A-Z]\.?", raw):  # "Surname, I." style
         authors = _split_en_apa_authors(raw)
@@ -140,6 +142,9 @@ def parse_reference(raw: str) -> dict:
 
     out["lang"] = detect_lang(body)
     if out["lang"] == "zh":
+        # "等.标题[J].刊名,2020" — Chinese entries often omit the space
+        # after a field-separating full stop
+        body = re.sub(r"(?<=[一-鿿\]])[.．](?=[^\s\d.])", ". ", body)
         tr = _TRANSLATION_RE.search(body)
         if tr and not _CJK_RE.search(tr.group(1)):
             out["translation"] = tr.group(1).strip()

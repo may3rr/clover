@@ -24,7 +24,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-asyncio"]
+dev = ["pytest", "pytest-asyncio", "reportlab"]  # reportlab: synthetic PDFs in tests
 local = ["mlx-lm"]
 
 [tool.setuptools.packages.find]

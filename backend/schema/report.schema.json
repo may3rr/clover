@@ -517,6 +517,220 @@
       "title": "LayerStatus",
       "type": "object"
     },
+    "Library": {
+      "properties": {
+        "folder": {
+          "title": "Folder",
+          "type": "string"
+        },
+        "docs": {
+          "items": {
+            "$ref": "#/$defs/LibraryDoc"
+          },
+          "title": "Docs",
+          "type": "array"
+        },
+        "links": {
+          "items": {
+            "$ref": "#/$defs/LibraryLink"
+          },
+          "title": "Links",
+          "type": "array"
+        },
+        "exemplar_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Exemplar Ids",
+          "type": "array"
+        },
+        "venue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue"
+        },
+        "unsupported": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Unsupported",
+          "type": "array"
+        }
+      },
+      "required": [
+        "folder"
+      ],
+      "title": "Library",
+      "type": "object"
+    },
+    "LibraryDoc": {
+      "description": "A PDF in the user's reference folder (文献文件夹).",
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "filename": {
+          "title": "Filename",
+          "type": "string"
+        },
+        "duplicates": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Duplicates",
+          "type": "array"
+        },
+        "pages": {
+          "default": 0,
+          "title": "Pages",
+          "type": "integer"
+        },
+        "readable": {
+          "default": true,
+          "title": "Readable",
+          "type": "boolean"
+        },
+        "source": {
+          "default": "filename",
+          "enum": [
+            "cnki_cover",
+            "cnki_citation",
+            "layout",
+            "doi",
+            "filename"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "authors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Authors",
+          "type": "array"
+        },
+        "venue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "doi": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doi"
+        },
+        "arxiv_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Arxiv Id"
+        }
+      },
+      "required": [
+        "id",
+        "filename"
+      ],
+      "title": "LibraryDoc",
+      "type": "object"
+    },
+    "LibraryLink": {
+      "description": "Reference entry -> local PDF. ``review`` links came from a weak\nmatch (or the model) and wait for the user in the confirmation step.",
+      "properties": {
+        "ref_id": {
+          "title": "Ref Id",
+          "type": "string"
+        },
+        "doc_id": {
+          "title": "Doc Id",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "doi",
+            "title",
+            "filename",
+            "llm",
+            "user"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "score": {
+          "title": "Score",
+          "type": "number"
+        },
+        "status": {
+          "default": "auto",
+          "enum": [
+            "auto",
+            "review",
+            "confirmed"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref_id",
+        "doc_id",
+        "method",
+        "score"
+      ],
+      "title": "LibraryLink",
+      "type": "object"
+    },
     "MathSpan": {
       "description": "LaTeX inline math inside Paragraph.text[start:end] (flattened text).\nruns is the display form: (text, \"\" | \"sub\" | \"sup\") pieces.",
       "properties": {
@@ -1466,6 +1680,17 @@
       "anyOf": [
         {
           "$ref": "#/$defs/Overview"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "library": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Library"
         },
         {
           "type": "null"

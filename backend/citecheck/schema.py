@@ -307,6 +307,48 @@ class Overview(BaseModel):
     note: str | None = None  # why it is unavailable, for the UI
 
 
+LibrarySource = Literal["cnki_cover", "cnki_citation", "layout", "doi", "filename"]
+
+
+class LibraryDoc(BaseModel):
+    """A PDF in the user's reference folder (文献文件夹)."""
+    id: str  # first 16 hex chars of the file's sha256
+    filename: str
+    duplicates: list[str] = Field(default_factory=list)  # byte-identical copies
+    pages: int = 0
+    readable: bool = True  # False: scanned / encrypted, no text layer
+    source: LibrarySource = "filename"  # where title/authors came from
+    title: str | None = None
+    authors: list[str] = Field(default_factory=list)
+    venue: str | None = None
+    year: int | None = None
+    doi: str | None = None
+    arxiv_id: str | None = None
+
+
+LinkMethod = Literal["doi", "title", "filename", "llm", "user"]
+
+
+class LibraryLink(BaseModel):
+    """Reference entry -> local PDF. ``review`` links came from a weak
+    match (or the model) and wait for the user in the confirmation step."""
+    ref_id: str
+    doc_id: str
+    method: LinkMethod
+    score: float  # 0-100
+    status: Literal["auto", "review", "confirmed"] = "auto"
+
+
+class Library(BaseModel):
+    folder: str
+    docs: list[LibraryDoc] = Field(default_factory=list)
+    links: list[LibraryLink] = Field(default_factory=list)
+    # unlinked PDFs published in the target venue: yardsticks for 对标
+    exemplar_ids: list[str] = Field(default_factory=list)
+    venue: str | None = None  # target venue the exemplars come from
+    unsupported: list[str] = Field(default_factory=list)  # .caj etc.
+
+
 class Report(BaseModel):
     document: Document
     sections: list[Section] = Field(default_factory=list)
@@ -320,4 +362,5 @@ class Report(BaseModel):
     findings: list[Finding] = Field(default_factory=list)
     revisions: list[Revision] = Field(default_factory=list)
     overview: Overview | None = None
+    library: Library | None = None
     meta: ReportMeta = Field(default_factory=ReportMeta)

@@ -138,9 +138,32 @@ export type Year1 = number | null;
 export type Url = string;
 export type Exemplars = ExemplarPaper[];
 export type Note2 = string | null;
+export type Folder = string;
+export type Id8 = string;
+export type Filename1 = string;
+export type Duplicates = string[];
+export type Pages = number;
+export type Readable = boolean;
+export type Source = "cnki_cover" | "cnki_citation" | "layout" | "doi" | "filename";
+export type Title6 = string | null;
+export type Authors1 = string[];
+export type Venue1 = string | null;
+export type Year2 = number | null;
+export type Doi1 = string | null;
+export type ArxivId = string | null;
+export type Docs = LibraryDoc[];
+export type RefId2 = string;
+export type DocId = string;
+export type Method = "doi" | "title" | "filename" | "llm" | "user";
+export type Score = number;
+export type Status2 = "auto" | "review" | "confirmed";
+export type Links = LibraryLink[];
+export type ExemplarIds = string[];
+export type Venue2 = string | null;
+export type Unsupported = string[];
 export type Local = number;
 export type Cloud = number;
-export type Status2 = "pending" | "running" | "done" | "failed";
+export type Status3 = "pending" | "running" | "done" | "failed";
 export type Error = string | null;
 export type Findings1 = number;
 export type DurationS = number;
@@ -158,6 +181,7 @@ export interface Report {
   findings?: Findings;
   revisions?: Revisions;
   overview?: Overview | null;
+  library?: Library | null;
   meta?: ReportMeta;
 }
 export interface Document {
@@ -363,6 +387,42 @@ export interface Stats {
 export interface Manuscript {
   [k: string]: number | boolean | null | undefined;
 }
+export interface Library {
+  folder: Folder;
+  docs?: Docs;
+  links?: Links;
+  exemplar_ids?: ExemplarIds;
+  venue?: Venue2;
+  unsupported?: Unsupported;
+}
+/**
+ * A PDF in the user's reference folder (文献文件夹).
+ */
+export interface LibraryDoc {
+  id: Id8;
+  filename: Filename1;
+  duplicates?: Duplicates;
+  pages?: Pages;
+  readable?: Readable;
+  source?: Source;
+  title?: Title6;
+  authors?: Authors1;
+  venue?: Venue1;
+  year?: Year2;
+  doi?: Doi1;
+  arxiv_id?: ArxivId;
+}
+/**
+ * Reference entry -> local PDF. ``review`` links came from a weak
+ * match (or the model) and wait for the user in the confirmation step.
+ */
+export interface LibraryLink {
+  ref_id: RefId2;
+  doc_id: DocId;
+  method: Method;
+  score: Score;
+  status?: Status2;
+}
 export interface ReportMeta {
   llm_calls?: LLMCalls;
   layers?: Layers;
@@ -378,7 +438,7 @@ export interface Layers {
   [k: string]: LayerStatus | undefined;
 }
 export interface LayerStatus {
-  status?: Status2;
+  status?: Status3;
   error?: Error;
   findings?: Findings1;
 }

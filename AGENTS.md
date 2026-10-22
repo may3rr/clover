@@ -64,6 +64,7 @@ citecheck/
 │   │   ├── config.py          # 读取 .env 与 config.toml
 │   │   ├── schema.py          # Pydantic 数据模型（第 5.1 节）
 │   │   ├── parse/             # docx 与 latex（parse/latex/）解析
+│   │   ├── library/           # 文献文件夹：PDF 扫描、元数据、与参考文献建立连接
 │   │   ├── refs/              # 参考文献结构化与真实性核验
 │   │   ├── support/           # 论断抽取与支持度判断
 │   │   ├── distribution/      # 引用功能与分布
