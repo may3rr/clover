@@ -176,7 +176,15 @@ async def _fetch_pdf_text(url: str, client: httpx.AsyncClient, cache: Cache) -> 
 
 
 def _tokenize(text: str) -> list[str]:
-    return re.findall(r"[a-z0-9一-鿿]+", text.lower())
+    """Latin words as-is; Chinese runs as character bigrams (a run of
+    ideographs has no spaces, so whole runs would never match)."""
+    out: list[str] = []
+    for tok in re.findall(r"[a-z0-9]+|[一-鿿]+", text.lower()):
+        if "一" <= tok[0] <= "鿿" and len(tok) > 1:
+            out += [tok[i:i + 2] for i in range(len(tok) - 1)]
+        else:
+            out.append(tok)
+    return out
 
 
 def _bm25_excerpt(fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT) -> str:

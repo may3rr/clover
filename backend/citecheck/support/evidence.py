@@ -16,6 +16,11 @@ _QUOTE_MAP = {
 }
 
 
+def _cjk(c: str) -> bool:
+    return ("\u3000" <= c <= "\u303f" or "\u3400" <= c <= "\u9fff"
+            or "\uff00" <= c <= "\uffef")
+
+
 def normalize(text: str) -> tuple[str, list[int]]:
     """Return (normalized_text, offset_map) where offset_map[i] is the
     index in the ORIGINAL text of the character produced at normalized
@@ -34,10 +39,10 @@ def normalize(text: str) -> tuple[str, list[int]]:
                         pending_space, pending_start = True, i
                     continue
                 c = _QUOTE_MAP.get(c, c)
-                if pending_space and out:
+                if pending_space and out and not (_cjk(out[-1]) or _cjk(c)):
                     out.append(" ")
                     mapping.append(pending_start)
-                    pending_space = False
+                pending_space = False
                 out.append(c)
                 mapping.append(i)
             continue
@@ -46,10 +51,12 @@ def normalize(text: str) -> tuple[str, list[int]]:
                 pending_space, pending_start = True, i
             continue
         ch = _QUOTE_MAP.get(ch, ch)
-        if pending_space and out:
+        # pypdf spaces Chinese glyphs apart ("代 伟"): whitespace next to
+        # a CJK character is dropped on both sides of the comparison
+        if pending_space and out and not (_cjk(out[-1]) or _cjk(ch)):
             out.append(" ")
             mapping.append(pending_start)
-            pending_space = False
+        pending_space = False
         out.append(ch)
         mapping.append(i)
     return "".join(out), mapping

@@ -28,6 +28,7 @@ from .distribution.bench import _DEFAULT as _DEFAULT_BENCH
 from .distribution.layer import run_distribution
 from .lint.norms import check_norms
 from .lint.reorder import plan_reorder
+from .library import build_library, scan_folder
 from .lint.typos import check_typos
 from .llm.client import doc_scope, stats_scope
 from .parse.bibguess import guess_bibliography_start
@@ -39,6 +40,7 @@ from .refs.verify import verify_references
 from .schema import (
     Finding,
     LayerStatus,
+    LibraryLink,
     LLMCalls,
     Report,
     ReportMeta,
@@ -114,6 +116,9 @@ async def run_pipeline(
     retrieval: RetrievalClient | None = None,
     cache: Cache | None = None,
     venue_id: str | None = None,
+    library_dir: str | Path | None = None,
+    library_links: list[LibraryLink] | None = None,
+    library_venue: str | None = None,
 ) -> Report:
     send = emit or (lambda _e: None)
     t0 = time.monotonic()
@@ -231,6 +236,30 @@ async def run_pipeline(
                          "relinked", changed)
 
         structured = asyncio.create_task(_structure())
+
+        async def _library():
+            # the folder scan (pypdf, threaded) overlaps structuring; the
+            # link step needs the structured titles and authors
+            if not library_dir:
+                return None, {}, []
+            try:
+                pdfs = await asyncio.to_thread(
+                    scan_folder, library_dir, cache,
+                    lambda d, t: _progress(
+                        "authenticity", 0.15 * d / max(t, 1),
+                        f"读取文献文件夹 {d}/{t} 篇"))
+                await structured
+                lib, local, pdfs = await build_library(
+                    parsed.references, library_dir, links=library_links,
+                    venue=library_venue, cache=cache, pdfs=pdfs)
+            except Exception as e:  # noqa: BLE001 — the run goes on without it
+                log.warning("reference library failed: %s", e)
+                return None, {}, []
+            send({"type": "library", "linked": len(lib.links),
+                  "docs": len(lib.docs), "exemplars": len(lib.exemplar_ids)})
+            return lib, local, pdfs
+
+        library_task = asyncio.create_task(_library())
         # let the structuring batches reach the cloud semaphore before the
         # layers queue their calls: priority orders waiters, but cannot
         # take back a slot already handed to a claim-extraction call
@@ -255,6 +284,8 @@ async def run_pipeline(
                     parsed, cache=cache, http=retrieval._client,
                     refs_ready=structured,
                     progress=lambda f, lb: _progress("support", f, lb))
+                _lib, local, _pdfs = await library_task
+                sup.set_local(local)
                 n_refs = len(parsed.references)
                 n_checked = 0
 
@@ -270,7 +301,7 @@ async def run_pipeline(
                 try:
                     auth_checks, auth_findings = await verify_references(
                         parsed.references, parsed.paragraphs, retrieval,
-                        on_ref=on_ref)
+                        on_ref=on_ref, local=local)
                 except Exception as e:  # noqa: BLE001
                     log.warning("authenticity layer failed: %s", e)
                     _layer("authenticity", "failed", error=_short_error(e))
@@ -391,6 +422,7 @@ async def run_pipeline(
                 findings=findings,
                 revisions=revisions,
                 overview=overview,
+                library=(await library_task)[0],
                 meta=meta,
             )
             send({"type": "done"})

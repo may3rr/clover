@@ -163,10 +163,17 @@ async def link_library(
                                  score=round(s, 1), status="review")
         used.add(pick.doc.id)
 
-    ordered = [links[r.id] for r in refs if r.id in links]
+    return assemble([links[r.id] for r in refs if r.id in links], pdfs, folder, venue)
+
+
+def assemble(links: list[LibraryLink], pdfs: list[LocalPdf], folder: str,
+             venue: str | None = None) -> Library:
+    """Library record from final links: unlinked PDFs of the target venue
+    become the exemplars (detected when ``venue`` is not given)."""
+    used = {x.doc_id for x in links}
     venue = venue or detect_venue(pdfs, used)
     exemplars = [p.doc.id for p in pdfs
                  if venue and p.doc.id not in used and p.doc.readable
                  and p.doc.venue == venue]
-    return Library(folder=folder, docs=[p.doc for p in pdfs], links=ordered,
+    return Library(folder=folder, docs=[p.doc for p in pdfs], links=links,
                    exemplar_ids=exemplars, venue=venue)

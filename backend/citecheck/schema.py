@@ -168,6 +168,10 @@ class SupportCheck(BaseModel):
     # unrelated to the claim (checked by the review model) — a likely
     # miscitation, surfaced as its own finding
     off_topic: bool = False
+    # evidence from the user's own PDF (文献文件夹): file name and the
+    # 1-based page the evidence sits on
+    source_file: str | None = None
+    source_page: int | None = None
 
 
 FindingLayer = Literal["authenticity", "support", "distribution", "norms"]

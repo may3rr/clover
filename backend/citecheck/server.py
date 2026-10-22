@@ -145,6 +145,52 @@ async def benchmarks() -> list[dict]:
     return out
 
 
+_LIBRARY_HINT = ("没有找到文献文件夹。请把论文 .docx 放在文件夹根目录，"
+                 "被引文献的 PDF 放进同级的 ref 文件夹，然后重新拖入。")
+
+
+@app.post("/library/scan")
+async def library_scan(
+    path: str = Form(...),
+    library: str | None = Form(None),
+):
+    """Confirmation step before a folder run: which file is the paper,
+    which folder holds the PDFs, and the proposed reference ↔ PDF links.
+    Nothing is sent to the cloud except the model's multiple-choice
+    question for ambiguous links."""
+    from .library import build_library
+    from .library.folder import resolve_folder
+    from .parse import parse_document
+
+    layout = resolve_folder(path)
+    if layout.paper is None:
+        return JSONResponse(
+            {"detail": "文件夹根目录没有找到论文 .docx。请把论文放在文件夹根目录，"
+                       "参考文献 PDF 放进 ref 文件夹，然后重新拖入。"},
+            status_code=400)
+    lib_dir = Path(library) if library else layout.library
+    if lib_dir is None or not lib_dir.is_dir():
+        return JSONResponse({"detail": _LIBRARY_HINT}, status_code=400)
+    try:
+        parsed = await asyncio.to_thread(parse_document, layout.paper)
+    except Exception:  # noqa: BLE001
+        log.exception("library scan: cannot parse %s", layout.paper)
+        return JSONResponse({"detail": "无法读取论文文件。请确认它是 .docx 格式，然后重新拖入。"},
+                            status_code=400)
+    lib, _local, _pdfs = await build_library(parsed.references, lib_dir)
+    return {
+        "paper": str(layout.paper),
+        "candidates": [str(p) for p in layout.candidates],
+        "kind": layout.kind,
+        "library": lib.model_dump(mode="json"),
+        "references": [
+            {"id": r.id, "label": r.label, "title": r.title, "authors": r.authors[:3],
+             "year": r.year, "lang": r.lang, "raw": r.raw[:300]}
+            for r in parsed.references if r.origin == "list"
+        ],
+    }
+
+
 @app.post("/analyze")
 async def analyze(
     request: Request,
@@ -153,6 +199,11 @@ async def analyze(
     benchmark: str = Form("arxiv_cs_cl"),
     # target venue for the overview stage; "" turns it off
     venue: str = Form("emnlp"),
+    # reference folder (文献文件夹) and the user's confirmed links (JSON
+    # list of LibraryLink); a dropped paper folder finds its ref/ itself
+    library: str | None = Form(None),
+    links: str | None = Form(None),
+    library_venue: str | None = Form(None),
 ):
     if file is not None and file.filename:
         _UPLOADS.mkdir(parents=True, exist_ok=True)
@@ -165,9 +216,27 @@ async def analyze(
         src = Path(path)
         if not src.exists():
             return JSONResponse({"detail": "文件不存在"}, status_code=400)
+        if src.is_dir():
+            from .library.folder import resolve_folder
+
+            layout = resolve_folder(src)
+            if layout.kind == "docx" and layout.paper is not None:
+                src = layout.paper
+            library = library or (str(layout.library) if layout.library else None)
     else:
         return JSONResponse(
             {"detail": "需要 file 或 path"}, status_code=400)
+
+    confirmed = None
+    if links:
+        from .schema import LibraryLink
+
+        try:
+            confirmed = [LibraryLink.model_validate(x) for x in json.loads(links)]
+        except (ValueError, TypeError):
+            return JSONResponse({"detail": "连接表格式不正确"}, status_code=400)
+    if library and not Path(library).is_dir():
+        return JSONResponse({"detail": _LIBRARY_HINT}, status_code=400)
 
     job = Job(id=secrets.token_hex(8), src_path=src)
     JOBS[job.id] = job
@@ -180,7 +249,8 @@ async def analyze(
         try:
             job.report = await run_pipeline(
                 src, benchmark_id=benchmark, emit=emit,
-                venue_id=venue or None)
+                venue_id=venue or None, library_dir=library,
+                library_links=confirmed, library_venue=library_venue or None)
             _save_report(job.id, src, benchmark, job.report)
         except PipelineError as e:
             job.error = str(e)

@@ -44,8 +44,12 @@ class SupportRun:
         http: httpx.AsyncClient | None = None,
         refs_ready: Awaitable[Any] | None = None,
         progress: Callable[[float, str], None] | None = None,
+        local: dict[str, Any] | None = None,
     ):
         self._parsed = parsed
+        # ref_id -> LocalPdf from the user's reference folder: the local
+        # full text replaces the network source for that reference
+        self._local = local or {}
         # progress(frac, label): claim extraction is the first quarter,
         # judging the (claim, ref) pairs the rest
         self._progress = progress
@@ -115,6 +119,11 @@ class SupportRun:
         self._jobs = jobs
         return claims
 
+    def set_local(self, local: dict[str, Any]) -> None:
+        """Linked PDFs, known once the library step finishes (before any
+        RefCheck arrives, so before any judge pair is queued)."""
+        self._local = local or {}
+
     def add_check(self, rc: RefCheck) -> None:
         """Queue this ref's judge pairs (claims may still be extracting —
         the queue task waits for them)."""
@@ -139,11 +148,23 @@ class SupportRun:
         # deduplicated per URL) runs outside the judge semaphore: a slow
         # PDF host must not hold a slot that a ready judge call could use
         matched = self._matched.get(rid)
-        source = await build_source(
-            matched, c.text, cache=self._cache, client=self._http)
+        pdf = self._local.get(rid)
+        if pdf is not None:
+            from ..library.source import local_source
+
+            source = await asyncio.to_thread(local_source, pdf, c.text)
+            matched = {**(matched or {}), "title": pdf.doc.title}
+        else:
+            source = await build_source(
+                matched, c.text, cache=self._cache, client=self._http)
         async with self._judge_sem:
-            self._out[(c.id, rid)] = await _judge_with_source(
-                c, rid, matched, source)
+            out = await _judge_with_source(c, rid, matched, source)
+            if pdf is not None and source.kind != "none":
+                from ..library.source import page_of
+
+                out.source_file = pdf.doc.filename
+                out.source_page = page_of(pdf, out.evidence)
+            self._out[(c.id, rid)] = out
         self._judged += 1
         total = max(len(self._jobs), 1)
         self._report(0.25 + 0.75 * self._judged / total,
@@ -241,7 +262,8 @@ def _support_findings(
                 anchor=Anchor(paragraph_id=pid, start=0, end=para_len.get(pid, 0)),
                 title="未能获取这篇文献的原文，相关论断无法判断",
                 detail="依据：未找到可用的摘要或开放全文。\n"
-                       "建议：人工核对引用该文献的论断。",
+                       "建议：把这篇文献的 PDF 放进文献文件夹后重新体检，"
+                       "或人工核对引用该文献的论断。",
                 refs=[rid],
             )
         )

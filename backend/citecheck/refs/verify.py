@@ -642,10 +642,12 @@ async def verify_references(
     paragraphs: list[Paragraph],
     client: RetrievalClient | None = None,
     on_ref: Callable[[RefCheck], object] | None = None,
+    local: dict | None = None,
 ) -> tuple[list[RefCheck], list[Finding]]:
     """Verify all refs; ``on_ref(check)`` fires as each check is final —
     verified refs emit as soon as the first three sources agree, without
-    waiting for arXiv batches for the stragglers."""
+    waiting for arXiv batches for the stragglers. ``local`` maps ref ids
+    to PDFs linked from the user's reference folder (library.source)."""
     para_len = {p.id: len(p.text) for p in paragraphs}
     own = client is None
     if own:
@@ -656,6 +658,13 @@ async def verify_references(
     pending: list[Reference] = []
 
     async def _emit(ref: Reference, check: RefCheck, finding: Finding | None):
+        # a linked PDF from the user's folder confirms or contradicts the
+        # entry before anything downstream sees the verdict
+        if local and ref.id in local:
+            from ..library.source import apply_local
+
+            check, finding = apply_local(
+                ref, check, local[ref.id], para_len.get(ref.paragraph_id or "", 0))
         checks[ref.id] = check
         if finding is not None:
             findings[ref.id] = finding

@@ -77,6 +77,8 @@ export type SourceTitle = string | null;
 export type SourceExcerpt = string | null;
 export type EvidenceSpan = [unknown, unknown] | null;
 export type OffTopic = boolean;
+export type SourceFile = string | null;
+export type SourcePage = number | null;
 export type SupportChecks = SupportCheck[];
 export type BenchmarkId = string;
 export type BenchmarkName = string;
@@ -282,6 +284,8 @@ export interface SupportCheck {
   source_excerpt?: SourceExcerpt;
   evidence_span?: EvidenceSpan;
   off_topic?: OffTopic;
+  source_file?: SourceFile;
+  source_page?: SourcePage;
 }
 export interface Distribution {
   benchmark_id: BenchmarkId;
