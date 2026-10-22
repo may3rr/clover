@@ -85,3 +85,81 @@ def test_cached_rescan(library):
     ref, cache, pdfs = library
     again = scan_folder(ref, cache)
     assert [p.doc for p in again] == [p.doc for p in pdfs]
+
+
+# ------------------------------------------------------------ linking
+
+from pathlib import Path  # noqa: E402
+
+from citecheck.library.link import link_library  # noqa: E402
+from citecheck.llm import client as llm  # noqa: E402
+from citecheck.parse import parse_docx  # noqa: E402
+from citecheck.schema import Reference  # noqa: E402
+
+DAKD = Path(__file__).parent / "fixtures" / "dakd_zh.docx"
+
+
+def _docname(lib, rid):
+    link = next((x for x in lib.links if x.ref_id == rid), None)
+    if link is None:
+        return None
+    return next(d.filename for d in lib.docs if d.id == link.doc_id)
+
+
+@pytest.mark.asyncio
+async def test_link_fixture_manuscript(library):
+    ref, _, pdfs = library
+    refs = parse_docx(DAKD).references
+    lib = await link_library(refs, pdfs, str(ref), use_model=False)
+    assert _docname(lib, "r1").startswith("生成式AI")  # formal CNKI page
+    assert _docname(lib, "r2").startswith("Ji et al.")  # not the Siren survey
+    assert _docname(lib, "r3").endswith("曾子明.pdf")  # CNKI cover
+    assert _docname(lib, "r4") is None  # no PDF for Qwen3
+    assert _docname(lib, "r5") == "fact-check.pdf"  # renamed file
+    assert all(x.status == "auto" for x in lib.links)
+    # the three uncited DAKD papers are the yardsticks; the duplicate is
+    # merged, the cited ones and the scan are not exemplars
+    assert lib.venue == "数据分析与知识发现"
+    names = sorted(d.filename for d in lib.docs if d.id in lib.exemplar_ids)
+    assert names == sorted([
+        "基于多提示学习的方面级情感分析研究_钱玲飞.pdf",
+        "基于分布式认知的多智能体虚假新闻检测研究_邹逢源.pdf",
+        "基于大语言模型的命名实体识别研究现状_阮光册.pdf",
+    ])
+
+
+@pytest.mark.asyncio
+async def test_link_doi_wins_over_title(library):
+    ref, _, pdfs = library
+    r = Reference(id="r1", raw="x", title="A completely different title here",
+                  doi="10.1145/3571730", lang="en")
+    lib = await link_library([r], pdfs, str(ref), use_model=False)
+    assert _docname(lib, "r1").startswith("Ji et al.")
+    assert lib.links[0].method == "doi"
+
+
+@pytest.mark.asyncio
+async def test_mid_band_goes_to_model_and_needs_review(library, monkeypatch):
+    ref, _, pdfs = library
+    # a mangled title: below the automatic threshold, above the ask band
+    r = Reference(id="r9", raw="韩明星. 融合蕴含树与大模型的事实核查方法研究[J]. 数据分析与知识发现, 2026.",
+                  title="融合蕴含树与大模型的事实核查方法研究", authors=["韩明星"],
+                  year=2026, lang="zh")
+    seen = {}
+
+    async def fake(task, messages, schema, **kw):
+        seen["prompt"] = messages[0]["content"]
+        return llm.LLMResult(value=schema(choice=1), route="cloud")
+
+    monkeypatch.setattr(llm, "chat_json", fake)
+    lib = await link_library([r], pdfs, str(ref))
+    assert _docname(lib, "r9") == "fact-check.pdf"
+    assert "融合蕴含树和LLM的事实核查研究" in seen["prompt"]
+    assert lib.links[0].method == "llm" and lib.links[0].status == "review"
+
+    async def none(task, messages, schema, **kw):
+        return llm.LLMResult(value=schema(choice=0), route="cloud")
+
+    monkeypatch.setattr(llm, "chat_json", none)
+    lib = await link_library([r], pdfs, str(ref))
+    assert lib.links == []

@@ -119,7 +119,7 @@ def _find_doi(text: str) -> str | None:
     return None
 
 
-def _filename_meta(name: str) -> tuple[str, str | None]:
+def filename_meta(name: str) -> tuple[str, str | None]:
     """(title guess, author guess) from a file name. CNKI saves downloads
     as "标题_第一作者.pdf"; browsers add " (1)" to repeats."""
     stem = _DUP_SUFFIX_RE.sub("", Path(name).stem).strip()
@@ -175,7 +175,7 @@ def _scan_one(path: Path, sha: str, cache: Cache) -> LocalPdf:
         return LocalPdf(LibraryDoc.model_validate(hit["doc"]).model_copy(
             update={"filename": path.name}), path, hit["pages"], hit["cover"])
 
-    fn_title, fn_author = _filename_meta(path.name)
+    fn_title, fn_author = filename_meta(path.name)
     doc = LibraryDoc(id=sha[:16], filename=path.name)
     pages: list[str] = []
     cover = 0

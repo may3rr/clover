@@ -45,3 +45,26 @@ def test_real_library_metadata(tmp_path):
     cnki = [p for p in pdfs if p.doc.source in {"cnki_cover", "cnki_citation"}]
     assert len(cnki) >= len(pdfs) - 1
     assert all(p.doc.title and p.doc.authors and p.doc.year for p in cnki)
+
+
+@needs_paper
+@needs_library
+@pytest.mark.asyncio
+async def test_real_links(tmp_path):
+    from citecheck.cache import Cache
+    from citecheck.library.link import link_library
+    from citecheck.library.scan import scan_folder
+
+    refs = parse_docx(PAPER).references
+    lib = await link_library(refs, scan_folder(LIBRARY, Cache(tmp_path / "c.sqlite")),
+                             LIBRARY, use_model=False)
+    docs = {d.id: d for d in lib.docs}
+    # every link: the PDF's title is the entry's title (no false links)
+    for link in lib.links:
+        ref = next(r for r in refs if r.id == link.ref_id)
+        assert ref.title.replace("？", "?")[:10] in docs[link.doc_id].title.replace("？", "?")
+    # every Chinese entry whose title appears in the folder is linked
+    titles = {d.title for d in lib.docs}
+    want = {r.id for r in refs if r.lang == "zh" and r.title in titles}
+    assert want <= {x.ref_id for x in lib.links}
+    assert len(lib.exemplar_ids) >= 20 and lib.venue
