@@ -206,6 +206,7 @@ const api: CitecheckApi = {
   getInfo: async () => ({ baseUrl: BASE, token: '', backendError: null }),
   pathForFile: () => `${HOME}/${SHOWCASE_FILE}`,
   openDocxDialog: async () => `${HOME}/${SHOWCASE_FILE}`,
+  openFolderDialog: async () => null,
   pickAvatar: async () => null,
   revealInFinder: (p) => {
     if (!flags.quietExport) download(SAMPLE_DOCX, p.split('/').pop() ?? 'clover.docx')

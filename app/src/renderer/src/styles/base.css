@@ -454,6 +454,17 @@ select {
   background: var(--fill-strong);
 }
 
+/* a row's secondary control: shown on hover / keyboard focus only */
+.list-row .row-action {
+  opacity: 0;
+  transition: opacity 160ms var(--ease);
+}
+.list-row:hover .row-action,
+.list-row:focus-within .row-action,
+.list-row .row-action.keep {
+  opacity: 1;
+}
+
 /* group labels (13px secondary) */
 .group-label {
   font-size: 13px;

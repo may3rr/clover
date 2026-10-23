@@ -153,12 +153,23 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
             label={s.label}
           />
           <div className="t13 secondary" style={{ marginTop: 8 }}>
-            {s.sourceKind === 'fulltext' ? '依据开放全文' : '依据摘要'}
+            {sourceLine(s.sourceKind, s.sourceFile, s.sourcePage)}
           </div>
         </div>
       )}
     </>
   )
+}
+
+/** where the excerpt came from: the user's own PDF (with the page the
+ *  evidence sits on), an open-access full text, or the abstract */
+export function sourceLine(
+  kind: string | null,
+  file: string | null | undefined,
+  page: number | null | undefined
+): string {
+  if (file) return `依据文献文件夹中的本地原文 ${file}${page ? `，第 ${page} 页` : ''}`
+  return kind === 'fulltext' ? '依据开放全文' : '依据摘要'
 }
 
 /** the sentence with the judged claim set in semibold — claim offsets
@@ -308,9 +319,11 @@ function AuthenticityDetail({
   const matched = check?.matched as Record<string, unknown> | undefined
 
   type Row = [string, string, string | null, boolean]
+  // the entry disagrees with the user's own PDF rather than a database
+  const localMode = (check?.issues ?? []).some((i) => i.includes('本地原文'))
   const theirs = (k: string): string | null => {
     if (!matched) return null
-    const v = matched[k]
+    const v = matched[localMode ? `local_${k}` : k]
     if (v == null) return null
     if (Array.isArray(v)) return v.slice(0, 4).join(', ')
     return String(v)
@@ -344,8 +357,10 @@ function AuthenticityDetail({
       ? `https://doi.org/${ref.doi.replace(/^https?:\/\/doi.org\//, '')}`
       : null
 
-  const status =
-    check?.status === 'not_found'
+  const localFile = matched?.local_file ? String(matched.local_file) : null
+  const status = localMode
+    ? `与文献文件夹中的本地原文 ${localFile ?? ''} 不一致，不一致的字段已标出`
+    : check?.status === 'not_found'
       ? '检索的文献数据库中均未找到这篇文献'
       : !matched
         ? '暂时无法完成核验，下面是你写的条目'
@@ -367,6 +382,7 @@ function AuthenticityDetail({
               value={yours}
               theirs={matched && bad ? theirs ?? '—' : null}
               bad={!!matched && bad}
+              source={localMode ? '本地原文' : '数据库记录'}
             />
           ))}
         </div>
@@ -391,11 +407,13 @@ function FieldRow({
   value,
   theirs,
   bad,
+  source = '数据库记录',
 }: {
   label: string
   value: string
   theirs: string | null
   bad: boolean
+  source?: string
 }) {
   return (
     <div className="min-w-0">
@@ -408,7 +426,7 @@ function FieldRow({
       {theirs != null && (
         <div className="t13" style={{ marginTop: 4, wordBreak: 'break-word' }}>
           <span className="secondary" style={{ marginRight: 8 }}>
-            数据库记录
+            {source}
           </span>
           {theirs}
         </div>
@@ -438,6 +456,29 @@ function DistributionDetail({
       })
     : secs
   const rows = shown.length ? shown : secs
+  const venueStats = (d?.venue_stats ?? []).filter((v) => v.bench)
+  if (item.kind !== 'group' && !item.anchors.length && venueStats.length) {
+    return (
+      <>
+        <div className="t13 secondary">
+          {d?.venue_source === 'exemplars'
+            ? `对标文献文件夹中《${d.venue}》的 ${d.n_papers} 篇论文，只在本机统计。`
+            : `对标内置的《${d?.venue}》基线，共 ${d?.n_papers ?? 0} 篇论文。`}
+        </div>
+        <div className="card flex flex-col" style={{ gap: 16 }}>
+          {venueStats.map((v) => (
+            <MetricGroup
+              key={v.key}
+              label={v.label}
+              value={v.value ?? 0}
+              bench={v.bench ?? null}
+              fmt={(x) => (v.unit === '%' ? `${(x * 100).toFixed(0)}%` : `${x.toFixed(0)} ${v.unit}`)}
+            />
+          ))}
+        </div>
+      </>
+    )
+  }
   return (
     <>
       {d?.note && <div className="t13 secondary">{d.note}</div>}

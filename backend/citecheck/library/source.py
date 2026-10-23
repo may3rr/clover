@@ -82,6 +82,7 @@ def apply_local(ref: Reference, check: RefCheck, pdf: LocalPdf,
     matched.setdefault("title", pdf.doc.title)
     matched.update({"local_pdf": pdf.doc.id, "local_file": pdf.doc.filename,
                     "local_title": pdf.doc.title, "local_venue": pdf.doc.venue,
+                    "local_authors": pdf.doc.authors[:4],
                     "local_year": pdf.doc.year})
     if issues:
         status = "mismatch"

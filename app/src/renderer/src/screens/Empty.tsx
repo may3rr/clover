@@ -24,6 +24,10 @@ interface Props {
   forceDrag?: boolean
   prefs: Prefs
   onOpenSettings: () => void
+  /** 文献文件夹 chosen before dropping a .docx (null = none) */
+  libraryDir: string | null
+  onPickLibrary: () => void
+  onClearLibrary: () => void
 }
 
 interface Bench {
@@ -61,6 +65,9 @@ export default function Empty({
   forceDrag,
   prefs,
   onOpenSettings,
+  libraryDir,
+  onPickLibrary,
+  onClearLibrary,
 }: Props) {
   const [drag, setDrag] = useState(false)
   const [err, setErr] = useState<string | null>(null)
@@ -163,8 +170,13 @@ export default function Empty({
               把论文拖到这里
             </button>
             <div className="secondary" style={{ marginTop: 8 }}>
-              支持英文论文的 .docx 文件，或 LaTeX 项目的 .zip
+              支持中英文论文的 .docx 文件，或 LaTeX 项目的 .zip
               压缩包、文件夹。全文在本机解析，不会上传。
+            </div>
+            <div className="t13 secondary" style={{ marginTop: 12 }}>
+              已经下载了被引文献的话，把论文 .docx 放在一个文件夹的根目录，
+              PDF 放进同级的 ref 文件夹，再拖入整个文件夹。本地原文会用来判断论断支持度，
+              文件夹里目标期刊的其他论文会作为对标范文。
             </div>
             {(err || dropError) && (
               <div className="font-normal" style={{ marginTop: 12 }}>
@@ -178,6 +190,19 @@ export default function Empty({
               <button className="pill-accent" onClick={onOpenDialog}>
                 选择文件
               </button>
+              {libraryDir ? (
+                <span className="pill-quiet flex items-center gap-2">
+                  <span className="secondary">文献文件夹</span>
+                  <span className="font-normal">{libraryDir.split('/').pop()}</span>
+                  <button className="t13 link-accent" onClick={onClearLibrary}>
+                    移除
+                  </button>
+                </span>
+              ) : (
+                <button className="pill-quiet font-normal" onClick={onPickLibrary}>
+                  添加文献文件夹
+                </button>
+              )}
               <label className="pill-quiet flex items-center gap-1">
                 <select
                   className="font-normal"

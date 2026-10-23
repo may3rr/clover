@@ -11,6 +11,9 @@ export interface SupportDetail {
   evidenceSpan: [number, number] | null
   label: string | null
   sourceKind: string | null
+  /** the user's own PDF (文献文件夹) and the evidence's page in it */
+  sourceFile: string | null
+  sourcePage: number | null
   rationale: string | null
 }
 
@@ -31,6 +34,8 @@ export function supportForFinding(
     evidenceSpan: null,
     label: null,
     sourceKind: null,
+    sourceFile: null,
+    sourcePage: null,
     rationale: null,
   }
   const f = item.finding
@@ -77,6 +82,8 @@ export function supportForFinding(
     evidenceSpan: (check?.evidence_span as [number, number] | undefined) ?? null,
     label: check?.label ?? null,
     sourceKind: check?.source_kind ?? null,
+    sourceFile: check?.source_file ?? null,
+    sourcePage: check?.source_page ?? null,
     rationale: check?.rationale ?? null,
   }
 }

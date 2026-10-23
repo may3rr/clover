@@ -4,6 +4,8 @@ import type { Report } from './types/report'
 import Empty from './screens/Empty'
 import Running, { type LayerUI } from './screens/Running'
 import ReportScreen from './screens/ReportScreen'
+import LibraryConfirm from './screens/LibraryConfirm'
+import type { LibraryScan } from './lib/library'
 import ErrorScreen from './screens/Error'
 import Settings from './screens/Settings'
 import Onboarding, { type OnboardStep } from './screens/Onboarding'
@@ -26,7 +28,14 @@ function readVenue(): string {
   return 'emnlp'
 }
 
-type Screen = 'empty' | 'running' | 'report' | 'error' | 'settings' | 'onboarding'
+type Screen =
+  | 'empty'
+  | 'library'
+  | 'running'
+  | 'report'
+  | 'error'
+  | 'settings'
+  | 'onboarding'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('empty')
@@ -48,6 +57,9 @@ export default function App() {
   // venue the running job was started with ('' = overview off)
   const [runVenue, setRunVenue] = useState('')
   const [jobError, setJobError] = useState<string | null>(null)
+  // 文献文件夹 picked on the home screen, and the pending link table
+  const [libraryDir, setLibraryDir] = useState<string | null>(null)
+  const [scan, setScan] = useState<LibraryScan | null>(null)
   const [fileName, setFileName] = useState('paper.docx')
   const exportRef = useRef<(() => void) | null>(null)
   const shotState = useRef<ShotCtx>({})
@@ -96,8 +108,8 @@ export default function App() {
   }, [])
 
   // ------------------------------------------------------------ analyze
-  const analyze = useCallback(
-    async (path: string) => {
+  const startJob = useCallback(
+    async (path: string, extra: Record<string, string> = {}) => {
       setJobError(null)
       setFileName(path.split('/').pop() ?? path)
       try {
@@ -105,6 +117,7 @@ export default function App() {
         fd.append('path', path)
         fd.append('benchmark', benchmark)
         fd.append('venue', venue)
+        for (const [k, v] of Object.entries(extra)) fd.append(k, v)
         const r = await apiFetch('/analyze', { method: 'POST', body: fd })
         if (!r.ok) {
           setJobError(ACCEPT_ERROR)
@@ -124,12 +137,54 @@ export default function App() {
     [benchmark, venue]
   )
 
+  // a paper folder (docx + ref/), or a docx with a chosen reference
+  // folder, goes through the link confirmation step first; a folder the
+  // scan can't use (LaTeX without ref/, …) runs as before
+  const analyze = useCallback(
+    async (path: string) => {
+      setJobError(null)
+      const folderLike = !isPaperPath(path)
+      if (!folderLike && !libraryDir) return startJob(path)
+      try {
+        const fd = new FormData()
+        fd.append('path', path)
+        if (libraryDir) fd.append('library', libraryDir)
+        const r = await apiFetch('/library/scan', { method: 'POST', body: fd })
+        if (r.ok) {
+          const sc = (await r.json()) as LibraryScan
+          setFileName(sc.paper.split('/').pop() ?? sc.paper)
+          morph(() => {
+            setScan(sc)
+            setScreen('library')
+          })
+          return
+        }
+        if (libraryDir) {
+          const { detail } = (await r.json().catch(() => ({}))) as { detail?: string }
+          setJobError(detail ?? ACCEPT_ERROR)
+          return
+        }
+      } catch {
+        setJobError('无法连接本地服务。请重新打开应用。')
+        return
+      }
+      startJob(path)
+    },
+    [libraryDir, startJob]
+  )
+
+  const pickLibrary = useCallback(async () => {
+    const p = await window.citecheck.openFolderDialog()
+    if (p) setLibraryDir(p)
+  }, [])
+
   const openDialog = useCallback(async () => {
     const p = await window.citecheck.openDocxDialog()
     if (p) analyze(p)
   }, [analyze])
 
   const reset = useCallback(() => {
+    setScan(null)
     setScreen('empty')
     setJobId(null)
     setReport(null)
@@ -303,6 +358,24 @@ export default function App() {
     )
   }
 
+  if (screen === 'library' && scan) {
+    return (
+      <LibraryConfirm
+        scan={scan}
+        libraryDir={scan.library.folder}
+        onCancel={reset}
+        error={jobError}
+        onStart={({ paper, links, venue: libVenue }) =>
+          startJob(paper, {
+            library: scan.library.folder,
+            links: JSON.stringify(links),
+            ...(libVenue ? { library_venue: libVenue } : {}),
+          })
+        }
+      />
+    )
+  }
+
   if (screen === 'running' && jobId) {
     return (
       <Running
@@ -351,6 +424,9 @@ export default function App() {
       setVenue={setVenue}
       onFile={analyze}
       onOpenDialog={openDialog}
+      libraryDir={libraryDir}
+      onPickLibrary={pickLibrary}
+      onClearLibrary={() => setLibraryDir(null)}
       onOpenReport={openReport}
       dropError={jobError}
       forceDrag={dragHint}

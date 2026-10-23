@@ -601,6 +601,17 @@ function SideRow({
   )
 }
 
+/** "《数据分析与知识发现》范文 32 篇" / built-in baseline / benchmark name */
+export function benchLabel(report: Report): string {
+  const d = report.distribution
+  if (!d) return '—'
+  if (d.venue && d.venue_source === 'exemplars')
+    return `《${d.venue}》，文献文件夹中的 ${d.n_papers} 篇论文`
+  if (d.venue && d.venue_source === 'builtin')
+    return `《${d.venue}》，内置基线 ${d.n_papers} 篇论文`
+  return d.benchmark_name ?? '—'
+}
+
 function PaperBody({
   report,
   items,
@@ -733,8 +744,16 @@ function PaperBody({
               ['参考文献', `${nRefs} 条`],
               [
                 '对标领域',
-                report.distribution?.benchmark_name ?? '—',
+                benchLabel(report),
               ],
+              ...(report.library
+                ? ([
+                    [
+                      '文献文件夹',
+                      `${report.library.links?.length ?? 0} 篇文献连接了本地原文`,
+                    ],
+                  ] as [string, string][])
+                : []),
               [
                 '检查用时',
                 duration(report.meta?.duration_s ?? 0),

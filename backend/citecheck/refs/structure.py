@@ -193,7 +193,10 @@ def parse_reference(raw: str) -> dict:
         out["authors"] = parse_authors(chunks[0], out["lang"])
         idx = 1
     if idx < len(chunks):
-        out["title"] = _TYPE_TAG_RE.sub("", chunks[idx]).strip(" .") or None
+        # GB/T: "Title[C]//Proceedings of …" — the title ends at its tag
+        tag = _TYPE_TAG_RE.search(chunks[idx])
+        title = chunks[idx][: tag.start()] if tag and tag.start() > 0 else chunks[idx]
+        out["title"] = _TYPE_TAG_RE.sub("", title).strip(" .") or None
     # venue: the next chunk that isn't a bare year/pages/edition fragment
     for j in range(idx + 1, len(chunks)):
         venue = re.split(r"[,，]", chunks[j])[0]

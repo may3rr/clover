@@ -152,6 +152,16 @@ ipcMain.handle('citecheck:open-docx', async () => {
   return r.canceled || !r.filePaths.length ? null : r.filePaths[0]
 })
 
+// 文献文件夹：被引文献 PDF 所在的目录
+ipcMain.handle('citecheck:open-folder', async () => {
+  if (!win) return null
+  const r = await dialog.showOpenDialog(win, {
+    properties: ['openDirectory'],
+    message: '选择存放被引文献 PDF 的文件夹',
+  })
+  return r.canceled || !r.filePaths.length ? null : r.filePaths[0]
+})
+
 ipcMain.handle('citecheck:pick-avatar', async () => {
   if (!win) return null
   const r = await dialog.showOpenDialog(win, {
@@ -249,6 +259,16 @@ function shotReady(): Promise<void> {
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+// dev only: `kill -USR2 <pid>` writes the window to $CITECHECK_CAPTURE —
+// for checking a screen without Screen Recording permission
+if (process.env.CITECHECK_CAPTURE) {
+  process.on('SIGUSR2', async () => {
+    if (!win) return
+    const img = await win.webContents.capturePage()
+    fs.writeFileSync(process.env.CITECHECK_CAPTURE!, img.toPNG())
+  })
+}
 
 // Prefer the real window (vibrancy + traffic lights) via screencapture;
 // fall back to capturePage if Screen Recording permission is missing.

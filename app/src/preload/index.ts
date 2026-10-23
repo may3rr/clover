@@ -9,6 +9,8 @@ export interface CitecheckApi {
   /** Absolute path of a dropped File (webUtils.getPathForFile). */
   pathForFile(file: File): string
   openDocxDialog(): Promise<string | null>
+  /** Directory picker for the reference folder (文献文件夹). */
+  openFolderDialog(): Promise<string | null>
   /** Image picker for the user avatar; returns a data URL or null. */
   pickAvatar(): Promise<string | null>
   revealInFinder(path: string): void
@@ -39,6 +41,7 @@ const api: CitecheckApi = {
   getInfo: () => ipcRenderer.invoke('citecheck:info'),
   pathForFile: (file) => webUtils.getPathForFile(file),
   openDocxDialog: () => ipcRenderer.invoke('citecheck:open-docx'),
+  openFolderDialog: () => ipcRenderer.invoke('citecheck:open-folder'),
   pickAvatar: () => ipcRenderer.invoke('citecheck:pick-avatar'),
   revealInFinder: (p) => ipcRenderer.invoke('citecheck:reveal', p),
   openPath: (p) => ipcRenderer.invoke('citecheck:open-path', p),
