@@ -449,3 +449,19 @@ def test_gbt_journal_volume_pages_and_corporate_duplicates():
     titles = {(f.title, tuple(f.refs)) for f in check_norms(parsed)
               if f.title != "这篇参考文献在正文中没有被引用"}
     assert titles == {("这条期刊文献缺少卷或期和页码", ("r2",))}
+
+
+@pytest.mark.asyncio
+async def test_typos_consistent_term_kept():
+    """决策化模型 used throughout the paper is the author's term: the
+    model's "决策式" correction is dropped; a one-off slip is still fixed."""
+    p = _typo_doc([
+        "本文比较决策化模型与大语言模型在声明验证上的表现。",
+        "决策化模型直接输出标签，速度较快，适合大规模部署。",
+        "实验表明决策化模型的的置信度质量较好，可以用于分流。",
+    ])
+    f, revs = await _run_typos(p, {"items": [
+        {"original": "比较决策化模型", "correction": "比较决策式模型", "reason": "用字"},
+        {"original": "模型的的置信度", "correction": "模型的置信度", "reason": "叠字"},
+    ]})
+    assert [(r.old, r.new) for r in revs] == [("的", "")]

@@ -7,6 +7,7 @@
 - original 必须在段落中恰好出现一次（逐字），否则丢弃；
 - correction 与 original 相同、改动了数字、或覆盖引用标记区间 → 丢弃；
 - 去掉公共前后缀得到最小编辑区间；拉丁单词扩展到整个词边界；
+- 中文改动所在的三字窗口在全文出现两次以上 → 视为作者的术语，丢弃；
 - 最小编辑距离 > 2 → 不生成修订，给一条低优先级 finding
   "疑似笔误，请确认"，detail 中给出建议文本；
 - 否则生成 Revision(kind="typo")。
@@ -28,6 +29,7 @@ from ..schema import Anchor, Finding, Paragraph, Revision
 
 _MATHY = re.compile(r"[0-9=+\-*/^(){}\[\]<>_\\]")
 _LATIN_WORD = re.compile(r"[A-Za-z0-9]")
+_CJK_CHAR = re.compile(r"[一-鿿]")
 _MIN_LEN = 10
 
 _PROMPT = """\
@@ -108,6 +110,7 @@ async def check_typos(
 ) -> tuple[list[Finding], list[Revision]]:
     """progress(done, total) fires as each paragraph finishes."""
     ref_paras = {r.paragraph_id for r in parsed.references if r.paragraph_id}
+    doc_text = "\n".join(p.text for p in parsed.paragraphs)
     markers_by_para: dict[str, list[tuple[int, int]]] = {}
     for m in parsed.markers:
         markers_by_para.setdefault(m.paragraph_id, []).append((m.start, m.end))
@@ -143,6 +146,13 @@ async def check_typos(
             if not old and not new:
                 continue
             a_start, a_end = s0 + i, s0 + j
+            # a Chinese "typo" whose surroundings recur elsewhere in the
+            # manuscript is the author's term (决策化模型 ×10, 可分流性 ×7),
+            # not a slip — never revise a word used consistently
+            if old and _CJK_CHAR.search(old + new):
+                window = p.text[max(0, a_start - 1):a_end + 1]
+                if doc_text.count(window) >= 2:
+                    continue
             anchor = Anchor(paragraph_id=p.id, start=a_start, end=a_end)
             if Levenshtein.distance(old, new) > 2:
                 findings.append(Finding(

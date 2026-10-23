@@ -249,3 +249,20 @@ def test_export_libreoffice_converts(tmp_path, name):
         capture_output=True, text=True, timeout=120)
     assert r.returncode == 0, r.stderr
     assert (tmp_path / (out.stem + ".pdf")).exists()
+
+
+def test_export_pure_insertion_typo(tmp_path):
+    """A typo fix that only inserts text (old == "", start == end) is a
+    point insertion after the run ending at the anchor."""
+    src = FIXTURES / "gbt_zh.docx"
+    p = parse_docx(src)
+    para = next(pp for pp in p.paragraphs if "知识表示学习" in pp.text)
+    at = para.text.index("知识表示学习") + len("知识表示学习")
+    rev = Revision(id="v1", kind="typo",
+                   anchor=Anchor(paragraph_id=para.id, start=at, end=at),
+                   old="", new="（KRL）", reason="test")
+    report = build_report(src, extra_revisions=[rev], with_distribution=False)
+    out = export_report(src, report, tmp_path / "out.docx")
+    el = dict(docx_xml.iter_paragraphs(doc_root(out)))[para.id]
+    inserted = ["".join(t.text or "" for t in ins.iter(w("t"))) for ins in el.iter(w("ins"))]
+    assert "（KRL）" in inserted

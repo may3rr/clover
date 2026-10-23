@@ -537,8 +537,9 @@ def export_report(
         if not runs:
             # pure insertion at a point: insert an ins after the run whose
             # text ends at the anchor offset
+            prefix, marks = _vr(r.anchor.paragraph_id)
             _, segs = dx.paragraph_text_map(
-                p, *_vr(r.anchor.paragraph_id))
+                p, prefix=prefix, note_marks=marks)
             prev = [s for s in segs
                     if s.run is not None and s.end <= r.anchor.start]
             if not prev:
