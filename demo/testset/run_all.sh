@@ -5,7 +5,8 @@ for d in liuqiao_kg luohuilan_odt zhaoyangyang_tod yinhongpeng_odt guyingjie_mrc
   for v in clean injected; do
     if [ -f "demo/testset/reports/${d}_${v}.json" ]; then echo "skip ${d}_${v}"; continue; fi
     echo "=== ${d}_${v} ==="
-    python demo/run_pipeline.py "demo/testset/zh_papers/${d}/manuscript${v:+_$v}.docx" \
+    if [ "$v" = "clean" ]; then f="manuscript.docx"; else f="manuscript_injected.docx"; fi
+    python demo/run_pipeline.py "demo/testset/zh_papers/${d}/${f}" \
       "demo/testset/reports/${d}_${v}.json" > "demo/testset/reports/${d}_${v}.log" 2>&1
     echo "exit=$? $(tail -1 demo/testset/reports/${d}_${v}.log | head -c 100)"
   done

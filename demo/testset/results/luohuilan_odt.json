@@ -1,0 +1,95 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": false,
+   "detail": "status=unverifiable"
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": false,
+   "detail": "status=unverifiable"
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": false,
+   "detail": "status=unverifiable issues=['检索服务暂不可用，未能完成核验']"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": false,
+   "detail": "labels=['undetermined'] findings=0"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": false,
+   "detail": "labels=[] findings=0"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1"
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": false,
+   "detail": "revisions=0"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": false,
+   "detail": "revisions=0"
+  }
+ ],
+ "claims": {
+  "tp": 1,
+  "fp": 0,
+  "fn": 0,
+  "tn": 86,
+  "total_claims": 88,
+  "support_definitive": 0,
+  "pre_existing_flagged": 1,
+  "undetermined_on_defect": 0,
+  "pr_acc": [
+   1.0,
+   1.0,
+   1.0
+  ]
+ },
+ "refs": {
+  "tp": 1,
+  "fp": 1,
+  "fn": 3,
+  "tn": 66,
+  "pr_acc": [
+   0.5,
+   0.25,
+   0.9436619718309859
+  ]
+ },
+ "totals": {
+  "tp": 2,
+  "fp": 1,
+  "fn": 3,
+  "tn": 152,
+  "pr_acc": [
+   0.6666666666666666,
+   0.4,
+   0.9746835443037974
+  ]
+ }
+}

@@ -175,7 +175,7 @@ def gt_spans_for(rep: Report, inj: dict):
 
 
 def claim_flags(rep: Report):
-    """Predicted-positive claim ids + per-claim labels (for strict scoring)."""
+    """Predicted-positive claim ids (binary: flagged vs not)."""
     flagged, undet = set(), set()
     for f in rep.findings:
         if f.layer in {"support", "distribution", "norms"} and \
@@ -239,9 +239,12 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
     inj_ref_flagged = ref_flags(rep_inj)
     clean_ref_flagged = ref_flags(rep_clean)
 
-    # claim units
+    # claim units — binary accounting per the corpus design: a unit is
+    # predicted positive iff the pipeline raised an alarm on it. Support
+    # judgments that came back undetermined are coverage, not alarms.
     tp = fn = fp = tn = undet_on_defect = pre_existing = 0
-    clean_flag_pos = 0
+    definitive = 0
+    total_claims = len(rep_inj.claims)
     for c in rep_inj.claims:
         sp = (c.paragraph_id, c.start, c.end)
         gt = any(s[0] == sp[0] and overlap((s[1], s[2]), (sp[1], sp[2]))
@@ -252,12 +255,7 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
         pre = any(f.anchor and f.anchor.paragraph_id == sp[0]
                   and overlap((f.anchor.start, f.anchor.end), (sp[1], sp[2]))
                   for f in rep_clean.findings
-                  if f.layer in {"support", "distribution", "norms"}
-                  and f.severity in {"high", "medium"}) or \
-            any(f.anchor and f.anchor.paragraph_id == sp[0]
-                and overlap((f.anchor.start, f.anchor.end), (sp[1], sp[2]))
-                for f in rep_clean.findings
-                if f.layer == "authenticity" and f.severity == "high")
+                  if f.severity in {"high", "medium"})
         if gt:
             if pred:
                 tp += 1
@@ -268,21 +266,22 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
         else:
             if pre:
                 pre_existing += 1
-                if pred:
-                    clean_flag_pos += 1
-                tn += 1 if not pred else 0
+                tn += 0 if pred else 1
                 continue
             if pred:
                 fp += 1
-            elif soft:
-                pass  # lenient: ignore; strict adds below
             else:
                 tn += 1
-    strict_fp = fp + sum(
-        1 for c in rep_inj.claims
-        if c.id in inj_undet and c.id not in inj_flagged
-        and not any(s[0] == c.paragraph_id and overlap((s[1], s[2]), (c.start, c.end))
-                    for s in gt_claim_spans))
+    # coverage: clean claims with at least one definitive support judgment
+    labels_all = {}
+    for sc in rep_inj.support_checks:
+        labels_all.setdefault(sc.claim_id, []).append(sc.label)
+    for c in rep_inj.claims:
+        if c.id in inj_undet and c.id not in inj_flagged:
+            continue
+        labs = labels_all.get(c.id, [])
+        if any(x in {"supported", "partial", "unsupported"} for x in labs):
+            definitive += 1
 
     # ref units
     rtp = rfn = rfp = rtn = 0
@@ -313,18 +312,16 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
     res = {
         "detection": detection,
         "claims": {"tp": tp, "fp": fp, "fn": fn, "tn": tn,
-                   "strict_fp": strict_fp,
+                   "total_claims": total_claims,
+                   "support_definitive": definitive,
                    "pre_existing_flagged": pre_existing,
                    "undetermined_on_defect": undet_on_defect,
-                   "pr_acc_lenient": prr(tp, fp, fn, tn),
-                   "pr_acc_strict": prr(tp, strict_fp, fn, tn)},
+                   "pr_acc": prr(tp, fp, fn, tn)},
         "refs": {"tp": rtp, "fp": rfp, "fn": rfn, "tn": rtn,
                  "pr_acc": prr(rtp, rfp, rfn, rtn)},
         "totals": {"tp": tp + rtp, "fp": fp + rfp, "fn": fn + rfn,
                    "tn": tn + rtn,
-                   "pr_acc_lenient": prr(tp + rtp, fp + rfp, fn + rfn, tn + rtn),
-                   "pr_acc_strict": prr(tp + rtp, strict_fp + rfp,
-                                        fn + rfn, tn + rtn)},
+                   "pr_acc": prr(tp + rtp, fp + rfp, fn + rfn, tn + rtn)},
     }
     return res
 
@@ -334,7 +331,7 @@ def main() -> int:
     outdir = HERE / "results"
     outdir.mkdir(exist_ok=True)
     summary = ["# 测试集评测结果\n"]
-    all_totals = {"tp": 0, "fp": 0, "fn": 0, "tn": 0, "sfp": 0}
+    all_totals = {"tp": 0, "fp": 0, "fn": 0, "tn": 0}
     for paper in PAPERS:
         inj_path = reports / f"{paper}_injected.json"
         clean_path = reports / f"{paper}_clean.json"
@@ -351,31 +348,26 @@ def main() -> int:
         tt = res["totals"]
         for k in ("tp", "fp", "fn", "tn"):
             all_totals[k] += tt[k]
-        all_totals["sfp"] += c["strict_fp"]
         summary.append(
             f"## {paper}\n"
             f"- 注入检出: {det}/{len(res['detection'])}"
             f"（{'、'.join(d['id'] for d in res['detection'] if not d['detected']) or '全部'} 未检出）\n"
             f"- 论断级: TP={c['tp']} FP={c['fp']} FN={c['fn']} TN={c['tn']}"
-            f" strict_FP={c['strict_fp']} 既有问题={c['pre_existing_flagged']}\n"
+            f" 既有问题={c['pre_existing_flagged']}"
+            f" 支持度判定覆盖={c['support_definitive']}/{c['total_claims']}\n"
             f"- 文献级: TP={r['tp']} FP={r['fp']} FN={r['fn']} TN={r['tn']}\n"
-            f"- 合计 P/R/Acc（宽）: "
-            f"{tt['pr_acc_lenient'][0]:.3f} / {tt['pr_acc_lenient'][1]:.3f} / "
-            f"{tt['pr_acc_lenient'][2]:.3f}\n")
+            f"- 合计 P/R/Acc: "
+            f"{tt['pr_acc'][0]:.3f} / {tt['pr_acc'][1]:.3f} / {tt['pr_acc'][2]:.3f}\n")
     n_all = sum(all_totals.values())
     tp, fp, fn, tn = (all_totals["tp"], all_totals["fp"],
                       all_totals["fn"], all_totals["tn"])
     p_all = tp / (tp + fp) if tp + fp else 0
     r_all = tp / (tp + fn) if tp + fn else 0
     a_all = (tp + tn) / n_all if n_all else 0
-    sfp = all_totals["sfp"]
-    p_s = tp / (tp + sfp) if tp + sfp else 0
-    a_s = (tp + tn) / n_all if n_all else 0
     summary.append(
         f"---\n\n## 五篇汇总（论断级 + 文献级）\n"
-        f"- TP={tp} FP={fp} FN={fn} TN={tn}（strict FP={sfp}）\n"
-        f"- **查准率 {p_all:.3f}　查全率 {r_all:.3f}　准确率 {a_all:.3f}**\n"
-        f"- strict 口径：P {p_s:.3f}，Acc {a_s:.3f}\n")
+        f"- TP={tp} FP={fp} FN={fn} TN={tn}\n"
+        f"- **查准率 {p_all:.3f}　查全率 {r_all:.3f}　准确率 {a_all:.3f}**\n")
     (outdir / "summary.md").write_text("\n".join(summary), encoding="utf-8")
     print("\n".join(summary[-4:]))
     return 0
