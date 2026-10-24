@@ -64,6 +64,8 @@ demo/testset/reports_*/
 demo/testset/zh_papers/**/*.pdf
 # English injected projects: regenerable from raw/ (inject_latex.py, seed=42)
 demo/testset/en_papers/
+# UI design drafts moved from the old latex-import worktree, kept local
+demo/ui-drafts/
 
 # ---- F7: real Chinese manuscript run (unpublished paper, never committed)
 demo/zh_eval/
