@@ -21,20 +21,20 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "detected": true,
-   "detail": "status=mismatch issues=['年份不一致：文中写 2010，数据库记录为 2014']"
+   "detected": false,
+   "detail": "status=verified issues=[]"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "detected": false,
-   "detail": "labels=['undetermined'] offtopic=0 findings=0"
+   "detected": true,
+   "detail": "labels=[] offtopic=0 findings=1"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": false,
-   "detail": "labels=[] offtopic=0 findings=0"
+   "detail": "labels=['undetermined'] offtopic=0 findings=0"
   },
   {
    "id": "stacking",
@@ -56,40 +56,40 @@
   }
  ],
  "claims": {
-  "tp": 3,
-  "fp": 3,
+  "tp": 2,
+  "fp": 1,
   "fn": 2,
-  "tn": 69,
+  "tn": 72,
   "total_claims": 93,
-  "support_definitive": 34,
-  "pre_existing_flagged": 17,
+  "support_definitive": 31,
+  "pre_existing_flagged": 18,
   "undetermined_on_defect": 2,
   "pr_acc": [
+   0.6666666666666666,
    0.5,
-   0.6,
-   0.935064935064935
+   0.961038961038961
   ]
  },
  "refs": {
-  "tp": 4,
+  "tp": 3,
   "fp": 1,
-  "fn": 0,
+  "fn": 1,
   "tn": 53,
   "pr_acc": [
-   0.8,
-   1.0,
-   0.9827586206896551
+   0.75,
+   0.75,
+   0.9655172413793104
   ]
  },
  "totals": {
-  "tp": 7,
-  "fp": 4,
-  "fn": 2,
-  "tn": 122,
+  "tp": 5,
+  "fp": 2,
+  "fn": 3,
+  "tn": 125,
   "pr_acc": [
-   0.6363636363636364,
-   0.7777777777777778,
-   0.9555555555555556
+   0.7142857142857143,
+   0.625,
+   0.9629629629629629
   ]
  }
 }

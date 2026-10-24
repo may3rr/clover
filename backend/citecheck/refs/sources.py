@@ -569,20 +569,24 @@ class RetrievalClient:
                 self._track("arxiv", 0.0, cached=True)
                 return SourceResult(ok=True, data=hit["xml"])
         await arxiv_throttle()
-        # one retry (like the other sources): the throttle lock already
-        # enforces the >=3s gap, backoff sleeps on top of it. A single
-        # failure only counts toward the circuit breaker (_note_result) —
-        # two consecutive fails take arXiv down for this run.
+        # one retry (like the other sources). Every attempt re-throttles:
+        # a retry fired inside arXiv's 3s rate window would just 429 again,
+        # and each 429 backs off >=3s before the next throttled attempt.
+        # A single failure only counts toward the circuit breaker
+        # (_note_result) — two consecutive fails take arXiv down for this run.
         xml_text: str | None = None
         last_err: str | None = None
         for attempt in range(2):
+            if attempt:
+                await arxiv_throttle()
             try:
                 async with self._sem("arxiv"):
                     resp = await self._client.get(ARXIV_API, params=params)
                 if resp.status_code == 429 or resp.status_code >= 500:
                     last_err = f"HTTP {resp.status_code}"
                     if attempt == 0:
-                        await asyncio.sleep(min(2**attempt, 4))
+                        await asyncio.sleep(
+                            max(_retry_after(resp, attempt), 3.0))
                         continue
                     break
                 resp.raise_for_status()

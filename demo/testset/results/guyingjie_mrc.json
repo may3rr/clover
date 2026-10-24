@@ -3,14 +3,14 @@
   {
    "id": "fake1",
    "kind": "fake_ref",
-   "detected": false,
-   "detail": "status=unverifiable"
+   "detected": true,
+   "detail": "status=not_found"
   },
   {
    "id": "fake2",
    "kind": "fake_ref",
-   "detected": false,
-   "detail": "status=unverifiable"
+   "detected": true,
+   "detail": "status=not_found"
   },
   {
    "id": "uncited",
@@ -21,20 +21,20 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "detected": true,
-   "detail": "status=mismatch issues=['年份不一致：文中写 2014，数据库记录为 2018']"
+   "detected": false,
+   "detail": "status=verified issues=[]"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "detected": false,
-   "detail": "labels=['undetermined'] offtopic=0 findings=0"
+   "detected": true,
+   "detail": "labels=['undetermined'] offtopic=1 findings=2"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1"
+   "detail": "labels=['undetermined'] offtopic=1 findings=2"
   },
   {
    "id": "stacking",
@@ -56,40 +56,40 @@
   }
  ],
  "claims": {
-  "tp": 1,
-  "fp": 8,
-  "fn": 2,
-  "tn": 112,
-  "total_claims": 167,
-  "support_definitive": 77,
+  "tp": 2,
+  "fp": 6,
+  "fn": 0,
+  "tn": 119,
+  "total_claims": 169,
+  "support_definitive": 78,
   "pre_existing_flagged": 48,
-  "undetermined_on_defect": 2,
+  "undetermined_on_defect": 0,
   "pr_acc": [
-   0.1111111111111111,
-   0.3333333333333333,
-   0.9186991869918699
+   0.25,
+   1.0,
+   0.952755905511811
   ]
  },
  "refs": {
-  "tp": 2,
-  "fp": 3,
-  "fn": 2,
-  "tn": 114,
+  "tp": 3,
+  "fp": 0,
+  "fn": 1,
+  "tn": 117,
   "pr_acc": [
-   0.4,
-   0.5,
-   0.9586776859504132
+   1.0,
+   0.75,
+   0.9917355371900827
   ]
  },
  "totals": {
-  "tp": 3,
-  "fp": 11,
-  "fn": 4,
-  "tn": 226,
+  "tp": 5,
+  "fp": 6,
+  "fn": 1,
+  "tn": 236,
   "pr_acc": [
-   0.21428571428571427,
-   0.42857142857142855,
-   0.9385245901639344
+   0.45454545454545453,
+   0.8333333333333334,
+   0.9717741935483871
   ]
  }
 }

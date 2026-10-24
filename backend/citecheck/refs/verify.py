@@ -45,10 +45,14 @@ log = logging.getLogger(__name__)
 _TITLE_MIN = 92.0
 _SURNAME_MIN = 85.0
 _SOURCES = ("crossref", "openalex", "s2", "arxiv")
-# not_found (English refs) requires these three to have really answered;
-# s2 is optional — rate-limited S2 must not block a fabricated ref from
-# reaching not_found.
+# not_found (English refs) requires these to have really answered; s2 is
+# optional — rate-limited S2 must not block a fabricated ref from reaching
+# not_found. arXiv is load-bearing only for arXiv-hosted works: for a
+# journal entry, Crossref + OpenAlex both coming back empty is evidence
+# enough, so an arXiv outage must not sink fabricated-journal-refs to
+# unverifiable (see _conclude).
 _REQUIRED = ("crossref", "openalex", "arxiv")
+_CORE = ("crossref", "openalex")
 _SRC_LABEL = {
     "crossref": "Crossref",
     "openalex": "OpenAlex",
@@ -346,6 +350,13 @@ def _grey(ref: Reference) -> bool:
     return not (ref.venue or "").strip() and not ref.doi
 
 
+def _is_arxiv_entry(ref: Reference) -> bool:
+    """An arXiv-hosted publication: Crossref never indexes these, so a
+    not_found on them requires the arXiv source to have answered."""
+    text = f"{ref.venue or ''} {ref.doi or ''} {ref.raw}"
+    return bool(re.search(r"arxiv", text, re.I))
+
+
 def _title_prefix(a: str, b: str) -> bool:
     """One title is the other's leading words (>= 4 words): a dropped
     subtitle, not a different work."""
@@ -353,6 +364,28 @@ def _title_prefix(a: str, b: str) -> bool:
     short, long_ = (wa, wb) if len(wa) <= len(wb) else (wb, wa)
     return len(short) >= 4 and len(long_) > len(short) \
         and long_[: len(short)] == short
+
+
+_YEAR_RUN = re.compile(r"(?:19|20)\d{2}")
+_DIGIT_RUN = re.compile(r"\d+")
+
+
+def _year_only_diff(a: str, b: str) -> bool:
+    """Titles whose ONLY difference is an embedded year number
+    ("The visual object tracking VOT2014 challenge results" vs the VOT2010
+    one): consecutive editions of a series are different works, and a
+    fuzzy score in the 90s must not conflate them."""
+    ta, tb = _norm(a).split(), _norm(b).split()
+    if len(ta) != len(tb) or ta == tb:
+        return False
+    for x, y in zip(ta, tb):
+        if x == y:
+            continue
+        if _DIGIT_RUN.sub("#", x) != _DIGIT_RUN.sub("#", y):
+            return False
+        if not (_YEAR_RUN.search(x) and _YEAR_RUN.search(y)):
+            return False
+    return True
 
 
 def _title_head(a: str, b: str) -> bool:
@@ -407,6 +440,11 @@ def _select(
         # plus agreeing first author and year identify the work
         by_id = score < _TITLE_MIN and bool(h.get("via_id"))
         if score < _TITLE_MIN and not (prefix or head or by_id):
+            continue
+        # consecutive editions of a series ("VOT2014 challenge results" vs
+        # VOT2010) fuzzy-score in the 90s — same DOI still wins, otherwise
+        # the year-only difference marks a different work
+        if _year_only_diff(want_title, h["title"]) and h is not doi_hit:
             continue
         issues, author_diff, year_diff = _evaluate(ref, h)
         if prefix or head or by_id:
@@ -477,18 +515,26 @@ def _conclude(
         ]
     else:
         matched = None
-        if ref.lang == "en" and set(_REQUIRED) <= responded and _grey(ref):
+        # Crossref + OpenAlex both answering is enough evidence for a
+        # journal/proceedings entry; arXiv is only load-bearing for
+        # arXiv-hosted works (Crossref never indexes those)
+        core = set(_CORE) <= responded
+        arxiv_silent = "arxiv" not in responded
+        arxiv_only = _is_arxiv_entry(ref)
+        if ref.lang == "en" and core and _grey(ref):
             # technical reports, web pages, datasets: real works the
             # scholarly databases don't index — absence proves nothing
             status = "unverifiable"
             issues = ["这条文献是技术报告、网页或数据集一类，或没有发表"
                       "信息，学术数据库通常不收录，未能核验"]
-        elif ref.lang == "en" and set(_REQUIRED) <= responded:
+        elif ref.lang == "en" and core and not (arxiv_only and arxiv_silent):
             status = "not_found"
             answered = "、".join(
                 _SRC_LABEL[s] for s in _SOURCES if s in responded
             )
             issues = [f"{answered}均未检索到相符文献"]
+            if arxiv_silent:
+                issues.append("arXiv 检索暂不可用，未参与本次核验")
         else:
             status = "unverifiable"
             missing = [s for s in _REQUIRED if s not in responded]

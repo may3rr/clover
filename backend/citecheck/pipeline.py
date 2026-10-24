@@ -26,6 +26,7 @@ from .cache import Cache
 from .config import get_settings
 from .distribution.bench import _DEFAULT as _DEFAULT_BENCH
 from .distribution.layer import run_distribution
+from .lint.attribution import check_attribution
 from .lint.norms import check_norms
 from .lint.reorder import plan_reorder
 from .distribution.registry import builtin_baseline, detect_from_manuscript, find_venue
@@ -379,6 +380,7 @@ async def run_pipeline(
                 try:
                     await structured
                     norm_findings = check_norms(parsed)
+                    norm_findings += check_attribution(parsed)
                     entry = (await venue_task)[0]
                     if entry is not None:
                         norm_findings += check_venue_rules(parsed, entry)

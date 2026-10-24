@@ -716,3 +716,100 @@ def test_arxiv_loose_search_uses_head_words_only(monkeypatch):
         "Long Reasoning Models"))
     assert r.ok
     assert seen == ["ti:NOT AND ti:Think AND ti:That AND ti:Much AND ti:for"]
+
+
+# ---------------------------------------------------------------------------
+# arXiv politeness: every attempt re-throttles, and a 429 backs off >=3s so
+# the retry leaves arXiv's rate window instead of 429ing again
+
+@pytest.mark.asyncio
+async def test_arxiv_429_rethrottle_and_backoff(tmp_path, monkeypatch):
+    client = RetrievalClient(cache=Cache(tmp_path / "axb.sqlite"))
+    throttles: list[int] = []
+    sleeps: list[float] = []
+    state = {"n": 0}
+
+    async def fake_throttle():
+        throttles.append(state["n"])
+
+    async def fake_sleep(d):
+        sleeps.append(d)
+
+    async def capture(url, params=None, headers=None, **kw):
+        state["n"] += 1
+        if state["n"] == 1:
+            return httpx.Response(429, text="slow down",
+                                  request=httpx.Request("GET", url))
+        return httpx.Response(200, text="<feed/>",
+                              request=httpx.Request("GET", url))
+
+    monkeypatch.setattr("citecheck.refs.sources.arxiv_throttle", fake_throttle)
+    monkeypatch.setattr("asyncio.sleep", fake_sleep)
+    monkeypatch.setattr(client._client, "get", capture)
+
+    r = await client._arxiv_query('ti:"some title"', 5)
+    assert r.ok
+    assert len(throttles) == 2            # one throttle per attempt
+    assert any(d >= 3.0 for d in sleeps)  # 429 left arXiv's rate window
+
+
+# ---------------------------------------------------------------------------
+# not_found: Crossref+OpenAlex suffice for journal entries; arXiv is only
+# load-bearing for arXiv-hosted works
+
+from citecheck.refs.verify import _conclude, _year_only_diff  # noqa: E402
+
+
+def _en_ref(**kw):
+    d = dict(id="r1", raw="[1] Smith J. A study of things. J Things, 2020",
+             title="A study of things", authors=["Smith J"], year=2020,
+             venue="Journal of Things", doi=None, lang="en")
+    d.update(kw)
+    return Reference(**d)
+
+
+def test_not_found_with_arxiv_silent():
+    ref = _en_ref()
+    check, finding = _conclude(ref, [], None, {"crossref", "openalex"}, 50)
+    assert check.status == "not_found"
+    assert any("arXiv 检索暂不可用" in i for i in check.issues)
+    assert finding is not None and finding.severity == "high"
+
+
+def test_not_found_all_sources_no_note():
+    ref = _en_ref()
+    check, _ = _conclude(ref, [], None,
+                         {"crossref", "openalex", "arxiv", "s2"}, 50)
+    assert check.status == "not_found"
+    assert not any("暂不可用" in i for i in check.issues)
+
+
+def test_arxiv_entry_still_requires_arxiv():
+    ref = _en_ref(venue="arXiv preprint")
+    check, _ = _conclude(ref, [], None, {"crossref", "openalex"}, 50)
+    assert check.status == "unverifiable"
+    assert "检索服务暂不可用" in check.issues[0]
+
+
+def test_zh_and_grey_stay_unverifiable():
+    ref = _en_ref(lang="zh", venue="计算机学报")
+    check, _ = _conclude(ref, [], None,
+                         {"crossref", "openalex", "arxiv"}, 50)
+    assert check.status == "unverifiable"
+    ref = _en_ref(venue=None, doi=None)
+    check, _ = _conclude(ref, [], None, {"crossref", "openalex"}, 50)
+    assert check.status == "unverifiable"
+    assert "技术报告" in check.issues[0]
+
+
+# ---------------------------------------------------------------------------
+# titles differing only in an embedded year are different works
+
+def test_year_only_diff():
+    a = "The visual object tracking VOT2014 challenge results"
+    assert _year_only_diff(a, "The visual object tracking VOT2010 "
+                              "challenge results")
+    assert not _year_only_diff(a, a)
+    assert not _year_only_diff(a, "The visual object tracking VOT2014 "
+                                  "challenge report")
+    assert not _year_only_diff("A study of X 2019", "A study of X")

@@ -560,3 +560,83 @@ async def test_judge_pair_accuracy(pair, monkeypatch):
     if check.label in {"supported", "partial", "unsupported"}:
         assert check.evidence_span is not None
         assert check.source_excerpt[check.evidence_span[0]:check.evidence_span[1]]
+
+
+# ---------------------------------------------------------------------------
+# arXiv abstract fetch: a transient 429 must not be cached as an empty
+# abstract for the whole cache TTL — the failure is retried next call
+
+@pytest.mark.asyncio
+async def test_arxiv_title_failure_not_cached(tmp_path, monkeypatch):
+    from citecheck.cache import Cache
+    from citecheck.support import sources as sup
+
+    cache = Cache(tmp_path / "axt.sqlite")
+    calls = {"n": 0}
+    sleeps: list[float] = []
+
+    async def capture(url, params=None, **kw):
+        calls["n"] += 1
+        return httpx.Response(429, text="slow down",
+                              request=httpx.Request("GET", url))
+
+    async def fake_throttle():
+        pass
+
+    async def fake_sleep(d):
+        sleeps.append(d)
+
+    monkeypatch.setattr(sup, "_arxiv_throttle", fake_throttle)
+    monkeypatch.setattr("asyncio.sleep", fake_sleep)
+
+    client = httpx.AsyncClient()
+    monkeypatch.setattr(client, "get", capture)
+    try:
+        assert await sup._arxiv_title_search("A title", client, cache) is None
+        assert calls["n"] == 2            # one retry, then gave up
+        assert any(d >= 3.0 for d in sleeps)
+        # nothing cached: a later call retries instead of replaying ""
+        assert await sup._arxiv_title_search("A title", client, cache) is None
+        assert calls["n"] == 4
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_arxiv_title_retry_then_cached(tmp_path, monkeypatch):
+    from citecheck.cache import Cache
+    from citecheck.support import sources as sup
+
+    cache = Cache(tmp_path / "axt2.sqlite")
+    calls = {"n": 0}
+
+    async def capture(url, params=None, **kw):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return httpx.Response(429, text="slow down",
+                                  request=httpx.Request("GET", url))
+        body = "<feed><entry><summary> the abstract </summary></entry></feed>"
+        return httpx.Response(200, text=body,
+                              request=httpx.Request("GET", url))
+
+    async def fake_throttle():
+        pass
+
+    async def fake_sleep(d):
+        pass
+
+    monkeypatch.setattr(sup, "_arxiv_throttle", fake_throttle)
+    monkeypatch.setattr("asyncio.sleep", fake_sleep)
+
+    client = httpx.AsyncClient()
+    monkeypatch.setattr(client, "get", capture)
+    try:
+        got = await sup._arxiv_title_search("A title", client, cache)
+        assert got == "the abstract"
+        assert calls["n"] == 2
+        # cached now — no further requests
+        assert await sup._arxiv_title_search("A title", client, cache) \
+            == "the abstract"
+        assert calls["n"] == 2
+    finally:
+        await client.aclose()

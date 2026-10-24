@@ -217,20 +217,42 @@ def _bm25_excerpt(fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT) -> str
     return " ".join(parts)[:limit] if parts else fulltext[:limit]
 
 
-async def _arxiv_summary_fetch(arxiv_id: str, client: httpx.AsyncClient) -> str:
-    await _arxiv_throttle()
-    try:
-        resp = await client.get(
-            "https://export.arxiv.org/api/query",
-            params={"id_list": arxiv_id},
-            timeout=15,
-        )
-        resp.raise_for_status()
-        m = re.search(r"<summary>(.*?)</summary>", resp.text, re.S)
-        return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
-    except httpx.HTTPError as e:
-        log.warning("arxiv api failed %s: %s", arxiv_id, e)
-        return ""
+async def _arxiv_fetch(params: dict, client: httpx.AsyncClient) -> str | None:
+    """One arXiv API call: polite >=3s spacing (every attempt re-throttles —
+    a retry inside arXiv's rate window just 429s again) and one retry.
+    Returns the response text, or None on failure — callers must NOT cache
+    None, a transient 429 would otherwise lose the abstract for the whole
+    cache TTL."""
+    for attempt in range(2):
+        await _arxiv_throttle()
+        try:
+            resp = await client.get(
+                "https://export.arxiv.org/api/query",
+                params=params, timeout=15,
+            )
+            if resp.status_code == 429 or resp.status_code >= 500:
+                if attempt == 0:
+                    await asyncio.sleep(3.0)
+                    continue
+                log.warning("arxiv api failed: HTTP %d", resp.status_code)
+                return None
+            resp.raise_for_status()
+            return resp.text
+        except httpx.HTTPError as e:
+            if attempt == 0:
+                await asyncio.sleep(3.0)
+                continue
+            log.warning("arxiv api failed: %s", e)
+            return None
+    return None
+
+
+async def _arxiv_summary_fetch(arxiv_id: str, client: httpx.AsyncClient) -> str | None:
+    text = await _arxiv_fetch({"id_list": arxiv_id}, client)
+    if text is None:
+        return None
+    m = re.search(r"<summary>(.*?)</summary>", text, re.S)
+    return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
 
 
 async def _arxiv_summary(arxiv_id: str, client: httpx.AsyncClient, cache: Cache) -> str | None:
@@ -240,24 +262,19 @@ async def _arxiv_summary(arxiv_id: str, client: httpx.AsyncClient, cache: Cache)
         return hit or None
     summary = await _shared(f"ax:{arxiv_id}",
                             lambda: _arxiv_summary_fetch(arxiv_id, client))
+    if summary is None:
+        return None
     cache.set(key, summary)
     return summary or None
 
 
-async def _arxiv_title_fetch(title: str, client: httpx.AsyncClient) -> str:
-    await _arxiv_throttle()
-    try:
-        resp = await client.get(
-            "https://export.arxiv.org/api/query",
-            params={"search_query": f'ti:"{title}"', "max_results": 1},
-            timeout=15,
-        )
-        resp.raise_for_status()
-        m = re.search(r"<entry>.*?<summary>(.*?)</summary>", resp.text, re.S)
-        return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
-    except httpx.HTTPError as e:
-        log.warning("arxiv title search failed: %s", e)
-        return ""
+async def _arxiv_title_fetch(title: str, client: httpx.AsyncClient) -> str | None:
+    text = await _arxiv_fetch({"search_query": f'ti:"{title}"', "max_results": 1},
+                              client)
+    if text is None:
+        return None
+    m = re.search(r"<entry>.*?<summary>(.*?)</summary>", text, re.S)
+    return re.sub(r"\s+", " ", m.group(1)).strip() if m else ""
 
 
 async def _arxiv_title_search(
@@ -271,6 +288,8 @@ async def _arxiv_title_search(
         return hit or None
     summary = await _shared(f"axt:{title}",
                             lambda: _arxiv_title_fetch(title, client))
+    if summary is None:
+        return None
     cache.set(key, summary)
     return summary or None
 
