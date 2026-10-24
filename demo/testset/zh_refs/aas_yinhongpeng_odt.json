@@ -1,6 +1,6 @@
 {
  "paper": "基于视觉的目标检测与跟踪综述",
- "source": "自动化学报官网 PDF（pymupdf 双栏抽取）",
+ "source": "自动化学报官网 PDF（pymupdf 双栏抽取，已滤页眉页脚）",
  "ref_count": 227,
  "refs": [
   {
@@ -41,7 +41,7 @@
   },
   {
    "n": 10,
-   "text": "期 尹宏鹏等: 基于视觉的目标检测与跟踪综述 1481 类器模型的产生、调整以及整合, 将有助于适应高维 数据的分类任务. References"
+   "text": "Zhang S P, Yao H X, Sun X, Lu X S. Sparse coding based vi- sual tracking: review and experimental comparison. Pattern Recognition, 2013, 46(7): 1772−1788"
   },
   {
    "n": 11,
@@ -109,7 +109,7 @@
   },
   {
    "n": 27,
-   "text": "McFarlane N J B, Schoﬁeld C P. Segmentation and tracking of piglets in images. Machine Vision and Applications, 1995, 8(3): 187−193 1482 自 动 化 学 报"
+   "text": "McFarlane N J B, Schoﬁeld C P. Segmentation and tracking of piglets in images. Machine Vision and Applications, 1995, 8(3): 187−193"
   },
   {
    "n": 28,
@@ -169,7 +169,7 @@
   },
   {
    "n": 42,
-   "text": "卷"
+   "text": "Lin H H, Liu T L, Chuang J H. A probabilistic SVM ap- proach for background scene initialization. In: Proceedings of the 2002 International Conference on Image Processing. Rochester, New York, USA: IEEE, 2002. 893−896"
   },
   {
    "n": 43,
@@ -325,7 +325,7 @@
   },
   {
    "n": 81,
-   "text": "Deselaers T, Ferrari V. Global and eﬃcient self-similarity for object classiﬁcation and detection. In: Proceedings of the 2010 IEEE Conference on Computer Vision and Pat- tern Recognition (CVPR). San Francisco, CA, USA: IEEE, 2010. 1633−1640 1484 自 动 化 学 报"
+   "text": "Deselaers T, Ferrari V. Global and eﬃcient self-similarity for object classiﬁcation and detection. In: Proceedings of the 2010 IEEE Conference on Computer Vision and Pat- tern Recognition (CVPR). San Francisco, CA, USA: IEEE, 2010. 1633−1640"
   },
   {
    "n": 82,
@@ -541,7 +541,7 @@
   },
   {
    "n": 135,
-   "text": "Yang J C, Yu K, Gong Y H, Huang T. Linear spatial pyramid matching using sparse coding for image classiﬁ- cation. In: Proceedings of the 2009 IEEE Conference on Computer Vision and Pattern Recognition. Miami, Florida, USA: IEEE, 2009. 1794−1801 1486 自 动 化 学 报"
+   "text": "Yang J C, Yu K, Gong Y H, Huang T. Linear spatial pyramid matching using sparse coding for image classiﬁ- cation. In: Proceedings of the 2009 IEEE Conference on Computer Vision and Pattern Recognition. Miami, Florida, USA: IEEE, 2009. 1794−1801"
   },
   {
    "n": 136,
@@ -761,7 +761,7 @@
   },
   {
    "n": 190,
-   "text": "Yao R, Shi Q F, Shen C H, Zhang Y N, van den Hengel A. Part-based visual tracking with online latent structural learning. In: Proceedings of the 2013 IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Port- land, OR, USA: IEEE, 2013. 2363−2370 1488 自 动 化 学 报"
+   "text": "Yao R, Shi Q F, Shen C H, Zhang Y N, van den Hengel A. Part-based visual tracking with online latent structural learning. In: Proceedings of the 2013 IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Port- land, OR, USA: IEEE, 2013. 2363−2370"
   },
   {
    "n": 191,
@@ -909,7 +909,7 @@
   },
   {
    "n": 227,
-   "text": "Kristan M, Pﬂugfelder R, Leonardis A, Matas J, ˇCehovin L, Nebehay G, Voj´ıˇr T, Fern´andez G, Lukeˇziˇc A, Dimitriev A, Petrosino A, Saﬀari A, Li B, Han B, Heng C, Garcia C, Pangerˇsiˇc D, H¨ager G, Khan F S, Oven F, Possegger H, Bischof H, Nam H, Zhu J K, Li J J, Choi J Y, Choi J W, Hen- riques J F, van de Weijer J, Batista J, Lebeda K, ¨Ofj¨all K, Yi K M, Qin L, Wen L Y, Maresca M E, Danelljan M, Fels- berg M, Cheng M M, Torr P, Huang Q M, Bowden R, Hare S, Lim S Y, Hong S, Liao S C, Hadﬁeld S, Li S Z, Duﬀner S, Golodetz S, Mauthner T, Vineet V, Lin W Y, Li Y, Qi Y K, Lei Z, Niu Z H. The visual object tracking VOT2014 chal- lenge results. In: Proceedings of the European Conference on Computer Vision (ECCV 2014), Lecture Notes in Com- puter Science. Zurich, Switzerland: Springer International Publishing, 2015. 191−217 尹宏鹏 重庆大学自动化学院副教授. 2009 年获得重庆大学博士学位. 主要研 究方向为模式识别, 图像处理与计算机 视觉. 本文通信作者. E-mail: yinhongpeng@gmail.com (YIN Hong-Peng Associate pro- fessor at the College of Automation, Chongqing University. He received his Ph. D. degree from Chongqing University in 2009. His re- search interest covers pattern recognition, image process- ing, and computer vision. Corresponding author of this paper.) 陈波 重庆大学自动化学院硕士研究 生. 2015 年获得重庆大学学士学位. 主 要研究方向为深度学习, 计算机视觉. E-mail: qiurenbieyuan@gmail.com (CHEN Bo Master student at the College of Automation, Chongqing Uni- versity. He received his bachelor′s degree from Chongqing University in 2015. His research interest covers deep learning and com- puter vision.) 柴毅 重庆大学自动化学院教授. 2001 年获得重庆大学博士学位. 主要研究方 向为信息处理, 融合与控制, 计算机网络 与系统控制. E-mail: chaiyi@cqu.edu.cn (CHAI Yi Professor at the Col- lege of Automation, Chongqing Univer- sity. He received his Ph. D. degree from Chongqing University in 2001. His research interest covers information processing, integration and control, and com- puter network and system control.) 刘兆栋 重庆大学自动化学院博士研究 生. 主要研究方向为稀疏表示, 机器学习. E-mail: liuzhaodong@cqu.edu.cn (LIU Zhao-Dong Ph. D. candi- date at the College of Automation, Chongqing University. His research in- terest covers sparse representation and machine learning.)"
+   "text": "Kristan M, Pﬂugfelder R, Leonardis A, Matas J, ˇCehovin L, Nebehay G, Voj´ıˇr T, Fern´andez G, Lukeˇziˇc A, Dimitriev A, Petrosino A, Saﬀari A, Li B, Han B, Heng C, Garcia C, Pangerˇsiˇc D, H¨ager G, Khan F S, Oven F, Possegger H, Bischof H, Nam H, Zhu J K, Li J J, Choi J Y, Choi J W, Hen- riques J F, van de Weijer J, Batista J, Lebeda K, ¨Ofj¨all K, Yi K M, Qin L, Wen L Y, Maresca M E, Danelljan M, Fels- berg M, Cheng M M, Torr P, Huang Q M, Bowden R, Hare S, Lim S Y, Hong S, Liao S C, Hadﬁeld S, Li S Z, Duﬀner S, Golodetz S, Mauthner T, Vineet V, Lin W Y, Li Y, Qi Y K, Lei Z, Niu Z H. The visual object tracking VOT2014 chal- lenge results. In: Proceedings of the European Conference on Computer Vision (ECCV 2014), Lecture Notes in Com- puter Science. Zurich, Switzerland: Springer International Publishing, 2015. 191−217"
   }
  ]
 }

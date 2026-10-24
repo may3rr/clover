@@ -1,11 +1,11 @@
 # 中文测试集参考文献总表
 
-> 用途：5 篇中文底稿的完整参考文献列表。**中文条目**请在知网逐条下载 PDF，放入对应论文的 `ref/` 文件夹（作为支持度证据的本地原文）；**英文条目**无需知网，系统联网（Crossref/OpenAlex/Semantic Scholar）核验即可，如也想要本地 PDF 可自行补齐。
+> 用途：5 篇中文底稿的完整参考文献列表。**中文条目**请在知网逐条下载 PDF，放入对应论文的 `ref/` 文件夹（作为支持度证据的本地原文）；**英文条目**无需知网，系统联网（Crossref/OpenAlex/Semantic Scholar）核验即可。语言判定：剔除万方对英文条目使用的「等」（et al.）标记后，条目含汉字才算中文。注意两类形似英文的中文文献：万方把作者名罗马化后用「等」结尾；自动化学报把中文文献著录成拼音作者 + 英文题名，并在括号内附中文原文（检索知网时直接用括号里的中文题名）。
 
 
 ## 顾迎捷, 桂小林, 李德福, 沈毅, 廖东. 基于神经网络的机器阅读理解综述. 软件学报, 2020, 31(7): 2095-2126. DOI 10.13328/j.cnki.jos.006048
 
-- 来源：官网 HTML 全文（jos.org.cn），逐条原文
+- 来源：
 - 共 130 条 = 中文 0 条（知网下载） + 英文 130 条（联网核验）
 
 | # | 参考文献条目 | 语言 |
@@ -143,8 +143,8 @@
 
 ## 刘峤, 李杨, 段宏, 刘瑶, 秦志光. 知识图谱构建技术综述. 计算机研究与发展, 2016, 53(3): 582-600. DOI 10.7544/issn1000-1239.2016.20148228
 
-- 来源：万方数据（分页抓取），逐条原文
-- 共 47 条 = 中文 30 条（知网下载） + 英文 17 条（联网核验）
+- 来源：万方数据（参考文献分页抓取，共47条）
+- 共 47 条 = 中文 14 条（知网下载） + 英文 33 条（联网核验）
 
 | # | 参考文献条目 | 语言 |
 | --- | --- | --- |
@@ -158,48 +158,48 @@
 | 8 | 王亦雷 , 嵇智源 , 夏勇 ,等. 移动用户人口统计信息预测 [J]. 电子科技大学学报 . 2015 ,(6).917-920,933. DOI: 10.3969/j.issn.1001-0548.2015.06.021 . | 中文 |
 | 9 | 丁哲 , 秦臻 , 郑文韬 ,等. 基于移动用户浏览行为的推荐模型 [J]. 电子科技大学学报 . 2017 ,46(6).907-912. DOI: 10.3969/j.issn.1001-0548.2017.06.020 . | 中文 |
 | 10 | 吴劲 , 陈志慧 . 基于Event-B的形式化建模关键技术研究 [J]. 电子科技大学学报 . 2014 ,(3).405-408. DOI: 10.3969/j.issn.1001-0548.2014.03.015 . 1 2 3 6 | 中文 |
-| 11 | Nguyen Thanh,Moreira Viviane,Nguyen Huong,等.Multilingual schema matching for Wikipedia infoboxes[J].Proc. VLDB Endow..2011.133-144.DOI:10.14778/2078324.2078329 . | 中文 |
+| 11 | Nguyen Thanh,Moreira Viviane,Nguyen Huong,等.Multilingual schema matching for Wikipedia infoboxes[J].Proc. VLDB Endow..2011.133-144.DOI:10.14778/2078324.2078329 . | 英文 |
 | 12 | Bizer, C,Heath, T,Berners-Lee, T.Linked Data - The Story So Far[J].International journal on Semantic Web & information systems.2009,5(3). | 英文 |
 | 13 | KATHLEEN M. CARLEY,BRADLEY MALIN,EDOARDO AIROLDI.A Network Analysis Model for Disambiguation of Names in Lists[J].Computational & Mathematical Organization Theory.2005,11(2). | 英文 |
-| 14 | Te-Won Lee,Girolami M.,Sejnowski T.J.,等.Blind source separation of more sources than mixtures usingovercomplete representations[J].IEEE signal processing letters.1999,6(4). | 中文 |
+| 14 | Te-Won Lee,Girolami M.,Sejnowski T.J.,等.Blind source separation of more sources than mixtures usingovercomplete representations[J].IEEE signal processing letters.1999,6(4). | 英文 |
 | 15 | V Richard Benjamins,Rudi Studer,Dieter Fensel.Knowledge Engineering: Principles and methods[J].Data & Knowledge Engineering.1998,25(1). | 英文 |
 | 16 | Jim Cowie,Wendy Lehnert.Information extraction[J].Communications of the ACM.1996,39 (1).80-91. | 英文 |
 | 17 | Jerry R. Hobbs.Resolving pronoun references[J].Lingua.1978,44(4).311-338.DOI:10.1016/0024-3841(78)90006-2 . | 英文 |
 | 18 | Zellig S. Harris.Distributional Structure[J].Word.1954,10(2-3).146-162.DOI:10.1080/00437956.1954.11659520 . | 英文 |
-| 19 | Zhigang Wang,Juanzi Li,Shuangjie Li,等.Cross-Lingual Knowledge Validation Based Taxonomy Derivation from Heterogeneous Online Wikis[C].2014. | 中文 |
+| 19 | Zhigang Wang,Juanzi Li,Shuangjie Li,等.Cross-Lingual Knowledge Validation Based Taxonomy Derivation from Heterogeneous Online Wikis[C].2014. | 英文 |
 | 20 | Jonathan Berant,Percy Liang.Semantic Parsing via Paraphrasing[C].2014. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
 | 21 | Xuchen Yao,Benjamin Van Durme.Information Extraction over Structured Data: Question Answering with Freebase[C].2014. | 英文 |
 | 22 | Zhichun Wang,Juanzi Li,Jie Tang.Boosting Cross-Lingual Knowledge Linking via Concept Annotation[C].2013. | 英文 |
-| 23 | Zhigang Wang,Zhixing Li,Juanzi Li,等.Transfer Learning Based Cross-lingual Knowledge Extraction for Wikipedia[C].2013. | 中文 |
-| 24 | Yi Zeng,Dongsheng Wang,Tielin Zhang,等.CASIA-KB: A Multi-source Chinese Semantic Knowledge Base Built from Structured and Unstructured Web Data[C].2013. | 中文 |
-| 25 | Kaushik Chakrabarti,Surajit Chaudhuri,Tao Cheng,等.A Framework for Robust Discovery of Entity Synonyms[C].2012. | 中文 |
-| 26 | Xueqing Liu,Yangqiu Song,Shixia Liu,等.Automatic Taxonomy Construction from Keywords[C].2012. | 中文 |
-| 27 | Wei Shen,Jianyong Wang,Ping Luo,等.LINDEN: Linking Named Entities with Knowledge Base via Semantic Knowledge[C].2012. | 中文 |
+| 23 | Zhigang Wang,Zhixing Li,Juanzi Li,等.Transfer Learning Based Cross-lingual Knowledge Extraction for Wikipedia[C].2013. | 英文 |
+| 24 | Yi Zeng,Dongsheng Wang,Tielin Zhang,等.CASIA-KB: A Multi-source Chinese Semantic Knowledge Base Built from Structured and Unstructured Web Data[C].2013. | 英文 |
+| 25 | Kaushik Chakrabarti,Surajit Chaudhuri,Tao Cheng,等.A Framework for Robust Discovery of Entity Synonyms[C].2012. | 英文 |
+| 26 | Xueqing Liu,Yangqiu Song,Shixia Liu,等.Automatic Taxonomy Construction from Keywords[C].2012. | 英文 |
+| 27 | Wei Shen,Jianyong Wang,Ping Luo,等.LINDEN: Linking Named Entities with Knowledge Base via Semantic Knowledge[C].2012. | 英文 |
 | 28 | Xiao Ling,Daniel S. Weld.Fine-Grained Entity Recognition[C].2012. | 英文 |
-| 29 | Mausam,Michael Schmitz,Robert Bart,等.Open Language Learning for Information Extraction[C].2012. | 中文 |
+| 29 | Mausam,Michael Schmitz,Robert Bart,等.Open Language Learning for Information Extraction[C].2012. | 英文 |
 | 30 | Zhichun Wang,Juanzi Li,Zhigang Wang,等.Cross-lingual Knowledge Linking Across Wiki Knowledge Bases[C].2012. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
 | 31 | Alan Akbik,Alexander Loeser.KrakeN: N-ary Facts in Open Information Extraction[C].2012. | 英文 |
 | 32 | Prithviraj Sen.Collective Context-Aware Topic Models for Entity Disambiguation[C].2012. | 英文 |
-| 33 | Wentao Wu,Hongsong Li,Haixun Wang,等.Probase: A Probabilistic Taxonomy for Text Understanding[C].2012. | 中文 |
+| 33 | Wentao Wu,Hongsong Li,Haixun Wang,等.Probase: A Probabilistic Taxonomy for Text Understanding[C].2012. | 英文 |
 | 34 | Ni Lao,Tom Mitchell,William W. Cohen.Random Walk Inference and Learning in A Large Scale Knowledge Base[C].2011. | 英文 |
 | 35 | Anthony Fader,Stephen Soderland,Oren Etzioni.Identifying Relations for Open Information Extraction[C].2011. | 英文 |
-| 36 | Lev Ratinov,Dan Roth,Doug Downey,等.Local and Global Algorithms for Disambiguation to Wikipedia[C].2011. | 中文 |
+| 36 | Lev Ratinov,Dan Roth,Doug Downey,等.Local and Global Algorithms for Disambiguation to Wikipedia[C].2011. | 英文 |
 | 37 | Xianpei Han,Le Sun,Jun Zhao.Collective Entity Linking in Web Text: A Graph-Based Method[C].2011. | 英文 |
-| 38 | Xiaohua Liu,Shaodian Zhang,Furu Wei,等.Recognizing Named Entities in Tweets[C].2011. | 中文 |
-| 39 | Ochs, Christopher,Tian, Tian,Geller, James,等.Google Knows Who is Famous Today -- Building an Ontology from Search Engine Knowledge and DBpedia[C].2011. | 中文 |
+| 38 | Xiaohua Liu,Shaodian Zhang,Furu Wei,等.Recognizing Named Entities in Tweets[C].2011. | 英文 |
+| 39 | Ochs, Christopher,Tian, Tian,Geller, James,等.Google Knows Who is Famous Today -- Building an Ontology from Search Engine Knowledge and DBpedia[C].2011. | 英文 |
 | 40 | Alpa Jain,Marco Pennacchiotti.Open Entity Extraction fromWeb Search Query Logs[C].2010. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
 | 41 | Fei Wu,Daniel S. Weld.Open Information Extraction using Wikipedia[C].2010. | 英文 |
-| 42 | Jun Zhu,Zaiqing Nie,Xiaojing Liu,等.StatSnowball: a Statistical Approach to Extracting Entity Relationships[C].2009. | 中文 |
+| 42 | Jun Zhu,Zaiqing Nie,Xiaojing Liu,等.StatSnowball: a Statistical Approach to Extracting Entity Relationships[C].2009. | 英文 |
 | 43 | Michele Banko,Oren Etzioni.The Tradeoffs Between Open and Traditional Relation Extraction[C].2008. | 英文 |
-| 44 | Soren Auer,Christian Bizer,Georgi Kobilarov,等.DBpedia: A Nucleus for a Web of Open Data[C].2007. | 中文 |
-| 45 | Fei Wu,Daniel S. Weld,PFei Wu,等.Autonomously semantifying wikipedia[C].2007. | 中文 |
+| 44 | Soren Auer,Christian Bizer,Georgi Kobilarov,等.DBpedia: A Nucleus for a Web of Open Data[C].2007. | 英文 |
+| 45 | Fei Wu,Daniel S. Weld,PFei Wu,等.Autonomously semantifying wikipedia[C].2007. | 英文 |
 | 46 | Amit Bagga,Breck Baldwin.Entity-Based Cross-document Coreferencing Using the Vector Space Model[C].1998. | 英文 |
 | 47 | Rau, L.F.,Institute of Electric and Electronic Engineer.Extracting company names from text[C].1991. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
 
 ## 尹宏鹏, 陈波, 柴毅, 刘兆栋. 基于视觉的目标检测与跟踪综述. 自动化学报, 2016, 42(10): 1466-1489. DOI 10.16383/j.aas.2016.c150823
 
-- 来源：自动化学报官网 PDF（pymupdf 双栏抽取），逐条原文
-- 共 227 条 = 中文 15 条（知网下载） + 英文 212 条（联网核验）
+- 来源：自动化学报官网 PDF（pymupdf 双栏抽取，已滤页眉页脚）
+- 共 227 条 = 中文 8 条（知网下载） + 英文 219 条（联网核验）
 
 | # | 参考文献条目 | 语言 |
 | --- | --- | --- |
@@ -212,7 +212,7 @@
 | 7 | Everingham M, Van Gool L, Williams C K I, Winn J, Zis- serman A. The pascal visual object classes (VOC) challenge. International Journal of Computer Vision, 2010, 88(2): 303−338 | 英文 |
 | 8 | Rautaray S S, Agrawal A. Vision based hand gesture recog- nition for human computer interaction: a survey. Artiﬁcial Intelligence Review, 2015, 43(1): 1−54 | 英文 |
 | 9 | Gao Y, Spiteri C, Pham M T, Al-Milli S. A survey on re- cent object detection techniques useful for monocular vision- based planetary terrain classiﬁcation. Robotics and Au- tonomous Systems, 2014, 62(2): 151−167 | 英文 |
-| 10 | 期 尹宏鹏等: 基于视觉的目标检测与跟踪综述 1481 类器模型的产生、调整以及整合, 将有助于适应高维 数据的分类任务. References | 中文 |
+| 10 | Zhang S P, Yao H X, Sun X, Lu X S. Sparse coding based vi- sual tracking: review and experimental comparison. Pattern Recognition, 2013, 46(7): 1772−1788 | 英文 |
 | 11 | Li X, Hu W M, Shen C H, Zhang Z F, Dick A, van den Hen- gel A. A survey of appearance models in visual object track- ing. ACM transactions on Intelligent Systems and Technol- ogy (TIST), 2013, 4(4): Article No. 58 | 英文 |
 | 12 | Gao Shi-Bo, Cheng Yong-Mei, Xiao Li-Ping, Wei Hai-Ping. Recent advances of sparse representation for object detec- tion. Acta Electronica Sinica, 2015, 43(2): 320−332 (高仕博, 程咏梅, 肖利平, 韦海萍. 面向目标检测的稀疏表示方法研 究进展. 电子学报, 2015, 43(2): 320−332) | 中文 |
 | 13 | Piccardi M. Background subtraction techniques: a review. In: Proceedings of the 2004 IEEE International Conference on Systems, Man and Cybernetics. The Hague, Holland: IEEE, 2004. 3099−3104 | 英文 |
@@ -229,7 +229,7 @@
 | 24 | Wang H Z, Suter D. A novel robust statistical method for background initialization and visual surveillance. In: Pro- ceedings of the 7th Asian Conference on Computer Vision (ACCV 2006). Hyderabad, India: Springer, 2006. 328−337 | 英文 |
 | 25 | Colombari A, Fusiello A. Patch-based background initializa- tion in heavily cluttered video. IEEE Transactions on Image Processing, 2010, 19(4): 926−933 | 英文 |
 | 26 | Lee B, Hedley M. Background estimation for video surveil- lance. In: Proceedings of the Image and Vision Computing New Zealand. Auckland, New Zealand, 2002. 315−320 | 英文 |
-| 27 | McFarlane N J B, Schoﬁeld C P. Segmentation and tracking of piglets in images. Machine Vision and Applications, 1995, 8(3): 187−193 1482 自 动 化 学 报 | 中文 |
+| 27 | McFarlane N J B, Schoﬁeld C P. Segmentation and tracking of piglets in images. Machine Vision and Applications, 1995, 8(3): 187−193 | 英文 |
 | 28 | Bouwmans T, El Baf F, Vachon B. Statistical background modeling for foreground detection: a survey. Handbook of Pattern Recognition and Computer Vision. Singapore: World Scientiﬁc Publishing, 2010. 181−189 | 英文 |
 | 29 | Bouwmans T. Recent advanced statistical background mod- eling for foreground detection: a systematic survey. Recent Patents on Computer Science, 2011, 4(3): 147−176 | 英文 |
 | 30 | Butler D E, Bove V M Jr, Sridharan S. Real-time adaptive foreground/background segmentation. EURASIP Journal on Advances in Signal Processing, 2005, 2005: 2292−2304 | 英文 |
@@ -244,7 +244,7 @@
 | 39 | Wren C R, Porikli F. Waviz: spectral similarity for ob- ject detection. In: Proceedings of the 2005 IEEE Interna- tional Workshop on Performance Evaluation of Tracking and Surveillance. Breckenridge, Colorado, USA: IEEE, 2005. 55−61 | 英文 |
 | 40 | Baltieri D, Vezzani R, Cucchiara R. Fast background initial- ization with recursive Hadamard transform. In: Proceed- ings of the 7th IEEE International Conference on Advanced Video and Signal Based Surveillance (AVSS). Boston, USA: IEEE, 2010. 165−171 | 英文 |
 | 41 | Bouwmans T, El Baf F, Vachon B. Background model- ing using mixture of gaussians for foreground detection — a survey. Recent Patents on Computer Science, 2008, 1(3): 219−237 | 英文 |
-| 42 | 卷 | 中文 |
+| 42 | Lin H H, Liu T L, Chuang J H. A probabilistic SVM ap- proach for background scene initialization. In: Proceedings of the 2002 International Conference on Image Processing. Rochester, New York, USA: IEEE, 2002. 893−896 | 英文 |
 | 43 | Maddalena L, Petrosino A. The SOBS algorithm: what are the limits? In: Proceedings of the 2012 IEEE Computer Society Conference on Computer Vision and Pattern Recog- nition Workshops (CVPRW). Providence, RI, USA: IEEE, 2012. 21−26 | 英文 |
 | 44 | Maddalena L, Petrosino A. The 3dSOBS+ algorithm for moving object detection. Computer Vision and Image Un- derstanding, 2014, 122: 65−73 | 英文 |
 | 45 | Goyette N, Jodoin P M, Porikli F, Konrad J, Ishwar P. Changedetection.net: a new change detection benchmark dataset. In: Proceedings of the 2012 IEEE Computer So- ciety Conference on Computer Vision and Pattern Recog- nition Workshops (CVPRW). Providence, RI, USA: IEEE, 2012. 1−8 | 英文 |
@@ -283,7 +283,7 @@
 | 78 | Vadivel A, Sural S, Majumdar A K. An integrated color and intensity co-occurrence matrix. Pattern Recognition Letters, 2007, 28(8): 974−983 | 英文 |
 | 79 | Walk S, Majer N, Schindler K, Schiele B. New features and insights for pedestrian detection. In: Proceedings of the 2010 IEEE Conference on Computer Vision and Pat- tern Recognition (CVPR). San Francisco, CA, USA: IEEE, 2010. 1030−1037 | 英文 |
 | 80 | Shechtman E, Irani M. Matching local self-similarities across images and videos. In: Proceedings of the 2007 IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Minneapolis, Minnesota, USA: IEEE, 2007. 1−8 | 英文 |
-| 81 | Deselaers T, Ferrari V. Global and eﬃcient self-similarity for object classiﬁcation and detection. In: Proceedings of the 2010 IEEE Conference on Computer Vision and Pat- tern Recognition (CVPR). San Francisco, CA, USA: IEEE, 2010. 1633−1640 1484 自 动 化 学 报 | 中文 |
+| 81 | Deselaers T, Ferrari V. Global and eﬃcient self-similarity for object classiﬁcation and detection. In: Proceedings of the 2010 IEEE Conference on Computer Vision and Pat- tern Recognition (CVPR). San Francisco, CA, USA: IEEE, 2010. 1633−1640 | 英文 |
 | 82 | Tuzel O, Porikli F, Meer P. Human detection via classiﬁca- tion on Riemannian manifolds. In: Proceedings of the 2007 IEEE Conference on Computer Vision and Pattern Recog- nition (CVPR). Minneapolis, Minnesota, USA: IEEE, 2007. 1−8 | 英文 |
 | 83 | Burghouts G J, Geusebroek J M. Performance evaluation of local colour invariants. Computer Vision and Image Under- standing, 2009, 113(1): 48−62 | 英文 |
 | 84 | Bosch A, Zisserman A, Mu˜noz X. Scene classiﬁcation using a hybrid generative/discriminative approach. IEEE Trans- actions on Pattern Analysis and Machine Intelligence, 2008, 30(4): 712−727 | 英文 |
@@ -337,7 +337,7 @@
 | 132 | Sch¨olkopf B, Smola A J. Learning with Kernels: Support Vector Machines, Regularization, Optimization, and Be- yond. London, England: MIT Press, 2002. | 英文 |
 | 133 | Lu Z W, Ip H H S. Image categorization with spatial mis- match kernels. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. Miami, Florida, USA: IEEE, 2009. 3974−404 | 英文 |
 | 134 | Lazebnik S, Schmid C, Ponce J. Beyond bags of features: spatial pyramid matching for recognizing natural scene cate- gories. In: Proceedings of the 2006 IEEE Computer Society Conference on Computer Vision and Pattern Recognition. New York, USA: IEEE, 2006. 2169−2178 | 英文 |
-| 135 | Yang J C, Yu K, Gong Y H, Huang T. Linear spatial pyramid matching using sparse coding for image classiﬁ- cation. In: Proceedings of the 2009 IEEE Conference on Computer Vision and Pattern Recognition. Miami, Florida, USA: IEEE, 2009. 1794−1801 1486 自 动 化 学 报 | 中文 |
+| 135 | Yang J C, Yu K, Gong Y H, Huang T. Linear spatial pyramid matching using sparse coding for image classiﬁ- cation. In: Proceedings of the 2009 IEEE Conference on Computer Vision and Pattern Recognition. Miami, Florida, USA: IEEE, 2009. 1794−1801 | 英文 |
 | 136 | Kavukcuoglu K, Ranzato M A, Fergus R, LeCun Y. Learn- ing invariant features through topographic ﬁlter maps. In: Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition. Miami, Florida, USA: IEEE, 2009. 1605−1612 | 英文 |
 | 137 | Gao S H, Tsang I W H, Chia L T, Zhao P L. Local fea- tures are not lonely-Laplacian sparse coding for image clas- siﬁcation. In: Proceedings of the 2010 IEEE Conference on Computer Vision and Pattern Recognition. San Francisco, CA, USA: IEEE, 2010. 3555−3561 | 英文 |
 | 138 | Meshram S B, Shinde S M. A survey on ensemble meth- ods for high dimensional data classiﬁcation in biomedicine ﬁeld. International Journal of Computer Applications, 2015, 111(11): 5−7 | 英文 |
@@ -392,7 +392,7 @@
 | 187 | Avidan S. Support vector tracking. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2004, 26(8): 1064−1072 | 英文 |
 | 188 | Williams O, Blake A, Cipolla R. Sparse Bayesian learning for eﬃcient visual tracking. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2005, 27(8): 1292−1304 | 英文 |
 | 189 | Tian M, Zhang W W, Liu F Q. On-line ensemble SVM for robust object tracking. In: Proceedings of the 8th Asian Conference on Computer Vision (ACCV 2007). Tokyo, Japan: Springer, 2007. 355−364 | 英文 |
-| 190 | Yao R, Shi Q F, Shen C H, Zhang Y N, van den Hengel A. Part-based visual tracking with online latent structural learning. In: Proceedings of the 2013 IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Port- land, OR, USA: IEEE, 2013. 2363−2370 1488 自 动 化 学 报 | 中文 |
+| 190 | Yao R, Shi Q F, Shen C H, Zhang Y N, van den Hengel A. Part-based visual tracking with online latent structural learning. In: Proceedings of the 2013 IEEE Conference on Computer Vision and Pattern Recognition (CVPR). Port- land, OR, USA: IEEE, 2013. 2363−2370 | 英文 |
 | 191 | Bai Y C, Tang M. Robust tracking via weakly supervised ranking SVM. In: Proceedings of the 2012 IEEE Confer- ence on Computer Vision and Pattern Recognition (CVPR). Providence, RI, USA: IEEE, 2012. 1854−1861 | 英文 |
 | 192 | Hare S, Saﬀari A, Torr P H S. Struck: structured output tracking with kernels. In: Proceedings of the 2011 Interna- tional Conference on Computer Vision (ICCV). Barcelona, Spain: IEEE, 2011. 263−270 | 英文 |
 | 193 | Tang F, Brennan S, Zhao Q, Tao H. Co-tracking using semi- supervised support vector machines. In: Proceedings of the 11th IEEE International Conference on Computer Vision. Rio de Janeiro, Brazil: IEEE, 2007. 1−8 | 英文 |
@@ -429,12 +429,12 @@
 | 224 | Doll´ar P, Belongie S, Perona P. The fastest pedestrian de- tector in the west. In: Proceedings of the 2010 British Ma- chine Vision Conference. Aberystwyth, UK: British Machine Vision Association, 2010. 68.1−68.11 | 英文 |
 | 225 | Hare S, Golodetz S, Saﬀari A, Vineet V, Cheng M M, Hicks S, Torr P. Struck: structured output tracking with kernels. IEEE Transactions on Pattern Analysis and Machine Intel- ligence, DOI: 10.1109/TPAMI.2015.2509974 | 英文 |
 | 226 | Babenko B, Yang M H, Belongie S. Robust object tracking with online multiple instance learning. IEEE Transactions on Pattern Analysis and Machine Intelligence, 2011, 33(8): 1619−1632 | 英文 |
-| 227 | Kristan M, Pﬂugfelder R, Leonardis A, Matas J, ˇCehovin L, Nebehay G, Voj´ıˇr T, Fern´andez G, Lukeˇziˇc A, Dimitriev A, Petrosino A, Saﬀari A, Li B, Han B, Heng C, Garcia C, Pangerˇsiˇc D, H¨ager G, Khan F S, Oven F, Possegger H, Bischof H, Nam H, Zhu J K, Li J J, Choi J Y, Choi J W, Hen- riques J F, van de Weijer J, Batista J, Lebeda K, ¨Ofj¨all K, Yi K M, Qin L, Wen L Y, Maresca M E, Danelljan M, Fels- berg M, Cheng M M, Torr P, Huang Q M, Bowden R, Hare S, Lim S Y, Hong S, Liao S C, Hadﬁeld S, Li S Z, Duﬀner S, Golodetz S, Mauthner T, Vineet V, Lin W Y, Li Y, Qi Y K, Lei Z, Niu Z H. The visual object tracking VOT2014 chal- lenge results. In: Proceedings of the European Conference on Computer Vision (ECCV 2014), Lecture Notes in Com- puter Science. Zurich, Switzerland: Springer International Publishing, 2015. 191−217 尹宏鹏 重庆大学自动化学院副教授. 2009 年获得重庆大学博士学位. 主要研 究方向为模式识别, 图像处理与计算机 视觉. 本文通信作者. E-mail: yinhongpeng@gmail.com (YIN Hong-Peng Associate pro- fessor at the College of Automation, Chongqing University. He received his Ph. D. degree from Chongqing University in 2009. His re- search interest covers pattern recognition, image process- ing, and computer vision. Corresponding author of this paper.) 陈波 重庆大学自动化学院硕士研究 生. 2015 年获得重庆大学学士学位. 主 要研究方向为深度学习, 计算机视觉. E-mail: qiurenbieyuan@gmail.com (CHEN Bo Master student at the College of Automation, Chongqing Uni- versity. He received his bachelor′s degree from Chongqing University in 2015. His research interest covers deep learning and com- puter vision.) 柴毅 重庆大学自动化学院教授. 2001 年获得重庆大学博士学位. 主要研究方 向为信息处理, 融合与控制, 计算机网络 与系统控制. E-mail: chaiyi@cqu.edu.cn (CHAI Yi Professor at the Col- lege of Automation, Chongqing Univer- sity. He received his Ph. D. degree from Chongqing University in 2001. His research interest covers information processing, integration and control, and com- puter network and system control.) 刘兆栋 重庆大学自动化学院博士研究 生. 主要研究方向为稀疏表示, 机器学习. E-mail: liuzhaodong@cqu.edu.cn (LIU Zhao-Dong Ph. D. candi- date at the College of Automation, Chongqing University. His research in- terest covers sparse representation and machine learning.) | 中文 |
+| 227 | Kristan M, Pﬂugfelder R, Leonardis A, Matas J, ˇCehovin L, Nebehay G, Voj´ıˇr T, Fern´andez G, Lukeˇziˇc A, Dimitriev A, Petrosino A, Saﬀari A, Li B, Han B, Heng C, Garcia C, Pangerˇsiˇc D, H¨ager G, Khan F S, Oven F, Possegger H, Bischof H, Nam H, Zhu J K, Li J J, Choi J Y, Choi J W, Hen- riques J F, van de Weijer J, Batista J, Lebeda K, ¨Ofj¨all K, Yi K M, Qin L, Wen L Y, Maresca M E, Danelljan M, Fels- berg M, Cheng M M, Torr P, Huang Q M, Bowden R, Hare S, Lim S Y, Hong S, Liao S C, Hadﬁeld S, Li S Z, Duﬀner S, Golodetz S, Mauthner T, Vineet V, Lin W Y, Li Y, Qi Y K, Lei Z, Niu Z H. The visual object tracking VOT2014 chal- lenge results. In: Proceedings of the European Conference on Computer Vision (ECCV 2014), Lecture Notes in Com- puter Science. Zurich, Switzerland: Springer International Publishing, 2015. 191−217 | 英文 |
 
 ## 罗会兰, 陈鸿坤. 基于深度学习的目标检测研究综述. 电子学报, 2020, 48(6): 1230-1239. DOI 10.3969/j.issn.0372-2112.2020.06.026
 
-- 来源：万方数据（注意：万方仅数字化 17 条，条目以知网 PDF 为准）
-- 共 17 条 = 中文 11 条（知网下载） + 英文 6 条（联网核验）
+- 来源：万方数据
+- 共 17 条 = 中文 5 条（知网下载） + 英文 12 条（联网核验）
 
 | # | 参考文献条目 | 语言 |
 | --- | --- | --- |
@@ -444,22 +444,22 @@
 | 4 | 周飞燕,金林鹏,董军.卷积神经网络研究综述[J].计算机学报.2017,(6).DOI:10.11897/SP.J.1016.2017.01229 . | 中文 |
 | 5 | 毕威,黄伟国,张永萍,等.基于图像显著轮廓的目标检测[J].电子学报.2017,(8).DOI:10.3969/j.issn.0372-2112.2017.08.014 . | 中文 |
 | 6 | Kartik Umesh Sharma,Nileshsingh V. Thakur.A review and an approach for object detection in images[J].International journal of computational vision and robotics.2017,7(1/2).196-237. | 英文 |
-| 7 | Deng, Jia,Khosla, Aditya,Bernstein, Michael,等.ImageNet Large Scale Visual Recognition Challenge[J].International Journal of Computer Vision.2015,115(3). | 中文 |
-| 8 | Uijlings, J.R.R.,Van De Sande, K.E.A.,Smeulders, A.W.M.,等.Selective search for object recognition[J].International Journal of Computer Vision.2013,104(2). | 中文 |
-| 9 | Everingham, M,Winn, J,Van Gool, L,等.The Pascal Visual Object Classes (VOC) Challenge[J].International Journal of Computer Vision.2010,88(2). | 中文 |
+| 7 | Deng, Jia,Khosla, Aditya,Bernstein, Michael,等.ImageNet Large Scale Visual Recognition Challenge[J].International Journal of Computer Vision.2015,115(3). | 英文 |
+| 8 | Uijlings, J.R.R.,Van De Sande, K.E.A.,Smeulders, A.W.M.,等.Selective search for object recognition[J].International Journal of Computer Vision.2013,104(2). | 英文 |
+| 9 | Everingham, M,Winn, J,Van Gool, L,等.The Pascal Visual Object Classes (VOC) Challenge[J].International Journal of Computer Vision.2010,88(2). | 英文 |
 | 10 | Lowe DG.Distinctive image features from scale-invariant keypoints[J].International Journal of Computer Vision.2004,60(2).91-110. 1 2 | 英文 |
-| 11 | Kaiming He,Xiangyu Zhang,Shaoqing Ren,等.Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition[C].2014. | 中文 |
-| 12 | Tsung-Yi Lin,Michael Maire,Serge Belongie,等.Microsoft COCO: Common Objects in Context[C].2014. | 中文 |
+| 11 | Kaiming He,Xiangyu Zhang,Shaoqing Ren,等.Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition[C].2014. | 英文 |
+| 12 | Tsung-Yi Lin,Michael Maire,Serge Belongie,等.Microsoft COCO: Common Objects in Context[C].2014. | 英文 |
 | 13 | Neubeck, A.,Van Gool, L..Efficient Non-Maximum Suppression[C].2006. | 英文 |
 | 14 | Dalai, N.,Triggs, B..Histograms of oriented gradients for human detection[C].2005. | 英文 |
-| 15 | Girshick, R.,Donahue, J.,Darrell, T.,等.Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation[C]. | 中文 |
+| 15 | Girshick, R.,Donahue, J.,Darrell, T.,等.Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation[C]. | 英文 |
 | 16 | Long, J.,Shelhamer, E.,Darrell, T..Fully convolutional networks for semantic segmentation[C]. | 英文 |
 | 17 | Ross Girshick.Fast R-CNN[C]. 1 2 | 英文 |
 
 ## 赵阳洋, 王振宇, 王佩, 杨添, 张睿. 任务型对话系统研究综述. 计算机学报, 2020, 43(10)
 
-- 来源：万方数据（分页抓取），逐条原文
-- 共 48 条 = 中文 26 条（知网下载） + 英文 22 条（联网核验）
+- 来源：万方数据
+- 共 48 条 = 中文 13 条（知网下载） + 英文 35 条（联网核验）
 
 | # | 参考文献条目 | 语言 |
 | --- | --- | --- |
@@ -476,34 +476,34 @@
 | 11 | 朱坤鸿.多模态教学对话系统研究与实现[D].2018. | 中文 |
 | 12 | 易炼.多模态对话管理系统的研究与实现[D].2014. | 中文 |
 | 13 | 曹均阔. 人机对话系统 [M].电子工业出版社,2017. | 中文 |
-| 14 | Daniel J. Russo,Benjamin Van Roy,Abbas Kazerouni,等.A Tutorial on Thompson Sampling[J].Foundations and trends in machine learning.2018,11(1).1-102.DOI:10.1561/2200000070 . | 中文 |
+| 14 | Daniel J. Russo,Benjamin Van Roy,Abbas Kazerouni,等.A Tutorial on Thompson Sampling[J].Foundations and trends in machine learning.2018,11(1).1-102.DOI:10.1561/2200000070 . | 英文 |
 | 15 | Gatt, Albert,Krahmer, Emiel.Survey of the State of the Art in Natural Language Generation: Core tasks, applications and evaluation[J].The Journal of Artificial Intelligence Research.2018.6165-170. | 英文 |
-| 16 | Hongshen Chen,Xiaorui Liu,Dawei Yin,等.A Survey on Dialogue Systems: Recent Advances and New Frontiers[J].SIGKDD explorations.2017,19(2). | 中文 |
+| 16 | Hongshen Chen,Xiaorui Liu,Dawei Yin,等.A Survey on Dialogue Systems: Recent Advances and New Frontiers[J].SIGKDD explorations.2017,19(2). | 英文 |
 | 17 | Patrícia Cristina Nascimento Souto.Creating Knowledge with and from the Differences: The Required Dialogicality and Dialogical Competences[J].RAI Revista de Administração e Inovação.2015,12(2).60-89.DOI:10.11606/rai.v12i2.100333 . | 英文 |
-| 18 | Mesnil, Gregoire,Dauphin, Yann,Yao, Kaisheng,等.Using Recurrent Neural Networks for Slot Filling in Spoken Language Understanding[J].IEEE/ACM transactions on audio, speech, and language processing.2015,23(3).530-539. | 中文 |
-| 19 | Mnih, Volodymyr,Kavukcuoglu, Koray,Silver, David,等.Human-level control through deep reinforcement learning[J].Nature.2015,518(Feb.26 TN.7540).529-a3.DOI:10.1038/nature14236 . | 中文 |
+| 18 | Mesnil, Gregoire,Dauphin, Yann,Yao, Kaisheng,等.Using Recurrent Neural Networks for Slot Filling in Spoken Language Understanding[J].IEEE/ACM transactions on audio, speech, and language processing.2015,23(3).530-539. | 英文 |
+| 19 | Mnih, Volodymyr,Kavukcuoglu, Koray,Silver, David,等.Human-level control through deep reinforcement learning[J].Nature.2015,518(Feb.26 TN.7540).529-a3.DOI:10.1038/nature14236 . | 英文 |
 | 20 | Shi, Yangyang,Larson, Martha,Jonker, Cathohin M..Recurrent neural network language model adaptation with curriculum learning[J].Computer speech & language.2015,33(1).136-154.DOI:10.1016/j.csl.2014.11.004 . 1 2 3 4 5 | 英文 |
 | 21 | Mairesse,François.Stochastic Language Generation in Dialogue Using Factored Language Models.[J].Computational Linguistics.2014,40(4).763-799.DOI:10.1162/COLI_a_00199 . | 英文 |
 | 22 | OLIVIER PIETQUIN,HELEN HASTIE.A survey on metrics for the evaluation of user simulations[J].The knowledge engineering review.2013,28(1).59-73. | 英文 |
-| 23 | Victor Lopez Salazar,Eduardo M. Eisman Cabeza,Juan Luis Castro Pena,等.A case based reasoning model for multilingual language generation in dialogues[J].Expert Systems with Application.2012,39(8).7330-7337. | 中文 |
+| 23 | Victor Lopez Salazar,Eduardo M. Eisman Cabeza,Juan Luis Castro Pena,等.A case based reasoning model for multilingual language generation in dialogues[J].Expert Systems with Application.2012,39(8).7330-7337. | 英文 |
 | 24 | Yang, Z.,Levow, G.-A.,Meng, H..Predicting User Satisfaction in Spoken Dialog System Evaluation With Collaborative Filtering[J].IEEE journal of selected topics in signal processing.2012,6(8).971-981. | 英文 |
 | 25 | Lemon, O..Learning what to say and how to say it: Joint optimisation of spoken dialogue management and natural language generation[J].Computer speech & language.2011,25(2). | 英文 |
-| 26 | Liu, H.,Lu, R.-Z.,Chen, Y.-Q.,等.Spoken language understanding using weakly supervised learning[J].Computer speech & language.2010,24(2). | 中文 |
+| 26 | Liu, H.,Lu, R.-Z.,Chen, Y.-Q.,等.Spoken language understanding using weakly supervised learning[J].Computer speech & language.2010,24(2). | 英文 |
 | 27 | Thomson, B.,Young, S..Bayesian update of dialogue state: A POMDP framework for spoken dialogue systems[J].Computer speech & language.2010,24(4).562-588.DOI:10.1016/j.csl.2009.07.003 . | 英文 |
-| 28 | Lemon, O.,Shimodaira, H.,Renals, S.,等.Evaluation of a hierarchical reinforcement learning spoken dialogue system[J].Computer speech & language.2010,24(2). | 中文 |
-| 29 | Lee, C.,Kim, K.,Lee, G.G.,等.Hybrid approach to robust dialog management using agenda and dialog examples[J].Computer speech & language.2010,24(4). | 中文 |
-| 30 | Young, S.,Ga?i?, M.,Keizer, S.,等.The Hidden Information State model: A practical framework for POMDP-based spoken dialogue management[J].Computer speech & language.2010,24(2).150-174.DOI:10.1016/j.csl.2009.04.001 . 1 2 3 4 5 | 中文 |
+| 28 | Lemon, O.,Shimodaira, H.,Renals, S.,等.Evaluation of a hierarchical reinforcement learning spoken dialogue system[J].Computer speech & language.2010,24(2). | 英文 |
+| 29 | Lee, C.,Kim, K.,Lee, G.G.,等.Hybrid approach to robust dialog management using agenda and dialog examples[J].Computer speech & language.2010,24(4). | 英文 |
+| 30 | Young, S.,Ga?i?, M.,Keizer, S.,等.The Hidden Information State model: A practical framework for POMDP-based spoken dialogue management[J].Computer speech & language.2010,24(2).150-174.DOI:10.1016/j.csl.2009.04.001 . 1 2 3 4 5 | 英文 |
 | 31 | Weinberger, Kilian Q.,Saul, Lawrence K..Distance Metric Learning for Large Margin Nearest Neighbor Classification.[J].Journal of Machine Learning Research.2009,10(2).207-244. | 英文 |
-| 32 | Tatsuya Kawahara,Ian Lane,Tomoko Matsui,等.Out-of-Domain Utterance Detection Using Classification Confidences of Multiple Topics[J].IEEE transactions on audio, speech, and language processing: A Publication of the IEEE Signal Processing Society.2007,15(1).150-161. | 中文 |
+| 32 | Tatsuya Kawahara,Ian Lane,Tomoko Matsui,等.Out-of-Domain Utterance Detection Using Classification Confidences of Multiple Topics[J].IEEE transactions on audio, speech, and language processing: A Publication of the IEEE Signal Processing Society.2007,15(1).150-161. | 英文 |
 | 33 | Jason D. Williams,Steve Young.Partially observable Markov decision processes for spoken dialog systems[J].Computer speech & language.2007,21(2).393-422. | 英文 |
 | 34 | Peng FC,McCallum A.Information extraction from research papers using conditional random fields[J].Information Processing & Management: Libraries & Information Retrieval Systems & Communication Networks: An International Journal.2006,42(4). | 英文 |
-| 35 | Satinder Singh,Diane Litman,Michael Kearns,等.Optimizing Dialogue Management with Reinforcement Learning: Experiments with the NJFun System[J].The Journal of Artificial Intelligence Research.2002.16105-133. | 中文 |
+| 35 | Satinder Singh,Diane Litman,Michael Kearns,等.Optimizing Dialogue Management with Reinforcement Learning: Experiments with the NJFun System[J].The Journal of Artificial Intelligence Research.2002.16105-133. | 英文 |
 | 36 | Marilyn A. Walker,Owen C. Rambow,Monica Rogati.Training a sentence planner for spoken dialogue using boosting[J].Computer speech & language.2002,16(3-4).409-433. | 英文 |
-| 37 | Glass JR.,Polifroni J.,Seneff S.,等.JUPITER: A telephone-based conversational interface for weather information[J].IEEE Transactions on Speech & Audio Proceeding: A Publication of the IEEE Signal Processing Society.2000,8(1). | 中文 |
+| 37 | Glass JR.,Polifroni J.,Seneff S.,等.JUPITER: A telephone-based conversational interface for weather information[J].IEEE Transactions on Speech & Audio Proceeding: A Publication of the IEEE Signal Processing Society.2000,8(1). | 英文 |
 | 38 | Volker Tresp.A Bayesian Committee Machine[J].Neural computation.2000,12(11).2719-2741. | 英文 |
 | 39 | felix A. Gers,Jurgen Schmidhuber,Fred Cummins.Learning to Forget: Continual Prediction with LSTM[J].Neural computation.2000,12(10).2451-2471. | 英文 |
 | 40 | Hearst M.A.,Dumais S.T..Support vector machines[J].IEEE intelligent systems & their applications.1998,13(4).18-28. 1 2 3 4 5 | 英文 |
-| 41 | M. A. Walker,D. J. Litman,C. A. Kamm,等.Evaluating spoken dialogue agents with PARADISE: Two case studies[J].Computer speech & language.1998,12(4).317-347. | 中文 |
+| 41 | M. A. Walker,D. J. Litman,C. A. Kamm,等.Evaluating spoken dialogue agents with PARADISE: Two case studies[J].Computer speech & language.1998,12(4).317-347. | 英文 |
 | 42 | WATANABE Taro,ARAKI Masahiro,DOSHITA Shuji.Evaluating Dialogue Strategies under Communication Errors Using Computer-to-Computer Simulation[J].IEICE transactions on information & systems.1998,81(9).1025-1033. | 英文 |
 | 43 | S, Hochreiter,J, Schmidhuber.Long short-term memory.[J].Neural computation.1997,9(8).1735-80. | 英文 |
 | 44 | Marvin Minsky.Society of mind: A response to four reviews[J].Artificial Intelligence.1991,48(3).371-396.DOI:10.1016/0004-3702(91)90036-J . | 英文 |
@@ -514,4 +514,4 @@
 
 ---
 
-五篇合计 469 条：中文 82 条（知网下载清单）、英文 387 条（联网核验）。
+五篇合计 469 条：中文 40 条（知网下载清单）、英文 429 条（联网核验）。
