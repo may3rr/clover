@@ -31,6 +31,7 @@ import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
 import {
   ArrowUpDocFillIcon,
+  CheckCircleFillIcon,
   PageIcon,
   DocMagnifyIcon,
   SealOkIllustration,
@@ -86,8 +87,16 @@ export default function ReportScreen({
   const [detailId, setDetailId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [exported, setExported] = useState<string | null>(null)
+  // export result toast: the saved file (with its full path for Finder),
+  // or the error with a retry
+  const [exported, setExported] = useState<{ name: string; path: string } | null>(null)
   const [exportErr, setExportErr] = useState<string | null>(null)
+  const toastTimer = useRef<ReturnType<typeof setTimeout>>()
+  const dismissToast = useCallback(() => {
+    clearTimeout(toastTimer.current)
+    setExported(null)
+    setExportErr(null)
+  }, [])
   const segRefs = useRef(new Map<string, HTMLElement[]>())
 
   // cross-pane hover link, done on the DOM so pointing never re-renders the
@@ -125,8 +134,7 @@ export default function ReportScreen({
   const doExport = useCallback(async () => {
     if (exporting) return
     setExporting(true)
-    setExportErr(null)
-    setExported(null)
+    dismissToast()
     try {
       const r = await apiFetch(`/reports/${jobId}/export`, { method: 'POST' })
       if (!r.ok) {
@@ -136,15 +144,16 @@ export default function ReportScreen({
         return
       }
       const { path } = (await r.json()) as { path: string }
-      setExported(path.split('/').pop() ?? path)
-      window.citecheck.revealInFinder(path)
+      // stay in the app: the toast offers Finder instead of jumping there
+      setExported({ name: path.split('/').pop() ?? path, path })
       onExported(path)
-      setTimeout(() => setExported(null), 4000)
+      toastTimer.current = setTimeout(() => setExported(null), 8000)
     } catch {
       setExportErr('导出失败。请确认本地服务仍在运行。')
     }
     setExporting(false)
-  }, [exporting, jobId, onExported])
+  }, [exporting, jobId, onExported, dismissToast])
+  useEffect(() => () => clearTimeout(toastTimer.current), [])
 
   useEffect(() => {
     registerExport(doExport)
@@ -249,12 +258,32 @@ export default function ReportScreen({
       } else if (e.key === 'Enter') {
         if (selectedId) select(selectedId, true)
       } else if (e.key === 'Escape') {
-        closeDetail()
+        if (exported || exportErr) dismissToast()
+        else closeDetail()
+      } else if (
+        /^[1-5]$/.test(e.key) &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey
+      ) {
+        // 1 = all, 2–5 = the four layers in sidebar order
+        const n = Number(e.key)
+        changeFilter(n === 1 ? null : LAYER_ORDER[n - 2])
       }
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [shown, selectedId, detailId, select, closeDetail])
+  }, [
+    shown,
+    selectedId,
+    detailId,
+    select,
+    closeDetail,
+    changeFilter,
+    exported,
+    exportErr,
+    dismissToast,
+  ])
 
   const step = useCallback(
     (delta: number) => {
@@ -296,6 +325,7 @@ export default function ReportScreen({
           <SideRow
             icon={<SideIcon name="all" />}
             label="全部问题"
+            hotkey="1"
             count={items.length}
             active={filter === null}
             onClick={() => changeFilter(null)}
@@ -310,6 +340,7 @@ export default function ReportScreen({
                 />
               }
               label={LAYER_NAMES[key]}
+              hotkey={String(LAYER_ORDER.indexOf(key) + 2)}
               count={counts[key] ?? 0}
               active={filter === key}
               onClick={() => changeFilter(key)}
@@ -344,19 +375,51 @@ export default function ReportScreen({
 
       {/* ---------- content between sidebar and inspector ---------- */}
       <div
-        className="flex flex-col h-full"
+        className="relative flex flex-col h-full"
         style={{ marginLeft: 240, marginRight: 380, background: 'var(--bg)' }}
       >
+        {(exported || exportErr) && (
+          <div className="toast-wrap">
+            <div className="toast" role="status" key={exported?.path ?? exportErr}>
+              {exported ? (
+                <>
+                  <CheckCircleFillIcon size={18} draw />
+                  <span className="toast-text">已导出 {exported.name}</span>
+                  <button
+                    className="pill-quiet t13"
+                    onClick={() => {
+                      window.citecheck.revealInFinder(exported.path)
+                      dismissToast()
+                    }}
+                  >
+                    在 Finder 中显示
+                  </button>
+                </>
+              ) : (
+                <>
+                  <SevGlyph severity="high" />
+                  <span className="toast-text">{exportErr}</span>
+                  <button className="pill-quiet t13" onClick={doExport}>
+                    重试
+                  </button>
+                </>
+              )}
+              <button
+                className="nav-btn"
+                aria-label="关闭"
+                onClick={dismissToast}
+              >
+                <CloseIcon />
+              </button>
+            </div>
+          </div>
+        )}
         <div
           className={`drag-strip bar-solid strip-edge flex items-center justify-between${scrolled ? ' scrolled' : ''}`}
           style={{ height: 52, flex: 'none', padding: '0 24px' }}
         >
           <div className="font-semibold">{filterName}</div>
           <div className="flex items-center gap-3">
-            {exported && (
-              <span className="t13 secondary">已导出到 {exported}</span>
-            )}
-            {exportErr && <span className="t13 secondary">{exportErr}</span>}
             <button
               className="pill-accent"
               onClick={doExport}
@@ -460,17 +523,20 @@ function SideRow({
   label,
   count,
   active,
+  hotkey,
   onClick,
 }: {
   icon: React.ReactNode
   label: string
   count?: number
   active?: boolean
+  hotkey?: string
   onClick?: () => void
 }) {
   return (
     <button
       className={`side-row ${active ? 'sel' : ''}`}
+      title={hotkey ? `${label}（按 ${hotkey}）` : undefined}
       style={{ fontWeight: active ? 600 : 400 }}
       onClick={onClick}
     >
@@ -757,7 +823,10 @@ function InspectorList({
             <span className="kbd">↑↓</span>切换
           </span>
           <span>
-            <span className="kbd">⏎</span>查看详情
+            <span className="kbd">⏎</span>详情
+          </span>
+          <span>
+            <span className="kbd">1–5</span>分类
           </span>
           <span>
             <span className="kbd">⌘E</span>导出
@@ -765,5 +834,23 @@ function InspectorList({
         </div>
       )}
     </>
+  )
+}
+
+/** 10px stroke cross for dismiss buttons */
+function CloseIcon() {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.6}
+      strokeLinecap="round"
+      aria-hidden
+    >
+      <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" />
+    </svg>
   )
 }

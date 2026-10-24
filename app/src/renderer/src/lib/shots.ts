@@ -93,6 +93,11 @@ export function applyShotState(state: string, ctx: ShotCtx) {
       ctx.setScreen?.('empty')
       ctx.setDrag?.(true)
       return
+    case 'report-dragover':
+      ctx.setReport?.(report ?? null)
+      ctx.setScreen?.('report')
+      ctx.setDrag?.(true)
+      return
     case 'running-shimmer':
       // before "parsed" — placeholder pages + wave
       ctx.setScreen?.('running')

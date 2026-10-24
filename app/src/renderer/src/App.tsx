@@ -8,6 +8,7 @@ import ErrorScreen from './screens/Error'
 import Settings from './screens/Settings'
 import Onboarding, { type OnboardStep } from './screens/Onboarding'
 import Credits from './components/Credits'
+import DropOverlay from './components/DropOverlay'
 import { applyShotState, type ShotCtx } from './lib/shots'
 import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
@@ -263,6 +264,16 @@ export default function App() {
   }, [screen])
 
   // ---------------------------------------------------------------- view
+  // report and settings have no drop zone of their own: the whole window
+  // takes a dragged paper there (home keeps its in-place zone)
+  const dropOverlay = (
+    <DropOverlay
+      enabled={screen === 'report' || screen === 'settings'}
+      force={dragHint && screen === 'report'}
+      onFile={analyze}
+    />
+  )
+
   if (!info) return <div className="h-full" />
   if (screen === 'error') return <ErrorScreen />
 
@@ -292,6 +303,7 @@ export default function App() {
         onPrefs={setPrefs}
         onBack={() => morph(() => setScreen(settingsFrom.current))}
       />
+      {dropOverlay}
       </>
     )
   }
@@ -315,6 +327,7 @@ export default function App() {
 
   if (screen === 'report' && report && jobId) {
     return (
+      <>
       <ReportScreen
         key={jobId}
         report={report}
@@ -333,6 +346,8 @@ export default function App() {
           }
         }}
       />
+      {dropOverlay}
+      </>
     )
   }
 

@@ -1498,3 +1498,60 @@ select {
 @media (prefers-reduced-motion: reduce) {
   .egg-btn, .egg-blink { animation: none; }
 }
+
+/* ========================================================== toast */
+/* floating result bar at the foot of the reading area — a popover, so it
+   is one of the few surfaces allowed the glass shadow */
+.toast-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 24px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: calc(100% - 48px);
+  padding: 8px 8px 8px 16px;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--glass-edge), var(--glass-shadow);
+  animation: cc-rise 240ms var(--ease) both;
+}
+.toast-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===================================================== drop overlay */
+/* a file dragged over any screen but home: the whole window answers */
+.drop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--drop-scrim);
+  animation: cc-fade 160ms var(--ease) both;
+  pointer-events: none;
+}
+.drop-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 48px;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--glass-edge), var(--glass-shadow);
+  animation: cc-rise 240ms var(--ease) both;
+}
