@@ -324,6 +324,33 @@ export function ChevronRightIcon({
   )
 }
 
+/* sidebar toggles — SF "sidebar.leading/trailing": one filled rounded
+   rect with a real die-cut slot (SVG mask, so any pane background shows
+   through), the standard macOS affordance for showing/hiding a pane */
+function _sbShape(slotX: number, p: IconProps) {
+  return (
+    <Fill {...p}>
+      <mask id={`cc-sb-${slotX}`}>
+        <rect width="24" height="24" fill="white" />
+        <rect x={slotX} y="4.75" width="1.5" height="14.5" fill="black" />
+      </mask>
+      <path
+        mask={`url(#cc-sb-${slotX})`}
+        fillRule="evenodd"
+        d="M6.25 4.75h11.5a2.5 2.5 0 0 1 2.5 2.5v9.5a2.5 2.5 0 0 1-2.5 2.5H6.25a2.5 2.5 0 0 1-2.5-2.5V7.25a2.5 2.5 0 0 1 2.5-2.5Z"
+      />
+    </Fill>
+  )
+}
+/** sidebar.leading — toggles the left sidebar pane */
+export function SidebarLeadingIcon(p: IconProps) {
+  return _sbShape(8.75, p)
+}
+/** sidebar.trailing — toggles the right inspector pane */
+export function SidebarTrailingIcon(p: IconProps) {
+  return _sbShape(13.75, p)
+}
+
 export function ChevronUpIcon({ size = 18, color = 'currentColor' }: IconProps) {
   return (
     <svg

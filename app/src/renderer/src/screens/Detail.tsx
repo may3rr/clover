@@ -3,7 +3,7 @@ import type { Report, RefCheck, SectionDist } from '../types/report'
 import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
-import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
+import { ChevronLeftIcon, SidebarTrailingIcon } from '../components/Icons'
 import { formatLoc } from '../lib/accept'
 import { HL_CLASS } from '../lib/highlight'
 
@@ -35,7 +35,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse }: 
           title="收起检查器 ⌘⇧\\"
           onClick={onCollapse}
         >
-          <ChevronRightIcon size={15} />
+          <SidebarTrailingIcon size={15} />
         </button>
       </div>
       <div className="flex-1 overflow-y-auto">

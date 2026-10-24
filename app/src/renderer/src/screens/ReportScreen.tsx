@@ -37,12 +37,12 @@ import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
 import {
   ArrowUpDocFillIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
   PageIcon,
   DocMagnifyIcon,
   SealOkIllustration,
   SevGlyph,
+  SidebarLeadingIcon,
+  SidebarTrailingIcon,
 } from '../components/Icons'
 
 const LAYER_NAMES: Record<string, string> = {
@@ -443,7 +443,7 @@ export default function ReportScreen({
               title="收起侧栏 ⌘\\"
               onClick={toggleLeftPane}
             >
-              <ChevronLeftIcon size={15} />
+              <SidebarLeadingIcon size={15} />
             </button>
           </div>
           <div className="group-label" style={{ fontWeight: 600 }}>
@@ -547,7 +547,17 @@ export default function ReportScreen({
           className={`drag-strip bar-solid strip-edge flex items-center justify-between${scrolled ? ' scrolled' : ''}`}
           style={{ height: 52, flex: 'none' }}
         >
-          <div className="flex min-w-0 flex-1 items-center">
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            {leftCollapsed && (
+              <button
+                className="icon-btn pop-in"
+                aria-label="展开侧栏"
+                title="展开侧栏 ⌘\\"
+                onClick={toggleLeftPane}
+              >
+                <SidebarLeadingIcon size={15} />
+              </button>
+            )}
             {searchOpen ? (
               <PaperSearch
                 rootRef={paperRef}
@@ -570,6 +580,16 @@ export default function ReportScreen({
                 }}
               >
                 <MagnifierIcon size={15} />
+              </button>
+            )}
+            {rightCollapsed && (
+              <button
+                className="icon-btn pop-in"
+                aria-label="展开检查器"
+                title="展开检查器 ⌘⇧\\"
+                onClick={toggleRightPane}
+              >
+                <SidebarTrailingIcon size={15} />
               </button>
             )}
             {exported && (
@@ -674,29 +694,6 @@ export default function ReportScreen({
           )}
         </div>
       </aside>
-
-      {/* collapsed-pane edge handles — quiet floating affordances at the
-          window edge while a pane is away */}
-      {leftCollapsed && (
-        <button
-          className="pane-handle left"
-          aria-label="展开侧栏"
-          title="展开侧栏 ⌘\\"
-          onClick={toggleLeftPane}
-        >
-          <ChevronRightIcon size={14} />
-        </button>
-      )}
-      {rightCollapsed && (
-        <button
-          className="pane-handle right"
-          aria-label="展开检查器"
-          title="展开检查器 ⌘⇧\\"
-          onClick={toggleRightPane}
-        >
-          <ChevronLeftIcon size={14} />
-        </button>
-      )}
     </div>
   )
 }
@@ -1096,7 +1093,7 @@ function InspectorList({
           title="收起检查器 ⌘⇧\\"
           onClick={onCollapse}
         >
-          <ChevronRightIcon size={15} />
+          <SidebarTrailingIcon size={15} />
         </button>
       </div>
       <div
