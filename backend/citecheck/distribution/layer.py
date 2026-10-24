@@ -59,7 +59,7 @@ _FUNC_PROMPT = """\
 段落中的 ⟦mN⟧ 是引用标记。判断每个标记在该句中的引用功能，取值仅限：
 background（背景）、method（方法）、comparison（对比）、result（结果）、
 critique（批评）。以 JSON 输出：
-{"items": [{"marker_id": "m0", "function": "background"}]}
+{"items": [{"marker_id": "m1", "function": "background"}]}
 
 段落：
 {text}"""
@@ -203,30 +203,34 @@ async def run_distribution(
     if classify:
         functions = {f: 0 for f in _FUNCS}
 
-        def _tagged(text: str, ms) -> str:
-            out = []
+        def _tagged(text: str, ms) -> tuple[str, dict[str, str]]:
+            # paragraph-local tags (m1, m2 …): document-wide marker ids
+            # shift when a citation is added earlier, which would change
+            # every later prompt and miss the cache
+            out, local = [], {}
             cur = 0
-            for m in sorted(ms, key=lambda x: x.start):
+            for k, m in enumerate(sorted(ms, key=lambda x: x.start)):
+                local[f"m{k + 1}"] = m.id
                 out.append(text[cur:m.start])
-                out.append(f"⟦{m.id}⟧")
+                out.append(f"⟦m{k + 1}⟧")
                 cur = m.end
             out.append(text[cur:])
-            return "".join(out)
+            return "".join(out), local
 
         async def _classify_para(pid, ms):
-            text = para_by_id[pid].text
+            tagged, local = _tagged(para_by_id[pid].text, ms)
             res = await chat_json(
                 "function",
                 [{"role": "user",
-                  "content": _FUNC_PROMPT.replace("{text}", _tagged(text, ms))}],
+                  "content": _FUNC_PROMPT.replace("{text}", tagged)}],
                 _FuncOut, route=route,
             )
             if res.value is None:
                 return
-            valid = {m.id for m in ms}
             for it in res.value.items:
-                if it.marker_id in valid and it.function in _FUNCS:
-                    marker_functions[it.marker_id] = it.function
+                mid = local.get(it.marker_id)
+                if mid and it.function in _FUNCS:
+                    marker_functions[mid] = it.function
                     functions[it.function] += 1
 
         n_done, n_total = 0, len(markers_by_para)

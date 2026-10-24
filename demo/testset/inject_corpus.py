@@ -8,16 +8,21 @@ Defect mix per paper (9 injections, seed=42, deterministic):
   fake_ref x2      fabricated-but-plausible references, each cited once
   misattr  x2      citation markers swapped to an unrelated real reference
                    (Zhang-guan-li-dai) — only markers the CLEAN run's claims
-                   actually cite, never author superscripts / table numbers
+                   actually cite, never author superscripts / table numbers;
+                   the swapped-in reference exists as an entry and the clean
+                   run retrieved its text (abstract or full text)
   wrong_year x1    publication year of one online-verified reference shifted
-                   -4 years (the last year-looking number, never a title token)
+                   -4 years; only entries whose text holds exactly one
+                   year-looking number and the clean run read that same
+                   year, so the edit is the publication year and nothing else
   uncited x1       a real, in-domain reference added but never cited
   stacking x1      a sentence citing six references at once
   typo x2          Chinese wrong-character in a citing sentence (post-
                    replacement snippet recorded, never inside a marker)
 
 Placement uses the CLEAN-run report as a whitelist (paragraphs that produced
-claims / markers those claims cite / refs verified online), so every
+claims / markers those claims cite / refs verified online / refs whose text
+was retrieved), so every
 injection is detectable in principle: the corpus measures detection
 capability, not parser blind spots. Requires reports/<paper>_clean.json.
 
@@ -91,6 +96,13 @@ UNCITED = {
 TYPOS = [("部署", "布署"), ("坐标", "座标"), ("候选", "侯选"),
          ("辨识", "辩识"), ("分量", "份量"), ("背景", "背境")]
 
+FAKE_SENTS = [
+    ("近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方法[{label}]"
+     "被证明能够提升跨领域场景下的鲁棒性."),
+    ("另有研究从数据增强的角度改进了这一流程,文献[{label}]报告了在低资源"
+     "条件下的稳定收益."),
+]
+
 STACK_SENT = ("此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等方面"
               "均存在明显差异,系统对比可参见文献[{refs}].")
 
@@ -128,26 +140,45 @@ def load_clean_state(directory: str):
             cite_markers.setdefault(m["paragraph_id"], []).append(
                 {"start": m["start"], "label": m["raw"].strip()[1:-1]})
     prose_pids = {c["paragraph_id"] for c in rep["claims"]}
-    verified_labels = set()
-    for rc in rep["ref_checks"]:
-        if rc["status"] != "verified":
+    checks = {rc["ref_id"]: rc for rc in rep["ref_checks"]}
+    sourced = {sc["ref_id"] for sc in rep["support_checks"]
+               if sc.get("source_kind") in {"abstract", "fulltext"}}
+    refs: dict[str, dict] = {}
+    for r in rep["references"]:
+        lm = re.match(r"^\[(\d{1,3})\]", r["raw"].strip())
+        if not lm:
             continue
-        ref = next((r for r in rep["references"] if r["id"] == rc["ref_id"]), None)
-        if ref:
-            lm = re.match(r"^\[(\d{1,3})\]", ref["raw"].strip())
-            if lm:
-                verified_labels.add(lm.group(1))
-    return pid_by_squash, cite_markers, marker_spans, prose_pids, verified_labels
+        rc = checks.get(r["id"]) or {}
+        refs[lm.group(1)] = {
+            "verified": rc.get("status") == "verified",
+            "year": r.get("year"),
+            "db_year": (rc.get("matched") or {}).get("year"),
+            "sourced": r["id"] in sourced,
+            # PDF-extraction artefacts glue back matter or a neighbour
+            # entry onto a few entries; never inject into those
+            "intact": len(r["raw"]) <= 400,
+        }
+    return pid_by_squash, cite_markers, marker_spans, prose_pids, refs
 
 
 def para_text(p) -> str:
     return "".join(r.text for r in p.runs)
 
 
-def rewrite(p, text: str):
-    for r in list(p.runs):
-        r._r.getparent().remove(r._r)
-    p.add_run(text)
+def splice(p, start: int, end: int, new: str):
+    """Replace text[start:end] inside the runs that hold it, keeping every
+    run's formatting. Rebuilding the paragraph as one plain run drops the
+    superscript / style runs the parser reads, which re-splits every claim
+    of the paragraph and turns its untouched sentences into new units."""
+    pos = 0
+    for r in p.runs:
+        t = r.text
+        a, b = pos, pos + len(t)
+        pos = b
+        if b <= start or a >= end and not (a == start == end):
+            continue
+        lo, hi = max(start, a) - a, min(end, b) - a
+        r.text = t[:lo] + (new if a <= start else "") + t[hi:]
 
 
 def find_body_and_refs(doc):
@@ -177,9 +208,11 @@ def inject_paper(directory: str, seed: int = 42):
     doc = Document(src)
     body_idx, ref_idx, ref_head = find_body_and_refs(doc)
     ref_texts = [doc.paragraphs[i].text.strip() for i in ref_idx]
-    n_refs = len(ref_texts)
     (pid_by_squash, cite_markers, marker_spans, prose_pids,
-     verified_labels) = load_clean_state(directory)
+     clean_refs) = load_clean_state(directory)
+    # labels the parser actually split into entries (a merged entry loses
+    # its successor's label, e.g. luohuilan [16])
+    known = sorted(int(x) for x in clean_refs if clean_refs[x]["intact"])
     spec = {"paper": directory, "source": "manuscript.docx",
             "target": "manuscript_injected.docx", "injections": []}
 
@@ -197,10 +230,11 @@ def inject_paper(directory: str, seed: int = 42):
     for k, fake in enumerate(FAKES[directory][:2]):
         doc.add_paragraph(f"[{label}] {fake}")
         ref_texts.append(f"[{label}] {fake}")
-        host_i = rng.choice(hosts)
+        host_i = rng.choice([i for i in hosts if i not in modified])
         host = doc.paragraphs[host_i]
-        snip = (f"近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模"
-                f"方法[{label}]被证明能够显著提升跨领域场景下的鲁棒性.")
+        # one sentence per fake: identical snippets would make the
+        # evaluator locate both in the same paragraph
+        snip = FAKE_SENTS[k].format(label=label)
         host.add_run(snip)
         modified.add(host_i)
         fake_snips.append(snip[:24])
@@ -220,27 +254,34 @@ def inject_paper(directory: str, seed: int = 42):
 
     # ---- 3. wrong_year x1 --------------------------------------------------
     year_target = None
-    # only entries the CLEAN run verified online: a -4 shift then provably
-    # mismatches the database record. Prefer English (most Latin) refs, and
-    # shift the LAST year-looking number (the publication-year position) of
-    # entries with >=2 such numbers — with a single match the number may be
-    # part of the title ("…VOT2014 challenge results"), and a title edit
-    # still fuzzy-matches the real record
+    # only entries the CLEAN run verified online with the year it read
+    # equal to the record's: a -4 shift then provably mismatches. The entry
+    # must hold exactly one year-looking number outside URLs, so the edit
+    # is the publication year — not an event year ("WWW 2010", "Proc. of
+    # the 2014 Conf."), a title token ("VOT2014") or a grant number in
+    # back matter glued onto the entry. Prefer English (most Latin) refs.
     latin = lambda s: sum(1 for c in s if c.isascii() and c.isalpha())
     for i in sorted(ref_idx, key=lambda i: -latin(doc.paragraphs[i].text)):
         t = doc.paragraphs[i].text
         lm = re.match(r"^\[(\d{1,3})\]", t.strip())
-        if not lm or lm.group(1) not in verified_labels:
+        info = clean_refs.get(lm.group(1)) if lm else None
+        if not (info and info["verified"] and info["intact"] and info["year"]
+                and info["year"] == info["db_year"]):
             continue
-        ms = list(re.finditer(r"(19[7-9]\d|20[01]\d)", t))
-        if len(ms) >= 2:
-            year_target = (i, ms[-1].group(1))
+        dated = re.sub(r"https?://\S+|10\.\d{4,9}/\S+",
+                       lambda m: " " * len(m.group(0)), t)
+        ms = list(re.finditer(r"(?<!\d)((?:19|20)\d{2})(?!\d)", dated))
+        if len(ms) == 1 and int(ms[0].group(1)) == info["year"]:
+            year_target = (i, ms[0])
             break
     if year_target:
-        i, old = year_target
+        i, ym = year_target
         t = doc.paragraphs[i].text
+        old = ym.group(1)
         new = str(int(old) - 4)
-        rewrite(doc.paragraphs[i], t.replace(old, new, 1))
+        # slice at the matched position — str.replace would hit the first
+        # occurrence, which need not be the one selected
+        splice(doc.paragraphs[i], ym.start(), ym.end(), new)
         add_note(id="wrongyear", kind="wrong_year", old_year=old, new_year=new,
                  match=re.sub(r"^\[\d{1,3}\]\s*", "", t)[:30])
 
@@ -272,14 +313,18 @@ def inject_paper(directory: str, seed: int = 42):
                 break
         if pos is None:
             continue
-        others = [x for x in range(1, n_refs + 1)
-                  if abs(x - n0) >= 8 and x not in used and x != n0]
+        # the swapped-in reference must exist as an intact entry whose text
+        # the clean run retrieved: without the cited paper's text no judge
+        # can tell a wrong citation from a right one, and that coverage gap
+        # is reported separately (support_definitive), not as a miss here
+        others = [x for x in known
+                  if abs(x - n0) >= 8 and x not in used
+                  and clean_refs[str(x)]["sourced"]]
         if not others:
             continue
         m2 = rng.choice(others)
         used.update({n0, m2})
-        rewrite(doc.paragraphs[i],
-                t[:pos] + f"[{m2}]" + t[pos + len(f"[{n0}]"):])
+        splice(doc.paragraphs[i], pos, pos + len(f"[{n0}]"), f"[{m2}]")
         modified.add(i)
         swapped += 1
         add_note(id=f"misattr{swapped}", kind="misattribution",
@@ -289,7 +334,7 @@ def inject_paper(directory: str, seed: int = 42):
     # ---- 5. stacking x1 ------------------------------------------------------
     host_i = rng.choice([i for i in hosts if i not in modified])
     host = doc.paragraphs[host_i]
-    refs6 = sorted(rng.sample(range(1, n_refs + 1), 6))
+    refs6 = sorted(rng.sample(known, 6))
     sent = STACK_SENT.format(refs=",".join(map(str, refs6)))
     host.add_run(sent)
     modified.add(host_i)
@@ -313,6 +358,8 @@ def inject_paper(directory: str, seed: int = 42):
             if pid is None or pid not in prose_pids:
                 continue
             t = doc.paragraphs[i].text
+            if _FRONT.search(t) or _AFFIL.search(t):
+                continue
             spans = marker_spans.get(pid, [])
             pos = next(
                 (o.start() for o in re.finditer(re.escape(orig), t)
@@ -321,7 +368,7 @@ def inject_paper(directory: str, seed: int = 42):
             if pos is None:
                 continue
             rewritten = t[:pos] + typo + t[pos + len(orig):]
-            rewrite(doc.paragraphs[i], rewritten)
+            splice(doc.paragraphs[i], pos, pos + len(orig), typo)
             done += 1
             # record the POST-replacement text: the snippet must be findable
             # inside the injected document

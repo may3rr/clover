@@ -213,9 +213,11 @@ async def test_function_classification_fake_llm(tmp_path, monkeypatch):
     async def fake(task, messages, schema, *, route="auto"):
         assert task == "function"
         return LLMResult(value=schema.model_validate({
-            "items": [{"marker_id": "m0", "function": "method"},
+            # the model sees paragraph-local tags (m1 …), mapped back to
+            # the document's marker ids
+            "items": [{"marker_id": "m1", "function": "method"},
                       {"marker_id": "m9", "function": "background"},
-                      {"marker_id": "m0", "function": "bogus"}],
+                      {"marker_id": "m1", "function": "bogus"}],
         }), route="cloud")
 
     monkeypatch.setattr(dist_mod, "chat_json", fake)

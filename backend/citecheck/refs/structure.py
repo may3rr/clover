@@ -12,7 +12,10 @@ from typing import Any
 
 _DOI_RE = re.compile(r"10\.\d{4,9}/[^\s\"<>，。；]+")
 _YEAR_RE = re.compile(r"(?<!\d)((?:19|20)\d{2})[a-z]?(?!\d)")
-_LABEL_RE = re.compile(r"^\s*[\[\(（【]?(\d{1,3})[\]\)）】]?[\.、]?\s+")
+# a bracketed label may touch the entry ("[15]GIRSHICK R,…", common in
+# Chinese journals); a bare number needs a separator ("12. Smith")
+_LABEL_RE = re.compile(
+    r"^\s*(?:[\[\(（【](\d{1,3})[\]\)）】][\.、]?\s*|(\d{1,3})[\.、]?\s+)")
 _CJK_RE = re.compile(r"[一-鿿]")
 # GB/T 7714-2015 document type codes: [J] [M] [C] [EB/OL] [DB/OL] [J/OL] …
 _TYPE_TAG_RE = re.compile(r"\[(?:[JMDPCRNSZOAG]|EB|DB|CP|DS)(/[A-Z]{1,2})?\]")
@@ -37,7 +40,7 @@ _ZH_NAME = re.compile(r"^[一-鿿]{2,4}$")
 
 def extract_label(raw: str) -> str | None:
     m = _LABEL_RE.match(raw)
-    return m.group(1) if m else None
+    return (m.group(1) or m.group(2)) if m else None
 
 
 def detect_lang(raw: str) -> str:
@@ -133,7 +136,7 @@ def parse_reference(raw: str) -> dict:
     body = raw.strip()
     m = _LABEL_RE.match(body)
     if m:
-        out["label"] = m.group(1)
+        out["label"] = m.group(1) or m.group(2)
         body = body[m.end():]
 
     doi = _DOI_RE.search(body)

@@ -42,11 +42,14 @@ demo/*_events.json
 # ---- T10 export artifacts
 *（引用体检*.docx
 *（Clover*.docx
+demo/export/
 
 # ---- OS / editors / logs
 .DS_Store
 *.log
 .idea/
+# other agents' scratch plans
+.zcode/
 .vscode/
 app/build/python/
 dist/
@@ -56,6 +59,8 @@ demo/latex/export/
 demo/testset/raw/
 demo/testset/zh_pdfs/
 demo/testset/reports/
+# earlier runs kept for comparison (degraded-mode baseline, pre-fix backup)
+demo/testset/reports_*/
 demo/testset/zh_papers/**/*.pdf
 
 # ---- F7: real Chinese manuscript run (unpublished paper, never committed)

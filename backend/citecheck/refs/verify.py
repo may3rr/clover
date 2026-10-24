@@ -85,6 +85,26 @@ def _surname(name: str) -> str:
     return latin_surname(n)
 
 
+def _name_tokens(name: str) -> set[str]:
+    """Full-name tokens of a latin name, initials dropped, hyphens joined:
+    'Yi-Feng Lin' -> {yifeng, lin}; 'Weld D.S.' -> {weld}."""
+    n = unicodedata.normalize("NFKC", name or "").lower()
+    n = re.sub(r"[\-‐‑–]", "", n)
+    return {t for t in re.split(r"[^a-z]+", n) if len(t) >= 2}
+
+
+def _latin_names_agree(ref_name: str, hit_name: str) -> bool:
+    """Same person despite name order: Chinese-English manuscripts write
+    'Liu Xiaohua' (surname first) for the record's 'Xiaohua Liu', and
+    'Wu Fei' reads as surname 'Fei' to the order heuristic. A shared full
+    name token is agreement; only names with nothing in common differ."""
+    a, b = _norm(_surname(ref_name)), _norm(_surname(hit_name))
+    if a and b and (fuzz.ratio(a, b) >= _SURNAME_MIN
+                    or a.split()[-1:] == b.split()[-1:]):
+        return True
+    return bool(_name_tokens(ref_name) & _name_tokens(hit_name))
+
+
 def _ref_surname(ref: Reference) -> str:
     return _surname(ref.authors[0]) if ref.authors else ""
 
@@ -233,10 +253,8 @@ def _evaluate(
         if _CJK.search(ref_surname):
             ok = hit_surname.startswith(ref_surname) or ref_surname.startswith(hit_surname)
         else:
-            a, b = _norm(ref_surname), _norm(hit_surname)
             # particles are written inconsistently ("van den Oord" / "Oord")
-            ok = (fuzz.ratio(a, b) >= _SURNAME_MIN
-                  or a.split()[-1:] == b.split()[-1:])
+            ok = _latin_names_agree(ref.authors[0], hit["authors"][0])
         if not ok:
             author_diff = True
             issues.append(
@@ -259,9 +277,7 @@ def _evaluate(
             if _CJK.search(ref_s2):
                 ok2 = hit_s2.startswith(ref_s2) or ref_s2.startswith(hit_s2)
             else:
-                a, b = _norm(ref_s2), _norm(hit_s2)
-                ok2 = (fuzz.ratio(a, b) >= _SURNAME_MIN
-                       or a.split()[-1:] == b.split()[-1:])
+                ok2 = _latin_names_agree(ref.authors[1], hit_authors[1])
             if not ok2:
                 issues.append(
                     f"第二作者不一致：文中写 {ref.authors[1]}，"

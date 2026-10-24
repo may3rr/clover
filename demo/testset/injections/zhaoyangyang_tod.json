@@ -15,7 +15,7 @@
    "kind": "fake_ref",
    "label": "241",
    "match": "Wang P, Yang Z. Multi-party ta",
-   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+   "snippet": "另有研究从数据增强的角度改进了这一流程,文献[241]报告了"
   },
   {
    "id": "uncited",
@@ -26,22 +26,22 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2019",
-   "new_year": "2015",
-   "match": "Roemmele M,Bejan C A,Gordon A "
+   "old_year": "2015",
+   "new_year": "2011",
+   "match": "Chen Y N,Wang W Y,Gershman A,e"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "snippet": "决了可变长度的句子的输入问题,但由于其网络视",
-   "cited_label": "199",
+   "cited_label": "237",
    "intended_label": "23"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "snippet": "义相似度、命名实体识别、情感分析和问答匹配等",
-   "cited_label": "66",
+   "cited_label": "83",
    "intended_label": "1"
   },
   {

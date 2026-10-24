@@ -52,32 +52,37 @@ References 取自论文 PDF 文献区原始文本（`build_docx.py`，逐条 [n]
 `zh_references.md` 中标注"中文"的 36 条 = 需要从知网下载的 PDF（放进各篇的 `ref/` 文件夹）。自动化学报那 8 条按刊物规范是拼音著录 + 括号内中文原文，检索知网直接用括号里的中文题名。
 英文条目无需知网：真实性核验与支持度证据走联网检索（Crossref/OpenAlex/S2/arXiv）。
 
-## 指标设计（与 `demo/evaluate.py` 的关键差别）
+## 注入与评测流程
 
-评测单元从"整篇注入处"改为**论断-引用对**：
+```bash
+source /opt/anaconda3/etc/profile.d/conda.sh && conda activate claude
+bash demo/testset/run_all.sh clean            # 五篇干净稿体检，产出注入白名单
+python demo/testset/inject_corpus.py          # 每篇 9 处注入，seed=42，依赖 reports/*_clean.json
+bash demo/testset/run_all.sh injected         # 五篇注入稿体检；reports/ 已有文件即跳过，重跑先删
+python demo/testset/evaluate_corpus.py        # results/<paper>.json 与 results/summary.md
+```
 
-- 一条引用句（claim）与其引用的每篇文献构成一个对；一篇 130 条文献的综述经解析后可产
-  生数百个数据点（zh_eval 实测：51 条文献 → 72 个对）。
-- 构造时对底稿随机选中 k 个"论断-引用对"注入错误（类型沿用 `demo/injections.json` 的
-  kind：`fake_ref` / `wrong_year` / `misattribution` / `uncited` / `stacking` / `typo` /
-  `ref_reorder`），其余对保持原样。
-- 判定（与 evaluate.py 检出规则一致，不放宽）：
-  - 注入对应被系统标出（如 misattribution → 该对 SupportCheck=unsupported 且有高严重度
-    support finding；wrong_year → RefCheck=mismatch 且 issue 含"年份"）；
-  - 未注入对若被标为高/中严重度问题，计为误报（FP）。
+每篇注入 9 处，共 45 处：伪造文献 2、张冠李戴 2、错年 1、未引用条目 1、引用堆砌 1、错别字 2。
+落点以干净稿报告为白名单：只改干净稿里产出论断的段落、论断真正引用的标记、在线核验通过的条目，
+张冠李戴换入的文献须在干净稿里取到过原文。白名单保证每处注入原则上可检出，实验测的是检出能力，
+解析盲区与原文覆盖率单独报告。注入在原有 run 内替换文字，保留 run 格式，干净稿与注入稿的差异
+只在注入点。
 
-统计口径（每篇底稿一份，全集汇总一份）：
+## 指标
 
-- TP = 注入对中系统报异常的数量；FN = 注入对中未报的数量；
-- FP = 未注入对中被报异常的数量（`undetermined`/`unverifiable` 不计 FP，单独报告；
-  同时给一列 strict 口径把 undetermined 计入 FP）；
-- Precision = TP / (TP + FP)，Recall = TP / (TP + FN)，
-  Accuracy = (TP + TN) / (注入对 + 未注入对总数)。
+- 单元：一条引用句或一条参考文献为一个数据点。没有引用的句子上出现报警或注入时，该句单独成为一个单元。
+- 正例：每处注入落在一个单元上，按该注入自己的检出规则判定 TP/FN。同一句上与注入无关的报警不算检出。
+- 负例：其余单元。体检报出任一高/中严重度问题即为阳性，包括 support/distribution/norms 发现、
+  unsupported 判定、not_found/mismatch、错别字修订。
+- 干净稿既有报警：负例上的报警若干净稿在同一文本上也报了，单列。宽口径剔除这部分，严口径计为误报。
+  这部分尚未人工核对，真实查准率落在两个口径之间。
+- 支持度判定覆盖：拿到 supported/partial/unsupported 确定判断的引用句占比，单列，不进 P/R。
+- 准确率以 TN 为主，只作参考。
 
-## 后续步骤（本次未做）
+## 已知局限
 
-1. 知网下载 36 条中文 PDF，按篇建 `ref/` 文件夹；中文底稿转 docx（PDF→docx 或按官网
-   HTML 重建）。
-2. 写通用注入脚本（参数化底稿，替代手写 `inject.py`），生成带注入的稿件副本。
-3. 跑管线（`run_pipeline.py`）+ 新 evaluate（按对统计 P/R/Acc），结果落
-   `demo/testset/results/`。
+- 底稿由 PDF 转换而来，正文有串栏、粘连单词、乱码字形。干净稿上的错别字修订大多是在修这些转换痕迹，
+  这是严口径查准率偏低的主要来源，不代表人类原稿的错误率。
+- 个别条目在转换时吞并了相邻条目或文后英文摘要（罗会兰 [15] 吞并 [16]，赵阳洋 [239]），注入器跳过超长条目。
+- 解析器取条目中第一个非会议年份作为出版年，"Proc. of the 2014 Conf." 这类缩写会被当成出版年。
+  错年注入只选只含一个年份的条目，不覆盖这一情形。

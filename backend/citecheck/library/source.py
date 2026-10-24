@@ -8,6 +8,8 @@ open-access PDF, and its metadata confirms or contradicts the entry.
 
 from __future__ import annotations
 
+import re
+
 from rapidfuzz import fuzz
 
 from ..schema import Finding, RefCheck, Reference
@@ -51,15 +53,35 @@ def page_of(pdf: LocalPdf, evidence: str | None) -> int | None:
 _TRUSTED = {"cnki_cover", "cnki_citation", "layout", "doi"}
 
 
+_CJK_RE = re.compile(r"[一-鿿]")
+
+
+def _is_cjk(text: str) -> bool:
+    return bool(_CJK_RE.search(text or ""))
+
+
+def _legible(text: str) -> bool:
+    """A title extracted with a broken font map comes out as symbol soup
+    ("„ØÓÚ¨¸»œ¶Ô»°"); it says nothing about which paper this is."""
+    t = re.sub(r"\s+", "", text or "")
+    return bool(t) and len(squash(t)) / len(t) >= 0.6
+
+
 def local_issues(ref: Reference, pdf: LocalPdf) -> list[str]:
     doc = pdf.doc
     if doc.source not in _TRUSTED:
         return []
     issues: list[str] = []
-    if ref.title and doc.title and fuzz.ratio(squash(ref.title), squash(doc.title)) < 85:
+    # a pinyin / English rendering of a Chinese paper ("Yu Kai", an English
+    # title) cannot be compared character by character with the cover
+    # page — the link already matched them, so silence is the honest call
+    if (ref.title and doc.title and _legible(doc.title)
+            and _is_cjk(ref.title) == _is_cjk(doc.title)
+            and fuzz.ratio(squash(ref.title), squash(doc.title)) < 85):
         issues.append(f"本地原文标题为《{doc.title[:60]}》")
     want, have = _first_author_key(ref.authors), _first_author_key(doc.authors)
-    if want and have and want != have and want not in squash(" ".join(doc.authors)):
+    if (want and have and _is_cjk(want) == _is_cjk(have) and want != have
+            and want not in squash(" ".join(doc.authors))):
         issues.append(f"本地原文首作者为 {doc.authors[0]}，文中写 {ref.authors[0]}")
     if ref.year and doc.year and abs(ref.year - doc.year) > 1:
         issues.append(f"本地原文年份为 {doc.year}，文中写 {ref.year}")

@@ -121,12 +121,17 @@ async def extract_claims(
         in_sent = [m for m in markers if m.start >= sent.start and m.end <= sent.end]
         if not in_sent:
             continue
-        # build the tagged sentence the model sees
+        # build the tagged sentence the model sees. Tags are numbered within
+        # the sentence (m1, m2 …), not with the document-wide marker ids: a
+        # citation added earlier in the paper shifts every later global id,
+        # which would change every later prompt, miss the cache and re-ask
+        # the model about sentences nobody edited
+        local = {f"m{k + 1}": m.id for k, m in enumerate(in_sent)}
         tagged_parts: list[str] = []
         cursor = sent.start
-        for m in in_sent:
+        for k, m in enumerate(in_sent):
             tagged_parts.append(paragraph.text[cursor : m.start])
-            tagged_parts.append(f"⟦{m.id}⟧")
+            tagged_parts.append(f"⟦m{k + 1}⟧")
             cursor = m.end
         tagged_parts.append(paragraph.text[cursor : sent.end])
         tagged = "".join(tagged_parts)
@@ -141,7 +146,6 @@ async def extract_claims(
         marker_spans = [(m.start - sent.start, m.end - sent.start) for m in in_sent]
         verifiable, idx_map = _remove_spans(sent.text, marker_spans)
         n_verifiable, vmap = normalize(verifiable)
-        in_ids = {m.id for m in in_sent}
 
         def locate(claim_text: str) -> tuple[int, int] | None:
             n_claim, _ = normalize(claim_text)
@@ -182,10 +186,10 @@ async def extract_claims(
             for c in res.value.claims:
                 if not isinstance(c, dict) or not c.get("text"):
                     continue
-                # marker ids are global (m0..mN); keep only ids that are
-                # actually in this sentence
-                ids = [str(x) for x in c.get("marker_ids") or []
-                       if str(x) in in_ids]
+                # tags are sentence-local; map back to marker ids and keep
+                # only tags that are actually in this sentence
+                ids = [local[str(x)] for x in c.get("marker_ids") or []
+                       if str(x) in local]
                 if ids:
                     produced.append({"text": str(c["text"]), "marker_ids": ids})
 

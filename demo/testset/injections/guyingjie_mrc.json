@@ -15,7 +15,7 @@
    "kind": "fake_ref",
    "label": "132",
    "match": "Kim S, Park C. Numerical reaso",
-   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+   "snippet": "另有研究从数据增强的角度改进了这一流程,文献[132]报告了"
   },
   {
    "id": "uncited",
@@ -26,22 +26,22 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2014",
-   "new_year": "2010",
-   "match": "Cho K, Van Merrienboer B, Gulc"
+   "old_year": "2018",
+   "new_year": "2014",
+   "match": "Parikh S, Sai AB, Nema P, et a"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "snippet": ";同样是SQuAD1.1数据集,Chen等人",
-   "cited_label": "89",
+   "cited_label": "122",
    "intended_label": "78"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "snippet": "NLP领域取得巨大成功后,Vaswani等人",
-   "cited_label": "108",
+   "cited_label": "19",
    "intended_label": "67"
   },
   {
@@ -49,12 +49,12 @@
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "12",
     "21",
     "26",
     "59",
     "60",
-    "75"
+    "75",
+    "98"
    ]
   },
   {

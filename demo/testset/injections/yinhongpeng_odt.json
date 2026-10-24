@@ -15,7 +15,7 @@
    "kind": "fake_ref",
    "label": "229",
    "match": "Chen B, Yin H. Attention-guide",
-   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+   "snippet": "另有研究从数据增强的角度改进了这一流程,文献[229]报告了"
   },
   {
    "id": "uncited",
@@ -26,22 +26,22 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2015",
-   "new_year": "2011",
-   "match": "Kristan M, Pﬂugfelder R, Leona"
+   "old_year": "2008",
+   "new_year": "2004",
+   "match": "Yan S Y, Shan S G, Chen X L, G"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "snippet": "跟踪评测的公开视频序列比较多[3],[4],",
-   "cited_label": "84",
+   "cited_label": "128",
    "intended_label": "5"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "snippet": "cbcl.mit.edu/software-",
-   "cited_label": "212",
+   "cited_label": "76",
    "intended_label": "139"
   },
   {
@@ -52,17 +52,17 @@
     "40",
     "56",
     "72",
+    "87",
     "88",
-    "109",
-    "179"
+    "197"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "背境",
-   "right": "背景",
-   "snippet": "关键词计算机视觉, 目标检测, 目标跟踪, 背境建模"
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "10 小时视频,[143]Pedestrian是64"
   },
   {
    "id": "typo2",

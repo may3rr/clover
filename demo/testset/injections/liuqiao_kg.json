@@ -15,7 +15,7 @@
    "kind": "fake_ref",
    "label": "84",
    "match": "Chen R, Xu H. Entity alignment",
-   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+   "snippet": "另有研究从数据增强的角度改进了这一流程,文献[84]报告了在"
   },
   {
    "id": "uncited",
@@ -26,22 +26,22 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2010",
-   "new_year": "2006",
-   "match": "Fu B,Brennan R,Declan O S.Cros"
+   "old_year": "2000",
+   "new_year": "1996",
+   "match": "Zhang Yiming,Zhou J F.A traina"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "snippet": "tureofknowledgegraph.图",
-   "cited_label": "63",
+   "cited_label": "76",
    "intended_label": "1"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "snippet": ".为促进知识库融合的标准化,Mendes等人",
-   "cited_label": "5",
+   "cited_label": "4",
    "intended_label": "53"
   },
   {
@@ -50,11 +50,11 @@
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
     "4",
+    "12",
     "28",
     "30",
     "65",
-    "72",
-    "78"
+    "72"
    ]
   },
   {

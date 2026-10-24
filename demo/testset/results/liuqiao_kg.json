@@ -4,92 +4,621 @@
    "id": "fake1",
    "kind": "fake_ref",
    "detected": true,
-   "detail": "status=not_found"
+   "detail": "status=not_found",
+   "located": true
   },
   {
    "id": "fake2",
    "kind": "fake_ref",
    "detected": true,
-   "detail": "status=not_found"
+   "detail": "status=not_found",
+   "located": true
   },
   {
    "id": "uncited",
    "kind": "uncited",
    "detected": true,
-   "detail": "ref=found"
+   "detail": "ref=found",
+   "located": true
   },
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "detected": false,
-   "detail": "status=verified issues=[]"
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 1996，数据库记录为 2000']",
+   "located": true
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1"
+   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "located": true
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "detected": false,
-   "detail": "labels=['undetermined'] offtopic=0 findings=0"
+   "detected": true,
+   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "located": true
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "detected": true,
-   "detail": "findings=1"
+   "detail": "findings=1",
+   "located": true
   },
   {
    "id": "typo1",
    "kind": "typo",
    "detected": true,
-   "detail": "revisions=1"
+   "detail": "revisions=1",
+   "located": true
   },
   {
    "id": "typo2",
    "kind": "typo",
    "detected": true,
-   "detail": "revisions=1"
+   "detail": "revisions=1",
+   "located": true
   }
  ],
- "claims": {
-  "tp": 2,
-  "fp": 1,
-  "fn": 2,
-  "tn": 53,
-  "total_claims": 74,
-  "support_definitive": 25,
-  "pre_existing_flagged": 16,
-  "undetermined_on_defect": 2,
-  "pr_acc": [
-   0.6666666666666666,
-   0.5,
-   0.9482758620689655
-  ]
+ "counts": {
+  "tp": 9,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 48,
+  "tn": 112,
+  "excluded": 5,
+  "claims": 72,
+  "refs": 85,
+  "support_definitive": 24
  },
- "refs": {
-  "tp": 3,
-  "fp": 0,
-  "fn": 1,
-  "tn": 38,
-  "pr_acc": [
-   1.0,
-   0.75,
-   0.9761904761904762
-  ]
- },
- "totals": {
-  "tp": 5,
-  "fp": 1,
-  "fn": 3,
-  "tn": 91,
-  "pr_acc": [
-   0.8333333333333334,
-   0.625,
-   0.96
-  ]
- }
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.15789473684210525,
+  1.0,
+  0.7159763313609467
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c2"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "早在2006年,Berners-Lee就提出了数据链接(linkeddata)的思想,呼吁推广和完善相关的技术标准如UR"
+  },
+  {
+   "unit": [
+    "claim",
+    "c28"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Banko等人提出了一种基于条件随机场的关系抽取模型(H-CRF)"
+  },
+  {
+   "unit": [
+    "span",
+    "p75",
+    210,
+    312
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "刘峤等:知识图谱构建技术综述而R2RML则具有较高的灵活性和可定制性,允许为给定的数据库结构定制词汇表,可以将关系数据库"
+  },
+  {
+   "unit": [
+    "ref",
+    "r40"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[40]ShenWei,WangJianyong,LuoPing,etal.Linden:Linkingnamedent"
+  },
+  {
+   "unit": [
+    "span",
+    "p11",
+    0,
+    108
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "KnowledgeBaseProductsDataSourceWikipedia,Freebase,KnowledgeG"
+  },
+  {
+   "unit": [
+    "claim",
+    "c17"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "提出了一种迭代扩展实体语料库的解决方案,基本思路是根据已知的实体实例进行特征建模,利用该模型对处理海量数据集得到新的命名"
+  },
+  {
+   "unit": [
+    "claim",
+    "c69"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "基于Freebase知识库,将给定问题转化为多个逻辑形式(logicform);"
+  },
+  {
+   "unit": [
+    "claim",
+    "c21"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "提出了一种基于Bootstrap算法的半监督学习方法,能够自动进行实体关系建模."
+  },
+  {
+   "unit": [
+    "ref",
+    "r71"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[71]DongXin,GabrilovichE,HeitzG,etal.Knowledgevault:AWeb-sca"
+  },
+  {
+   "unit": [
+    "span",
+    "p64",
+    276,
+    407
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "由于该问题在信息检索和自然语言处理等领域具有特殊的重要性,吸引了大量的研究努力,因此学术界对该问题有多种不同的表述,典型"
+  },
+  {
+   "unit": [
+    "ref",
+    "r68"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[68]LaoNi,MitchellT,CohenWW.Randomwalkinferenceandlearningin"
+  },
+  {
+   "unit": [
+    "span",
+    "p91",
+    356,
+    421
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "一阶谓词逻辑建立在命题的基础上,在一阶谓词逻辑中,命题被分解为个体individuals)和谓词(predication"
+  },
+  {
+   "unit": [
+    "ref",
+    "r22"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[22]Mausam,SchmitzM,BartR,etal.Openlanguagelearningforinform"
+  },
+  {
+   "unit": [
+    "claim",
+    "c43"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "借助搜索引擎的关键词日志和DBpedia知识库,构建了一个知名人物本体库,据此实现了一个本体搜索引擎原型系统,为解决人物"
+  },
+  {
+   "unit": [
+    "ref",
+    "r13"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[13]JainA,PennacchiottiM.OpenentityextractionfromWebsearchqu"
+  },
+  {
+   "unit": [
+    "span",
+    "p75",
+    5,
+    121
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为此,W3C于2012年推出了2种映射语言标准:DirectMapping(Adirectmappingofrelati"
+  },
+  {
+   "unit": [
+    "ref",
+    "r44"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[44]GroszBJ,WeinsteinS,JoshiAK.Centering:Aframeworkformodeli"
+  },
+  {
+   "unit": [
+    "claim",
+    "c24"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "提出了面向开放域的信息抽取方法框架(openinformationextraction,OIE),并发布了基于自监督(s"
+  },
+  {
+   "unit": [
+    "claim",
+    "c48"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Cheng等人通过对搜索引擎的查询和点击记录进行研究,发现可以根据用户查询之后的点击行为对实体进行区分."
+  },
+  {
+   "unit": [
+    "ref",
+    "r72"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[72]TanCH,AgichteinE,IpeirotisP,etal.Trust,butverify:Predict"
+  },
+  {
+   "unit": [
+    "span",
+    "p110",
+    76,
+    154
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "模式层链接的核心是本体映射(对齐),其内涵是如果2个本体间如果存在语义上的概念关联,则通过语义关联实现二者之间的映射,本"
+  },
+  {
+   "unit": [
+    "claim",
+    "c52"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "利用跨语言知识链接方法得到的知识对,在分别生成中英文本体模型的过程中,使二者相互确认,同时提高了中文关系和英文关系预测的"
+  },
+  {
+   "unit": [
+    "span",
+    "p6",
+    101,
+    413
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "教育部-中国移动科研基金项目(MCM20121041)ThisworkwassupportedbytheNational"
+  },
+  {
+   "unit": [
+    "span",
+    "p12",
+    0,
+    68
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "WolframAlphaAppleSiriMathematicaWikipedia,BingSeachEngineSat"
+  },
+  {
+   "unit": [
+    "span",
+    "p22",
+    0,
+    73
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "2.1.1实体抽取实体抽取,也称为命名实体识别(namedentityrecognition,NER),是指从文本数据集"
+  },
+  {
+   "unit": [
+    "span",
+    "p18",
+    167,
+    244
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "如果以“实体-关系-实体”或者“实体-属性-性值”三元组作为事实的基本表达方式,则存储在图数据库中的所有数据将构成庞大的"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    0,
+    100
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "AbstractGooglesknowledgegraphtechnologyhasdrawnalotofresear"
+  },
+  {
+   "unit": [
+    "ref",
+    "r24"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[24]ZhuJun,NieZaijiang,LiuXiaojiang,etal.StatSnowball:Astati"
+  },
+  {
+   "unit": [
+    "claim",
+    "c23"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "采用基于实例的无监督学习方法,在公开语料库上获得了较好的实验结果,能够对实体间的雇佣关系、位置关系以及生产关系等多元关系"
+  },
+  {
+   "unit": [
+    "ref",
+    "r45"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[45]LappinS,ShalomHJ.Analgorithmforpronominalanaphoraresolut"
+  },
+  {
+   "unit": [
+    "span",
+    "p15",
+    0,
+    43
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "SougouSeachZhilifangKBWebOpenDataEngine"
+  },
+  {
+   "unit": [
+    "span",
+    "p49",
+    64,
+    186
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "这种方法的基本假设是属性名和属性值之间有位置上的关联关系,事实上在真实语言环境中,许多实体属性值附近都存在一些用于限制和"
+  },
+  {
+   "unit": [
+    "span",
+    "p3",
+    0,
+    169
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "LiuQiao,LiYang,DuanHong,LiuYao,andQinZhiguang(SchoolofInform"
+  },
+  {
+   "unit": [
+    "span",
+    "p85",
+    5,
+    136
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "例如Probase在处理“domesticanimalsotherthandogssuchascats”这样的句子时,可"
+  },
+  {
+   "unit": [
+    "ref",
+    "r28"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[28]SuchanekFM,KasneciG,WeikumG.Yago:Acoreofsemanticknowledg"
+  },
+  {
+   "unit": [
+    "ref",
+    "r38"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[38]BunescuR,PascaM.Usingencyclopedicknowledgefornamedentity"
+  },
+  {
+   "unit": [
+    "ref",
+    "r41"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[41]RatinovL,RothD,DowneyD,etal.Localandglobalalgorithmsford"
+  },
+  {
+   "unit": [
+    "ref",
+    "r54"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[54]SahooSS,HalbW,HellmannS,etal.Asurveyofcurrentapproachesf"
+  },
+  {
+   "unit": [
+    "ref",
+    "r10"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[10]LingXiao,WeldD.S.Fine-grainedentityrecognition[C]??Proco"
+  },
+  {
+   "unit": [
+    "claim",
+    "c8"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "微软在2013年7月发布了自己的Satori知识库之后,必应(Bing)搜索引擎产品的高级主管Weitz公开表示,发布S"
+  },
+  {
+   "unit": [
+    "span",
+    "p7",
+    380,
+    461
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "该项目始于2010年谷歌收购Metaweb公司,并籍此获得了该公司的语义搜索核心技术,其中的关键技术包括从互联网的网页中"
+  },
+  {
+   "unit": [
+    "span",
+    "p17",
+    0,
+    15
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "1.1知识图谱的定义定义1."
+  },
+  {
+   "unit": [
+    "claim",
+    "c61"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "采用基于翻译的跨语言知识抽取模型,该模型首先通过跨语言知识链接和属性对齐的方式将目标语种的相关内容映射到源语种知识库中所"
+  },
+  {
+   "unit": [
+    "claim",
+    "c47"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "基于点互信息(pointwisemutualinformation,PMI)来求解实体所在文档的相似度,并用于求解TOE"
+  },
+  {
+   "unit": [
+    "ref",
+    "r58"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[58]WuWentao,LiHongsong,WangHaixun,etal.Probase:Aprobabilist"
+  },
+  {
+   "unit": [
+    "span",
+    "p120",
+    0,
+    86
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "6结束语互联网正从包含网页和网页之间超链接的文档万维网(Webofdocument)转变成包含大量描述各种实体和实体之间"
+  },
+  {
+   "unit": [
+    "claim",
+    "c62"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "提出了一种基于迁移学习的跨语言知识抽取框架(WikiCiKE),该框架利用源语种知识库中丰富的无结构文本信息以及结构化信"
+  },
+  {
+   "unit": [
+    "claim",
+    "c38"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "以维基百科作为知识库,基于实体所在页面的上下文信息和指称项所在语料的上下文信息,利用词袋模型构造特征向量作为实体链接时进"
+  }
+ ]
 }

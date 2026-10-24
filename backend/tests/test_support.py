@@ -97,7 +97,7 @@ async def test_extract_claims_with_fake_llm(monkeypatch):
     async def fake(task, messages, schema, **kw):
         return llm.LLMResult(
             value=schema(claims=[{"text": "Transformers work well on many tasks",
-                                  "marker_ids": ["m0"]}]),
+                                  "marker_ids": ["m1"]}]),  # sentence-local tag
             route="local",
         )
 
@@ -127,7 +127,7 @@ async def test_extract_filters_foreign_marker_ids(monkeypatch):
         return llm.LLMResult(
             value=schema(claims=[{
                 "text": "Attention helps sequence models",
-                "marker_ids": ["m0", "m99"],  # m99 does not exist
+                "marker_ids": ["m1", "m99"],  # m99 does not exist
             }]),
             route="local",
         )
@@ -141,6 +141,32 @@ async def test_extract_filters_foreign_marker_ids(monkeypatch):
     assert covered == {"m0", "m1"}
     for c in claims:
         assert set(c.marker_ids) <= {"m0", "m1"}
+
+
+@pytest.mark.asyncio
+async def test_extract_prompt_independent_of_global_marker_ids(monkeypatch):
+    """F8: an injected citation earlier in the paper shifted every later
+    global marker id, changed every later prompt and missed the cache.
+    The model sees sentence-local tags, so the prompt only depends on the
+    sentence."""
+    text = "Attention helps sequence models [1] here."
+    para = Paragraph(id="p0", section_id="s0", text=text, char_offset=0)
+    prompts = []
+
+    async def fake(task, messages, schema, **kw):
+        prompts.append(messages[0]["content"])
+        return llm.LLMResult(value=schema(claims=[{
+            "text": "Attention helps sequence models", "marker_ids": ["m1"]}]),
+            route="local")
+
+    monkeypatch.setattr(claims_mod, "chat_json", fake)
+    out = []
+    for mid in ("m0", "m57"):
+        m = CitationMarker(id=mid, paragraph_id="p0", start=32, end=35,
+                           raw="[1]", ref_ids=["r1"])
+        out.append(await extract_claims(para, [m]))
+    assert prompts[0] == prompts[1]
+    assert out[1][0].marker_ids == ["m57"]
 
 
 @pytest.mark.asyncio

@@ -15,7 +15,7 @@
    "kind": "fake_ref",
    "label": "71",
    "match": "Zhao K, Rao Y. Context-aware r",
-   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+   "snippet": "另有研究从数据增强的角度改进了这一流程,文献[71]报告了在"
   },
   {
    "id": "uncited",
@@ -26,22 +26,22 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2017",
-   "new_year": "2013",
-   "match": "GIRSHICK R,DONAHUE J,DARRELL T"
+   "old_year": "2018",
+   "new_year": "2014",
+   "match": "KUZNETSOVA A,ROM H,ALLDRIN N,e"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "snippet": "2]提出了CornerNet算法,借鉴了文献",
-   "cited_label": "16",
+   "cited_label": "23",
    "intended_label": "63"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "snippet": "目标的检测框进行去除冗余操作.RM借鉴了文献",
-   "cited_label": "9",
+   "cited_label": "13",
    "intended_label": "40"
   },
   {
@@ -53,8 +53,8 @@
     "5",
     "12",
     "14",
-    "55",
-    "68"
+    "56",
+    "69"
    ]
   },
   {

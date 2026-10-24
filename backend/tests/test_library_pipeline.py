@@ -3,6 +3,7 @@ evidence in the support layer, the /library/scan endpoint."""
 
 from __future__ import annotations
 
+import dataclasses
 import shutil
 from pathlib import Path
 
@@ -77,6 +78,15 @@ def test_apply_local(paper_folder):
     assert any("首作者为 曾子明" in i for i in check.issues)
     assert any("年份为 2026" in i for i in check.issues)
     assert finding.title == "文献信息与本地原文不一致"
+    # pinyin authors / an English title of a Chinese paper, and a cover
+    # title extracted as symbol soup, cannot contradict the local copy
+    pinyin = ref.model_copy(update={"authors": ["Zeng Ziming"], "title": (
+        "Adversarial hallucination mitigation for classical literature QA")})
+    check, finding = apply_local(pinyin, online, p, 40)
+    assert check.status == "verified" and finding is None
+    garbled = p.doc.model_copy(update={"title": "„ØÓÚ¨¸»œ¶Ô»°ˇµ˝‡µ˜¸…¿…"})
+    from citecheck.library.source import local_issues
+    assert local_issues(ref, dataclasses.replace(p, doc=garbled)) == []
 
 
 @pytest.mark.asyncio

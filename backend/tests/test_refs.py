@@ -813,3 +813,45 @@ def test_year_only_diff():
     assert not _year_only_diff(a, "The visual object tracking VOT2014 "
                                   "challenge report")
     assert not _year_only_diff("A study of X 2019", "A study of X")
+
+
+def test_surname_first_full_names_are_not_a_mismatch():
+    """F8 liuqiao: Chinese-English lists write 'Liu Xiaohua' (surname
+    first) for the record's 'Xiaohua Liu', and 'Wu Fei' read as surname
+    'Fei' — 25 false 首作者不一致 on one human paper."""
+    ref = make_ref(
+        "[7] Liu Xiaohua, Zhang Shaodian, Wei Furu, et al. Recognizing named "
+        "entities in tweets[C]//Proc of ACL. 2011: 359-367.")
+    hit = _hit(title="Recognizing named entities in tweets",
+               authors=("Xiaohua Liu", "Shaodian Zhang"), year=2011, doi=None)
+    issues, author_diff, _ = _evaluate(ref, hit)
+    assert not any("作者" in i for i in issues) and author_diff is False
+    ref = make_ref(
+        "[30] Wu Fei, Weld D S. Autonomously semantifying wikipedia[C]//Proc "
+        "of CIKM. 2007: 41-50.")
+    hit = _hit(title="Autonomously semantifying wikipedia",
+               authors=("Wu, Fei", "Weld, Daniel S."), year=2007, doi=None)
+    assert not any("作者" in i for i in _evaluate(ref, hit)[0])
+
+
+def test_unrelated_first_author_still_flagged():
+    ref = make_ref(RAWS["devlin"])
+    hit = _hit(authors=("Kenton Lee", "Ming-Wei Chang"))
+    issues, author_diff, _ = _evaluate(ref, hit)
+    assert author_diff and any("首作者不一致" in i for i in issues)
+
+
+def test_bracketed_label_without_space_resolves_by_label():
+    """F8 luohuilan: "[15]GIRSHICK R,…" got no label, so markers fell back
+    to list position and, after one entry merged into its neighbour,
+    every later [n] pointed at entry n+1."""
+    from citecheck.parse.links import _number_resolver
+
+    assert parse_reference("[15]GIRSHICK R,DONAHUE J.Rich feature "
+                           "hierarchies[A].CVPR.2014.580-587.")["label"] == "15"
+    assert parse_reference("12. Smith J. A title. 2019.")["label"] == "12"
+    assert parse_reference("2019 survey of things")["label"] is None
+    refs = [make_ref(f"[{n}]AUTHOR{n} A.Title number {n}[J].Venue,2019.",
+                     rid=f"r{k}") for k, n in enumerate([14, 15, 17, 18])]
+    resolve = _number_resolver(refs)
+    assert resolve(17) == "r2" and resolve(15) == "r1"
