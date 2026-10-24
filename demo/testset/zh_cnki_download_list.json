@@ -1,0 +1,158 @@
+[
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 1,
+  "title": "基于开放网络知识的信息检索与数据挖掘",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 2,
+  "title": "大数据系统和分析技术综述",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 3,
+  "title": "基于弱监督学习的海量网络数据关系抽取",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 4,
+  "title": "基于描述逻辑的组合知识库推理",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 5,
+  "title": "开放式文本信息抽取",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 6,
+  "title": "基于扩展领域模型的有名属性抽取",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 7,
+  "title": "基于核函数中文关系自动抽取系统的实现",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "知识图谱构建技术综述",
+  "n": 8,
+  "title": "知识库推理和维护系统(KBIMS)",
+  "src": "wanfang_liuqiao_kg.json"
+ },
+ {
+  "from": "基于深度学习的目标检测研究综述",
+  "n": 1,
+  "title": "改进的SSD航拍目标检测方法",
+  "src": "wanfang_luohuilan_odt.json"
+ },
+ {
+  "from": "基于深度学习的目标检测研究综述",
+  "n": 2,
+  "title": "面向小目标的多尺度Faster-RCNN检测算法",
+  "src": "wanfang_luohuilan_odt.json"
+ },
+ {
+  "from": "基于深度学习的目标检测研究综述",
+  "n": 3,
+  "title": "基于深度学习的场景文字检测综述",
+  "src": "wanfang_luohuilan_odt.json"
+ },
+ {
+  "from": "基于深度学习的目标检测研究综述",
+  "n": 4,
+  "title": "卷积神经网络研究综述",
+  "src": "wanfang_luohuilan_odt.json"
+ },
+ {
+  "from": "基于深度学习的目标检测研究综述",
+  "n": 5,
+  "title": "基于图像显著轮廓的目标检测",
+  "src": "wanfang_luohuilan_odt.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 1,
+  "title": "智能对话系统研究综述",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 2,
+  "title": "关于人机对话系统的思考",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 3,
+  "title": "限定领域口语对话系统中超出领域话语的协处理方法",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 4,
+  "title": "任务型人机对话系统中的认知技术——概念、进展及其未来",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 5,
+  "title": "开展情感计算研究构建和谐电子社会",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 6,
+  "title": "对话系统中控制模型的比较研究",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 7,
+  "title": "情感计算理论与技术",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 8,
+  "title": "口语对话系统的POMDP模型及求解",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 9,
+  "title": "对话系统评价方法综述被引量:3",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 10,
+  "title": "限定领域口语对话系统中超出领域话语的对话行为识别",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 11,
+  "title": "多模态教学对话系统研究与实现",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 12,
+  "title": "多模态对话管理系统的研究与实现",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ },
+ {
+  "from": "任务型对话系统研究综述",
+  "n": 13,
+  "title": "人机对话系统",
+  "src": "wanfang_zhaoyangyang_tod.json"
+ }
+]
