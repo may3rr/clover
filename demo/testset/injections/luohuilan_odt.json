@@ -1,0 +1,75 @@
+{
+ "paper": "luohuilan_odt",
+ "source": "manuscript.docx",
+ "target": "manuscript_injected.docx",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "label": "70",
+   "match": "Feature pyramid refinement for",
+   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "label": "71",
+   "match": "Context-aware region proposal ",
+   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "label": "72",
+   "match": "Redmon J, Divvala S, Girshick "
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "old_year": "2014",
+   "new_year": "2010",
+   "match": "GIRSHICK R,DONAHUE J,DARRELL T"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "目标的检测框进行去除冗余操作.RM借鉴了文献",
+   "cited_label": "11",
+   "intended_label": "40"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "述本节主要将近年来基于候选区域的目标检测算法",
+   "cited_label": "46",
+   "intended_label": "14"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
+   "labels": [
+    "8",
+    "29",
+    "30",
+    "35",
+    "42",
+    "53"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "座标",
+   "right": "坐标",
+   "snippet": "[38]提出了Softer NMS 算法,不是直接选"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "[1],使得目标检测具有很大的挑战性.的影响传统的目"
+  }
+ ]
+}

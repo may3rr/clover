@@ -1,0 +1,75 @@
+{
+ "paper": "yinhongpeng_odt",
+ "source": "manuscript.docx",
+ "target": "manuscript_injected.docx",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "label": "228",
+   "match": "Scale-adaptive anchor-free det",
+   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "label": "229",
+   "match": "Attention-guided feature fusio",
+   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "label": "230",
+   "match": "Redmon J, Divvala S, Girshick "
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "old_year": "2014",
+   "new_year": "2010",
+   "match": "Kristan M, Pﬂugfelder R, Leona"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "的目标检测与跟踪综述尹宏鹏[1],[2]陈波",
+   "cited_label": "147",
+   "intended_label": "2"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "列(2015年)该比赛从2013年开始举办表",
+   "cited_label": "46",
+   "intended_label": "7"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
+   "labels": [
+    "21",
+    "76",
+    "142",
+    "159",
+    "161",
+    "213"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "辩识",
+   "right": "辨识",
+   "snippet": "6 届视觉与学习青年研讨会(Vision and L"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "关键词计算机视觉, 目标检测, 目标跟踪, 背景建模"
+  }
+ ]
+}

@@ -1,0 +1,75 @@
+{
+ "paper": "liuqiao_kg",
+ "source": "manuscript.docx",
+ "target": "manuscript_injected.docx",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "label": "83",
+   "match": "Temporal knowledge graph reaso",
+   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "label": "84",
+   "match": "Entity alignment between knowl",
+   "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "label": "85",
+   "match": "徐增林, 盛泳潘, 贺丽荣, 王雅芳. 知识图谱技术综述[J"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "old_year": "2013",
+   "new_year": "2009",
+   "match": "Berant J,Chou A,Frostig R,et a"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "多问题,微软希望取得领导地位,而不是追随谷歌",
+   "cited_label": "55",
+   "intended_label": "6"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "试问题,取得了74%的正确率.Cheng等人",
+   "cited_label": "9",
+   "intended_label": "49"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
+   "labels": [
+    "5",
+    "9",
+    "28",
+    "35",
+    "41",
+    "52"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "[47]通过实验发现,语义背景知识对于构造共指消解算"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "[32].实体链接的基本思想是首先根据给定的实体指称"
+  }
+ ]
+}
