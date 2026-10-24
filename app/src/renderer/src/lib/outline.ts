@@ -60,6 +60,9 @@ export interface SkLine {
   dots?: number[]
   /** last line of a paragraph renders shorter */
   short?: boolean
+  /** bar width 0..1 — ragged line ends follow the paragraph's own tail,
+   * so pages read like text instead of uniform full-width chops */
+  w?: number
 }
 
 export type SkPage = SkLine[]
@@ -106,6 +109,9 @@ export function layoutSkeleton(outline: Outline): SkLayout {
       if (p.heading) continue
       const n = Math.max(1, Math.round((p.length / CHARS_PER_LINE) * scale))
       const per = p.length / n
+      // the paragraph's ragged end: chars left in the final ~90-char line
+      const tail = p.length % CHARS_PER_LINE || CHARS_PER_LINE * 0.62
+      const tailW = Math.min(0.95, Math.max(0.35, tail / CHARS_PER_LINE))
       for (let i = 0; i < n; i++) {
         const charStart = i * per
         const charEnd = (i + 1) * per
@@ -116,6 +122,7 @@ export function layoutSkeleton(outline: Outline): SkLayout {
           charStart,
           charEnd,
           short: i === n - 1,
+          w: i === n - 1 ? tailW : undefined,
           dots: p.markers
             .map((m) => m * p.length)
             .filter((c) => c >= charStart && c < charEnd)
@@ -125,7 +132,13 @@ export function layoutSkeleton(outline: Outline): SkLayout {
     }
   }
   for (let i = 0; i < refBars; i++) {
-    units.push({ kind: 'ref', key: `r-${i}`, short: true })
+    // reference entries vary in length — a deterministic ragged rhythm
+    units.push({
+      kind: 'ref',
+      key: `r-${i}`,
+      short: true,
+      w: 0.58 + 0.37 * ((i * 0.618) % 1),
+    })
   }
 
   // paginate evenly: pick the page count first, then spread lines so no

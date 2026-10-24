@@ -325,30 +325,30 @@ export function ChevronRightIcon({
 }
 
 /* sidebar toggles — SF "sidebar.leading/trailing": one filled rounded
-   rect with a real die-cut slot (SVG mask, so any pane background shows
-   through), the standard macOS affordance for showing/hiding a pane */
-function _sbShape(slotX: number, p: IconProps) {
+   rect with a die-cut slot (evenodd sub-path, so any pane background
+   shows through; no mask/id — reference-free SVG renders everywhere) */
+function _sbSlot(slotX: number, p: IconProps) {
   return (
     <Fill {...p}>
-      <mask id={`cc-sb-${slotX}`}>
-        <rect width="24" height="24" fill="white" />
-        <rect x={slotX} y="4.75" width="1.5" height="14.5" fill="black" />
-      </mask>
       <path
-        mask={`url(#cc-sb-${slotX})`}
         fillRule="evenodd"
-        d="M6.25 4.75h11.5a2.5 2.5 0 0 1 2.5 2.5v9.5a2.5 2.5 0 0 1-2.5 2.5H6.25a2.5 2.5 0 0 1-2.5-2.5V7.25a2.5 2.5 0 0 1 2.5-2.5Z"
+        clipRule="evenodd"
+        d={
+          'M6.25 4.75H17.75A2.5 2.5 0 0 1 20.25 7.25V16.75A2.5 2.5 0 0 1 17.75 19.25H6.25' +
+          'A2.5 2.5 0 0 1 3.75 16.75V7.25A2.5 2.5 0 0 1 6.25 4.75Z' +
+          `M${slotX + 1.5} 6.75H${slotX}V17.25H${slotX + 1.5}Z`
+        }
       />
     </Fill>
   )
 }
-/** sidebar.leading — toggles the left sidebar pane */
+/** sidebar.leading — toggles the left sidebar pane (slot on the left) */
 export function SidebarLeadingIcon(p: IconProps) {
-  return _sbShape(8.75, p)
+  return _sbSlot(8.75, p)
 }
-/** sidebar.trailing — toggles the right inspector pane */
+/** sidebar.trailing — toggles the right inspector pane (slot on the right) */
 export function SidebarTrailingIcon(p: IconProps) {
-  return _sbShape(13.75, p)
+  return _sbSlot(13.75, p)
 }
 
 export function ChevronUpIcon({ size = 18, color = 'currentColor' }: IconProps) {

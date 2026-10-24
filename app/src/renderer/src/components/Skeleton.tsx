@@ -22,6 +22,13 @@ const SEV_CLASS: Record<string, string> = {
   low: 'sk-sev-low',
 }
 
+/** pre-parse placeholder rhythm: full lines with ragged paragraph ends
+    and the odd stray short line — reads like text, no mechanical
+    every-fifth-bar pattern */
+const SHIMMER_W = [
+  1, 1, 0.78, 1, 0.6, 1, 1, 0.88, 0.42, 1, 1, 0.7, 1, 0.55, 1, 0.83,
+]
+
 export default function SkeletonPaper({ outline, lit }: Props) {
   const layout = useMemo(
     () => (outline ? layoutSkeleton(outline) : null),
@@ -75,7 +82,12 @@ export default function SkeletonPaper({ outline, lit }: Props) {
           <div
             key={u.key}
             className={`sk-bar${u.short ? ' short' : ''}${u.kind === 'ref' ? ' ref' : ''}${sev ? ` ${SEV_CLASS[sev] ?? ''}` : ''}`}
-            style={{ animationDelay: `${d}ms` }}
+            style={{
+              animationDelay: `${d}ms`,
+              ...(u.w !== undefined
+                ? { width: `${Math.round(u.w * 100)}%` }
+                : null),
+            }}
           >
             {(u.dots ?? []).map((x, k) => (
               <i
@@ -93,13 +105,21 @@ export default function SkeletonPaper({ outline, lit }: Props) {
   if (!outline || !layout) {
     // pre-parse: four placeholder pages (the max the outline can show) so
     // the row is full-width before AND after parsing — no reflow when the
-    // real outline lands
+    // real outline lands. First bar of each page stands in for a heading.
     return (
       <div className="sk-row sk-shimmer">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="sk-page">
-            {Array.from({ length: 16 }).map((_, k) => (
-              <div key={k} className={k % 5 === 4 ? 'sk-bar short' : 'sk-bar'} />
+            {SHIMMER_W.map((w, k) => (
+              <div
+                key={k}
+                className="sk-bar"
+                style={
+                  k === 0
+                    ? { height: 5, width: '46%', borderRadius: 2.5 }
+                    : { width: `${Math.round(w * 100)}%` }
+                }
+              />
             ))}
           </div>
         ))}

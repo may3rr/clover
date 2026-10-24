@@ -440,7 +440,7 @@ export default function ReportScreen({
             <button
               className="icon-btn"
               aria-label="收起侧栏"
-              title="收起侧栏 ⌘\\"
+              title="收起侧栏 ⌘\"
               onClick={toggleLeftPane}
             >
               <SidebarLeadingIcon size={15} />
@@ -550,9 +550,9 @@ export default function ReportScreen({
           <div className="flex min-w-0 flex-1 items-center gap-2">
             {leftCollapsed && (
               <button
-                className="icon-btn pop-in"
+                className="icon-btn"
                 aria-label="展开侧栏"
-                title="展开侧栏 ⌘\\"
+                title="展开侧栏 ⌘\"
                 onClick={toggleLeftPane}
               >
                 <SidebarLeadingIcon size={15} />
@@ -584,9 +584,9 @@ export default function ReportScreen({
             )}
             {rightCollapsed && (
               <button
-                className="icon-btn pop-in"
+                className="icon-btn"
                 aria-label="展开检查器"
-                title="展开检查器 ⌘⇧\\"
+                title="展开检查器 ⌘⇧\"
                 onClick={toggleRightPane}
               >
                 <SidebarTrailingIcon size={15} />
@@ -1090,7 +1090,7 @@ function InspectorList({
         <button
           className="icon-btn"
           aria-label="收起检查器"
-          title="收起检查器 ⌘⇧\\"
+          title="收起检查器 ⌘⇧\"
           onClick={onCollapse}
         >
           <SidebarTrailingIcon size={15} />

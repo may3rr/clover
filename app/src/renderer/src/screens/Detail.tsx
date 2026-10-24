@@ -32,7 +32,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse }: 
         <button
           className="icon-btn"
           aria-label="收起检查器"
-          title="收起检查器 ⌘⇧\\"
+          title="收起检查器 ⌘⇧\"
           onClick={onCollapse}
         >
           <SidebarTrailingIcon size={15} />

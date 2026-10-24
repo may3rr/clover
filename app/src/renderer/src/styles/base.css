@@ -498,17 +498,6 @@ select {
   padding-left: 84px;
 }
 
-/* the expand button that appears in the center strip once a pane is
-   away — fades in with the pane's collapse */
-@keyframes cc-pop-in {
-  from {
-    opacity: 0;
-  }
-}
-.pop-in {
-  animation: cc-pop-in 160ms var(--ease);
-}
-
 /* ---- scroll edge fade --------------------------------------------------
    List content dissolves toward an edge only while more content lies that
    way (can-top / can-bottom from useScrollFade). @property makes the fade

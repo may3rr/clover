@@ -17,6 +17,7 @@ import { supportForFinding } from './claims'
 import { pickGreeting } from './greetings'
 import { relDay } from './reltime'
 import { barGeom, comparedSections } from './dist'
+import { layoutSkeleton } from './outline'
 import type { Finding, Report, Revision } from '../types/report'
 
 function item(
@@ -447,5 +448,38 @@ describe('distribution findings collapse', () => {
   it('leaves a single section finding alone', () => {
     const items = buildItems({ ...base, findings: [f('a', 'h1', 'low')] } as never)
     expect(items.map((i) => i.id)).toEqual(['a'])
+  })
+})
+
+describe('layoutSkeleton ragged line ends', () => {
+  it('sizes paragraph tails by their own ragged end, refs by a varied rhythm', () => {
+    const outline = {
+      title: null as string | null,
+      references: 4,
+      sections: [
+        {
+          id: 's1',
+          title: 'A',
+          canonical: 'other',
+          paragraphs: [
+            { id: 'p1', length: 200, markers: [] }, // tail 20/90 -> clamp 0.35
+            { id: 'p2', length: 145, markers: [] }, // tail 55/90 -> 0.61
+            { id: 'p3', length: 90, markers: [] },  // exact line -> 0.62 stand-in
+          ],
+        },
+      ],
+    }
+    const lines = layoutSkeleton(outline).pages.flat()
+    const last = (pid: string) =>
+      lines.filter((l) => l.paraId === pid).at(-1)!
+    expect(last('p1').w).toBeCloseTo(0.35, 2)
+    expect(last('p2').w).toBeCloseTo(0.61, 2)
+    expect(last('p3').w).toBeCloseTo(0.62, 2)
+    // full lines carry no width (default 100%); refs vary between entries
+    const full = lines.filter((l) => l.kind === 'line' && !l.short)
+    expect(full.every((l) => l.w === undefined)).toBe(true)
+    const refs = lines.filter((l) => l.kind === 'ref').map((l) => l.w)
+    expect(new Set(refs.map((w) => w!.toFixed(3))).size).toBe(4)
+    expect(refs.every((w) => w! >= 0.58 && w! <= 0.95)).toBe(true)
   })
 })
