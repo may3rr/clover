@@ -1,6 +1,6 @@
 # 中文测试集参考文献总表
 
-> 用途：5 篇中文底稿的完整参考文献列表。**中文条目**请在知网逐条下载 PDF，放入对应论文的 `ref/` 文件夹（作为支持度证据的本地原文）；**英文条目**无需知网，系统联网（Crossref/OpenAlex/Semantic Scholar）核验即可。语言判定：剔除万方对英文条目使用的「等」（et al.）标记后，条目含汉字才算中文。注意两类形似英文的中文文献：万方把作者名罗马化后用「等」结尾；自动化学报把中文文献著录成拼音作者 + 英文题名，并在括号内附中文原文（检索知网时直接用括号里的中文题名）。
+> 用途：5 篇中文底稿的完整参考文献列表。**中文条目**请在知网逐条下载 PDF，放入对应论文的 `ref/` 文件夹（作为支持度证据的本地原文）；**英文条目**无需知网，系统联网（Crossref/OpenAlex/Semantic Scholar）核验即可。语言判定：剔除万方对英文条目使用的「等」（et al.）标记后，条目含汉字才算中文。注意两类形似英文的中文文献：万方把中文文献著录成拼音作者（用「等」结尾）；自动化学报把中文文献著录成拼音作者 + 英文题名并在括号内附中文原文（检索知网时直接用括号里的中文题名）。
 
 
 ## 顾迎捷, 桂小林, 李德福, 沈毅, 廖东. 基于神经网络的机器阅读理解综述. 软件学报, 2020, 31(7): 2095-2126. DOI 10.13328/j.cnki.jos.006048
@@ -144,7 +144,7 @@
 ## 刘峤, 李杨, 段宏, 刘瑶, 秦志光. 知识图谱构建技术综述. 计算机研究与发展, 2016, 53(3): 582-600. DOI 10.7544/issn1000-1239.2016.20148228
 
 - 来源：万方数据（参考文献分页抓取，共47条）
-- 共 47 条 = 中文 14 条（知网下载） + 英文 33 条（联网核验）
+- 共 47 条 = 中文 10 条（知网下载） + 英文 37 条（联网核验）
 
 | # | 参考文献条目 | 语言 |
 | --- | --- | --- |
@@ -157,7 +157,7 @@
 | 7 | 刘峤 , 韩明皓 , 杨晓慧 ,等. 基于表示学习和语义要素感知的关系推理算法 [J]. 计算机研究与发展 . 2017 ,54(8).1682-1692. DOI: 10.7544/issn1000-1239.2017.20170200 . | 中文 |
 | 8 | 王亦雷 , 嵇智源 , 夏勇 ,等. 移动用户人口统计信息预测 [J]. 电子科技大学学报 . 2015 ,(6).917-920,933. DOI: 10.3969/j.issn.1001-0548.2015.06.021 . | 中文 |
 | 9 | 丁哲 , 秦臻 , 郑文韬 ,等. 基于移动用户浏览行为的推荐模型 [J]. 电子科技大学学报 . 2017 ,46(6).907-912. DOI: 10.3969/j.issn.1001-0548.2017.06.020 . | 中文 |
-| 10 | 吴劲 , 陈志慧 . 基于Event-B的形式化建模关键技术研究 [J]. 电子科技大学学报 . 2014 ,(3).405-408. DOI: 10.3969/j.issn.1001-0548.2014.03.015 . 1 2 3 6 | 中文 |
+| 10 | 吴劲 , 陈志慧 . 基于Event-B的形式化建模关键技术研究 [J]. 电子科技大学学报 . 2014 ,(3).405-408. DOI: 10.3969/j.issn.1001-0548.2014.03.015 . | 中文 |
 | 11 | Nguyen Thanh,Moreira Viviane,Nguyen Huong,等.Multilingual schema matching for Wikipedia infoboxes[J].Proc. VLDB Endow..2011.133-144.DOI:10.14778/2078324.2078329 . | 英文 |
 | 12 | Bizer, C,Heath, T,Berners-Lee, T.Linked Data - The Story So Far[J].International journal on Semantic Web & information systems.2009,5(3). | 英文 |
 | 13 | KATHLEEN M. CARLEY,BRADLEY MALIN,EDOARDO AIROLDI.A Network Analysis Model for Disambiguation of Names in Lists[J].Computational & Mathematical Organization Theory.2005,11(2). | 英文 |
@@ -167,7 +167,7 @@
 | 17 | Jerry R. Hobbs.Resolving pronoun references[J].Lingua.1978,44(4).311-338.DOI:10.1016/0024-3841(78)90006-2 . | 英文 |
 | 18 | Zellig S. Harris.Distributional Structure[J].Word.1954,10(2-3).146-162.DOI:10.1080/00437956.1954.11659520 . | 英文 |
 | 19 | Zhigang Wang,Juanzi Li,Shuangjie Li,等.Cross-Lingual Knowledge Validation Based Taxonomy Derivation from Heterogeneous Online Wikis[C].2014. | 英文 |
-| 20 | Jonathan Berant,Percy Liang.Semantic Parsing via Paraphrasing[C].2014. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
+| 20 | Jonathan Berant,Percy Liang.Semantic Parsing via Paraphrasing[C].2014. | 英文 |
 | 21 | Xuchen Yao,Benjamin Van Durme.Information Extraction over Structured Data: Question Answering with Freebase[C].2014. | 英文 |
 | 22 | Zhichun Wang,Juanzi Li,Jie Tang.Boosting Cross-Lingual Knowledge Linking via Concept Annotation[C].2013. | 英文 |
 | 23 | Zhigang Wang,Zhixing Li,Juanzi Li,等.Transfer Learning Based Cross-lingual Knowledge Extraction for Wikipedia[C].2013. | 英文 |
@@ -177,7 +177,7 @@
 | 27 | Wei Shen,Jianyong Wang,Ping Luo,等.LINDEN: Linking Named Entities with Knowledge Base via Semantic Knowledge[C].2012. | 英文 |
 | 28 | Xiao Ling,Daniel S. Weld.Fine-Grained Entity Recognition[C].2012. | 英文 |
 | 29 | Mausam,Michael Schmitz,Robert Bart,等.Open Language Learning for Information Extraction[C].2012. | 英文 |
-| 30 | Zhichun Wang,Juanzi Li,Zhigang Wang,等.Cross-lingual Knowledge Linking Across Wiki Knowledge Bases[C].2012. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
+| 30 | Zhichun Wang,Juanzi Li,Zhigang Wang,等.Cross-lingual Knowledge Linking Across Wiki Knowledge Bases[C].2012. | 英文 |
 | 31 | Alan Akbik,Alexander Loeser.KrakeN: N-ary Facts in Open Information Extraction[C].2012. | 英文 |
 | 32 | Prithviraj Sen.Collective Context-Aware Topic Models for Entity Disambiguation[C].2012. | 英文 |
 | 33 | Wentao Wu,Hongsong Li,Haixun Wang,等.Probase: A Probabilistic Taxonomy for Text Understanding[C].2012. | 英文 |
@@ -187,14 +187,14 @@
 | 37 | Xianpei Han,Le Sun,Jun Zhao.Collective Entity Linking in Web Text: A Graph-Based Method[C].2011. | 英文 |
 | 38 | Xiaohua Liu,Shaodian Zhang,Furu Wei,等.Recognizing Named Entities in Tweets[C].2011. | 英文 |
 | 39 | Ochs, Christopher,Tian, Tian,Geller, James,等.Google Knows Who is Famous Today -- Building an Ontology from Search Engine Knowledge and DBpedia[C].2011. | 英文 |
-| 40 | Alpa Jain,Marco Pennacchiotti.Open Entity Extraction fromWeb Search Query Logs[C].2010. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
+| 40 | Alpa Jain,Marco Pennacchiotti.Open Entity Extraction fromWeb Search Query Logs[C].2010. | 英文 |
 | 41 | Fei Wu,Daniel S. Weld.Open Information Extraction using Wikipedia[C].2010. | 英文 |
 | 42 | Jun Zhu,Zaiqing Nie,Xiaojing Liu,等.StatSnowball: a Statistical Approach to Extracting Entity Relationships[C].2009. | 英文 |
 | 43 | Michele Banko,Oren Etzioni.The Tradeoffs Between Open and Traditional Relation Extraction[C].2008. | 英文 |
 | 44 | Soren Auer,Christian Bizer,Georgi Kobilarov,等.DBpedia: A Nucleus for a Web of Open Data[C].2007. | 英文 |
 | 45 | Fei Wu,Daniel S. Weld,PFei Wu,等.Autonomously semantifying wikipedia[C].2007. | 英文 |
 | 46 | Amit Bagga,Breck Baldwin.Entity-Based Cross-document Coreferencing Using the Vector Space Model[C].1998. | 英文 |
-| 47 | Rau, L.F.,Institute of Electric and Electronic Engineer.Extracting company names from text[C].1991. 1 2 3 4 5 引证文献 (2830) 仅看全文排序： 发表时间 被引频次 查看被引分布图 | 中文 |
+| 47 | Rau, L.F.,Institute of Electric and Electronic Engineer.Extracting company names from text[C].1991. | 英文 |
 
 ## 尹宏鹏, 陈波, 柴毅, 刘兆栋. 基于视觉的目标检测与跟踪综述. 自动化学报, 2016, 42(10): 1466-1489. DOI 10.16383/j.aas.2016.c150823
 
@@ -472,7 +472,7 @@
 | 7 | 罗森林,潘丽敏.情感计算理论与技术[J].系统工程与电子技术.2003,25(7).905-909.DOI:10.3321/j.issn:1001-506X.2003.07.037 . | 中文 |
 | 8 | 张波,蔡庆生,郭百宁.口语对话系统的POMDP模型及求解[J].计算机研究与发展.2002,(2). | 中文 |
 | 9 | 张伟男,张杨子,刘挺.对话系统评价方法综述 被引量:3[J].中国科学（信息科学）.2017,(8).953-966. | 中文 |
-| 10 | 黄沛杰,王俊东,柯子烜,等.限定领域口语对话系统中超出领域话语的对话行为识别[J].中文信息学报.2016,(6). 1 2 3 4 5 | 中文 |
+| 10 | 黄沛杰,王俊东,柯子烜,等.限定领域口语对话系统中超出领域话语的对话行为识别[J].中文信息学报.2016,(6). | 中文 |
 | 11 | 朱坤鸿.多模态教学对话系统研究与实现[D].2018. | 中文 |
 | 12 | 易炼.多模态对话管理系统的研究与实现[D].2014. | 中文 |
 | 13 | 曹均阔. 人机对话系统 [M].电子工业出版社,2017. | 中文 |
@@ -482,7 +482,7 @@
 | 17 | Patrícia Cristina Nascimento Souto.Creating Knowledge with and from the Differences: The Required Dialogicality and Dialogical Competences[J].RAI Revista de Administração e Inovação.2015,12(2).60-89.DOI:10.11606/rai.v12i2.100333 . | 英文 |
 | 18 | Mesnil, Gregoire,Dauphin, Yann,Yao, Kaisheng,等.Using Recurrent Neural Networks for Slot Filling in Spoken Language Understanding[J].IEEE/ACM transactions on audio, speech, and language processing.2015,23(3).530-539. | 英文 |
 | 19 | Mnih, Volodymyr,Kavukcuoglu, Koray,Silver, David,等.Human-level control through deep reinforcement learning[J].Nature.2015,518(Feb.26 TN.7540).529-a3.DOI:10.1038/nature14236 . | 英文 |
-| 20 | Shi, Yangyang,Larson, Martha,Jonker, Cathohin M..Recurrent neural network language model adaptation with curriculum learning[J].Computer speech & language.2015,33(1).136-154.DOI:10.1016/j.csl.2014.11.004 . 1 2 3 4 5 | 英文 |
+| 20 | Shi, Yangyang,Larson, Martha,Jonker, Cathohin M..Recurrent neural network language model adaptation with curriculum learning[J].Computer speech & language.2015,33(1).136-154.DOI:10.1016/j.csl.2014.11.004 . | 英文 |
 | 21 | Mairesse,François.Stochastic Language Generation in Dialogue Using Factored Language Models.[J].Computational Linguistics.2014,40(4).763-799.DOI:10.1162/COLI_a_00199 . | 英文 |
 | 22 | OLIVIER PIETQUIN,HELEN HASTIE.A survey on metrics for the evaluation of user simulations[J].The knowledge engineering review.2013,28(1).59-73. | 英文 |
 | 23 | Victor Lopez Salazar,Eduardo M. Eisman Cabeza,Juan Luis Castro Pena,等.A case based reasoning model for multilingual language generation in dialogues[J].Expert Systems with Application.2012,39(8).7330-7337. | 英文 |
@@ -492,7 +492,7 @@
 | 27 | Thomson, B.,Young, S..Bayesian update of dialogue state: A POMDP framework for spoken dialogue systems[J].Computer speech & language.2010,24(4).562-588.DOI:10.1016/j.csl.2009.07.003 . | 英文 |
 | 28 | Lemon, O.,Shimodaira, H.,Renals, S.,等.Evaluation of a hierarchical reinforcement learning spoken dialogue system[J].Computer speech & language.2010,24(2). | 英文 |
 | 29 | Lee, C.,Kim, K.,Lee, G.G.,等.Hybrid approach to robust dialog management using agenda and dialog examples[J].Computer speech & language.2010,24(4). | 英文 |
-| 30 | Young, S.,Ga?i?, M.,Keizer, S.,等.The Hidden Information State model: A practical framework for POMDP-based spoken dialogue management[J].Computer speech & language.2010,24(2).150-174.DOI:10.1016/j.csl.2009.04.001 . 1 2 3 4 5 | 英文 |
+| 30 | Young, S.,Ga?i?, M.,Keizer, S.,等.The Hidden Information State model: A practical framework for POMDP-based spoken dialogue management[J].Computer speech & language.2010,24(2).150-174.DOI:10.1016/j.csl.2009.04.001 . | 英文 |
 | 31 | Weinberger, Kilian Q.,Saul, Lawrence K..Distance Metric Learning for Large Margin Nearest Neighbor Classification.[J].Journal of Machine Learning Research.2009,10(2).207-244. | 英文 |
 | 32 | Tatsuya Kawahara,Ian Lane,Tomoko Matsui,等.Out-of-Domain Utterance Detection Using Classification Confidences of Multiple Topics[J].IEEE transactions on audio, speech, and language processing: A Publication of the IEEE Signal Processing Society.2007,15(1).150-161. | 英文 |
 | 33 | Jason D. Williams,Steve Young.Partially observable Markov decision processes for spoken dialog systems[J].Computer speech & language.2007,21(2).393-422. | 英文 |
@@ -502,7 +502,7 @@
 | 37 | Glass JR.,Polifroni J.,Seneff S.,等.JUPITER: A telephone-based conversational interface for weather information[J].IEEE Transactions on Speech & Audio Proceeding: A Publication of the IEEE Signal Processing Society.2000,8(1). | 英文 |
 | 38 | Volker Tresp.A Bayesian Committee Machine[J].Neural computation.2000,12(11).2719-2741. | 英文 |
 | 39 | felix A. Gers,Jurgen Schmidhuber,Fred Cummins.Learning to Forget: Continual Prediction with LSTM[J].Neural computation.2000,12(10).2451-2471. | 英文 |
-| 40 | Hearst M.A.,Dumais S.T..Support vector machines[J].IEEE intelligent systems & their applications.1998,13(4).18-28. 1 2 3 4 5 | 英文 |
+| 40 | Hearst M.A.,Dumais S.T..Support vector machines[J].IEEE intelligent systems & their applications.1998,13(4).18-28. | 英文 |
 | 41 | M. A. Walker,D. J. Litman,C. A. Kamm,等.Evaluating spoken dialogue agents with PARADISE: Two case studies[J].Computer speech & language.1998,12(4).317-347. | 英文 |
 | 42 | WATANABE Taro,ARAKI Masahiro,DOSHITA Shuji.Evaluating Dialogue Strategies under Communication Errors Using Computer-to-Computer Simulation[J].IEICE transactions on information & systems.1998,81(9).1025-1033. | 英文 |
 | 43 | S, Hochreiter,J, Schmidhuber.Long short-term memory.[J].Neural computation.1997,9(8).1735-80. | 英文 |
@@ -510,8 +510,8 @@
 | 45 | Rabiner L.R..A tutorial on hidden Markov models and selected applications in speech recognition[J].Proceedings of the IEEE.1989,77(2). | 英文 |
 | 46 | Joseph Weizenbaum.ELIZA - a computer program for the study of natural language communication between man and machine[J].Communications of the ACM.1983,26 (1).23-28.DOI:10.1145/357980.357991 . | 英文 |
 | 47 | Cover, T.,Hart, P..Nearest neighbor pattern classification[J].Information Theory, IEEE Transactions on.1967,13(1).21-27. | 英文 |
-| 48 | WILLIAM RTHOMPSON.On the Likelihood That ONE Unknown Probability Exceeds Another in View of the Evidence of Two Samples[J].Biometrika.1933,25(3-4).285-294. 1 2 3 4 5 | 英文 |
+| 48 | WILLIAM RTHOMPSON.On the Likelihood That ONE Unknown Probability Exceeds Another in View of the Evidence of Two Samples[J].Biometrika.1933,25(3-4).285-294. | 英文 |
 
 ---
 
-五篇合计 469 条：中文 40 条（知网下载清单）、英文 429 条（联网核验）。
+五篇合计 469 条：中文 36 条（知网下载清单）、英文 433 条（联网核验）。
