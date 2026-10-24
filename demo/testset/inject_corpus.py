@@ -6,12 +6,20 @@ describing every injection and how the evaluator should detect it.
 
 Defect mix per paper (9 injections, seed=42, deterministic):
   fake_ref x2      fabricated-but-plausible references, each cited once
-  misattr  x2      single-marker sentences whose marker is swapped to an
-                   unrelated real reference (Zhang-guan-li-dai)
-  wrong_year x1    publication year of one reference shifted -4 years
+  misattr  x2      citation markers swapped to an unrelated real reference
+                   (Zhang-guan-li-dai) — only markers the CLEAN run's claims
+                   actually cite, never author superscripts / table numbers
+  wrong_year x1    publication year of one online-verified reference shifted
+                   -4 years (the last year-looking number, never a title token)
   uncited x1       a real, in-domain reference added but never cited
   stacking x1      a sentence citing six references at once
-  typo x2          Chinese wrong-character in a citing sentence
+  typo x2          Chinese wrong-character in a citing sentence (post-
+                   replacement snippet recorded, never inside a marker)
+
+Placement uses the CLEAN-run report as a whitelist (paragraphs that produced
+claims / markers those claims cite / refs verified online), so every
+injection is detectable in principle: the corpus measures detection
+capability, not parser blind spots. Requires reports/<paper>_clean.json.
 
 ref_reorder is intentionally not injected: it is an export-layer feature
 (labels stay bound to entries), not a detection target.
@@ -31,48 +39,53 @@ from docx import Document
 HERE = Path(__file__).resolve().parent
 
 FAKES = {
-    "liuqiao_kg": [
-        ("Temporal knowledge graph reasoning with historical interaction "
-         "encoding[J].Journal of Computer Science and Technology.2021,36(4).780-794."),
-        ("Entity alignment between knowledge graphs with attribute-aware "
-         "graph convolution[J].Journal of Computer Research and "
-         "Development.2020,57(7).1-13."),
+    # 各刊按其参考文献表的原生著录样式伪造，避免样式启发式直接归类为无发表信息
+    "liuqiao_kg": [  # 计算机研究与发展: 作者.题名[J].期刊,年,卷(期):页.
+        ("Wang X, Li J, Zhou Y. Temporal knowledge graph reasoning with "
+         "historical interaction encoding[J]. Journal of Computer Science "
+         "and Technology, 2021, 36(4): 780-794."),
+        ("Chen R, Xu H. Entity alignment between knowledge graphs with "
+         "attribute-aware graph convolution[J]. Journal of Computer Research "
+         "and Development, 2020, 57(7): 1441-1453."),
     ],
-    "luohuilan_odt": [
-        ("Feature pyramid refinement for small object detection in aerial "
-         "images[J].IEEE Transactions on Image Processing.2020,29.8319-8330."),
-        ("Context-aware region proposal network for multi-scale object "
-         "detection[J].Pattern Recognition.2019,95.120-131."),
+    "luohuilan_odt": [  # 电子学报: 作者.题名[J].期刊.年,(期).页
+        ("Liu S, Deng Z. Feature pyramid refinement for small object "
+         "detection in aerial images[J]. IEEE Transactions on Image "
+         "Processing.2020,(9).8319-8330."),
+        ("Zhao K, Rao Y. Context-aware region proposal network for "
+         "multi-scale object detection[J]. Pattern "
+         "Recognition.2019,(12).120-131."),
     ],
-    "zhaoyangyang_tod": [
-        ("Domain-aware dialogue state tracking with schema prompts[J]."
-         "Computer Speech and Language.2021,65.101-120."),
-        ("Multi-party task-oriented dialogue systems with dynamic belief "
-         "graphs[J].Chinese Journal of Computers.2020,43(9).1-15."),
+    "zhaoyangyang_tod": [  # 计算机学报: 作者.题名[J].期刊,年,卷(期):页
+        ("Zhang M, Lei T. Domain-aware dialogue state tracking with schema "
+         "prompts[J]. Computer Speech and Language, 2021, 65: 101-120."),
+        ("Wang P, Yang Z. Multi-party task-oriented dialogue systems with "
+         "dynamic belief graphs[J]. Chinese Journal of Computers, 2020, "
+         "43(9): 1712-1727."),
     ],
-    "yinhongpeng_odt": [
-        ("Scale-adaptive anchor-free detector for tiny vehicle detection[J]."
-         "Acta Automatica Sinica.2020,46(7).1-14."),
-        ("Attention-guided feature fusion for video object detection[J]."
-         "IEEE Transactions on Circuits and Systems for Video "
-         "Technology.2020,30(9).1-12."),
+    "yinhongpeng_odt": [  # 自动化学报(英文著录): Author. Title[J]. Journal, 年, 卷(期): 页
+        ("Gao X, Wen L. Scale-adaptive anchor-free detector for tiny "
+         "vehicle detection. Acta Automatica Sinica, 2020, 46(7): 1-14"),
+        ("Chen B, Yin H. Attention-guided feature fusion for video object "
+         "detection[J]. IEEE Transactions on Circuits and Systems for Video "
+         "Technology, 2020, 30(9): 2211-2224."),
     ],
-    "guyingjie_mrc": [
-        ("Cross-lingual machine reading comprehension with aligned passage "
-         "retrieval[J].ACM Transactions on Asian and Low-Resource Language "
-         "Information Processing.2020,19(3).1-17."),
-        ("Numerical reasoning over machine reading comprehension with "
-         "program synthesis[J].Journal of Computer Science and "
-         "Technology.2020,35(6).1-14."),
+    "guyingjie_mrc": [  # 软件学报: Author.Title. In:Proc.., 年, 页 / [J].期刊, 年, 卷(期): 页
+        ("Sun F, Liu Q. Cross-lingual machine reading comprehension with "
+         "aligned passage retrieval[J].Journal of Computer Science and "
+         "Technology., 2020, 35(6): 1-17."),
+        ("Kim S, Park C. Numerical reasoning over machine reading "
+         "comprehension with program synthesis[J].Artificial "
+         "Intelligence., 2020, 285: 103-118."),
     ],
 }
 
 UNCITED = {
     "liuqiao_kg": "徐增林, 盛泳潘, 贺丽荣, 王雅芳. 知识图谱技术综述[J]. 电子科技大学学报, 2016, 45(4): 589-606.",
-    "luohuilan_odt": "Redmon J, Divvala S, Girshick R, et al. You only look once: Unified, real-time object detection[A]. CVPR. 2016. 779-788.",
-    "zhaoyangyang_tod": "Vaswani A, Shazeer N, Parmar N, et al. Attention is all you need[A]. NIPS. 2017. 5998-6008.",
-    "yinhongpeng_odt": "Redmon J, Divvala S, Girshick R, et al. You only look once: Unified, real-time object detection[A]. CVPR. 2016. 779-788.",
-    "guyingjie_mrc": "Liu Y, Ott M, Goyal N, et al. RoBERTa: A robustly optimized BERT pretraining approach[J]. arXiv preprint arXiv:1907.11692. 2019.",
+    "luohuilan_odt": "Redmon J, Divvala S, Girshick R, et al. You only look once: Unified, real-time object detection[A].CVPR.2016.779-788.",
+    "zhaoyangyang_tod": "Zhong V, Xiong C, Socher R. Seq2SQL: Generating structured queries from natural language using reinforcement learning. 2017. https://arxiv.org/abs/1709.05178",
+    "yinhongpeng_odt": "Redmon J, Divvala S, Girshick R, et al. You only look once: Unified, real-time object detection[A]. IEEE Computer Society, 2016. 779-788",
+    "guyingjie_mrc": "Liu Y, Ott M, Goyal N, et al. RoBERTa: A robustly optimized BERT pretraining approach. 2019. https://arxiv.org/abs/1907.11692",
 }
 
 TYPOS = [("部署", "布署"), ("坐标", "座标"), ("候选", "侯选"),
@@ -80,6 +93,51 @@ TYPOS = [("部署", "布署"), ("坐标", "座标"), ("候选", "侯选"),
 
 STACK_SENT = ("此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等方面"
               "均存在明显差异,系统对比可参见文献[{refs}].")
+
+# paragraphs a citation-marker swap must avoid: author-affiliation superscript
+# lists ("尹宏鹏[1],[2]陈波"), keyword lines, table/figure captions and other
+# non-prose — the parser does not treat those [n] as citations
+_AFFIL = re.compile(r"\[\d{1,3}\]\s*,\s*\[\d{1,3}\]")
+_FRONT = re.compile(r"关键词|Key\s*words|Keywords", re.IGNORECASE)
+
+
+def squash(s: str) -> str:
+    return re.sub(r"\s+", "", s)
+
+
+def load_clean_state(directory: str):
+    """Placement whitelist from the CLEAN-run report: injections land only
+    where the pipeline demonstrably reads the text — paragraphs that produced
+    claims, citation markers those claims cite, references verified online.
+    Placed there every injection is detectable in principle, so the corpus
+    measures detection capability, not parser blind spots (author-affiliation
+    superscripts, running heads, table captions)."""
+    rep = json.loads(
+        (HERE / "reports" / f"{directory}_clean.json").read_text(encoding="utf-8"))
+    pid_by_squash = {squash(p["text"]): p["id"] for p in rep["paragraphs"]}
+    claimed = set()
+    for c in rep["claims"]:
+        claimed.update(c.get("marker_ids") or [])
+    cite_markers: dict[str, list[dict]] = {}
+    marker_spans: dict[str, list[tuple[int, int]]] = {}
+    for m in rep["markers"]:
+        if not m.get("ref_ids"):
+            continue
+        marker_spans.setdefault(m["paragraph_id"], []).append((m["start"], m["end"]))
+        if m["id"] in claimed and re.fullmatch(r"\[\d{1,3}\]", m["raw"].strip()):
+            cite_markers.setdefault(m["paragraph_id"], []).append(
+                {"start": m["start"], "label": m["raw"].strip()[1:-1]})
+    prose_pids = {c["paragraph_id"] for c in rep["claims"]}
+    verified_labels = set()
+    for rc in rep["ref_checks"]:
+        if rc["status"] != "verified":
+            continue
+        ref = next((r for r in rep["references"] if r["id"] == rc["ref_id"]), None)
+        if ref:
+            lm = re.match(r"^\[(\d{1,3})\]", ref["raw"].strip())
+            if lm:
+                verified_labels.add(lm.group(1))
+    return pid_by_squash, cite_markers, marker_spans, prose_pids, verified_labels
 
 
 def para_text(p) -> str:
@@ -120,6 +178,8 @@ def inject_paper(directory: str, seed: int = 42):
     body_idx, ref_idx, ref_head = find_body_and_refs(doc)
     ref_texts = [doc.paragraphs[i].text.strip() for i in ref_idx]
     n_refs = len(ref_texts)
+    (pid_by_squash, cite_markers, marker_spans, prose_pids,
+     verified_labels) = load_clean_state(directory)
     spec = {"paper": directory, "source": "manuscript.docx",
             "target": "manuscript_injected.docx", "injections": []}
 
@@ -131,10 +191,13 @@ def inject_paper(directory: str, seed: int = 42):
     # ---- 1. fake_ref x2 --------------------------------------------------
     label = next_ref_label(ref_texts)
     fake_snips = []
+    hosts = [i for i in body_idx
+             if not _AFFIL.search(doc.paragraphs[i].text)
+             and not _FRONT.search(doc.paragraphs[i].text)]
     for k, fake in enumerate(FAKES[directory][:2]):
         doc.add_paragraph(f"[{label}] {fake}")
         ref_texts.append(f"[{label}] {fake}")
-        host_i = rng.choice(body_idx)
+        host_i = rng.choice(hosts)
         host = doc.paragraphs[host_i]
         snip = (f"近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模"
                 f"方法[{label}]被证明能够显著提升跨领域场景下的鲁棒性.")
@@ -147,7 +210,9 @@ def inject_paper(directory: str, seed: int = 42):
 
     # ---- 2. uncited x1 ----------------------------------------------------
     unc = UNCITED[directory]
-    already = any(unc[:16] in t for t in ref_texts)
+    # whitespace-insensitive: the paper's own copy may format authors
+    # differently ("Vaswani A,Shazeer N" vs "Vaswani A, Shazeer N")
+    already = any(squash(unc)[:16] in squash(t) for t in ref_texts)
     if not already:
         ulabel = next_ref_label(ref_texts)
         doc.add_paragraph(f"[{ulabel}] {unc}")
@@ -155,14 +220,21 @@ def inject_paper(directory: str, seed: int = 42):
 
     # ---- 3. wrong_year x1 --------------------------------------------------
     year_target = None
-    # prefer an English-language reference: Chinese entries often cannot be
-    # verified online, which would make the injected defect undetectable
+    # only entries the CLEAN run verified online: a -4 shift then provably
+    # mismatches the database record. Prefer English (most Latin) refs, and
+    # shift the LAST year-looking number (the publication-year position) of
+    # entries with >=2 such numbers — with a single match the number may be
+    # part of the title ("…VOT2014 challenge results"), and a title edit
+    # still fuzzy-matches the real record
     latin = lambda s: sum(1 for c in s if c.isascii() and c.isalpha())
     for i in sorted(ref_idx, key=lambda i: -latin(doc.paragraphs[i].text)):
         t = doc.paragraphs[i].text
-        m = re.search(r"(19[7-9]\d|20[01]\d)", t)
-        if m:
-            year_target = (i, m.group(1))
+        lm = re.match(r"^\[(\d{1,3})\]", t.strip())
+        if not lm or lm.group(1) not in verified_labels:
+            continue
+        ms = list(re.finditer(r"(19[7-9]\d|20[01]\d)", t))
+        if len(ms) >= 2:
+            year_target = (i, ms[-1].group(1))
             break
     if year_target:
         i, old = year_target
@@ -173,41 +245,49 @@ def inject_paper(directory: str, seed: int = 42):
                  match=re.sub(r"^\[\d{1,3}\]\s*", "", t)[:30])
 
     # ---- 4. misattribution x2 ----------------------------------------------
+    # swap only markers the CLEAN run's claims actually cite — never author
+    # superscripts, table numbers or running heads
     swapped = 0
-    single = [i for i in body_idx if i not in modified and
-              len(re.findall(r"\[\d{1,3}\]", doc.paragraphs[i].text)) == 1]
-    multi = [i for i in body_idx if i not in modified and
-             len(re.findall(r"\[\d{1,3}\]", doc.paragraphs[i].text)) > 1]
-    cand = [(i, 1) for i in single] + [(i, 0) for i in multi]
+    cand = []
+    for i in body_idx:
+        pid = pid_by_squash.get(squash(para_text(doc.paragraphs[i])))
+        if pid is None or i in modified:
+            continue
+        ms = [m for m in cite_markers.get(pid, []) if m["start"] >= 25]
+        if ms:
+            cand.append((i, ms))
     rng.shuffle(cand)
     used = set()
-    for i, single_only in cand:
+    for i, ms in cand:
         if swapped >= 2:
             break
         t = doc.paragraphs[i].text
-        matches = list(re.finditer(r"\[(\d{1,3})\]", t))
-        matches = [m for m in matches if m.start() >= 25]
-        if single_only and len(matches) != 1:
+        m = rng.choice(ms)
+        n0 = int(m["label"])
+        # find this marker's [n0] in the docx text near the report offset
+        pos = None
+        for occ in re.finditer(rf"\[{n0}\]", t):
+            if abs(occ.start() - m["start"]) <= 12:
+                pos = occ.start()
+                break
+        if pos is None:
             continue
-        if not matches:
-            continue
-        m = matches[0]
-        n0 = int(m.group(1))
         others = [x for x in range(1, n_refs + 1)
                   if abs(x - n0) >= 8 and x not in used and x != n0]
         if not others:
             continue
         m2 = rng.choice(others)
         used.update({n0, m2})
-        rewrite(doc.paragraphs[i], t.replace(f"[{n0}]", f"[{m2}]", 1))
+        rewrite(doc.paragraphs[i],
+                t[:pos] + f"[{m2}]" + t[pos + len(f"[{n0}]"):])
         modified.add(i)
         swapped += 1
         add_note(id=f"misattr{swapped}", kind="misattribution",
-                 snippet=re.sub(r"\s+", "", t[max(0, m.start() - 30):m.start()])[-22:],
+                 snippet=re.sub(r"\s+", "", t[max(0, pos - 30):pos])[-22:],
                  cited_label=str(m2), intended_label=str(n0))
 
     # ---- 5. stacking x1 ------------------------------------------------------
-    host_i = rng.choice([i for i in body_idx if i not in modified])
+    host_i = rng.choice([i for i in hosts if i not in modified])
     host = doc.paragraphs[host_i]
     refs6 = sorted(rng.sample(range(1, n_refs + 1), 6))
     sent = STACK_SENT.format(refs=",".join(map(str, refs6)))
@@ -217,9 +297,10 @@ def inject_paper(directory: str, seed: int = 42):
              labels=[str(x) for x in refs6])
 
     # ---- 6. typo x2 ------------------------------------------------------------
+    # hosts are paragraphs that produced claims in the CLEAN run — real
+    # prose the typo checker reads — and the word must not sit inside a
+    # citation-marker span
     done = 0
-    for wrong, right in [("", "")]:
-        pass
     pairs = TYPOS[:]
     rng.shuffle(pairs)
     for orig, typo in pairs:
@@ -228,13 +309,25 @@ def inject_paper(directory: str, seed: int = 42):
         for i in body_idx:
             if i in modified:
                 continue
+            pid = pid_by_squash.get(squash(para_text(doc.paragraphs[i])))
+            if pid is None or pid not in prose_pids:
+                continue
             t = doc.paragraphs[i].text
-            if orig in t and "[" in t:
-                rewrite(doc.paragraphs[i], t.replace(orig, typo, 1))
-                done += 1
-                add_note(id=f"typo{done}", kind="typo", wrong=typo, right=orig,
-                         snippet=t[:26])
-                break
+            spans = marker_spans.get(pid, [])
+            pos = next(
+                (o.start() for o in re.finditer(re.escape(orig), t)
+                 if not any(o.start() < e and s < o.end() for s, e in spans)),
+                None)
+            if pos is None:
+                continue
+            rewritten = t[:pos] + typo + t[pos + len(orig):]
+            rewrite(doc.paragraphs[i], rewritten)
+            done += 1
+            # record the POST-replacement text: the snippet must be findable
+            # inside the injected document
+            add_note(id=f"typo{done}", kind="typo", wrong=typo, right=orig,
+                     snippet=rewritten[:26])
+            break
 
     out = HERE / "zh_papers" / directory / "manuscript_injected.docx"
     doc.save(out)

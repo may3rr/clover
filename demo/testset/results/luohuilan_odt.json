@@ -28,13 +28,13 @@
    "id": "misattr1",
    "kind": "misattribution",
    "detected": false,
-   "detail": "labels=['undetermined'] findings=0"
+   "detail": "labels=['undetermined'] offtopic=0 findings=0"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": false,
-   "detail": "labels=[] findings=0"
+   "detail": "labels=[] offtopic=0 findings=0"
   },
   {
    "id": "stacking",
@@ -56,18 +56,18 @@
   }
  ],
  "claims": {
-  "tp": 1,
-  "fp": 4,
-  "fn": 1,
-  "tn": 70,
+  "tp": 3,
+  "fp": 3,
+  "fn": 2,
+  "tn": 69,
   "total_claims": 93,
   "support_definitive": 34,
-  "pre_existing_flagged": 19,
-  "undetermined_on_defect": 1,
+  "pre_existing_flagged": 17,
+  "undetermined_on_defect": 2,
   "pr_acc": [
-   0.2,
    0.5,
-   0.9342105263157895
+   0.6,
+   0.935064935064935
   ]
  },
  "refs": {
@@ -82,14 +82,14 @@
   ]
  },
  "totals": {
-  "tp": 5,
-  "fp": 5,
-  "fn": 1,
-  "tn": 123,
+  "tp": 7,
+  "fp": 4,
+  "fn": 2,
+  "tn": 122,
   "pr_acc": [
-   0.5,
-   0.8333333333333334,
-   0.9552238805970149
+   0.6363636363636364,
+   0.7777777777777778,
+   0.9555555555555556
   ]
  }
 }

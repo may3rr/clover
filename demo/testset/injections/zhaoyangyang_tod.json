@@ -7,69 +7,69 @@
    "id": "fake1",
    "kind": "fake_ref",
    "label": "240",
-   "match": "Domain-aware dialogue state tr",
+   "match": "Zhang M, Lei T. Domain-aware d",
    "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
   },
   {
    "id": "fake2",
    "kind": "fake_ref",
    "label": "241",
-   "match": "Multi-party task-oriented dial",
+   "match": "Wang P, Yang Z. Multi-party ta",
    "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
   },
   {
    "id": "uncited",
    "kind": "uncited",
    "label": "242",
-   "match": "Vaswani A, Shazeer N, Parmar N"
+   "match": "Zhong V, Xiong C, Socher R. Se"
   },
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2011",
-   "new_year": "2007",
+   "old_year": "2019",
+   "new_year": "2015",
    "match": "Roemmele M,Bejan C A,Gordon A "
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "理解的错误导致DM模块做出不好甚至错误的决策",
-   "cited_label": "41",
-   "intended_label": "135"
+   "snippet": "决了可变长度的句子的输入问题,但由于其网络视",
+   "cited_label": "199",
+   "intended_label": "23"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "短期记忆网络(LongShort-Team表",
-   "cited_label": "128",
-   "intended_label": "3"
+   "snippet": "义相似度、命名实体识别、情感分析和问答匹配等",
+   "cited_label": "66",
+   "intended_label": "1"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "46",
-    "68",
-    "129",
-    "185",
-    "196",
-    "225"
+    "2",
+    "72",
+    "151",
+    "195",
+    "208",
+    "223"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "背境",
-   "right": "背景",
-   "snippet": "[145]等对话系统也逐渐往此方向发展.因此,设计蜜"
+   "wrong": "布署",
+   "right": "部署",
+   "snippet": "[36]和单例学习是迁移学习的特例,也被经零次学习常"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "wrong": "侯选",
-   "right": "候选",
-   "snippet": "3.1.1 自然语言理解自然语言理解的目的是将用户的"
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "[145]等对话系统也逐渐往此方向发展.因此,设计蜜"
   }
  ]
 }

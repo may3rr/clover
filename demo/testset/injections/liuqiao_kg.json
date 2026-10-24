@@ -7,14 +7,14 @@
    "id": "fake1",
    "kind": "fake_ref",
    "label": "83",
-   "match": "Temporal knowledge graph reaso",
+   "match": "Wang X, Li J, Zhou Y. Temporal",
    "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
   },
   {
    "id": "fake2",
    "kind": "fake_ref",
    "label": "84",
-   "match": "Entity alignment between knowl",
+   "match": "Chen R, Xu H. Entity alignment",
    "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
   },
   {
@@ -26,50 +26,50 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2013",
-   "new_year": "2009",
-   "match": "Berant J,Chou A,Frostig R,et a"
+   "old_year": "2010",
+   "new_year": "2006",
+   "match": "Fu B,Brennan R,Declan O S.Cros"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "多问题,微软希望取得领导地位,而不是追随谷歌",
-   "cited_label": "55",
-   "intended_label": "6"
+   "snippet": "tureofknowledgegraph.图",
+   "cited_label": "63",
+   "intended_label": "1"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "试问题,取得了74%的正确率.Cheng等人",
-   "cited_label": "9",
-   "intended_label": "49"
+   "snippet": ".为促进知识库融合的标准化,Mendes等人",
+   "cited_label": "5",
+   "intended_label": "53"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "5",
-    "9",
+    "4",
     "28",
-    "35",
-    "41",
-    "52"
+    "30",
+    "65",
+    "72",
+    "78"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "背境",
-   "right": "背景",
-   "snippet": "[47]通过实验发现,语义背景知识对于构造共指消解算"
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "4 知识图谱的应用通过知识图谱,不仅可以将互联网的信"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "wrong": "侯选",
-   "right": "候选",
-   "snippet": "[32].实体链接的基本思想是首先根据给定的实体指称"
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "[47]通过实验发现,语义背境知识对于构造共指消解算"
   }
  ]
 }

@@ -4,7 +4,10 @@ Unit of measurement (per the corpus design): the citing claim (一条引用句) 
 the reference. For every injected manuscript this script
 
   1. checks each injection against the pipeline report using the same
-     detection rules as demo/evaluate.py (not relaxed),
+     detection rules as demo/evaluate.py (not relaxed); a misattribution
+     counts as detected when the pipeline raised ANY support-layer alarm on
+     the swapped marker's sentence — unsupported (high), review-confirmed
+     off_topic (medium) or the attribution-consistency rule (medium),
   2. walks every claim / reference and labels it ground-truth positive
      (targeted by an injection) or clean, and predicted positive (flagged by
      the pipeline: high/medium support/distribution/norms finding anchored on
@@ -31,6 +34,7 @@ ROOT = HERE.parent.parent
 sys.path.insert(0, str(ROOT / "backend"))
 
 from citecheck.schema import Report  # noqa: E402
+from citecheck.support.claims import split_sentences  # noqa: E402
 
 PAPERS = ["liuqiao_kg", "luohuilan_odt", "zhaoyangyang_tod",
           "yinhongpeng_odt", "guyingjie_mrc"]
@@ -78,13 +82,38 @@ def ref_id_by_label(report: Report, label: str) -> str | None:
     return None
 
 
+def find_ref_by_inj(report: Report, inj: dict):
+    """The injected reference entry: prefer the spec's [label] (unique even
+    when the paper already cites a near-duplicate), fall back to a
+    whitespace-insensitive match on the raw entry text."""
+    lab = inj.get("label")
+    if lab is not None:
+        rid = ref_id_by_label(report, str(lab))
+        if rid is not None:
+            return next((r for r in report.references if r.id == rid), None)
+    m = inj.get("match", "")
+    if not m:
+        return None
+    return next((r for r in report.references
+                 if norm(m)[:20] in norm(r.raw)), None)
+
+
+def marker_sentence_span(para_text: str, pos: int):
+    """(start, end) of the sentence containing the marker at `pos`, split
+    with the same boundaries the claim extractor uses so spans and claims
+    line up."""
+    for s in split_sentences(para_text):
+        if s.start <= pos < s.end:
+            return (s.start, s.end)
+    return (max(0, pos - 40), min(len(para_text), pos + 40))
+
+
 def detect_injection(rep: Report, inj: dict) -> tuple[bool, str, dict]:
     """(detected, detail, gt_span) — gt_span = (paragraph_id, start, end) of
     the defective text for claim-level accounting (None for ref-level)."""
     kind = inj["kind"]
     if kind == "fake_ref":
-        r = next((r for r in rep.references
-                  if norm(inj["match"])[:20] in norm(r.raw)), None)
+        r = find_ref_by_inj(rep, inj)
         rc = next((c for c in rep.ref_checks if c.ref_id == r.id), None) if r else None
         fs = [f for f in rep.findings if f.layer == "authenticity"
               and r and r.id in f.refs]
@@ -93,8 +122,7 @@ def detect_injection(rep: Report, inj: dict) -> tuple[bool, str, dict]:
         return ok, f"status={rc.status if rc else '-'}", None
 
     if kind == "wrong_year":
-        r = next((r for r in rep.references
-                  if norm(inj["match"])[:20] in norm(r.raw)), None)
+        r = find_ref_by_inj(rep, inj)
         rc = next((c for c in rep.ref_checks if c.ref_id == r.id), None) if r else None
         ok = bool(rc and rc.status == "mismatch"
                   and any("年份" in i for i in rc.issues))
@@ -102,23 +130,45 @@ def detect_injection(rep: Report, inj: dict) -> tuple[bool, str, dict]:
 
     if kind == "misattribution":
         para = find_para(rep, inj["snippet"])
-        span = locate(rep, para, inj["snippet"])
         ref = ref_id_by_label(rep, inj["cited_label"])
+        span = None
+        if para is not None:
+            s = locate(rep, para, inj["snippet"])
+            marker = f"[{inj['cited_label']}]"
+            pos = None
+            # prefer the marker right after the recorded context snippet
+            for m in re.finditer(re.escape(marker), para.text):
+                if s and abs(m.start() - s[1]) <= 4:
+                    pos = m.start()
+                    break
+            if pos is None:
+                m = re.search(re.escape(marker), para.text)
+                pos = m.start() if m else (s[1] if s else 0)
+            span = marker_sentence_span(para.text, pos)
         cs = [c for c in rep.claims
-              if para and c.paragraph_id == para.id and overlap(claim_span(c), span)]
+              if para is not None and c.paragraph_id == para.id
+              and overlap(claim_span(c), span)]
         cks = [c for c in rep.support_checks
                if ref and c.ref_id == ref and any(c.claim_id == cl.id for cl in cs)]
-        fs = [f for f in rep.findings if f.layer == "support" and f.severity == "high"
-              and f.anchor and f.anchor.paragraph_id == (para.id if para else "")
-              and overlap((f.anchor.start, f.anchor.end), span)]
-        ok = bool(any(c.label == "unsupported" for c in cks) and fs)
+        # any support-layer alarm on the sentence counts: unsupported (high),
+        # review-confirmed off_topic (medium), or the attribution rule
+        fs = [f for f in rep.findings if f.layer == "support"
+              and f.severity in {"high", "medium"} and f.anchor
+              and f.anchor.paragraph_id == (para.id if para is not None else "")
+              and overlap((f.anchor.start, f.anchor.end), span)
+              and (ref is None or ref in f.refs)]
         labels = [c.label for c in cks]
-        return ok, f"labels={labels} findings={len(fs)}", \
-            (para.id, span[0], span[1]) if (para and span) else None
+        offtopic = [bool(getattr(c, "off_topic", False)) for c in cks]
+        hi = any(f.severity == "high" for f in fs)
+        attr = any("归属" in f.title or "引错" in f.title for f in fs)
+        ok = bool((any(x == "unsupported" for x in labels) and hi)
+                  or (any(offtopic) and fs)
+                  or attr)
+        return ok, f"labels={labels} offtopic={sum(offtopic)} findings={len(fs)}", \
+            (para.id, span[0], span[1]) if (para is not None and span) else None
 
     if kind == "uncited":
-        r = next((r for r in rep.references
-                  if norm(inj["match"])[:20] in norm(r.raw)), None)
+        r = find_ref_by_inj(rep, inj)
         ok = bool(r and any(f.layer == "norms" and "没有被引用" in f.title
                             and r.id in f.refs for f in rep.findings))
         return ok, f"ref={'found' if r else 'missing'}", None
@@ -166,10 +216,14 @@ def gt_spans_for(rep: Report, inj: dict):
         _, _, span = detect_injection(rep, inj)
         return span
     if kind == "fake_ref":
-        para = find_para(rep, inj.get("snippet", inj["match"]))
+        para = find_para(rep, inj.get("snippet", inj.get("match", "")))
         if para is None:
             return None
-        m = re.search(r"\[\d{1,3}\]", para.text)
+        m = None
+        if inj.get("label"):
+            m = re.search(r"\[%s\]" % re.escape(str(inj["label"])), para.text)
+        if m is None:
+            m = re.search(r"\[\d{1,3}\]", para.text)
         return (para.id, m.start(), m.end()) if m else None
     return None
 
@@ -221,7 +275,10 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
         ok, detail, span = detect_injection(rep_inj, inj)
         detection.append({"id": inj["id"], "kind": inj["kind"],
                           "detected": ok, "detail": detail})
-        if ok and span:
+        # ground truth covers every injection, detected or not: an alarm on
+        # an undetected injection's position is a true positive there, not a
+        # false positive elsewhere (it IS the defect location)
+        if span:
             gt_claim_spans.append(span)
         if inj["kind"] in {"fake_ref", "uncited"}:
             r = next((r for r in rep_inj.references

@@ -7,14 +7,14 @@
    "id": "fake1",
    "kind": "fake_ref",
    "label": "131",
-   "match": "Cross-lingual machine reading ",
+   "match": "Sun F, Liu Q. Cross-lingual ma",
    "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
   },
   {
    "id": "fake2",
    "kind": "fake_ref",
    "label": "132",
-   "match": "Numerical reasoning over machi",
+   "match": "Kim S, Park C. Numerical reaso",
    "snippet": "近期工作也探索了该方向的可扩展性,例如基于结构化约束的建模方"
   },
   {
@@ -26,35 +26,35 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2018",
-   "new_year": "2014",
-   "match": "Parikh S, Sai AB, Nema P, et a"
+   "old_year": "2014",
+   "new_year": "2010",
+   "match": "Cho K, Van Merrienboer B, Gulc"
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "相同,有些数据集还会预测“是/否”、不可回答",
-   "cited_label": "125",
-   "intended_label": "27"
+   "snippet": ";同样是SQuAD1.1数据集,Chen等人",
+   "cited_label": "89",
+   "intended_label": "78"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "度上可以提升模型的性能.例如:Huang等人",
-   "cited_label": "31",
-   "intended_label": "105"
+   "snippet": "NLP领域取得巨大成功后,Vaswani等人",
+   "cited_label": "108",
+   "intended_label": "67"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
+    "12",
+    "21",
     "26",
-    "42",
-    "72",
-    "94",
-    "98",
-    "117"
+    "59",
+    "60",
+    "75"
    ]
   },
   {
