@@ -48,6 +48,54 @@
   "src": "wanfang_liuqiao_kg.json"
  },
  {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 12,
+  "title": "面向目标检测的稀疏表示方法研究进展",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 17,
+  "title": "黄凯奇,陈晓棠,康运锋,谭铁牛",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 19,
+  "title": "视觉跟踪技术综述",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 20,
+  "title": "运动目标检测算法的探讨",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 21,
+  "title": "运动目标跟踪算法研究综述",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 22,
+  "title": "微弱运动目标的检测与跟踪识别算法研究",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 106,
+  "title": "深度学习及其在目标和行为识别中的新进展",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
+  "from": "基于视觉的目标检测与跟踪综述",
+  "n": 208,
+  "title": "基于全局和局部约束直推学习的鲁棒跟踪研究",
+  "src": "aas_yinhongpeng_odt.json"
+ },
+ {
   "from": "基于深度学习的目标检测研究综述",
   "n": 1,
   "title": "改进的SSD航拍目标检测方法",
