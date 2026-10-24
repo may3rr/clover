@@ -1,0 +1,80 @@
+{
+  "source": "base_paper.docx",
+  "target": "demo_paper.docx",
+  "injections": [
+    {
+      "id": "fake1",
+      "kind": "fake_ref",
+      "match": "Prompt-conditioned evidence alignment for retrieval-augmented language models",
+      "label": "25",
+      "snippet": "Prompt-conditioned evidence alignment has been proposed to tighten this coupling"
+    },
+    {
+      "id": "fake2",
+      "kind": "fake_ref",
+      "match": "Citation graph rewiring for faithful text generation",
+      "label": "26",
+      "snippet": "Citation-graph rewiring has also been explored as a way to repair attribution links"
+    },
+    {
+      "id": "wrongyear",
+      "kind": "wrong_year",
+      "match": "Lewis P, Perez E, Piktus A, et al. Retrieval-augmented generation",
+      "old_year": "2020",
+      "new_year": "2016"
+    },
+    {
+      "id": "misattr1",
+      "kind": "misattribution",
+      "snippet": "REALM pre-trains a neural knowledge retriever jointly with the masked language model during pre-training [21].",
+      "cited_label": "21",
+      "intended_label": "7"
+    },
+    {
+      "id": "misattr2",
+      "kind": "misattribution",
+      "snippet": "probabilistic scoring framework of BM25 defines the lexical baseline we compare against [20].",
+      "cited_label": "20",
+      "intended_label": "13"
+    },
+    {
+      "id": "uncited",
+      "kind": "uncited",
+      "match": "Chain-of-thought prompting elicits reasoning",
+      "label": "27"
+    },
+    {
+      "id": "stacking",
+      "kind": "stacking",
+      "snippet": "These themes recur across the retrieval, grounding and attribution literature"
+    },
+    {
+      "id": "typo1",
+      "kind": "typo",
+      "wrong": "Retreival-augmented",
+      "right": "Retrieval-augmented",
+      "snippet": "combines this parametric memory"
+    },
+    {
+      "id": "typo2",
+      "kind": "typo",
+      "wrong": "recieved",
+      "right": "received",
+      "snippet": "less direct measurement"
+    },
+    {
+      "id": "typo3",
+      "kind": "typo",
+      "wrong": "recal",
+      "right": "recall",
+      "snippet": "ColBERTv2 achieves strong",
+      "protected": [
+        "ColBERTv2",
+        "BEIR"
+      ]
+    }
+  ],
+  "reorder": {
+    "note": "bibliography shuffled; markers unchanged"
+  }
+}

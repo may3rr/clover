@@ -1,0 +1,81 @@
+{
+  "detected": "6/10",
+  "reorder_check": true,
+  "unmatched_high_findings": 0,
+  "passed": false,
+  "high_findings": [],
+  "unmatched_high": [],
+  "severity_counts": {
+    "high": 0,
+    "medium": 5,
+    "low": 8
+  },
+  "results": [
+    {
+      "id": "fake1",
+      "kind": "fake_ref",
+      "detected": false,
+      "detail": "ref=r12 status=unverifiable"
+    },
+    {
+      "id": "fake2",
+      "kind": "fake_ref",
+      "detected": false,
+      "detail": "ref=r6 status=unverifiable"
+    },
+    {
+      "id": "wrongyear",
+      "kind": "wrong_year",
+      "detected": true,
+      "detail": "ref=r2 status=mismatch issues=['年份不一致：文中写 2016，数据库记录为 2020']"
+    },
+    {
+      "id": "misattr1",
+      "kind": "misattribution",
+      "detected": false,
+      "detail": "para=p9 ref=r24 labels=['undetermined'] findings=0"
+    },
+    {
+      "id": "misattr2",
+      "kind": "misattribution",
+      "detected": false,
+      "detail": "para=p8 ref=r10 labels=['undetermined'] findings=0"
+    },
+    {
+      "id": "uncited",
+      "kind": "uncited",
+      "detected": true,
+      "detail": "ref=r9"
+    },
+    {
+      "id": "stacking",
+      "kind": "stacking",
+      "detected": true,
+      "detail": "para=p22 findings=['这句话同时引用了 6 篇文献']"
+    },
+    {
+      "id": "typo1",
+      "kind": "typo",
+      "detected": true,
+      "detail": "para=p5 revisions=1 old='Retreival-augmented'"
+    },
+    {
+      "id": "typo2",
+      "kind": "typo",
+      "detected": true,
+      "detail": "para=p6 revisions=1 old='recieved'"
+    },
+    {
+      "id": "typo3",
+      "kind": "typo",
+      "detected": true,
+      "detail": "para=p8 revisions=1 old='recal'"
+    },
+    {
+      "id": "reorder",
+      "kind": "reorder",
+      "detected": true,
+      "detail": "exported demo_paper_体检.docx; self-check (reject=orig, accept=first-appearance order) passed"
+    }
+  ]
+}
