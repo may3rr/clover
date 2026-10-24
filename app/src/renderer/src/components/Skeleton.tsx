@@ -91,10 +91,12 @@ export default function SkeletonPaper({ outline, lit }: Props) {
   )
 
   if (!outline || !layout) {
-    // pre-parse: placeholder pages + AFFiNE-style shimmer sweep
+    // pre-parse: four placeholder pages (the max the outline can show) so
+    // the row is full-width before AND after parsing — no reflow when the
+    // real outline lands
     return (
       <div className="sk-row sk-shimmer">
-        {[0, 1].map((i) => (
+        {[0, 1, 2, 3].map((i) => (
           <div key={i} className="sk-page">
             {Array.from({ length: 16 }).map((_, k) => (
               <div key={k} className={k % 5 === 4 ? 'sk-bar short' : 'sk-bar'} />

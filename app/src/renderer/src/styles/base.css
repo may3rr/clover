@@ -826,9 +826,6 @@ select {
 .sk-row {
   display: flex;
   gap: 12px;
-  background: var(--bg-subtle);
-  border-radius: 12px;
-  padding: 12px;
 }
 .sk-page {
   width: 124px;
@@ -867,6 +864,7 @@ select {
   background: var(--fill-strong);
   transform-origin: left;
   animation: cc-bar-in 240ms var(--ease) both;
+  transition: background 240ms var(--ease);
   flex: none;
 }
 .sk-bar.short {
@@ -893,16 +891,17 @@ select {
   max-width: 100px;
   text-overflow: ellipsis;
 }
-/* layer anchors light the bar in the vivid severity color (~0.85 —
-   these are graphics, not highlights behind text) */
+/* layer anchors tint the bar in the severity color — gentle dye, not a
+   loud patch: half-opacity so the skeleton stays quiet, and the tint
+   eases in over the background transition above */
 .sk-sev-high {
-  background: color-mix(in srgb, var(--high) 85%, transparent);
+  background: color-mix(in srgb, var(--high) 55%, transparent);
 }
 .sk-sev-medium {
-  background: color-mix(in srgb, var(--medium) 85%, transparent);
+  background: color-mix(in srgb, var(--medium) 55%, transparent);
 }
 .sk-sev-low {
-  background: color-mix(in srgb, var(--text-secondary) 85%, transparent);
+  background: color-mix(in srgb, var(--text-secondary) 55%, transparent);
 }
 /* citation markers: accent dots on the bars */
 .sk-dot {
@@ -912,14 +911,22 @@ select {
   height: 4px;
   border-radius: 50%;
   background: var(--accent);
+  opacity: 0;
+  animation: cc-dot-in 240ms var(--ease) forwards;
 }
+@keyframes cc-dot-in {
+  to {
+    opacity: 1;
+  }
+}
+/* a fresh anchor breathes one soft halo (subtle, not a radar ping) */
 @keyframes cc-dot-pulse {
   0% {
     transform: scale(1);
-    opacity: 0.5;
+    opacity: 0.55;
   }
   100% {
-    transform: scale(3);
+    transform: scale(1.9);
     opacity: 0;
   }
 }
@@ -929,7 +936,7 @@ select {
   inset: 0;
   border-radius: 50%;
   background: var(--accent);
-  animation: cc-dot-pulse 400ms var(--ease);
+  animation: cc-dot-pulse 600ms var(--ease);
 }
 /* AFFiNE-style shimmer wave over the pre-parse placeholder */
 .sk-shimmer .sk-bar {
@@ -1787,10 +1794,14 @@ select {
 }
 
 /* ======================================================== running */
-/* one column: title, overall bar, skeleton, layer rows share a width */
+/* one column: title, overall bar, skeleton, layer rows share a width.
+   Pages float straight on the window background (their glass shadow is
+   the lift) — a wrapping panel would read as flat emptiness beside a
+   1–3 page skeleton */
 .run-col .sk-row {
   width: 100%;
-  height: 194px; /* page 170 + 2×12 padding: same box with 1–4 pages */
+  height: 194px; /* keep the box height across 1–4 pages (no jump) */
+  align-items: center;
   justify-content: center;
 }
 .run-track {
