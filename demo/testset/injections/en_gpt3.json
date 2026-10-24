@@ -1,0 +1,76 @@
+{
+ "paper": "en_gpt3",
+ "source": "raw/2005.14165.tar.gz",
+ "target": "en_papers/gpt3/manuscript_injected.zip",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "key": "zhao2019incontext",
+   "match": "In-context task induction with",
+   "snippet": "Recent work has also explored "
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "key": "moran2018scaling",
+   "match": "Scaling behavior of conditiona",
+   "snippet": "Another line of research revis"
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "key": "clark2020electra",
+   "match": "{ELECTRA}: Pre-training text e"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "key": "raffel2019t5",
+   "old_year": "2019",
+   "new_year": "2015",
+   "match": "Exploring the limits of transf"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "rossGPU’s.Previouswork",
+   "cited_key": "DBLP:journals/corr/abs-cs-0508103",
+   "intended_key": "kaplan2020scaling"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "ontheWinogenderdataset",
+   "cited_key": "Duan2016RL2FR",
+   "intended_key": "rudinger2018gender"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "Moreover, these works differ w",
+   "keys": [
+    "andrychowicz2016learning",
+    "berant2013semantic",
+    "mostafazadeh2016corpus",
+    "schick2020exploiting",
+    "wang2018multi",
+    "yang2019xlnet"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "thier",
+   "right": "their",
+   "snippet": "absorb knowledge as thier capac"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "seperate",
+   "right": "separate",
+   "snippet": "ious examples of a (seperate) none"
+  }
+ ]
+}

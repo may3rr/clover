@@ -68,6 +68,20 @@ python demo/testset/evaluate_corpus.py        # results/<paper>.json 与 results
 解析盲区与原文覆盖率单独报告。注入在原有 run 内替换文字，保留 run 格式，干净稿与注入稿的差异
 只在注入点。
 
+### 英文语料
+
+```bash
+bash demo/testset/run_en.sh clean             # raw/ 五个 arXiv 源码包
+python demo/testset/inject_latex.py           # 写 en_papers/<name>/manuscript_injected.zip，seed=42
+bash demo/testset/run_en.sh injected
+python demo/testset/evaluate_corpus.py en     # results/en_<name>.json 与 results/summary_en.md
+```
+
+注入类型与中文一致，错别字换成英文拼写错误。编辑落在解析器映射出的源码偏移上：
+伪造与未引用条目按该篇自己的 .bbl 或 .bib 格式写入，张冠李戴改 `\cite{}` 里的键，
+错年改 .bib 的 year 字段或 .bbl 条目里唯一的年份。未引用条目只注入 .bbl 项目（ResNet、GPT-3），
+.bib 里没被引用的条目 BibTeX 不会输出，不构成错误，因此英文共 42 处注入。
+
 ## 指标
 
 - 单元：一条引用句或一条参考文献为一个数据点。没有引用的句子上出现报警或注入时，该句单独成为一个单元。

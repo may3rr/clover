@@ -1,0 +1,70 @@
+{
+ "paper": "en_t5",
+ "source": "raw/1910.10683.tar.gz",
+ "target": "en_papers/t5/manuscript_injected.zip",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "key": "liu2019crosstask",
+   "match": "Cross-task span corruption for",
+   "snippet": "Recent work has also explored "
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "key": "kim2018multigran",
+   "match": "Multi-granularity denoising ob",
+   "snippet": "Another line of research revis"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "key": "smith2013dirt",
+   "old_year": "2013",
+   "new_year": "2009",
+   "match": "Dirt cheap web-scale parallel "
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "emsasquestionanswering",
+   "cited_key": "shazeer2017outrageously",
+   "intended_key": "mccann2018natural"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "sformachinetranslation",
+   "cited_key": "de2019commitmentbank",
+   "intended_key": "smith2013dirt"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "Moreover, these works differ w",
+   "keys": [
+    "clark2019boolq",
+    "li2012literature",
+    "russakovsky2015imagenet",
+    "sanh2019distilbert",
+    "song2019mass",
+    "wang2019can"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "diffrent",
+   "right": "different",
+   "snippet": "mbeddings produce a diffrent learn"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "perfomance",
+   "right": "performance",
+   "snippet": " 90.3. Notably, our perfomance was s"
+  }
+ ]
+}

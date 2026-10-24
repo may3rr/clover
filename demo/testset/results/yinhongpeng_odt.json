@@ -88,6 +88,26 @@
  "fp_units": [
   {
    "unit": [
+    "claim",
+    "c116"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "将空间失配核(Spatialmismatchker-nels,SMK)引入SVM对图像进行分类"
+  },
+  {
+   "unit": [
+    "claim",
+    "c117"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "提出了空间金字塔匹配核(Spatialpyramidmatching,SPM)并将其用于自然场景分类问题"
+  },
+  {
+   "unit": [
     "span",
     "p8",
     0,
@@ -109,433 +129,18 @@
     "revision:typo"
    ],
    "text": "然而,随着时代的发展,目标检测与跟踪技术也在突飞猛进,近几年来该领域的研究成果可谓日新月异,各种优秀算法也是层出不穷,特"
-  },
-  {
-   "unit": [
-    "claim",
-    "c116"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "将空间失配核(Spatialmismatchker-nels,SMK)引入SVM对图像进行分类"
-  },
-  {
-   "unit": [
-    "claim",
-    "c117"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "提出了空间金字塔匹配核(Spatialpyramidmatching,SPM)并将其用于自然场景分类问题"
   }
  ],
  "pre_existing_units": [
   {
    "unit": [
-    "ref",
-    "r209"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[209]WuY,LimJ,YangMH.Onlineobjecttracking:abench-mark.In:Pro"
-  },
-  {
-   "unit": [
     "claim",
-    "c16"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "从检测、跟踪与识别三方面对手势识别"
-  },
-  {
-   "unit": [
-    "claim",
-    "c73"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "基于熵的显著性特征通过计算图像像素的灰度概率分布来获取目标的感兴趣区域"
-  },
-  {
-   "unit": [
-    "claim",
-    "c57"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "revision:typo"
-   ],
-   "text": "中层共享部分描述(Sharedmid-levelparts,Shufflets)"
-  },
-  {
-   "unit": [
-    "ref",
-    "r32"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[32]PalomoEJ,Dom´ınguezE,LuqueRM,Mu˜nozJ.Imagehierarchicalse"
-  },
-  {
-   "unit": [
-    "claim",
-    "c151"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Jia等将跟踪目标进行局部分块处理,采用局部稀疏表示与对齐池化对目标表观建模,其跟踪结果对局部遮挡和光照变化具有较好的鲁"
-  },
-  {
-   "unit": [
-    "claim",
-    "c56"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "稀疏表示目标描述(Sparselets)"
-  },
-  {
-   "unit": [
-    "ref",
-    "r21"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[21]ZhangJuan,MaoXiao-Bo,ChenTie-Jun.Surveyofmovingobjecttra"
-  },
-  {
-   "unit": [
-    "ref",
-    "r26"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[26]LeeB,HedleyM.Backgroundestimationforvideosurveil-lance.I"
-  },
-  {
-   "unit": [
-    "claim",
-    "c152"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "在Mei等的工作基础上,Jia等将跟踪目标进行局部分块处理,采用局部稀疏表示与对齐池化对目标表观建模,其跟踪结果对局部遮"
-  },
-  {
-   "unit": [
-    "claim",
-    "c19"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "从全局与局部信息描述的角度探讨了目"
-  },
-  {
-   "unit": [
-    "claim",
-    "c226"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "MIL0.423.11从评测结果可以明显看到,MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标"
-  },
-  {
-   "unit": [
-    "ref",
-    "r34"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[34]ToyamaK,KrummJ,BrumittB,MeyersB.Wallﬂower:principlesandp"
-  },
-  {
-   "unit": [
-    "ref",
-    "r89"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[89]LeeTS,MumfordD,RomeroR,LammeVAF.Theroleoftheprimaryvisua"
-  },
-  {
-   "unit": [
-    "claim",
-    "c165"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "对弱分类器进行改进,使其能自适应环境的变化,提出了一种新的特征加权算法,在实验中取得了较好的跟踪效果."
-  },
-  {
-   "unit": [
-    "ref",
-    "r211"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[211]CollinsR,ZhouXH,TehSK.Anopensourcetrackingtestbedandeva"
-  },
-  {
-   "unit": [
-    "span",
-    "p87",
-    95,
-    153
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "IEEETransactionsonImageProcessing,2010,19(4):926−933"
-  },
-  {
-   "unit": [
-    "claim",
-    "c49"
+    "c101"
    ],
    "alarms": [
     "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "变尺寸梯度直方图(HOGwithvariablesize,v-HOG)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c128"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "CVCDatasets共9个数据集标注外等场景,行人间存在部分遮挡"
-  },
-  {
-   "unit": [
-    "span",
-    "p86",
-    110,
-    185
-   ],
-   "alarms": [
-    "norms:正文引用找不到对应的参考文献条目"
-   ],
-   "text": "In:Pro-ceedingsofthe7thAsianConferenceonComputerVision(ACCV2"
-  },
-  {
-   "unit": [
-    "claim",
-    "c131"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "约328000张图MicrosoftCOCO是景理解等,不仅标注了不同的类别,http://mscoco.org/片,含"
-  },
-  {
-   "unit": [
-    "claim",
-    "c187"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Nguyen等对前景与背景分别进行局部纹理特征提取,并采用线性判别分析(Lineardiscriminantanalys"
-  },
-  {
-   "unit": [
-    "claim",
-    "c45"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "Lowe提出的尺度不变特征(SIFT)"
-  },
-  {
-   "unit": [
-    "span",
-    "p83",
-    42,
-    84
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Surveyofmovingobjecttrackingalgorithm."
-  },
-  {
-   "unit": [
-    "span",
-    "p88",
-    67,
-    128
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "In:ProceedingsoftheImageandVisionComputingNewZealand."
-  },
-  {
-   "unit": [
-    "ref",
-    "r30"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[30]ButlerDE,BoveVMJr,SridharanS.Real-timeadaptiveforeground"
-  },
-  {
-   "unit": [
-    "claim",
-    "c88"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "这种层间独立的条件使得RBM的训练显得十分高效"
-  },
-  {
-   "unit": [
-    "span",
-    "p19",
-    0,
-    37
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "42卷方法名称象的不同,将其分为基于背景建模和基于目标建模的检测方法."
-  },
-  {
-   "unit": [
-    "claim",
-    "c141"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "将加权增量学习用于子空间学习中,分别对人脸表观与动态背景进行建模,均取得了较好的识别效果."
-  },
-  {
-   "unit": [
-    "span",
-    "p75",
-    59,
-    148
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "In:Proceedingsofthe2004IEEEInternationalConferenceonSystems,"
-  },
-  {
-   "unit": [
-    "ref",
-    "r176"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[176]WangNY,WangJD,YeungDY.Onlinerobustnon-negativedictionar"
-  },
-  {
-   "unit": [
-    "claim",
-    "c62"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "尺度不变形状特征"
-  },
-  {
-   "unit": [
-    "claim",
-    "c70"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "Shapecontext通过获取形状上某一参考点与其余点的距离分布来描述目标轮廓"
-  },
-  {
-   "unit": [
-    "span",
-    "p62",
-    0,
-    56
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "10期尹宏鹏等:基于视觉的目标检测与跟踪综述类器模型的产生、调整以及整合,将有助于适应高维数据的分类任务."
-  },
-  {
-   "unit": [
-    "span",
-    "p85",
-    129,
-    204
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "In:Proceedingsofthe8thIEEEInternationalConferenceonComputerV"
-  },
-  {
-   "unit": [
-    "claim",
-    "c66"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "Gabor利用Gabor滤波器对图像卷积得到,在一定程度上模拟了人类视觉的细胞感受野机制"
-  },
-  {
-   "unit": [
-    "ref",
-    "r31"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[31]KimK,ChalidabhongseTH,HarwoodD,DavisL.Back-groundmodelin"
-  },
-  {
-   "unit": [
-    "span",
-    "p81",
-    34,
-    63
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Asurveyofvisualtrack-ing."
+   "text": "基于自编码机的特征表达"
   },
   {
    "unit": [
@@ -550,200 +155,22 @@
   {
    "unit": [
     "claim",
-    "c69"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "其实质是一种弹性形状模型,是通过将梯度直方图(HOG)特征与LatentSVM相结合DPM而训练得到的一种目标形状描述模"
-  },
-  {
-   "unit": [
-    "span",
-    "p76",
-    110,
-    153
+    "c105"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "ComputerScienceReview,2014,11−12:31−66"
-  },
-  {
-   "unit": [
-    "span",
-    "p13",
-    787,
-    856
-   ],
-   "alarms": [
-    "support:正文作者归属与文献作者不一致，可能引错了文献"
-   ],
-   "text": "Aho-nen等[57]将局部二值模式(Localbinarypatterns,LBP)用于人脸特征描述,实现了对人脸的"
+   "text": "Donahue等提出了深度卷积激活特征(Deepconvolutionalactivationfeature,DeCAF"
   },
   {
    "unit": [
     "claim",
-    "c147"
+    "c106"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Chin等使用核独立主成分分析(Kernelprinci-palcomponentanalysis,KPCA)构建非线性"
-  },
-  {
-   "unit": [
-    "ref",
-    "r22"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[22]NiuXiang-Jie,HuangYong-Chun.Researchondetectionandtracki"
-  },
-  {
-   "unit": [
-    "span",
-    "p75",
-    149,
-    179
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "TheHague,Holland:IEEE,2004."
-  },
-  {
-   "unit": [
-    "claim",
-    "c207"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "典型跟踪算法的性能对比Table7Performancecomparisonoftypicaltrackingalgor"
-  },
-  {
-   "unit": [
-    "span",
-    "p86",
-    0,
-    109
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "24WangHZ,SuterD.Anovelrobuststatisticalmethodforbackgroundin"
-  },
-  {
-   "unit": [
-    "span",
-    "p76",
-    0,
-    110
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "14BouwmansT.Traditionalandrecentapproachesinback-groundmodel"
-  },
-  {
-   "unit": [
-    "claim",
-    "c129"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "PASCALVOC共11540张图,该比赛包括分类、检测、分割、动http://host.robots.ox.ac.uk"
-  },
-  {
-   "unit": [
-    "claim",
-    "c50"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "共生梯度直方图(Co-occurrencehistogramoforientedgradi-ents,CoHOG)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c84"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "此外,使用较多的工具还有Torch7、Cuda-ConvNet、MatConvNet、Pylearn2、Thea-no等"
-  },
-  {
-   "unit": [
-    "ref",
-    "r28"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[28]BouwmansT,ElBafF,VachonB.Statisticalbackgroundmodelingfo"
-  },
-  {
-   "unit": [
-    "span",
-    "p2",
-    0,
-    333
-   ],
-   "alarms": [
-    "norms:正文混用了数字编号和作者-年份两种引用格式"
-   ],
-   "text": "摘要基于视觉的目标检测与跟踪是图像处理、计算机视觉、模式识别等众多学科的交叉研究课题,在视频监控、虚拟现实、人机交互、自"
-  },
-  {
-   "unit": [
-    "claim",
-    "c71"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "kAS使用一组近似线性的线段对目标形状进行描述,具有平移、尺度等不变特性"
-  },
-  {
-   "unit": [
-    "ref",
-    "r152"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[152]RahmatiH,AamoOM,StavdahlØ,AddeL.Kernel-basedobjecttrack"
-  },
-  {
-   "unit": [
-    "span",
-    "p61",
-    0,
-    60
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "42卷景信息进行分析及充分利用,能够有效地获取场景的先验知识,降低复杂的背景环境以及场景中与目标相似的物体的干扰;"
-  },
-  {
-   "unit": [
-    "span",
-    "p82",
-    34,
-    75
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Themethodsformov-ingobjectdetection."
+   "text": "将大容量的卷积神经网络(CNN)应用于自下而上的区域方法,提出了基于区域的卷积神经网络(RegionswithCNNfe"
   },
   {
    "unit": [
@@ -759,170 +186,6 @@
   {
    "unit": [
     "claim",
-    "c25"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "surveillancevideos:asurvey标检测、分类及其跟踪进行了详细阐述在智能视频监控的底层部分,对目标检"
-  },
-  {
-   "unit": [
-    "span",
-    "p13",
-    0,
-    38
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "42卷赖了人类知识、经验的总结,且不能做到对图像或目标模型最本质的刻画."
-  },
-  {
-   "unit": [
-    "span",
-    "p85",
-    0,
-    128
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "23GutchessD,TrajkovicsM,Cohen-SolalE,LyonsD,JainAK.Abackgrou"
-  },
-  {
-   "unit": [
-    "claim",
-    "c7"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Lowe通过获取图像关键点附近的梯度信息来描述运动目标,提出了尺度不变特征(Scaleinvariantfeaturet"
-  },
-  {
-   "unit": [
-    "span",
-    "p89",
-    0,
-    81
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "27McFarlaneNJB,SchofieldCP.Segmentationandtrackingofpigletsi"
-  },
-  {
-   "unit": [
-    "span",
-    "p12",
-    1140,
-    1196
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Bouwmans等分别在行了综述工作,对背景建模方法进行了详细的分类与总结,有兴趣的读者可以参考相关文献."
-  },
-  {
-   "unit": [
-    "claim",
-    "c74"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "revision:typo"
-   ],
-   "text": "Gabor利用Gabor滤波器对图像卷积得到,在一定程度上模拟了人类视觉的细胞感受野机制通过计算像素点与周围像素的对比信"
-  },
-  {
-   "unit": [
-    "ref",
-    "r90"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[90]LeeTS,MumfordD.HierarchicalBayesianinferenceinthevisualc"
-  },
-  {
-   "unit": [
-    "ref",
-    "r167"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[167]MeiX,LingHB.Robustvisualtrackingusingl1minimiza-tion.In"
-  },
-  {
-   "unit": [
-    "ref",
-    "r20"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[20]WanYing,HanYi,LuHan-Qing.Themethodsformov-ingobjectdetec"
-  },
-  {
-   "unit": [
-    "claim",
-    "c206"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "VOTChallenge是列(2015年)该比赛从2013年开始举办"
-  },
-  {
-   "unit": [
-    "span",
-    "p78",
-    0,
-    107
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "16GowsikhaaD,AbiramiS,BaskaranR.Automatedhumanbehavioranalys"
-  },
-  {
-   "unit": [
-    "claim",
-    "c224"
-   ],
-   "alarms": [
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标三个跟踪精度指标上,分别取得了第一和第二的成绩"
-  },
-  {
-   "unit": [
-    "claim",
-    "c222"
-   ],
-   "alarms": [
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "MIL0.423.11从评测结果可以明显看到,MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标"
-  },
-  {
-   "unit": [
-    "claim",
-    "c130"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "共14197122张大规模目标识别比赛,包括目标检http://image-net.org/ImageNet是图片测、定"
-  },
-  {
-   "unit": [
-    "claim",
     "c113"
    ],
    "alarms": [
@@ -934,186 +197,13 @@
   {
    "unit": [
     "claim",
-    "c162"
+    "c114"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "由于该类方法具有较强的判别学习能力,因此其已广泛地应用于目标跟踪任务中"
-  },
-  {
-   "unit": [
-    "ref",
-    "r212"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[212]FisherRB.ThePETS04surveillanceground-truthdatasets.In:P"
-  },
-  {
-   "unit": [
-    "claim",
-    "c106"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "将大容量的卷积神经网络(CNN)应用于自下而上的区域方法,提出了基于区域的卷积神经网络(RegionswithCNNfe"
-  },
-  {
-   "unit": [
-    "claim",
-    "c161"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "2.2.1基于在线Boosting的方法基于在线Boosting的方法来源于Valiant提出的PAC学习模型,其基本思"
-  },
-  {
-   "unit": [
-    "span",
-    "p64",
-    0,
-    78
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "2PapageorgiouCP,OrenM,PoggioT.Ageneralframeworkforobjectdete"
-  },
-  {
-   "unit": [
-    "span",
-    "p83",
-    85,
-    206
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "ApplicationResearchofComput-ers,2009,26(12):4407−4410(张娟,毛晓波"
-  },
-  {
-   "unit": [
-    "ref",
-    "r1"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[1]HaroldWA.Aircraftwarningsystem,U.S.Patent3053932,Septembe"
-  },
-  {
-   "unit": [
-    "span",
-    "p40",
-    37,
-    37
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ""
-  },
-  {
-   "unit": [
-    "claim",
-    "c46"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "梯度位置方向直方图(Gradientlocation-orientationhistograms,GLOH)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c101"
-   ],
-   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
     "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "基于自编码机的特征表达"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    263,
-    371
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Thissurveygivesadetailoverviewofthehistory,thestate-of-the-a"
-  },
-  {
-   "unit": [
-    "claim",
-    "c83"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "使用较多的工具还有Torch7"
-  },
-  {
-   "unit": [
-    "ref",
-    "r35"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "norms:这篇参考文献在正文中没有被引用",
-    "status:not_found"
-   ],
-   "text": "[35]RidderC,MunkeltO,KirchnerH.Adaptivebackgroundes-timation"
-  },
-  {
-   "unit": [
-    "claim",
-    "c68"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "通过计算相邻矩形区域的像素和之差来描述线性、边缘、中心点以及对角线特征,其改Haar-like进特征主要有LAB等"
-  },
-  {
-   "unit": [
-    "ref",
-    "r177"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[177]ZhangX,GuanNY,TaoDC,QiuXG,LuoZG.Onlinemulti-modalrobust"
-  },
-  {
-   "unit": [
-    "claim",
-    "c35"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "模糊模型能同时处理光照变化和动态背景"
-  },
-  {
-   "unit": [
-    "span",
-    "p71",
-    0,
-    157
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "9GaoY,SpiteriC,PhamMT,Al-MilliS.Asurveyonre-centobjectdetect"
+   "text": "1.2.2分类器文献对现有的分类器进行了详细的阐述,其中,支持向量机(SVM)是使用最为广泛的分类自动表基于学习的特征表"
   },
   {
    "unit": [
@@ -1128,12 +218,387 @@
   {
    "unit": [
     "claim",
+    "c123"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "运动估计则是采用某种运动假设来预估目标可能出现的位置,常用的运动估计方法主要有线性回归、均值漂移、隐马尔科夫模型、卡尔曼"
+  },
+  {
+   "unit": [
+    "claim",
+    "c126"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "共51段视频,ChangeDetec包含了动态背景、目标运动、夜晚"
+  },
+  {
+   "unit": [
+    "claim",
+    "c127"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "revision:typo",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "10小时视频,Pedestrian是640×480得,行人之间存在一定的遮挡"
+  },
+  {
+   "unit": [
+    "claim",
+    "c128"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "CVCDatasets共9个数据集标注外等场景,行人间存在部分遮挡"
+  },
+  {
+   "unit": [
+    "claim",
+    "c129"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "PASCALVOC共11540张图,该比赛包括分类、检测、分割、动http://host.robots.ox.ac.uk"
+  },
+  {
+   "unit": [
+    "claim",
+    "c130"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "共14197122张大规模目标识别比赛,包括目标检http://image-net.org/ImageNet是图片测、定"
+  },
+  {
+   "unit": [
+    "claim",
+    "c131"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "约328000张图MicrosoftCOCO是景理解等,不仅标注了不同的类别,http://mscoco.org/片,含"
+  },
+  {
+   "unit": [
+    "claim",
+    "c141"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "将加权增量学习用于子空间学习中,分别对人脸表观与动态背景进行建模,均取得了较好的识别效果."
+  },
+  {
+   "unit": [
+    "claim",
+    "c147"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Chin等使用核独立主成分分析(Kernelprinci-palcomponentanalysis,KPCA)构建非线性"
+  },
+  {
+   "unit": [
+    "claim",
+    "c151"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Jia等将跟踪目标进行局部分块处理,采用局部稀疏表示与对齐池化对目标表观建模,其跟踪结果对局部遮挡和光照变化具有较好的鲁"
+  },
+  {
+   "unit": [
+    "claim",
+    "c152"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "在Mei等的工作基础上,Jia等将跟踪目标进行局部分块处理,采用局部稀疏表示与对齐池化对目标表观建模,其跟踪结果对局部遮"
+  },
+  {
+   "unit": [
+    "claim",
+    "c16"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "从检测、跟踪与识别三方面对手势识别"
+  },
+  {
+   "unit": [
+    "claim",
+    "c160"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "来源于Valiant提出的PAC学习模型"
+  },
+  {
+   "unit": [
+    "claim",
+    "c161"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "2.2.1基于在线Boosting的方法基于在线Boosting的方法来源于Valiant提出的PAC学习模型,其基本思"
+  },
+  {
+   "unit": [
+    "claim",
+    "c162"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "由于该类方法具有较强的判别学习能力,因此其已广泛地应用于目标跟踪任务中"
+  },
+  {
+   "unit": [
+    "claim",
+    "c163"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "通过初始化一个弱分类器集合,将梯度特征选择整合到了在线Boosting的学习框架下,用于构建判别式表观模型,极大地提升了"
+  },
+  {
+   "unit": [
+    "claim",
     "c164"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
    "text": "Avidan通过对弱分类器的特征加权,重新整合弱分类器对像素进行分类,其最大的不足在于该方法需要对特征池中的所有特征进行"
+  },
+  {
+   "unit": [
+    "claim",
+    "c165"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "对弱分类器进行改进,使其能自适应环境的变化,提出了一种新的特征加权算法,在实验中取得了较好的跟踪效果."
+  },
+  {
+   "unit": [
+    "claim",
+    "c169"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "将SVM分类器与基于光流的跟踪方法相结合,提出了支持向量跟踪器(Supportvectortracking,SVT)对车"
+  },
+  {
+   "unit": [
+    "claim",
+    "c17"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "对行星地形分类中的目标检测技术进行"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "对基于稀疏编码的目标跟踪进行了全面"
+  },
+  {
+   "unit": [
+    "claim",
+    "c187"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Nguyen等对前景与背景分别进行局部纹理特征提取,并采用线性判别分析(Lineardiscriminantanalys"
+  },
+  {
+   "unit": [
+    "claim",
+    "c19"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "从全局与局部信息描述的角度探讨了目"
+  },
+  {
+   "unit": [
+    "claim",
+    "c195"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "在数据集VOT2015上对典型的跟踪算法进行了评测,其评测结果如表7所列出(性能前三的指标分别用粗体、粗体加斜体与花体显"
+  },
+  {
+   "unit": [
+    "claim",
+    "c2"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "CollegeofAutomation,ChongqingUni-versity,Chongqing400044Octo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c20"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "综述了稀疏表示方法在目标检测领域中"
+  },
+  {
+   "unit": [
+    "claim",
+    "c202"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "PedestriansDataset踪,可用于评测多目标跟踪算法“Central”Pedestrian"
+  },
+  {
+   "unit": [
+    "claim",
+    "c206"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "VOTChallenge是列(2015年)该比赛从2013年开始举办"
+  },
+  {
+   "unit": [
+    "claim",
+    "c207"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "典型跟踪算法的性能对比Table7Performancecomparisonoftypicaltrackingalgor"
+  },
+  {
+   "unit": [
+    "claim",
+    "c222"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "MIL0.423.11从评测结果可以明显看到,MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标"
+  },
+  {
+   "unit": [
+    "claim",
+    "c223"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标三个跟踪精度指标上,分别取得了第一和第二的成绩"
+  },
+  {
+   "unit": [
+    "claim",
+    "c224"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标三个跟踪精度指标上,分别取得了第一和第二的成绩"
+  },
+  {
+   "unit": [
+    "claim",
+    "c225"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "SODLT跟踪器在跟踪准确度上与DeepSRDCF跟踪器并居第二"
+  },
+  {
+   "unit": [
+    "claim",
+    "c226"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "MIL0.423.11从评测结果可以明显看到,MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标"
+  },
+  {
+   "unit": [
+    "claim",
+    "c229"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "In:Pro-ceedingsofthe7thAsianConferenceonComputerVision"
+  },
+  {
+   "unit": [
+    "claim",
+    "c25"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "surveillancevideos:asurvey标检测、分类及其跟踪进行了详细阐述在智能视频监控的底层部分,对目标检"
+  },
+  {
+   "unit": [
+    "claim",
+    "c35"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "模糊模型能同时处理光照变化和动态背景"
+  },
+  {
+   "unit": [
+    "claim",
+    "c41"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "光照变化和背景动态变化等情况"
   },
   {
    "unit": [
@@ -1149,141 +614,93 @@
   {
    "unit": [
     "claim",
-    "c105"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Donahue等提出了深度卷积激活特征(Deepconvolutionalactivationfeature,DeCAF"
-  },
-  {
-   "unit": [
-    "claim",
-    "c61"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "线描述子(Bunchoflinesdescriptor,BOLD)"
-  },
-  {
-   "unit": [
-    "span",
-    "p67",
-    76,
-    180
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "In:Proceedingsofthe2005IEEEComputerSocietyConferenceonComput"
-  },
-  {
-   "unit": [
-    "claim",
-    "c20"
+    "c45"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "综述了稀疏表示方法在目标检测领域中"
-  },
-  {
-   "unit": [
-    "ref",
-    "r146"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[146]SeberGAF,LeeAJ.LinearRegressionAnalysis(SecondEdition)."
-  },
-  {
-   "unit": [
-    "ref",
-    "r39"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "norms:这篇参考文献在正文中没有被引用",
-    "status:not_found"
-   ],
-   "text": "[39]WrenCR,PorikliF.Waviz:spectralsimilarityforob-jectdetect"
+   "text": "Lowe提出的尺度不变特征(SIFT)"
   },
   {
    "unit": [
     "claim",
-    "c195"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "在数据集VOT2015上对典型的跟踪算法进行了评测,其评测结果如表7所列出(性能前三的指标分别用粗体、粗体加斜体与花体显"
-  },
-  {
-   "unit": [
-    "claim",
-    "c18"
+    "c46"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "对基于稀疏编码的目标跟踪进行了全面"
+   "text": "梯度位置方向直方图(Gradientlocation-orientationhistograms,GLOH)"
   },
   {
    "unit": [
     "claim",
-    "c41"
+    "c47"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "光照变化和背景动态变化等情况"
-  },
-  {
-   "unit": [
-    "ref",
-    "r75"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[75]DhankharP,SahuN.Areviewandresearchofedgedetec-tiontechni"
+   "text": "其中,使用最为广泛的梯度特征是Lowe提出的尺度不变特征(SIFT),其通过获取特定关键点附近的梯度信息来描述目标,通常"
   },
   {
    "unit": [
     "claim",
-    "c2"
+    "c48"
    ],
    "alarms": [
     "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "CollegeofAutomation,ChongqingUni-versity,Chongqing400044Octo"
+   "text": "Dalal等为解决静态图像中的行人检测问题而提出的梯度直方图特征(HOG)"
   },
   {
    "unit": [
     "claim",
-    "c160"
+    "c49"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "来源于Valiant提出的PAC学习模型"
+   "text": "变尺寸梯度直方图(HOGwithvariablesize,v-HOG)"
   },
   {
    "unit": [
-    "span",
-    "p88",
-    0,
-    66
+    "claim",
+    "c50"
    ],
    "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "共生梯度直方图(Co-occurrencehistogramoforientedgradi-ents,CoHOG)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c51"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "另外,Dalal等为解决静态图像中的行人检测问题而提出的梯度直方图特征(HOG),也逐渐成为近年来最具影响的特征之一,其"
+  },
+  {
+   "unit": [
+    "claim",
+    "c56"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "稀疏表示目标描述(Sparselets)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c57"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
     "revision:typo"
    ],
-   "text": "26LeeB,HedleyM.Backgroundestimationforvideosurveil-lance."
+   "text": "中层共享部分描述(Sharedmid-levelparts,Shufflets)"
   },
   {
    "unit": [
@@ -1299,64 +716,35 @@
   {
    "unit": [
     "claim",
-    "c223"
+    "c60"
    ],
    "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
     "support:被引文献不支持这条论断"
    ],
-   "text": "MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标三个跟踪精度指标上,分别取得了第一和第二的成绩"
-  },
-  {
-   "unit": [
-    "ref",
-    "r29"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[29]BouwmansT.Recentadvancedstatisticalbackgroundmod-elingfo"
-  },
-  {
-   "unit": [
-    "span",
-    "p70",
-    0,
-    107
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "8RautaraySS,AgrawalA.Visionbasedhandgesturerecog-nitionforhu"
+   "text": "文献对形状特征提取进行了综述工作"
   },
   {
    "unit": [
     "claim",
-    "c17"
+    "c61"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "对行星地形分类中的目标检测技术进行"
+   "text": "线描述子(Bunchoflinesdescriptor,BOLD)"
   },
   {
    "unit": [
     "claim",
-    "c163"
+    "c62"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "通过初始化一个弱分类器集合,将梯度特征选择整合到了在线Boosting的学习框架下,用于构建判别式表观模型,极大地提升了"
-  },
-  {
-   "unit": [
-    "claim",
-    "c123"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "运动估计则是采用某种运动假设来预估目标可能出现的位置,常用的运动估计方法主要有线性回归、均值漂移、隐马尔科夫模型、卡尔曼"
+   "text": "尺度不变形状特征"
   },
   {
    "unit": [
@@ -1374,13 +762,452 @@
   {
    "unit": [
     "claim",
-    "c114"
+    "c65"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
     "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "1.2.2分类器文献对现有的分类器进行了详细的阐述,其中,支持向量机(SVM)是使用最为广泛的分类自动表基于学习的特征表"
+   "text": "颜色特征是通过计算局部的图像属性(如灰度、颜色等)的概率分布而得到一种特征描述,该类特征主要包括了颜色SIFT特征、颜色"
+  },
+  {
+   "unit": [
+    "claim",
+    "c66"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Gabor利用Gabor滤波器对图像卷积得到,在一定程度上模拟了人类视觉的细胞感受野机制"
+  },
+  {
+   "unit": [
+    "claim",
+    "c67"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "通过计算像素点与周围像素的对比信息,获得的一种对光照不变的局部描述,其改进特LBP征主要有CS-LBP、NR-LBP等"
+  },
+  {
+   "unit": [
+    "claim",
+    "c68"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "通过计算相邻矩形区域的像素和之差来描述线性、边缘、中心点以及对角线特征,其改Haar-like进特征主要有LAB等"
+  },
+  {
+   "unit": [
+    "claim",
+    "c69"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "其实质是一种弹性形状模型,是通过将梯度直方图(HOG)特征与LatentSVM相结合DPM而训练得到的一种目标形状描述模"
+  },
+  {
+   "unit": [
+    "claim",
+    "c7"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Lowe通过获取图像关键点附近的梯度信息来描述运动目标,提出了尺度不变特征(Scaleinvariantfeaturet"
+  },
+  {
+   "unit": [
+    "claim",
+    "c70"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Shapecontext通过获取形状上某一参考点与其余点的距离分布来描述目标轮廓"
+  },
+  {
+   "unit": [
+    "claim",
+    "c71"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "kAS使用一组近似线性的线段对目标形状进行描述,具有平移、尺度等不变特性"
+  },
+  {
+   "unit": [
+    "claim",
+    "c72"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "通过将图像像素值映射至相应的语义属性来对目标进行描述,该特征通常包含种语义Colornames属性,一般需要结合梯度特征"
+  },
+  {
+   "unit": [
+    "claim",
+    "c73"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "基于熵的显著性特征通过计算图像像素的灰度概率分布来获取目标的感兴趣区域"
+  },
+  {
+   "unit": [
+    "claim",
+    "c74"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "revision:typo"
+   ],
+   "text": "Gabor利用Gabor滤波器对图像卷积得到,在一定程度上模拟了人类视觉的细胞感受野机制通过计算像素点与周围像素的对比信"
+  },
+  {
+   "unit": [
+    "claim",
+    "c83"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "使用较多的工具还有Torch7"
+  },
+  {
+   "unit": [
+    "claim",
+    "c84"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "此外,使用较多的工具还有Torch7、Cuda-ConvNet、MatConvNet、Pylearn2、Thea-no等"
+  },
+  {
+   "unit": [
+    "claim",
+    "c88"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "这种层间独立的条件使得RBM的训练显得十分高效"
+  },
+  {
+   "unit": [
+    "ref",
+    "r1"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[1]HaroldWA.Aircraftwarningsystem,U.S.Patent3053932,Septembe"
+  },
+  {
+   "unit": [
+    "ref",
+    "r132"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[132]Sch¨olkopfB,SmolaAJ.LearningwithKernels:SupportVectorMa"
+  },
+  {
+   "unit": [
+    "ref",
+    "r140"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[140]WuB,NevatiaR.Detectionofmultiple,partiallyoccludedhuman"
+  },
+  {
+   "unit": [
+    "ref",
+    "r141"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[141]WuB,NevatiaR.Clusterboostedtreeclassiﬁerformulti-view,m"
+  },
+  {
+   "unit": [
+    "ref",
+    "r146"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[146]SeberGAF,LeeAJ.LinearRegressionAnalysis(SecondEdition)."
+  },
+  {
+   "unit": [
+    "ref",
+    "r149"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[149]AliNH,HassanGM.Kalmanﬁltertracking.InternationalJournal"
+  },
+  {
+   "unit": [
+    "ref",
+    "r152"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[152]RahmatiH,AamoOM,StavdahlØ,AddeL.Kernel-basedobjecttrack"
+  },
+  {
+   "unit": [
+    "ref",
+    "r167"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[167]MeiX,LingHB.Robustvisualtrackingusingl1minimiza-tion.In"
+  },
+  {
+   "unit": [
+    "ref",
+    "r176"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[176]WangNY,WangJD,YeungDY.Onlinerobustnon-negativedictionar"
+  },
+  {
+   "unit": [
+    "ref",
+    "r177"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[177]ZhangX,GuanNY,TaoDC,QiuXG,LuoZG.Onlinemulti-modalrobust"
+  },
+  {
+   "unit": [
+    "ref",
+    "r20"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[20]WanYing,HanYi,LuHan-Qing.Themethodsformov-ingobjectdetec"
+  },
+  {
+   "unit": [
+    "ref",
+    "r209"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[209]WuY,LimJ,YangMH.Onlineobjecttracking:abench-mark.In:Pro"
+  },
+  {
+   "unit": [
+    "ref",
+    "r21"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[21]ZhangJuan,MaoXiao-Bo,ChenTie-Jun.Surveyofmovingobjecttra"
+  },
+  {
+   "unit": [
+    "ref",
+    "r210"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[210]WuY,LimJ,YangMH.Objecttrackingbenchmark.IEEETransaction"
+  },
+  {
+   "unit": [
+    "ref",
+    "r211"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[211]CollinsR,ZhouXH,TehSK.Anopensourcetrackingtestbedandeva"
+  },
+  {
+   "unit": [
+    "ref",
+    "r212"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[212]FisherRB.ThePETS04surveillanceground-truthdatasets.In:P"
+  },
+  {
+   "unit": [
+    "ref",
+    "r22"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[22]NiuXiang-Jie,HuangYong-Chun.Researchondetectionandtracki"
+  },
+  {
+   "unit": [
+    "ref",
+    "r26"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[26]LeeB,HedleyM.Backgroundestimationforvideosurveil-lance.I"
+  },
+  {
+   "unit": [
+    "ref",
+    "r28"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[28]BouwmansT,ElBafF,VachonB.Statisticalbackgroundmodelingfo"
+  },
+  {
+   "unit": [
+    "ref",
+    "r29"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[29]BouwmansT.Recentadvancedstatisticalbackgroundmod-elingfo"
+  },
+  {
+   "unit": [
+    "ref",
+    "r30"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[30]ButlerDE,BoveVMJr,SridharanS.Real-timeadaptiveforeground"
+  },
+  {
+   "unit": [
+    "ref",
+    "r31"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[31]KimK,ChalidabhongseTH,HarwoodD,DavisL.Back-groundmodelin"
+  },
+  {
+   "unit": [
+    "ref",
+    "r32"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[32]PalomoEJ,Dom´ınguezE,LuqueRM,Mu˜nozJ.Imagehierarchicalse"
+  },
+  {
+   "unit": [
+    "ref",
+    "r34"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[34]ToyamaK,KrummJ,BrumittB,MeyersB.Wallﬂower:principlesandp"
+  },
+  {
+   "unit": [
+    "ref",
+    "r35"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "norms:这篇参考文献在正文中没有被引用",
+    "status:not_found"
+   ],
+   "text": "[35]RidderC,MunkeltO,KirchnerH.Adaptivebackgroundes-timation"
+  },
+  {
+   "unit": [
+    "ref",
+    "r39"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "norms:这篇参考文献在正文中没有被引用",
+    "status:not_found"
+   ],
+   "text": "[39]WrenCR,PorikliF.Waviz:spectralsimilarityforob-jectdetect"
+  },
+  {
+   "unit": [
+    "ref",
+    "r75"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[75]DhankharP,SahuN.Areviewandresearchofedgedetec-tiontechni"
+  },
+  {
+   "unit": [
+    "ref",
+    "r89"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[89]LeeTS,MumfordD,RomeroR,LammeVAF.Theroleoftheprimaryvisua"
+  },
+  {
+   "unit": [
+    "ref",
+    "r90"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[90]LeeTS,MumfordD.HierarchicalBayesianinferenceinthevisualc"
   },
   {
    "unit": [
@@ -1397,175 +1224,74 @@
   {
    "unit": [
     "span",
-    "p84",
-    35,
-    117
+    "p12",
+    1140,
+    1196
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Researchondetectionandtrackingidentificationalgorithmofweakm"
-  },
-  {
-   "unit": [
-    "claim",
-    "c127"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "10小时视频,Pedestrian是640×480得,行人之间存在一定的遮挡"
-  },
-  {
-   "unit": [
-    "claim",
-    "c202"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "PedestriansDataset踪,可用于评测多目标跟踪算法“Central”Pedestrian"
-  },
-  {
-   "unit": [
-    "claim",
-    "c48"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "Dalal等为解决静态图像中的行人检测问题而提出的梯度直方图特征(HOG)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c51"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "另外,Dalal等为解决静态图像中的行人检测问题而提出的梯度直方图特征(HOG),也逐渐成为近年来最具影响的特征之一,其"
-  },
-  {
-   "unit": [
-    "claim",
-    "c67"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "通过计算像素点与周围像素的对比信息,获得的一种对光照不变的局部描述,其改进特LBP征主要有CS-LBP、NR-LBP等"
-  },
-  {
-   "unit": [
-    "ref",
-    "r132"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[132]Sch¨olkopfB,SmolaAJ.LearningwithKernels:SupportVectorMa"
-  },
-  {
-   "unit": [
-    "claim",
-    "c126"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "共51段视频,ChangeDetec包含了动态背景、目标运动、夜晚"
-  },
-  {
-   "unit": [
-    "claim",
-    "c72"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "通过将图像像素值映射至相应的语义属性来对目标进行描述,该特征通常包含种语义Colornames属性,一般需要结合梯度特征"
-  },
-  {
-   "unit": [
-    "claim",
-    "c65"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "颜色特征是通过计算局部的图像属性(如灰度、颜色等)的概率分布而得到一种特征描述,该类特征主要包括了颜色SIFT特征、颜色"
+   "text": "Bouwmans等分别在行了综述工作,对背景建模方法进行了详细的分类与总结,有兴趣的读者可以参考相关文献."
   },
   {
    "unit": [
     "span",
-    "p72",
+    "p13",
     0,
-    111
+    38
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "10ZhangSP,YaoHX,SunX,LuXS.Sparsecodingbasedvi-sualtracking:r"
-  },
-  {
-   "unit": [
-    "ref",
-    "r140"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[140]WuB,NevatiaR.Detectionofmultiple,partiallyoccludedhuman"
+   "text": "42卷赖了人类知识、经验的总结,且不能做到对图像或目标模型最本质的刻画."
   },
   {
    "unit": [
     "span",
-    "p70",
-    108,
-    156
+    "p13",
+    787,
+    856
    ],
    "alarms": [
-    "revision:typo"
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
    ],
-   "text": "ArtificialIntelligenceReview,2015,43(1):1−54"
+   "text": "Aho-nen等[57]将局部二值模式(Localbinarypatterns,LBP)用于人脸特征描述,实现了对人脸的"
   },
   {
    "unit": [
     "span",
-    "p87",
+    "p19",
     0,
-    94
+    37
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "25ColombariA,FusielloA.Patch-basedbackgroundinitializa-tioni"
+   "text": "42卷方法名称象的不同,将其分为基于背景建模和基于目标建模的检测方法."
   },
   {
    "unit": [
-    "claim",
-    "c225"
+    "span",
+    "p2",
+    0,
+    333
    ],
    "alarms": [
-    "support:被引文献不支持这条论断"
+    "norms:正文混用了数字编号和作者-年份两种引用格式"
    ],
-   "text": "SODLT跟踪器在跟踪准确度上与DeepSRDCF跟踪器并居第二"
+   "text": "摘要基于视觉的目标检测与跟踪是图像处理、计算机视觉、模式识别等众多学科的交叉研究课题,在视频监控、虚拟现实、人机交互、自"
   },
   {
    "unit": [
-    "claim",
-    "c229"
+    "span",
+    "p22",
+    0,
+    250
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "In:Pro-ceedingsofthe7thAsianConferenceonComputerVision"
+   "text": "2[140−141]DetectionTest是及多视角下无遮挡的行人检测数据Users/OldUsers/bowu/D"
   },
   {
    "unit": [
@@ -1581,50 +1307,39 @@
   },
   {
    "unit": [
-    "ref",
-    "r149"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[149]AliNH,HassanGM.Kalmanﬁltertracking.InternationalJournal"
-  },
-  {
-   "unit": [
     "span",
-    "p72",
-    112,
-    154
+    "p4",
+    263,
+    371
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "PatternRecognition,2013,46(7):1772−1788"
+   "text": "Thissurveygivesadetailoverviewofthehistory,thestate-of-the-a"
   },
   {
    "unit": [
     "span",
-    "p80",
-    56,
-    110
+    "p40",
+    37,
+    37
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "ACMComputingSurveys(CSUR),2006,38(4):ArticleNo."
+   "text": ""
   },
   {
    "unit": [
     "span",
-    "p68",
+    "p42",
     0,
-    122
+    54
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "6FelzenszwalbPF,GirshickRB,McAllesterD,RamananD.Objectdetect"
+   "text": "7段序列列,可用于目标检测与跟踪、动作http://www.pets2015.net/是识别、场景分析等"
   },
   {
    "unit": [
@@ -1641,89 +1356,14 @@
   {
    "unit": [
     "span",
-    "p68",
-    123,
-    210
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "IEEETransactionsonPatternAnalysisandMa-chineIntelligence,201"
-  },
-  {
-   "unit": [
-    "span",
-    "p22",
+    "p61",
     0,
-    250
+    60
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "2[140−141]DetectionTest是及多视角下无遮挡的行人检测数据Users/OldUsers/bowu/D"
-  },
-  {
-   "unit": [
-    "claim",
-    "c60"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "文献对形状特征提取进行了综述工作"
-  },
-  {
-   "unit": [
-    "ref",
-    "r210"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[210]WuY,LimJ,YangMH.Objecttrackingbenchmark.IEEETransaction"
-  },
-  {
-   "unit": [
-    "claim",
-    "c47"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "其中,使用最为广泛的梯度特征是Lowe提出的尺度不变特征(SIFT),其通过获取特定关键点附近的梯度信息来描述目标,通常"
-  },
-  {
-   "unit": [
-    "claim",
-    "c169"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "将SVM分类器与基于光流的跟踪方法相结合,提出了支持向量跟踪器(Supportvectortracking,SVT)对车"
-  },
-  {
-   "unit": [
-    "span",
-    "p42",
-    0,
-    54
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "7段序列列,可用于目标检测与跟踪、动作http://www.pets2015.net/是识别、场景分析等"
-  },
-  {
-   "unit": [
-    "ref",
-    "r141"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[141]WuB,NevatiaR.Clusterboostedtreeclassiﬁerformulti-view,m"
+   "text": "42卷景信息进行分析及充分利用,能够有效地获取场景的先验知识,降低复杂的背景环境以及场景中与目标相似的物体的干扰;"
   },
   {
    "unit": [
@@ -1736,6 +1376,366 @@
     "revision:typo"
    ],
    "text": "4)基于核的支持向量机分类方法支持向量机(SVM)因其分类性能优良、操作实现简单等特性,仍是目前倍受青睐的常用分类方法之"
+  },
+  {
+   "unit": [
+    "span",
+    "p62",
+    0,
+    56
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "10期尹宏鹏等:基于视觉的目标检测与跟踪综述类器模型的产生、调整以及整合,将有助于适应高维数据的分类任务."
+  },
+  {
+   "unit": [
+    "span",
+    "p64",
+    0,
+    78
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "2PapageorgiouCP,OrenM,PoggioT.Ageneralframeworkforobjectdete"
+  },
+  {
+   "unit": [
+    "span",
+    "p67",
+    76,
+    180
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "In:Proceedingsofthe2005IEEEComputerSocietyConferenceonComput"
+  },
+  {
+   "unit": [
+    "span",
+    "p68",
+    0,
+    122
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "6FelzenszwalbPF,GirshickRB,McAllesterD,RamananD.Objectdetect"
+  },
+  {
+   "unit": [
+    "span",
+    "p68",
+    123,
+    210
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "IEEETransactionsonPatternAnalysisandMa-chineIntelligence,201"
+  },
+  {
+   "unit": [
+    "span",
+    "p70",
+    0,
+    107
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "8RautaraySS,AgrawalA.Visionbasedhandgesturerecog-nitionforhu"
+  },
+  {
+   "unit": [
+    "span",
+    "p70",
+    108,
+    156
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "ArtificialIntelligenceReview,2015,43(1):1−54"
+  },
+  {
+   "unit": [
+    "span",
+    "p71",
+    0,
+    157
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "9GaoY,SpiteriC,PhamMT,Al-MilliS.Asurveyonre-centobjectdetect"
+  },
+  {
+   "unit": [
+    "span",
+    "p72",
+    0,
+    111
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "10ZhangSP,YaoHX,SunX,LuXS.Sparsecodingbasedvi-sualtracking:r"
+  },
+  {
+   "unit": [
+    "span",
+    "p72",
+    112,
+    154
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "PatternRecognition,2013,46(7):1772−1788"
+  },
+  {
+   "unit": [
+    "span",
+    "p75",
+    149,
+    179
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "TheHague,Holland:IEEE,2004."
+  },
+  {
+   "unit": [
+    "span",
+    "p75",
+    59,
+    148
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "In:Proceedingsofthe2004IEEEInternationalConferenceonSystems,"
+  },
+  {
+   "unit": [
+    "span",
+    "p76",
+    0,
+    110
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "14BouwmansT.Traditionalandrecentapproachesinback-groundmodel"
+  },
+  {
+   "unit": [
+    "span",
+    "p76",
+    110,
+    153
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "ComputerScienceReview,2014,11−12:31−66"
+  },
+  {
+   "unit": [
+    "span",
+    "p78",
+    0,
+    107
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "16GowsikhaaD,AbiramiS,BaskaranR.Automatedhumanbehavioranalys"
+  },
+  {
+   "unit": [
+    "span",
+    "p80",
+    56,
+    110
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "ACMComputingSurveys(CSUR),2006,38(4):ArticleNo."
+  },
+  {
+   "unit": [
+    "span",
+    "p81",
+    34,
+    63
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Asurveyofvisualtrack-ing."
+  },
+  {
+   "unit": [
+    "span",
+    "p82",
+    34,
+    75
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Themethodsformov-ingobjectdetection."
+  },
+  {
+   "unit": [
+    "span",
+    "p83",
+    42,
+    84
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Surveyofmovingobjecttrackingalgorithm."
+  },
+  {
+   "unit": [
+    "span",
+    "p83",
+    85,
+    206
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "ApplicationResearchofComput-ers,2009,26(12):4407−4410(张娟,毛晓波"
+  },
+  {
+   "unit": [
+    "span",
+    "p84",
+    35,
+    117
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Researchondetectionandtrackingidentificationalgorithmofweakm"
+  },
+  {
+   "unit": [
+    "span",
+    "p85",
+    0,
+    128
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "23GutchessD,TrajkovicsM,Cohen-SolalE,LyonsD,JainAK.Abackgrou"
+  },
+  {
+   "unit": [
+    "span",
+    "p85",
+    129,
+    204
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "In:Proceedingsofthe8thIEEEInternationalConferenceonComputerV"
+  },
+  {
+   "unit": [
+    "span",
+    "p86",
+    0,
+    109
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "24WangHZ,SuterD.Anovelrobuststatisticalmethodforbackgroundin"
+  },
+  {
+   "unit": [
+    "span",
+    "p86",
+    110,
+    185
+   ],
+   "alarms": [
+    "norms:正文引用找不到对应的参考文献条目"
+   ],
+   "text": "In:Pro-ceedingsofthe7thAsianConferenceonComputerVision(ACCV2"
+  },
+  {
+   "unit": [
+    "span",
+    "p87",
+    0,
+    94
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "25ColombariA,FusielloA.Patch-basedbackgroundinitializa-tioni"
+  },
+  {
+   "unit": [
+    "span",
+    "p87",
+    95,
+    153
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "IEEETransactionsonImageProcessing,2010,19(4):926−933"
+  },
+  {
+   "unit": [
+    "span",
+    "p88",
+    0,
+    66
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "26LeeB,HedleyM.Backgroundestimationforvideosurveil-lance."
+  },
+  {
+   "unit": [
+    "span",
+    "p88",
+    67,
+    128
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "In:ProceedingsoftheImageandVisionComputingNewZealand."
+  },
+  {
+   "unit": [
+    "span",
+    "p89",
+    0,
+    81
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "27McFarlaneNJB,SchofieldCP.Segmentationandtrackingofpigletsi"
   }
  ]
 }

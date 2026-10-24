@@ -1,0 +1,70 @@
+{
+ "paper": "en_ddpm",
+ "source": "raw/2006.11239.tar.gz",
+ "target": "en_papers/ddpm/manuscript_injected.zip",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "key": "hsu2019annealed",
+   "match": "Annealed denoising flows for h",
+   "snippet": "Recent work has also explored "
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "key": "ortega2018score",
+   "match": "Score-guided Markov chains for",
+   "snippet": "Another line of research revis"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "key": "bordes2016learning",
+   "old_year": "2017",
+   "new_year": "2013",
+   "match": "Learning to Generate Samples f"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "singscorematchingmodel",
+   "cited_key": "ho2019flow++",
+   "intended_key": "song2019generative"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "els.Thismaterialisfrom",
+   "cited_key": "harsha2007communication",
+   "intended_key": "sohl2015deep"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "Moreover, these works differ w",
+   "keys": [
+    "gao2018learning",
+    "goodfellow2014generative",
+    "havasi2018minimal",
+    "karras2019style",
+    "prenger2019waveglow",
+    "salimans2016weight"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "wich",
+   "right": "which",
+   "snippet": "bits per dimension, wich is co"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "betwen",
+   "right": "between",
+   "snippet": "lishes a connection betwen diffu"
+  }
+ ]
+}

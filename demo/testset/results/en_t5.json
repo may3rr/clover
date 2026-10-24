@@ -1,0 +1,475 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2009，数据库记录为 2013']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 8,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 37,
+  "tn": 241,
+  "excluded": 3,
+  "claims": 153,
+  "refs": 135,
+  "support_definitive": 99
+ },
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.17777777777777778,
+  1.0,
+  0.8706293706293706
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c106"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Earlyresultsontransferlearningfortextclassificationtasksadvo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c11"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "TheTransformerwasinitiallyshowntobeeffectiveformachinetransl"
+  },
+  {
+   "unit": [
+    "claim",
+    "c115"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Thefindingthatamulti-taskmodelisoutperformedbyseparatemodels"
+  },
+  {
+   "unit": [
+    "claim",
+    "c118"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Sinceotherfields(e.g.computervision)useasuperviseddatasetfor"
+  },
+  {
+   "unit": [
+    "claim",
+    "c119"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "The“bitterlesson”ofmachinelearningresearcharguesthatgeneralm"
+  },
+  {
+   "unit": [
+    "claim",
+    "c13"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "TheprimarybuildingblockoftheTransformerisself-attention"
+  },
+  {
+   "unit": [
+    "claim",
+    "c130"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "^a^b^c^d^e^f^g"
+  },
+  {
+   "unit": [
+    "claim",
+    "c131"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "RTEandWNLIaretwoofthetaskswheremachineperformancehashistoric"
+  },
+  {
+   "unit": [
+    "claim",
+    "c135"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "HumanperformanceonSQuADisestimatedat82.30and91.22fortheExact"
+  },
+  {
+   "unit": [
+    "claim",
+    "c14"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "Self-attentionisavariantofattention"
+  },
+  {
+   "unit": [
+    "claim",
+    "c144"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "generativemodelstrainedwithmaximumlikelihoodarepronetoproduc"
+  },
+  {
+   "unit": [
+    "claim",
+    "c147"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Somecurrentworkalongtheselinesincludedistillation,parameters"
+  },
+  {
+   "unit": [
+    "claim",
+    "c15"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "wasintendedforsequence-to-sequencetasks"
+  },
+  {
+   "unit": [
+    "claim",
+    "c2"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Inapplicationsoftransferlearningtocomputervision"
+  },
+  {
+   "unit": [
+    "claim",
+    "c22"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "ithasrecentlybecomemorecommontouserelativepositionembeddings"
+  },
+  {
+   "unit": [
+    "claim",
+    "c3"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "pre-trainingistypicallydoneviasupervisedlearningonalargelabe"
+  },
+  {
+   "unit": [
+    "claim",
+    "c33"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "arelimitedtoNewsdata"
+  },
+  {
+   "unit": [
+    "claim",
+    "c36"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断",
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "GLUEandSuperGLUEeachcompriseacollectionoftextclassificationt"
+  },
+  {
+   "unit": [
+    "claim",
+    "c4"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Thisapproachhasrecentlybeenusedtoobtainstate-of-the-artresul"
+  },
+  {
+   "unit": [
+    "claim",
+    "c5"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "neuralnetworks,whichhavebeenshowntoexhibitremarkablescalabil"
+  },
+  {
+   "unit": [
+    "claim",
+    "c52"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "OmittingresultsontheWNLIvalidationsetisstandardpractice"
+  },
+  {
+   "unit": [
+    "claim",
+    "c6"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "Thissynergyhasresultedinagreatdealofrecentworkdevelopingtran"
+  },
+  {
+   "unit": [
+    "claim",
+    "c64"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "encodetextasWordPiecetokens"
+  },
+  {
+   "unit": [
+    "claim",
+    "c65"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "WeuseSentencePiecetoencodetextasWordPiecetokens"
+  },
+  {
+   "unit": [
+    "claim",
+    "c67"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "“denoising”objectives(alsocalled“maskedlanguagemodeling”)pro"
+  },
+  {
+   "unit": [
+    "claim",
+    "c72"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "BERTalsousesafully-visiblemaskingpatternandappendsaspecial“c"
+  },
+  {
+   "unit": [
+    "claim",
+    "c83"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "itshistoricuseasapre-trainingobjective"
+  },
+  {
+   "unit": [
+    "claim",
+    "c85"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "XLNetalsobearssomeresemblancetothesharedencoder-decoderappro"
+  },
+  {
+   "unit": [
+    "claim",
+    "c86"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Thisobservationhasbeenpreviouslymadeby"
+  },
+  {
+   "unit": [
+    "claim",
+    "c87"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Thishasledtothedevelopmentofawidevarietyofpre-trainingobject"
+  },
+  {
+   "unit": [
+    "ref",
+    "r10"
+   ],
+   "alarms": [
+    "norms:这条参考文献与前面的条目重复"
+   ],
+   "text": "Bojar,Ondřej,Chatterjee,Rajen,Federmann,Christian,Haddow,Bar"
+  },
+  {
+   "unit": [
+    "ref",
+    "r80"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "Papineni,Kishore,Roukos,Salim,Ward,Todd,Zhu,Wei-Jing.BLEU:am"
+  },
+  {
+   "unit": [
+    "ref",
+    "r93"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "Ratner,Alex,Hancock,Braden,Dunnmon,Jared,Goldman,Roger,Ré,Ch"
+  },
+  {
+   "unit": [
+    "span",
+    "p1266",
+    166,
+    241
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "thisweekalvesreleasedacharitysinglewithformerteam-matjosepin"
+  },
+  {
+   "unit": [
+    "span",
+    "p1299",
+    0,
+    70
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Processedinput:copachoice1:Manycitizensrelocatedtothecapitol"
+  },
+  {
+   "unit": [
+    "span",
+    "p1307",
+    141,
+    220
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "alargeswingingwindowopenedintotheyard,whichmadeitpleasantand"
+  },
+  {
+   "unit": [
+    "span",
+    "p444",
+    0,
+    79
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Wecomparethespan-corruptionobjectivetothei.i.d-corruptionobj"
+  }
+ ]
+}

@@ -1,0 +1,542 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2007，数据库记录为 2011']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=0 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": false,
+   "detail": "labels=['undetermined'] offtopic=0 findings=0",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 8,
+  "fn": 1,
+  "fp_new": 0,
+  "pre_existing": 42,
+  "tn": 119,
+  "excluded": 4,
+  "claims": 108,
+  "refs": 53,
+  "support_definitive": 75
+ },
+ "lenient": [
+  1.0,
+  0.8888888888888888,
+  0.9921875
+ ],
+ "strict": [
+  0.16,
+  0.8888888888888888,
+  0.7470588235294118
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c1"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Deepconvolutionalneuralnetworks"
+  },
+  {
+   "unit": [
+    "claim",
+    "c10"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Thisproblem,however,hasbeenlargelyaddressedbynormalizediniti"
+  },
+  {
+   "unit": [
+    "claim",
+    "c11"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "whichenablenetworkswithtensoflayerstostartconvergingforstoch"
+  },
+  {
+   "unit": [
+    "claim",
+    "c13"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "Shortcutconnectionsarethoseskippingoneormorelayers."
+  },
+  {
+   "unit": [
+    "claim",
+    "c21"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Bothofthemarepowerfulshallowrepresentationsforimageretrieval"
+  },
+  {
+   "unit": [
+    "claim",
+    "c24"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "AnalternativetoMultigridishierarchicalbasispreconditioning"
+  },
+  {
+   "unit": [
+    "claim",
+    "c25"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "thesesolversconvergemuchfasterthanstandardsolversthatareunaw"
+  },
+  {
+   "unit": [
+    "claim",
+    "c27"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "Practicesandtheoriesthatleadtoshortcutconnections"
+  },
+  {
+   "unit": [
+    "claim",
+    "c30"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "proposemethodsforcenteringlayerresponses,gradients,andpropag"
+  },
+  {
+   "unit": [
+    "claim",
+    "c31"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "an“inception”layeriscomposedofashortcutbranchandafewdeeperbr"
+  },
+  {
+   "unit": [
+    "claim",
+    "c33"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "presentshortcutconnectionswithgatingfunctions"
+  },
+  {
+   "unit": [
+    "claim",
+    "c4"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "networkdepthisofcrucialimportance"
+  },
+  {
+   "unit": [
+    "claim",
+    "c40"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Theimageisresizedwithitsshortersiderandomlysampledin[256,480"
+  },
+  {
+   "unit": [
+    "claim",
+    "c5"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "onthechallengingImageNetdataset"
+  },
+  {
+   "unit": [
+    "claim",
+    "c59"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Strongregularizationsuchasmaxout"
+  },
+  {
+   "unit": [
+    "claim",
+    "c6"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Recentevidencerevealsthatnetworkdepthisofcrucialimportance,a"
+  },
+  {
+   "unit": [
+    "claim",
+    "c60"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "obtainthebestresults"
+  },
+  {
+   "unit": [
+    "claim",
+    "c61"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Strongregularizationsuchasmaxoutordropoutisappliedtoobtainth"
+  },
+  {
+   "unit": [
+    "claim",
+    "c69"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Theselayersaresharedbyaregionproposalnetwork(RPN,generating3"
+  },
+  {
+   "unit": [
+    "claim",
+    "c7"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Manyothernontrivialvisualrecognitiontaskshavealsogreatlybene"
+  },
+  {
+   "unit": [
+    "claim",
+    "c75"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "TheMSCOCOdatasetinvolves80objectcategories."
+  },
+  {
+   "unit": [
+    "claim",
+    "c77"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Non-maximumsuppression(NMS)isappliedontheunionsetofpredicted"
+  },
+  {
+   "unit": [
+    "claim",
+    "c87"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "TheresultonPASCALVOC2012is10pointshigherthanthepreviousstate"
+  },
+  {
+   "unit": [
+    "claim",
+    "c9"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Thisproblem,however,hasbeenlargelyaddressedbynormalizediniti"
+  },
+  {
+   "unit": [
+    "claim",
+    "c93"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "Weadoptthe“per-classregression”(PCR)strategy"
+  },
+  {
+   "unit": [
+    "claim",
+    "c96"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "ThisRPNendswithtwosibling1×1convolutionallayersforbinaryclas"
+  },
+  {
+   "unit": [
+    "claim",
+    "c97"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Theclsandreglayersarebothinaper-classfrom,incontrastto"
+  },
+  {
+   "unit": [
+    "claim",
+    "c99"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Toavoidnegativesamplesbeingdominate,8anchorsarerandomlysampl"
+  },
+  {
+   "unit": [
+    "ref",
+    "r17"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "H.Jegou,M.Douze,andC.Schmid.Productquantizationfornearestnei"
+  },
+  {
+   "unit": [
+    "ref",
+    "r3"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "W.L.Briggs,S.F.McCormick,etal.AMultigridTutorial.Siam,2000."
+  },
+  {
+   "unit": [
+    "ref",
+    "r48"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "A.VedaldiandB.Fulkerson.VLFeat:Anopenandportablelibraryofcom"
+  },
+  {
+   "unit": [
+    "span",
+    "p108",
+    83,
+    238
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thebaselinearchitecturesarethesameastheaboveplainnets,expect"
+  },
+  {
+   "unit": [
+    "span",
+    "p179",
+    0,
+    108
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Errorrates(%)ofsingle-modelresultsontheImageNetvalidationset"
+  },
+  {
+   "unit": [
+    "span",
+    "p198",
+    536,
+    537
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "."
+  },
+  {
+   "unit": [
+    "span",
+    "p2",
+    214,
+    403
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "DeepresidualnetsarefoundationsofoursubmissionstoILSVRC&COCO2"
+  },
+  {
+   "unit": [
+    "span",
+    "p220",
+    106,
+    285
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Onthisdatasetweuseidentityshortcutsinallcases(,optionA),soou"
+  },
+  {
+   "unit": [
+    "span",
+    "p271",
+    289,
+    290
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "."
+  },
+  {
+   "unit": [
+    "span",
+    "p358",
+    151,
+    366
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Wecomputethefull-imagesharedconvfeaturemapsusingthoselayersw"
+  },
+  {
+   "unit": [
+    "span",
+    "p363",
+    330,
+    514
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "WetraintheCOCOmodelswithan8-GPUimplementation,andthustheRPNs"
+  },
+  {
+   "unit": [
+    "span",
+    "p603",
+    442,
+    443
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "."
+  },
+  {
+   "unit": [
+    "span",
+    "p616",
+    56,
+    148
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "OurdetectionsystemisFasterR-CNN[32]withtheimprovementsinTabl"
+  },
+  {
+   "unit": [
+    "span",
+    "p674",
+    176,
+    368
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Butwenoticethatonthisdataset,oneimageusuallycontainsasingled"
+  }
+ ]
+}

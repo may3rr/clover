@@ -62,6 +62,8 @@ demo/testset/reports/
 # earlier runs kept for comparison (degraded-mode baseline, pre-fix backup)
 demo/testset/reports_*/
 demo/testset/zh_papers/**/*.pdf
+# English injected projects: regenerable from raw/ (inject_latex.py, seed=42)
+demo/testset/en_papers/
 
 # ---- F7: real Chinese manuscript run (unpublished paper, never committed)
 demo/zh_eval/

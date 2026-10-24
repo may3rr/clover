@@ -1,0 +1,250 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2016，数据库记录为 2020']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": false,
+   "detail": "labels=['undetermined'] offtopic=0 findings=0",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 7,
+  "fn": 1,
+  "fp_new": 0,
+  "pre_existing": 15,
+  "tn": 110,
+  "excluded": 4,
+  "claims": 69,
+  "refs": 60,
+  "support_definitive": 47
+ },
+ "lenient": [
+  1.0,
+  0.875,
+  0.9915254237288136
+ ],
+ "strict": [
+  0.3181818181818182,
+  0.875,
+  0.8796992481203008
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c11"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Suchlocalmulti-headdot-productselfattentionblockscancomplete"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "byaugmentingfeaturemapsforimageclassification"
+  },
+  {
+   "unit": [
+    "claim",
+    "c19"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "byfurtherprocessingtheoutputofaCNNusingself-attention,e.g.fo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c20"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "unifiedtext-visiontasks"
+  },
+  {
+   "unit": [
+    "claim",
+    "c21"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Therehasalsobeenalotofinterestincombiningconvolutionalneural"
+  },
+  {
+   "unit": [
+    "claim",
+    "c28"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Layernorm(LN)isappliedbeforeeveryblock,andresidualconnection"
+  },
+  {
+   "unit": [
+    "claim",
+    "c51"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "muchoftheirsuccessstemsnotonlyfromtheirexcellentscalabilityb"
+  },
+  {
+   "unit": [
+    "ref",
+    "r49"
+   ],
+   "alarms": [
+    "norms:这条参考文献与前面的条目重复"
+   ],
+   "text": "Wang,Huiyu,Zhu,Yukun,Green,Bradley,Adam,Hartwig,Yuille,Alan,"
+  },
+  {
+   "unit": [
+    "span",
+    "p129",
+    520,
+    521
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "."
+  },
+  {
+   "unit": [
+    "span",
+    "p134",
+    517,
+    778
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "and5hybrids,R50+ViT-B/32,B/16,L/32,L/16pre-trainedfor7epochs"
+  },
+  {
+   "unit": [
+    "span",
+    "p686",
+    595,
+    741
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Then,basedonthecoordinateonthepathintheinput,weconcatenateth"
+  },
+  {
+   "unit": [
+    "span",
+    "p709",
+    140,
+    424
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Forthe1-dimensionaland2-dimensionalpositionalembeddings,wetr"
+  },
+  {
+   "unit": [
+    "span",
+    "p718",
+    1276,
+    1277
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "."
+  },
+  {
+   "unit": [
+    "span",
+    "p719",
+    0,
+    315
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Moreover,wehavemodifiedViTtoprocessinputsinthe2-dimensionals"
+  },
+  {
+   "unit": [
+    "span",
+    "p721",
+    0,
+    248
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Figure,presenttheperformanceofAxialResNet,Axial-ViT-B/32andA"
+  }
+ ]
+}

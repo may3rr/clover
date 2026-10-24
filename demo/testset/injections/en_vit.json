@@ -1,0 +1,70 @@
+{
+ "paper": "en_vit",
+ "source": "raw/2010.11929.tar.gz",
+ "target": "en_papers/vit/manuscript_injected.zip",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "key": "chen2019patchattn",
+   "match": "Patch-level self-attention for",
+   "snippet": "Recent work has also explored "
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "key": "rossi2020globaltok",
+   "match": "Global token mixing for convol",
+   "snippet": "Another line of research revis"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "key": "zhao2020-san",
+   "old_year": "2020",
+   "new_year": "2016",
+   "match": "Exploring Self-Attention for I"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "ainingiscommonpractice",
+   "cited_key": "xie2020-noisystudent",
+   "intended_key": "kolesnikov2020-bit"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "orViT-H/14,andalsoused",
+   "cited_key": "huang2020ccnet",
+   "intended_key": "polyak"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "Moreover, these works differ w",
+   "keys": [
+    "deng2009-imagenet",
+    "kingma2015adam",
+    "polyak",
+    "radford2019-gpt2",
+    "ramachandran19-sasa",
+    "wu2018group"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "wich",
+   "right": "which",
+   "snippet": "nier et al. (2020), wich extra"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "trainig",
+   "right": "training",
+   "snippet": "self-supervised pre-trainig metho"
+  }
+ ]
+}

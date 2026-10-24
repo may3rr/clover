@@ -103,110 +103,115 @@
   {
    "unit": [
     "claim",
-    "c73"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "因此,强化学习智能体(agent)通过图利用强化学习方法学习任务型对话策略的四种方法常见的一种解决方法是使用用户模拟器来"
-  },
-  {
-   "unit": [
-    "span",
-    "p166",
-    331,
-    390
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "手机助手、问答系统、智能聊天机器人等对话系统如雨后春笋般地涌现,人机对话系统业的蓬勃发展展现了人机对话广泛的应用价值."
-  },
-  {
-   "unit": [
-    "span",
-    "p127",
-    0,
-    83
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "使用最大互信息(MaximumMutualInformation,MMI)来重建传统的Seq2Seq,这种方法使得生成的"
-  },
-  {
-   "unit": [
-    "claim",
-    "c57"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "通过学最近,引入了信念跟踪的深度学习习权重和使用滑动窗口的方式,解决使用单个神经网络在任意数量的可能值上输出一系列概率分"
-  },
-  {
-   "unit": [
-    "claim",
-    "c148"
+    "c1"
    ],
    "alarms": [
     "revision:typo",
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "利大限度地提高预测准确性用基于内存网络在问答系统领域展现出来的优势,将基于内存的端到端模型应用于任务型对话系统."
+   "text": "为首的第一代对话系统,主要依赖专统."
   },
   {
    "unit": [
     "claim",
-    "c86"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "都使用分层强化等人学习(HierarchicalReinforcementLearning,HRL)来分解复合任务,结果"
-  },
-  {
-   "unit": [
-    "claim",
-    "c56"
+    "c10"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "模型将提取的特征用MM)于序列建模."
+   "text": "K近邻(K-NearestNeighbor,(NaiveBayesian)"
   },
   {
    "unit": [
     "claim",
-    "c152"
+    "c100"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "提出基于注意力的具有策略的问题."
-  },
-  {
-   "unit": [
-    "span",
-    "p47",
-    78,
-    148
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "统计学学习算法将对话过程映射为一个统计模型,并引入强化学习算法来计算对话状态的条件概率分布,例如贝叶斯网络、部分可观测马"
+   "text": "提出了一个与领域无关的摘要方法,Wang等人空间,允许一个域上训练的策略被转移到其他域."
   },
   {
    "unit": [
     "claim",
-    "c192"
+    "c101"
    ],
    "alarms": [
     "revision:typo",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "support:被引文献只部分支持这条论断"
    ],
-   "text": "通过利用源领域中的可复作为首选."
+   "text": "由于语言识别或语言理解的错误导致DM模块做出不好甚至错误的决策"
+  },
+  {
+   "unit": [
+    "claim",
+    "c104"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "虽然使用基于SVM的主题分度类方法检测原话语是否不在领域内."
+  },
+  {
+   "unit": [
+    "claim",
+    "c106"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "分别提提高体验"
+  },
+  {
+   "unit": [
+    "claim",
+    "c111"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "基于此的智能机器人大部分是集中在用果户的自然语言、动作或表情等简单的层面,没有基于语音层面的情感交互,导致了目前大多数的"
+  },
+  {
+   "unit": [
+    "claim",
+    "c115"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "将基于句子话生成的研究"
+  },
+  {
+   "unit": [
+    "claim",
+    "c116"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "也使用了语言模型,但不需要基于短语的方法手工制定规则,比基于类的语言模型方法更高效、准确率也更高."
+  },
+  {
+   "unit": [
+    "claim",
+    "c117"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "目前,基于深度学习的NLG模型普遍以编码器-解码器(Encoder-"
+  },
+  {
+   "unit": [
+    "claim",
+    "c119"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "提出使用序列到序码器列(Sequence-to-Sequence,Seq2Seq)模型来生成简单的对话."
   },
   {
    "unit": [
@@ -220,93 +225,23 @@
   },
   {
    "unit": [
-    "span",
-    "p155",
-    6,
-    28
+    "claim",
+    "c123"
    ],
    "alarms": [
-    "revision:typo"
+    "support:被引文献只部分支持这条论断"
    ],
-   "text": "Dhingra等器仍然是一项具有挑战性的任务"
+   "text": "采用基用户进行适当的信息性响应"
   },
   {
    "unit": [
     "claim",
-    "c171"
+    "c126"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "support:被引文献只部分支持这条论断"
    ],
-   "text": "任务型对话系统的各个子模块的评测指标"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    2915,
-    3139
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Fortheend-to-endmethod,therearetwoframeworkstobuildanend-to-"
-  },
-  {
-   "unit": [
-    "span",
-    "p46",
-    58,
-    158
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "适用于无训练数据集对于复杂状态的无法手工制定更新机的场景,即冷启动场景制,缺少灵活性相关参数需要人工编写制定,无法根据适"
-  },
-  {
-   "unit": [
-    "span",
-    "p108",
-    502,
-    582
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "引入相对于Seq2Seq模型在自动指标和上下文自然人类成对偏好测试中效果显着改善语言生成生成的回复不但会考虑上下文,而且"
-  },
-  {
-   "unit": [
-    "claim",
-    "c165"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "也使用监督学习和强化学习的技术以端到端人的方式训练完成任务型对话系统,通过结合用户模拟器来模拟用户议程进行训练,以此形成"
-  },
-  {
-   "unit": [
-    "claim",
-    "c178"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "多种方式相结合的混合方法"
-  },
-  {
-   "unit": [
-    "span",
-    "p124",
-    24,
-    89
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "基于规则或基于模板[183-184]具有鲁棒性和充分性,但频繁重复相的方法同的内容、笨拙的输出形式使得基于规则的生成模型"
+   "text": "迁移学习的对话生成解决目标领域数据不足的问题"
   },
   {
    "unit": [
@@ -323,229 +258,87 @@
   },
   {
    "unit": [
-    "ref",
-    "r189"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[189]MinskyM.Societyofmind:Aresponsetofourreviews.Artificial"
-  },
-  {
-   "unit": [
     "claim",
-    "c187"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "训练集:31279句客观+单开发集:4462句人工测试集:9042句"
-  },
-  {
-   "unit": [
-    "span",
-    "p95",
-    0,
-    57
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "[136]更有效地应对噪音环境及语言和的方法和MDP语言理解等问题,产生具有良好鲁棒性的DM策[137-138]."
-  },
-  {
-   "unit": [
-    "claim",
-    "c45"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "DM的代表性方法对比任务描述方法类型方法名称优点有限无需训练数据"
-  },
-  {
-   "unit": [
-    "span",
-    "p58",
-    651,
-    685
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "模仿学习的原理是通过给智能体提供先验题知识,从而学习、模仿人类行为."
-  },
-  {
-   "unit": [
-    "claim",
-    "c190"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "使用监督话系统评估是合理的"
-  },
-  {
-   "unit": [
-    "claim",
-    "c55"
+    "c129"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "、CRF、RNN"
-  },
-  {
-   "unit": [
-    "span",
-    "p161",
-    6,
-    47
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "目前,面对冷启动或数系统训练数据的一部分据不足的情况时,迁移学习逐步地被广泛应用."
-  },
-  {
-   "unit": [
-    "span",
-    "p133",
-    798,
-    817
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "适于大规模数据集的场景难以集合知识库;"
-  },
-  {
-   "unit": [
-    "span",
-    "p143",
-    21,
-    133
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Zhao等人学习框架,基于长短记忆网络的深度Q网络的变体,即深度循环Q网络(DeepRecurrentQ-Network"
+   "text": "使用神经网络的模板的模型又有不可控的风险"
   },
   {
    "unit": [
     "claim",
-    "c88"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "图分层强化学习与子目标发现网络的工作流程示意图"
-  },
-  {
-   "unit": [
-    "span",
-    "p23",
-    54,
-    108
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "RNN的变体例如长短记忆网络通过三个门结构(输入门、遗忘门和输出门)可以学习长距离的依赖关系,得到了广泛应用"
-  },
-  {
-   "unit": [
-    "span",
-    "p117",
-    6,
-    60
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "如何在不于全面使用手工制作调整规则模板耗费人力物力的情况下,生成自然、生动和合适的回复需要进一步研究和探索."
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    2622,
-    2759
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "IntheendofDMsection,wesummarizethelatestsolutionsandideastod"
-  },
-  {
-   "unit": [
-    "span",
-    "p31",
-    143,
-    312
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "对于评测多轮对一步考验机器阅读理解能力话的阅读理解技术,斯坦福大学提出了Conversa-tionalQuestionA"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    2009,
-    2128
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Amongthem,wedividethethreetasksoftheNLUmoduleintotextclassif"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    430,
-    625
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Therefore,human-machinedialoguetechnologyhasmadesubstantialp"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    2294,
-    2404
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "IntheDMsection,wedividetheDMintodialoguestatetracking(DST)ta"
-  },
-  {
-   "unit": [
-    "ref",
-    "r176"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[176]RusV,CaiZ,GraesserAC.Evaluationinnaturallanguagegenerat"
-  },
-  {
-   "unit": [
-    "claim",
-    "c70"
+    "c13"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "基于优先级采样的深度优势学习的深度Q网络"
+   "text": "法具有较强的一致性结果,其性能在很大程度上取决用于识别最近邻的距离度量,并且不擅长处理高"
+  },
+  {
+   "unit": [
+    "claim",
+    "c130"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "目前的人机对话系统虽然能够通过修改数据库保证其身份的一致"
+  },
+  {
+   "unit": [
+    "claim",
+    "c134"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "该方法不易扩展到大型开放域系"
+  },
+  {
+   "unit": [
+    "claim",
+    "c138"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "用于对话生成的神经模型倾向于产识生通用响应,在大多数情况下无法对其进行适当的和信息性的响应,因为在不具备常识知识和对话背"
+  },
+  {
+   "unit": [
+    "claim",
+    "c145"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "它进一步提出了一种快速多样化的解决方法修改了波束搜索(BeamTraining)以将有意义的响应排列到更高的位置."
+  },
+  {
+   "unit": [
+    "claim",
+    "c147"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "基于监督学习的框架需要收集许多对话样本,然后将其用于训练对话系统的多个组成部分,以最"
+  },
+  {
+   "unit": [
+    "claim",
+    "c148"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "利大限度地提高预测准确性用基于内存网络在问答系统领域展现出来的优势,将基于内存的端到端模型应用于任务型对话系统."
   },
   {
    "unit": [
@@ -560,70 +353,105 @@
   {
    "unit": [
     "claim",
-    "c179"
+    "c152"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
+    "support:被引文献只部分支持这条论断"
    ],
-   "text": "目前任务型个对话系统需要更全面的指标对话系统常用的评估方法包括基于语料库的方、基于用户模拟的方法、基于人工评法和多种方式"
-  },
-  {
-   "unit": [
-    "span",
-    "p153",
-    2277,
-    2299
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "人-机对话数据sematicPaper:3."
+   "text": "提出基于注意力的具有策略的问题."
   },
   {
    "unit": [
     "claim",
-    "c66"
+    "c155"
    ],
    "alarms": [
-    "revision:typo"
+    "label:unsupported",
+    "revision:typo",
+    "support:被引文献不支持这条论断",
+    "support:被引文献只部分支持这条论断"
    ],
-   "text": "算法相结合,提出了深的Q学习(Q-Learning)度Q网络(DeepQ-Network,DQN)模型."
+   "text": "在进行对话时,要对对话状态进行表方法示和跟踪,这需要人工定义对话领域相关的知识库进行检索的动作空间,耗时又耗力."
   },
   {
    "unit": [
-    "span",
-    "p131",
-    159,
-    222
+    "claim",
+    "c157"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "并且,由于一个模块的输入依赖于另一个模块的输出,当将一个模块调整到新环境或更新数据,其他所有模块为保证全局最优要进行相对"
+   "text": "引入可以或响应生成方面表现不佳."
   },
   {
    "unit": [
-    "span",
-    "p124",
-    459,
-    500
+    "claim",
+    "c159"
    ],
    "alarms": [
-    "revision:typo"
+    "support:被引文献只部分支持这条论断"
    ],
-   "text": "如果模型可以访问并利用大规模的知识常识和背景知识就可以理解对话,从而更恰当地响应."
+   "text": "提出使用向量表示对话状态进行隐式对话状态表示,向量每一维代表需要自己学习的槽."
   },
   {
    "unit": [
-    "span",
-    "p133",
-    405,
-    453
+    "claim",
+    "c160"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "的序列到提升检索精确实体的能力序列模型一个端到可以直接从底层知识库中提取有用端到端端的可训信息;"
+   "text": "使用基于被提强化学习来构建端到端对话系统的框架"
+  },
+  {
+   "unit": [
+    "claim",
+    "c161"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "首先提出一种端到端的强深度化出."
+  },
+  {
+   "unit": [
+    "claim",
+    "c162"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "构造了一个端到端的KB-InfoBot,使用“软等人查询”的后验分布来表示用户对知识库中实体的兴趣度,并将这种软检索和强"
+  },
+  {
+   "unit": [
+    "claim",
+    "c163"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "结合监督学习和深度学习模式进行优化的"
+  },
+  {
+   "unit": [
+    "claim",
+    "c164"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "William等人提出混合编端到端方法码网络(HybridCodeNetworks,HCN),通过使用LSTM来避免状态"
+  },
+  {
+   "unit": [
+    "claim",
+    "c165"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "也使用监督学习和强化学习的技术以端到端人的方式训练完成任务型对话系统,通过结合用户模拟器来模拟用户议程进行训练,以此形成"
   },
   {
    "unit": [
@@ -639,46 +467,144 @@
   {
    "unit": [
     "claim",
-    "c147"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "基于监督学习的框架需要收集许多对话样本,然后将其用于训练对话系统的多个组成部分,以最"
-  },
-  {
-   "unit": [
-    "span",
-    "p160",
-    6,
-    49
+    "c170"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "除此之外,多任务学习和迁移学习还可以通据过使用不同语言、任务、领域或模型的信息作为对话"
-  },
-  {
-   "unit": [
-    "span",
-    "p77",
-    292,
-    365
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ",T:→=LSTM(ft,h→t-1)(14)h1:←=LSTM(ft,h←t+1)(15)h1:然约束是航班的抵达时间"
+   "text": "模块来帮助系统更接近地模仿人类对话的模型但目前进行实验的问题还限定在开放域,因此对于任务型对话系统的端到端方发引入大规模"
   },
   {
    "unit": [
     "claim",
-    "c95"
+    "c171"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "任务型对话系统的各个子模块的评测指标"
+  },
+  {
+   "unit": [
+    "claim",
+    "c172"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "变分近似q(ω|θ)和后验p(ω|!)之间的参数KL散度(Kullback-LeiblerDivergence,KLD)"
+   "text": "对话状态跟踪ROC表现、等误差率和正确接受率"
+  },
+  {
+   "unit": [
+    "claim",
+    "c173"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "任务型对话系统任务常见的评测数据及其相关信息汇总表"
+  },
+  {
+   "unit": [
+    "claim",
+    "c175"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "包含个任务:天气、播放Download:音乐、搜索、添加到列表、预com/snipsco/nlu-benchmark/S"
+  },
+  {
+   "unit": [
+    "claim",
+    "c176"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "人-人对话的数据集42yp2BzDUK6U虽然对话系统中的各个组成部分通常可以根据如表8所示的明确指标进行优化和评估,但"
+  },
+  {
+   "unit": [
+    "claim",
+    "c177"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "基于用户模拟的方法"
+  },
+  {
+   "unit": [
+    "claim",
+    "c178"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "多种方式相结合的混合方法"
+  },
+  {
+   "unit": [
+    "claim",
+    "c179"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "目前任务型个对话系统需要更全面的指标对话系统常用的评估方法包括基于语料库的方、基于用户模拟的方法、基于人工评法和多种方式"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "提出利用循环神经网络(Recurrent和Lee等人NeuralNetworks,RNN)解决CNN的视野受限问题,结合"
+  },
+  {
+   "unit": [
+    "claim",
+    "c180"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "7个意图72个槽值客观+单训练集:13084人工测试集:7007训练集:6894客观+edu/sls/downloads"
+  },
+  {
+   "unit": [
+    "claim",
+    "c183"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "训练语料的质量和对话系统生成内容的明质量紧密相关"
+  },
+  {
+   "unit": [
+    "claim",
+    "c185"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "在实践中经常观察到,在为真实用户提供服人务时,用户模拟器由于过拟合不能达到很好的效果."
+  },
+  {
+   "unit": [
+    "claim",
+    "c187"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "训练集:31279句客观+单开发集:4462句人工测试集:9042句"
   },
   {
    "unit": [
@@ -702,39 +628,54 @@
   },
   {
    "unit": [
-    "span",
-    "p4",
-    0,
-    105
+    "claim",
+    "c190"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "AbstractThehuman-machinedialoguesystemisthecoretechnologyint"
+   "text": "使用监督话系统评估是合理的"
   },
   {
    "unit": [
-    "span",
-    "p46",
-    578,
-    676
+    "claim",
+    "c192"
    ],
    "alarms": [
-    "revision:typo"
+    "revision:typo",
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "深度强化其有效性得到验证(在预订电影票的任Q学习学习(DQN)务中,epoch=300,任务成功率0.7867,平均对话"
+   "text": "通过利用源领域中的可复作为首选."
   },
   {
    "unit": [
-    "span",
-    "p4",
-    1556,
-    1749
+    "claim",
+    "c193"
    ],
    "alarms": [
-    "revision:typo"
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "2020Technology,Guangzhou510000)Universityof赵阳洋等:任务型对话系统研究综述["
+   "text": "和单例学习是迁移学习的特例,也被经零次学习常用于多领域之间的快速迁移任务."
+  },
+  {
+   "unit": [
+    "claim",
+    "c22"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "RNN制定任务资源,开发成本高"
+  },
+  {
+   "unit": [
+    "claim",
+    "c23"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "NLU的代表性方法对比"
   },
   {
    "unit": [
@@ -748,86 +689,6 @@
   },
   {
    "unit": [
-    "span",
-    "p35",
-    219,
-    260
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "例如,ELMo模型(EmbeddingsfromLanguageModels)"
-  },
-  {
-   "unit": [
-    "span",
-    "p153",
-    1940,
-    1975
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在餐厅预定餐桌fb.com/downloads/babi/bAbl2."
-  },
-  {
-   "unit": [
-    "span",
-    "p91",
-    15,
-    95
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "使用DQN来优神经网络化策略,方法包含变分信息最大化探索(VariationalInformationMaximizin"
-  },
-  {
-   "unit": [
-    "claim",
-    "c34"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "斯坦福大学在原有的SQuAD1.0数据集的集基础上进行扩充,发布了QuestionAnsweringDataset(SQ"
-  },
-  {
-   "unit": [
-    "span",
-    "p124",
-    116,
-    218
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "基于语料库的方法[120,186]能够从数据中学统习直接使系统能够更自然地模拟人类响应,消除对预定义规则的依赖,并使系统"
-  },
-  {
-   "unit": [
-    "span",
-    "p22",
-    5,
-    737
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "相比之下,RNN[30-31]制定任务资源,开发成本高模型及其变体,如长短期记忆网络(LongShort-Team表[3"
-  },
-  {
-   "unit": [
-    "claim",
-    "c185"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在实践中经常观察到,在为真实用户提供服人务时,用户模拟器由于过拟合不能达到很好的效果."
-  },
-  {
-   "unit": [
     "claim",
     "c30"
    ],
@@ -838,523 +699,23 @@
   },
   {
    "unit": [
-    "span",
-    "p121",
-    6,
-    59
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "为了使得对话系统更加逼近真实人类交互集行为,应根据用户的年龄、个性、心情、兴趣和个性等标签生成个性化响应."
-  },
-  {
-   "unit": [
-    "span",
-    "p148",
-    341,
-    393
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "这通过监督学习或强化学习进行学习和优化种方法能够适用于任何数据库或API,但难以解决用户模糊需求的任务."
-  },
-  {
-   "unit": [
     "claim",
-    "c172"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "对话状态跟踪ROC表现、等误差率和正确接受率"
-  },
-  {
-   "unit": [
-    "claim",
-    "c129"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "使用神经网络的模板的模型又有不可控的风险"
-  },
-  {
-   "unit": [
-    "span",
-    "p111",
-    294,
-    340
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "适于大规模数据集和无法平行化处理,导致模型训练时间有上下文的多轮对话较长需要大量的语料支持;"
-  },
-  {
-   "unit": [
-    "claim",
-    "c138"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "用于对话生成的神经模型倾向于产识生通用响应,在大多数情况下无法对其进行适当的和信息性的响应,因为在不具备常识知识和对话背"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    1219,
-    1389
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Thereareusedintheopenfieldscenariosandcanhandleawidevarietyo"
-  },
-  {
-   "unit": [
-    "ref",
-    "r107"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[107]LakshminarayananAS,SharmaS,RavindranB.Dynamicframeskipd"
-  },
-  {
-   "unit": [
-    "claim",
-    "c13"
+    "c33"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "法具有较强的一致性结果,其性能在很大程度上取决用于识别最近邻的距离度量,并且不擅长处理高"
-  },
-  {
-   "unit": [
-    "span",
-    "p158",
-    562,
-    706
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "虽然半监督或无监督学习在一定程度上避免了数据资源的浪费,但半监督学习需要做未标记数据于已存在的标注类别相联系的基本假设,"
-  },
-  {
-   "unit": [
-    "span",
-    "p58",
-    398,
-    429
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "DP需要基于目前状态St和可能的动作来选择最高累计奖励的动作."
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    287,
-    430
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Inrecentyears,thebreakthroughprogressindeeplearningtechnolog"
-  },
-  {
-   "unit": [
-    "span",
-    "p131",
-    64,
-    76
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "(3)模块处理相互依赖."
-  },
-  {
-   "unit": [
-    "ref",
-    "r229"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[229]Gai'cM,LefevreF,JurˇcekF,etal.Back-offactionselectioni"
-  },
-  {
-   "unit": [
-    "ref",
-    "r18"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[18]HashemiHB,AsiaeeA,KraftR.Queryintentdetectionusingconvol"
+   "text": "面向更复杂、更接近真实应用场景的数据"
   },
   {
    "unit": [
     "claim",
-    "c53"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "、网络排序(Web-styleRanking)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c90"
+    "c34"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "的启发下,Gai'CommitteeMachine,BCM)c等"
-  },
-  {
-   "unit": [
-    "claim",
-    "c111"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "基于此的智能机器人大部分是集中在用果户的自然语言、动作或表情等简单的层面,没有基于语音层面的情感交互,导致了目前大多数的"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    1095,
-    1219
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Thenon-task-orienteddialoguesystems,alsocalledknownaschatrob"
-  },
-  {
-   "unit": [
-    "span",
-    "p113",
-    18,
-    110
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "因此Kumar等人经网络(DynamicMemoryNetwork,DMN)处理输入序列和背景知识,形成情景记忆模块(E"
-  },
-  {
-   "unit": [
-    "claim",
-    "c116"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "也使用了语言模型,但不需要基于短语的方法手工制定规则,比基于类的语言模型方法更高效、准确率也更高."
-  },
-  {
-   "unit": [
-    "span",
-    "p46",
-    833,
-    877
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在DDQ的基础上,利用判别器区控制模拟数据的质量,这使得对话策略能进行有效且稳健的学习;"
-  },
-  {
-   "unit": [
-    "claim",
-    "c134"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "该方法不易扩展到大型开放域系"
-  },
-  {
-   "unit": [
-    "ref",
-    "r81"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[81]BohusD,RudnickyA.Ak-hypotheses+otherbeliefupdatingmodel/"
-  },
-  {
-   "unit": [
-    "claim",
-    "c64"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "进行了扩展,利用已有数据信法对Dagger算法息进行交互式学习,实现模仿和强化学习的技术统一."
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    625,
-    909
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Inthispaper,wefirstsystematicallydescribethedevelopmentproce"
-  },
-  {
-   "unit": [
-    "span",
-    "p62",
-    58,
-    214
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "其中Q-学习算法分成如下两步:1计算当前状态行动下的价值目标函数:Δq(s,a)=r(s′)+γmaxa′qT-1(s′"
-  },
-  {
-   "unit": [
-    "span",
-    "p58",
-    541,
-    607
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "因此在序列多步决策问题中,强化学习需要频繁地试错,来获得稀疏的奖励,这种“随机”方式的不但搜索空间非常巨大,而且前期收敛"
-  },
-  {
-   "unit": [
-    "claim",
-    "c130"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "目前的人机对话系统虽然能够通过修改数据库保证其身份的一致"
-  },
-  {
-   "unit": [
-    "span",
-    "p7",
-    223,
-    223
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ""
-  },
-  {
-   "unit": [
-    "claim",
-    "c180"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "7个意图72个槽值客观+单训练集:13084人工测试集:7007训练集:6894客观+edu/sls/downloads"
-  },
-  {
-   "unit": [
-    "claim",
-    "c157"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "引入可以或响应生成方面表现不佳."
-  },
-  {
-   "unit": [
-    "claim",
-    "c183"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "训练语料的质量和对话系统生成内容的明质量紧密相关"
-  },
-  {
-   "unit": [
-    "claim",
-    "c100"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出了一个与领域无关的摘要方法,Wang等人空间,允许一个域上训练的策略被转移到其他域."
-  },
-  {
-   "unit": [
-    "span",
-    "p102",
-    20,
-    50
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "因此,设计蜜一个高效的混合DM模型是人机对话发展的必然趋势."
-  },
-  {
-   "unit": [
-    "claim",
-    "c162"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "构造了一个端到端的KB-InfoBot,使用“软等人查询”的后验分布来表示用户对知识库中实体的兴趣度,并将这种软检索和强"
-  },
-  {
-   "unit": [
-    "claim",
-    "c106"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "分别提提高体验"
-  },
-  {
-   "unit": [
-    "claim",
-    "c91"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "提出一个策略委员会模型进行有效的多域策人"
-  },
-  {
-   "unit": [
-    "claim",
-    "c170"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "模块来帮助系统更接近地模仿人类对话的模型但目前进行实验的问题还限定在开放域,因此对于任务型对话系统的端到端方发引入大规模"
-  },
-  {
-   "unit": [
-    "span",
-    "p58",
-    5,
-    78
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "强化学替专家手工设计一系列复杂的决策规则习是通过一个马尔可夫决策过程(MarkovDecisionProcess,MDP"
-  },
-  {
-   "unit": [
-    "ref",
-    "r94"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[94]LemonO,RieserrV.Reinforcementlearningforadaptivedialogue"
-  },
-  {
-   "unit": [
-    "claim",
-    "c161"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "首先提出一种端到端的强深度化出."
-  },
-  {
-   "unit": [
-    "claim",
-    "c117"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "目前,基于深度学习的NLG模型普遍以编码器-解码器(Encoder-"
-  },
-  {
-   "unit": [
-    "span",
-    "p161",
-    123,
-    189
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "然而,迁移学习在实际应用可能会在将源领域中含有噪音的信息迁移到目标领域,损伤目标领域的性能,因此源领域和目标领域的实际效"
-  },
-  {
-   "unit": [
-    "span",
-    "p57",
-    5,
-    60
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "以通过监督学习、强化学习和模仿学习得到监督学习需要专家手工设计对话策略规则,通过上一步生成的动作进行监督学习."
-  },
-  {
-   "unit": [
-    "claim",
-    "c46"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "发现出跟踪多个对话状态的好"
-  },
-  {
-   "unit": [
-    "claim",
-    "c101"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "由于语言识别或语言理解的错误导致DM模块做出不好甚至错误的决策"
+   "text": "斯坦福大学在原有的SQuAD1.0数据集的集基础上进行扩充,发布了QuestionAnsweringDataset(SQ"
   },
   {
    "unit": [
@@ -1371,64 +732,114 @@
   {
    "unit": [
     "claim",
-    "c83"
+    "c4"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "从任务型对话系统和非任务型对话系统分综述别概述其主要的深度学习模型,内容涉及比较全面."
+  },
+  {
+   "unit": [
+    "claim",
+    "c40"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "提出知识引导的结构注意网络(K-SAN)方等人法来避免该问题,利用先验知识作为指导,以结合非平面拓扑结构,并为不同的特定"
+  },
+  {
+   "unit": [
+    "claim",
+    "c45"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "编码器是一个双向长短期记忆网络(Bi-directionalLongShort-TermMemory"
-  },
-  {
-   "unit": [
-    "span",
-    "p75",
-    187,
-    187
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ""
+   "text": "DM的代表性方法对比任务描述方法类型方法名称优点有限无需训练数据"
   },
   {
    "unit": [
     "claim",
-    "c22"
+    "c46"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "发现出跟踪多个对话状态的好"
+  },
+  {
+   "unit": [
+    "claim",
+    "c48"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "随后提出了可以计处,Wang等人缺点适用场景ASR和NLU中的识别错误没有机会得到纠正,也无法追踪多种状态"
+  },
+  {
+   "unit": [
+    "claim",
+    "c51"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "目前,基于判别式模型展现出更为有利的优势,它把DST当作分类任务,结合深度学习等方法进行自动特征提取,从而对对话状态进行"
+  },
+  {
+   "unit": [
+    "claim",
+    "c53"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "、网络排序(Web-styleRanking)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c54"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "等模MEM)型将所有历史信息抽象成一个固定维的特征向量用于训练分类器."
+  },
+  {
+   "unit": [
+    "claim",
+    "c55"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "RNN制定任务资源,开发成本高"
+   "text": "、CRF、RNN"
   },
   {
    "unit": [
     "claim",
-    "c115"
+    "c56"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "模型将提取的特征用MM)于序列建模."
+  },
+  {
+   "unit": [
+    "claim",
+    "c57"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "将基于句子话生成的研究"
-  },
-  {
-   "unit": [
-    "claim",
-    "c164"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "William等人提出混合编端到端方法码网络(HybridCodeNetworks,HCN),通过使用LSTM来避免状态"
-  },
-  {
-   "unit": [
-    "claim",
-    "c177"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "基于用户模拟的方法"
+   "text": "通过学最近,引入了信念跟踪的深度学习习权重和使用滑动窗口的方式,解决使用单个神经网络在任意数量的可能值上输出一系列概率分"
   },
   {
    "unit": [
@@ -1444,217 +855,6 @@
   {
    "unit": [
     "claim",
-    "c176"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "人-人对话的数据集42yp2BzDUK6U虽然对话系统中的各个组成部分通常可以根据如表8所示的明确指标进行优化和评估,但"
-  },
-  {
-   "unit": [
-    "claim",
-    "c18"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出利用循环神经网络(Recurrent和Lee等人NeuralNetworks,RNN)解决CNN的视野受限问题,结合"
-  },
-  {
-   "unit": [
-    "claim",
-    "c193"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "和单例学习是迁移学习的特例,也被经零次学习常用于多领域之间的快速迁移任务."
-  },
-  {
-   "unit": [
-    "span",
-    "p150",
-    0,
-    76
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "[203]的方法非常有解码器直接生成数据库的查询效,但由于解码器的生成过程不能保证查询的格式正确,并且不能够满足任务型对"
-  },
-  {
-   "unit": [
-    "span",
-    "p77",
-    23,
-    81
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Su等人动学习和高斯过程模型共同训练对话策略与奖励模型,使用RNN编码器-解码器以无监督的方式生成连续空间对话表示."
-  },
-  {
-   "unit": [
-    "claim",
-    "c160"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "使用基于被提强化学习来构建端到端对话系统的框架"
-  },
-  {
-   "unit": [
-    "span",
-    "p11",
-    150,
-    331
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "表[1]任务型对话系统和非任务型对话系统对比表任务型对话系统非任务型对话系统目的完成任务或动作闲聊特定域(垂直域)领域开"
-  },
-  {
-   "unit": [
-    "span",
-    "p159",
-    67,
-    67
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ""
-  },
-  {
-   "unit": [
-    "claim",
-    "c163"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "结合监督学习和深度学习模式进行优化的"
-  },
-  {
-   "unit": [
-    "span",
-    "p89",
-    0,
-    279
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "[127]提出了BBQ网络(Bayesian-By-Backprop等人Networks),BBQ网络是DQN的一种变体"
-  },
-  {
-   "unit": [
-    "span",
-    "p82",
-    209,
-    297
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "作者采用分层强化学习方法学习了两个Q函数,分别θe和θi由参数化:在子目标中进行*(s,g;θe)函数和选择原始动作来完"
-  },
-  {
-   "unit": [
-    "span",
-    "p40",
-    906,
-    942
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "DST主要分为三类方法:基于人工规则、基于生成式模型和基于判别模式模型."
-  },
-  {
-   "unit": [
-    "claim",
-    "c10"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "K近邻(K-NearestNeighbor,(NaiveBayesian)"
-  },
-  {
-   "unit": [
-    "ref",
-    "r226"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[226]SchatzmannJ.StatisticalUserandErrorModellingforSpokenDi"
-  },
-  {
-   "unit": [
-    "claim",
-    "c123"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "采用基用户进行适当的信息性响应"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    105,
-    287
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Itisanewwayofharmonioushuman-computerinteraction,whosepurpos"
-  },
-  {
-   "unit": [
-    "claim",
-    "c159"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出使用向量表示对话状态进行隐式对话状态表示,向量每一维代表需要自己学习的槽."
-  },
-  {
-   "unit": [
-    "span",
-    "p12",
-    0,
-    73
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "3任务型对话系统方法任务型对话系统主要的有两种方法:管道方法(PipelineMethod)和端到端方法(End-to-"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    2404,
-    2622
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Andwenotonlyanalyzeandcomparetherepresentativealgorithmsford"
-  },
-  {
-   "unit": [
-    "claim",
     "c63"
    ],
    "alarms": [
@@ -1664,156 +864,13 @@
   },
   {
    "unit": [
-    "span",
-    "p126",
-    243,
-    275
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "到目前为止,该通用响应问题已经吸复引了越来越多的研究人员的注意."
-  },
-  {
-   "unit": [
-    "span",
-    "p13",
-    0,
-    231
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "3.1管道方法一个完整的任务型对话系统的管道方法主要包括5个部分:自动语音识别(AutomaticSpeechRecog"
-  },
-  {
-   "unit": [
     "claim",
-    "c54"
+    "c64"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "等模MEM)型将所有历史信息抽象成一个固定维的特征向量用于训练分类器."
-  },
-  {
-   "unit": [
-    "span",
-    "p31",
-    312,
-    374
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "此数据集较SQuSD2.0数据集而言处理更加困难,主要表现在它的标准答案不再是依赖于篇章的某个连续片段,且多轮对话的指代"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    1749,
-    1909
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Forthepipelinemethod,therearethreemodulestobeintroduced:Natu"
-  },
-  {
-   "unit": [
-    "span",
-    "p28",
-    34,
-    77
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "习3目前,NLU模块对于语言的理解还停留在语义表层,在复杂任务下结合知识进行逻辑推理能"
-  },
-  {
-   "unit": [
-    "claim",
-    "c92"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "提出了另一种多域对话略学习."
-  },
-  {
-   "unit": [
-    "claim",
-    "c104"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "虽然使用基于SVM的主题分度类方法检测原话语是否不在领域内."
-  },
-  {
-   "unit": [
-    "claim",
-    "c78"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "通常称为利用(Exploitation)和行良好的权衡探索(Exploration)."
-  },
-  {
-   "unit": [
-    "claim",
-    "c48"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "随后提出了可以计处,Wang等人缺点适用场景ASR和NLU中的识别错误没有机会得到纠正,也无法追踪多种状态"
-  },
-  {
-   "unit": [
-    "span",
-    "p29",
-    340,
-    399
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "为避免这些问题,一种常用的方法是利用N最优假设列表(N-besthypotheselist)来输出最有可能的N个当"
-  },
-  {
-   "unit": [
-    "claim",
-    "c51"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "目前,基于判别式模型展现出更为有利的优势,它把DST当作分类任务,结合深度学习等方法进行自动特征提取,从而对对话状态进行"
-  },
-  {
-   "unit": [
-    "claim",
-    "c126"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "迁移学习的对话生成解决目标领域数据不足的问题"
-  },
-  {
-   "unit": [
-    "claim",
-    "c175"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "包含个任务:天气、播放Download:音乐、搜索、添加到列表、预com/snipsco/nlu-benchmark/S"
+   "text": "进行了扩展,利用已有数据信法对Dagger算法息进行交互式学习,实现模仿和强化学习的技术统一."
   },
   {
    "unit": [
@@ -1828,124 +885,32 @@
   {
    "unit": [
     "claim",
-    "c119"
+    "c66"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "提出使用序列到序码器列(Sequence-to-Sequence,Seq2Seq)模型来生成简单的对话."
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    909,
-    1095
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Asakeybranchofhumanmachinedialoguesystem,task-orienteddialog"
+   "text": "算法相结合,提出了深的Q学习(Q-Learning)度Q网络(DeepQ-Network,DQN)模型."
   },
   {
    "unit": [
     "claim",
-    "c9"
+    "c70"
    ],
    "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "其技术经历了从统计学习到深度学习的转变,最早的传统统计学习模型有:支持向量机(SupportVectorMachines"
+   "text": "基于优先级采样的深度优势学习的深度Q网络"
   },
   {
    "unit": [
     "claim",
-    "c33"
+    "c73"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "面向更复杂、更接近真实应用场景的数据"
-  },
-  {
-   "unit": [
-    "claim",
-    "c23"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "NLU的代表性方法对比"
-  },
-  {
-   "unit": [
-    "span",
-    "p145",
-    331,
-    388
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "RNN之后经过密连接层和softmax层,将输出的动作模板的数量与动作掩码点乘并进行规范化,就得到了下一步的动作."
-  },
-  {
-   "unit": [
-    "claim",
-    "c145"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "它进一步提出了一种快速多样化的解决方法修改了波束搜索(BeamTraining)以将有意义的响应排列到更高的位置."
-  },
-  {
-   "unit": [
-    "span",
-    "p123",
-    414,
-    414
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ""
-  },
-  {
-   "unit": [
-    "span",
-    "p105",
-    102,
-    149
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "NLG的方法可以话分为:基于规则模板/句子规划的方法、基于语言模型的方法和基于深度学习的方法."
-  },
-  {
-   "unit": [
-    "span",
-    "p76",
-    13,
-    68
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "例如制定旅行计划任务,在题其中的预订航班和预定酒店两个子任务中,一个自另一种解决方法是通过在线学习,减少用户反"
-  },
-  {
-   "unit": [
-    "span",
-    "p153",
-    1089,
-    1144
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Maluuba租用旅行预定数Human-humanPaper:据集goalorienteddataset2."
+   "text": "因此,强化学习智能体(agent)通过图利用强化学习方法学习任务型对话策略的四种方法常见的一种解决方法是使用用户模拟器来"
   },
   {
    "unit": [
@@ -1960,108 +925,92 @@
   {
    "unit": [
     "claim",
-    "c155"
+    "c78"
    ],
    "alarms": [
-    "label:unsupported",
-    "revision:typo",
-    "support:被引文献不支持这条论断",
+    "revision:typo"
+   ],
+   "text": "通常称为利用(Exploitation)和行良好的权衡探索(Exploration)."
+  },
+  {
+   "unit": [
+    "claim",
+    "c80"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "训练,该算法能够从最小数量GP-SARSA算法的对话样本中引导稀疏值函数的估计."
+  },
+  {
+   "unit": [
+    "claim",
+    "c83"
+   ],
+   "alarms": [
     "support:被引文献只部分支持这条论断"
    ],
-   "text": "在进行对话时,要对对话状态进行表方法示和跟踪,这需要人工定义对话领域相关的知识库进行检索的动作空间,耗时又耗力."
-  },
-  {
-   "unit": [
-    "span",
-    "p95",
-    172,
-    253
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在对话系统中,虽然用户可能对于对话系统所在的垂直领域比较熟悉,一些超出领域(Out-Of-Domian,OOD)的话语,"
+   "text": "编码器是一个双向长短期记忆网络(Bi-directionalLongShort-TermMemory"
   },
   {
    "unit": [
     "claim",
-    "c173"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "任务型对话系统任务常见的评测数据及其相关信息汇总表"
-  },
-  {
-   "unit": [
-    "span",
-    "p20",
-    0,
-    68
+    "c86"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "[27]、尔可夫模型(HiddenMarkovModels,HMM)最大熵马尔可夫模型(MaximumEntropyMa"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    1909,
-    2009
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Inthelastpartofthissection,wesummarizetheadvantagesanddisadv"
-  },
-  {
-   "unit": [
-    "span",
-    "p4",
-    3235,
-    3676
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Finally,wesummarizethecurrentissuesthatlimitthedevelopmentof"
-  },
-  {
-   "unit": [
-    "span",
-    "p19",
-    176,
-    235
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "通常使用的线性统计方法包括条件随[25-26]、隐马机场(ConditionalRandomFields,CRF)"
+   "text": "都使用分层强化等人学习(HierarchicalReinforcementLearning,HRL)来分解复合任务,结果"
   },
   {
    "unit": [
     "claim",
-    "c40"
+    "c88"
    ],
    "alarms": [
-    "revision:typo",
     "support:被引文献的研究内容与这条论断无关，可能引错了文献"
    ],
-   "text": "提出知识引导的结构注意网络(K-SAN)方等人法来避免该问题,利用先验知识作为指导,以结合非平面拓扑结构,并为不同的特定"
+   "text": "图分层强化学习与子目标发现网络的工作流程示意图"
   },
   {
    "unit": [
-    "span",
-    "p132",
-    4,
-    14
+    "claim",
+    "c9"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "其技术经历了从统计学习到深度学习的转变,最早的传统统计学习模型有:支持向量机(SupportVectorMachines"
+  },
+  {
+   "unit": [
+    "claim",
+    "c90"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "程需要耗费大量的人力"
+   "text": "的启发下,Gai'CommitteeMachine,BCM)c等"
+  },
+  {
+   "unit": [
+    "claim",
+    "c91"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "提出一个策略委员会模型进行有效的多域策人"
+  },
+  {
+   "unit": [
+    "claim",
+    "c92"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "提出了另一种多域对话略学习."
   },
   {
    "unit": [
@@ -2076,45 +1025,23 @@
   {
    "unit": [
     "claim",
-    "c80"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "训练,该算法能够从最小数量GP-SARSA算法的对话样本中引导稀疏值函数的估计."
-  },
-  {
-   "unit": [
-    "span",
-    "p140",
-    248,
-    359
+    "c95"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "与先前的方法相比,TSCP参数更少且训练速度更快,在大规模数据训练的基础上其任务完成度、语言质量和效率都显著优于最先进的"
-  },
-  {
-   "unit": [
-    "claim",
-    "c4"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "从任务型对话系统和非任务型对话系统分综述别概述其主要的深度学习模型,内容涉及比较全面."
+   "text": "变分近似q(ω|θ)和后验p(ω|!)之间的参数KL散度(Kullback-LeiblerDivergence,KLD)"
   },
   {
    "unit": [
     "ref",
-    "r95"
+    "r107"
    ],
    "alarms": [
     "authenticity:文献信息与数据库记录不一致",
     "status:mismatch"
    ],
-   "text": "[95]RossS,BagnellD.Efficientreductionsforimitationlearning//"
+   "text": "[107]LakshminarayananAS,SharmaS,RavindranB.Dynamicframeskipd"
   },
   {
    "unit": [
@@ -2140,15 +1067,727 @@
   },
   {
    "unit": [
+    "ref",
+    "r176"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[176]RusV,CaiZ,GraesserAC.Evaluationinnaturallanguagegenerat"
+  },
+  {
+   "unit": [
+    "ref",
+    "r18"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[18]HashemiHB,AsiaeeA,KraftR.Queryintentdetectionusingconvol"
+  },
+  {
+   "unit": [
+    "ref",
+    "r189"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[189]MinskyM.Societyofmind:Aresponsetofourreviews.Artificial"
+  },
+  {
+   "unit": [
+    "ref",
+    "r226"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[226]SchatzmannJ.StatisticalUserandErrorModellingforSpokenDi"
+  },
+  {
+   "unit": [
+    "ref",
+    "r229"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[229]Gai'cM,LefevreF,JurˇcekF,etal.Back-offactionselectioni"
+  },
+  {
+   "unit": [
+    "ref",
+    "r81"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[81]BohusD,RudnickyA.Ak-hypotheses+otherbeliefupdatingmodel/"
+  },
+  {
+   "unit": [
+    "ref",
+    "r94"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[94]LemonO,RieserrV.Reinforcementlearningforadaptivedialogue"
+  },
+  {
+   "unit": [
+    "ref",
+    "r95"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[95]RossS,BagnellD.Efficientreductionsforimitationlearning//"
+  },
+  {
+   "unit": [
     "span",
-    "p4",
-    2759,
-    2915
+    "p102",
+    20,
+    50
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "FortheNLGmodule,wefocusontheanalysisoftherelevanttraditional"
+   "text": "因此,设计蜜一个高效的混合DM模型是人机对话发展的必然趋势."
+  },
+  {
+   "unit": [
+    "span",
+    "p105",
+    102,
+    149
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "NLG的方法可以话分为:基于规则模板/句子规划的方法、基于语言模型的方法和基于深度学习的方法."
+  },
+  {
+   "unit": [
+    "span",
+    "p108",
+    502,
+    582
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "引入相对于Seq2Seq模型在自动指标和上下文自然人类成对偏好测试中效果显着改善语言生成生成的回复不但会考虑上下文,而且"
+  },
+  {
+   "unit": [
+    "span",
+    "p11",
+    150,
+    331
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "表[1]任务型对话系统和非任务型对话系统对比表任务型对话系统非任务型对话系统目的完成任务或动作闲聊特定域(垂直域)领域开"
+  },
+  {
+   "unit": [
+    "span",
+    "p111",
+    294,
+    340
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "适于大规模数据集和无法平行化处理,导致模型训练时间有上下文的多轮对话较长需要大量的语料支持;"
+  },
+  {
+   "unit": [
+    "span",
+    "p113",
+    18,
+    110
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "因此Kumar等人经网络(DynamicMemoryNetwork,DMN)处理输入序列和背景知识,形成情景记忆模块(E"
+  },
+  {
+   "unit": [
+    "span",
+    "p117",
+    6,
+    60
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "如何在不于全面使用手工制作调整规则模板耗费人力物力的情况下,生成自然、生动和合适的回复需要进一步研究和探索."
+  },
+  {
+   "unit": [
+    "span",
+    "p12",
+    0,
+    73
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "3任务型对话系统方法任务型对话系统主要的有两种方法:管道方法(PipelineMethod)和端到端方法(End-to-"
+  },
+  {
+   "unit": [
+    "span",
+    "p121",
+    6,
+    59
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为了使得对话系统更加逼近真实人类交互集行为,应根据用户的年龄、个性、心情、兴趣和个性等标签生成个性化响应."
+  },
+  {
+   "unit": [
+    "span",
+    "p123",
+    414,
+    414
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": ""
+  },
+  {
+   "unit": [
+    "span",
+    "p124",
+    116,
+    218
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "基于语料库的方法[120,186]能够从数据中学统习直接使系统能够更自然地模拟人类响应,消除对预定义规则的依赖,并使系统"
+  },
+  {
+   "unit": [
+    "span",
+    "p124",
+    24,
+    89
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "基于规则或基于模板[183-184]具有鲁棒性和充分性,但频繁重复相的方法同的内容、笨拙的输出形式使得基于规则的生成模型"
+  },
+  {
+   "unit": [
+    "span",
+    "p124",
+    459,
+    500
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "如果模型可以访问并利用大规模的知识常识和背景知识就可以理解对话,从而更恰当地响应."
+  },
+  {
+   "unit": [
+    "span",
+    "p126",
+    243,
+    275
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "到目前为止,该通用响应问题已经吸复引了越来越多的研究人员的注意."
+  },
+  {
+   "unit": [
+    "span",
+    "p127",
+    0,
+    83
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "使用最大互信息(MaximumMutualInformation,MMI)来重建传统的Seq2Seq,这种方法使得生成的"
+  },
+  {
+   "unit": [
+    "span",
+    "p13",
+    0,
+    231
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "3.1管道方法一个完整的任务型对话系统的管道方法主要包括5个部分:自动语音识别(AutomaticSpeechRecog"
+  },
+  {
+   "unit": [
+    "span",
+    "p131",
+    159,
+    222
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "并且,由于一个模块的输入依赖于另一个模块的输出,当将一个模块调整到新环境或更新数据,其他所有模块为保证全局最优要进行相对"
+  },
+  {
+   "unit": [
+    "span",
+    "p131",
+    64,
+    76
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "(3)模块处理相互依赖."
+  },
+  {
+   "unit": [
+    "span",
+    "p132",
+    4,
+    14
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "程需要耗费大量的人力"
+  },
+  {
+   "unit": [
+    "span",
+    "p133",
+    405,
+    453
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "的序列到提升检索精确实体的能力序列模型一个端到可以直接从底层知识库中提取有用端到端端的可训信息;"
+  },
+  {
+   "unit": [
+    "span",
+    "p133",
+    798,
+    817
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "适于大规模数据集的场景难以集合知识库;"
+  },
+  {
+   "unit": [
+    "span",
+    "p140",
+    248,
+    359
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "与先前的方法相比,TSCP参数更少且训练速度更快,在大规模数据训练的基础上其任务完成度、语言质量和效率都显著优于最先进的"
+  },
+  {
+   "unit": [
+    "span",
+    "p143",
+    21,
+    133
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Zhao等人学习框架,基于长短记忆网络的深度Q网络的变体,即深度循环Q网络(DeepRecurrentQ-Network"
+  },
+  {
+   "unit": [
+    "span",
+    "p145",
+    331,
+    388
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "RNN之后经过密连接层和softmax层,将输出的动作模板的数量与动作掩码点乘并进行规范化,就得到了下一步的动作."
+  },
+  {
+   "unit": [
+    "span",
+    "p148",
+    341,
+    393
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "这通过监督学习或强化学习进行学习和优化种方法能够适用于任何数据库或API,但难以解决用户模糊需求的任务."
+  },
+  {
+   "unit": [
+    "span",
+    "p150",
+    0,
+    76
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "[203]的方法非常有解码器直接生成数据库的查询效,但由于解码器的生成过程不能保证查询的格式正确,并且不能够满足任务型对"
+  },
+  {
+   "unit": [
+    "span",
+    "p153",
+    1089,
+    1144
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Maluuba租用旅行预定数Human-humanPaper:据集goalorienteddataset2."
+  },
+  {
+   "unit": [
+    "span",
+    "p153",
+    1940,
+    1975
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "在餐厅预定餐桌fb.com/downloads/babi/bAbl2."
+  },
+  {
+   "unit": [
+    "span",
+    "p153",
+    2277,
+    2299
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "人-机对话数据sematicPaper:3."
+  },
+  {
+   "unit": [
+    "span",
+    "p155",
+    6,
+    28
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Dhingra等器仍然是一项具有挑战性的任务"
+  },
+  {
+   "unit": [
+    "span",
+    "p158",
+    562,
+    706
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "虽然半监督或无监督学习在一定程度上避免了数据资源的浪费,但半监督学习需要做未标记数据于已存在的标注类别相联系的基本假设,"
+  },
+  {
+   "unit": [
+    "span",
+    "p159",
+    67,
+    67
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": ""
+  },
+  {
+   "unit": [
+    "span",
+    "p160",
+    6,
+    49
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "除此之外,多任务学习和迁移学习还可以通据过使用不同语言、任务、领域或模型的信息作为对话"
+  },
+  {
+   "unit": [
+    "span",
+    "p161",
+    123,
+    189
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "然而,迁移学习在实际应用可能会在将源领域中含有噪音的信息迁移到目标领域,损伤目标领域的性能,因此源领域和目标领域的实际效"
+  },
+  {
+   "unit": [
+    "span",
+    "p161",
+    6,
+    47
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "目前,面对冷启动或数系统训练数据的一部分据不足的情况时,迁移学习逐步地被广泛应用."
+  },
+  {
+   "unit": [
+    "span",
+    "p166",
+    331,
+    390
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "手机助手、问答系统、智能聊天机器人等对话系统如雨后春笋般地涌现,人机对话系统业的蓬勃发展展现了人机对话广泛的应用价值."
+  },
+  {
+   "unit": [
+    "span",
+    "p19",
+    176,
+    235
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "通常使用的线性统计方法包括条件随[25-26]、隐马机场(ConditionalRandomFields,CRF)"
+  },
+  {
+   "unit": [
+    "span",
+    "p20",
+    0,
+    68
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "[27]、尔可夫模型(HiddenMarkovModels,HMM)最大熵马尔可夫模型(MaximumEntropyMa"
+  },
+  {
+   "unit": [
+    "span",
+    "p22",
+    5,
+    737
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "相比之下,RNN[30-31]制定任务资源,开发成本高模型及其变体,如长短期记忆网络(LongShort-Team表[3"
+  },
+  {
+   "unit": [
+    "span",
+    "p23",
+    54,
+    108
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "RNN的变体例如长短记忆网络通过三个门结构(输入门、遗忘门和输出门)可以学习长距离的依赖关系,得到了广泛应用"
+  },
+  {
+   "unit": [
+    "span",
+    "p28",
+    34,
+    77
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "习3目前,NLU模块对于语言的理解还停留在语义表层,在复杂任务下结合知识进行逻辑推理能"
+  },
+  {
+   "unit": [
+    "span",
+    "p29",
+    340,
+    399
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为避免这些问题,一种常用的方法是利用N最优假设列表(N-besthypotheselist)来输出最有可能的N个当"
+  },
+  {
+   "unit": [
+    "span",
+    "p31",
+    143,
+    312
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "对于评测多轮对一步考验机器阅读理解能力话的阅读理解技术,斯坦福大学提出了Conversa-tionalQuestionA"
+  },
+  {
+   "unit": [
+    "span",
+    "p31",
+    312,
+    374
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "此数据集较SQuSD2.0数据集而言处理更加困难,主要表现在它的标准答案不再是依赖于篇章的某个连续片段,且多轮对话的指代"
+  },
+  {
+   "unit": [
+    "span",
+    "p35",
+    219,
+    260
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "例如,ELMo模型(EmbeddingsfromLanguageModels)"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    0,
+    105
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "AbstractThehuman-machinedialoguesystemisthecoretechnologyint"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    105,
+    287
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Itisanewwayofharmonioushuman-computerinteraction,whosepurpos"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    1095,
+    1219
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thenon-task-orienteddialoguesystems,alsocalledknownaschatrob"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    1219,
+    1389
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thereareusedintheopenfieldscenariosandcanhandleawidevarietyo"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    1556,
+    1749
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "2020Technology,Guangzhou510000)Universityof赵阳洋等:任务型对话系统研究综述["
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    1749,
+    1909
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Forthepipelinemethod,therearethreemodulestobeintroduced:Natu"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    1909,
+    2009
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Inthelastpartofthissection,wesummarizetheadvantagesanddisadv"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    2009,
+    2128
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Amongthem,wedividethethreetasksoftheNLUmoduleintotextclassif"
   },
   {
    "unit": [
@@ -2164,14 +1803,375 @@
   },
   {
    "unit": [
-    "claim",
-    "c1"
+    "span",
+    "p4",
+    2294,
+    2404
    ],
    "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
+    "revision:typo"
    ],
-   "text": "为首的第一代对话系统,主要依赖专统."
+   "text": "IntheDMsection,wedividetheDMintodialoguestatetracking(DST)ta"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    2404,
+    2622
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Andwenotonlyanalyzeandcomparetherepresentativealgorithmsford"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    2622,
+    2759
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "IntheendofDMsection,wesummarizethelatestsolutionsandideastod"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    2759,
+    2915
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "FortheNLGmodule,wefocusontheanalysisoftherelevanttraditional"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    287,
+    430
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Inrecentyears,thebreakthroughprogressindeeplearningtechnolog"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    2915,
+    3139
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Fortheend-to-endmethod,therearetwoframeworkstobuildanend-to-"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    3235,
+    3676
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Finally,wesummarizethecurrentissuesthatlimitthedevelopmentof"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    430,
+    625
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Therefore,human-machinedialoguetechnologyhasmadesubstantialp"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    625,
+    909
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Inthispaper,wefirstsystematicallydescribethedevelopmentproce"
+  },
+  {
+   "unit": [
+    "span",
+    "p4",
+    909,
+    1095
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Asakeybranchofhumanmachinedialoguesystem,task-orienteddialog"
+  },
+  {
+   "unit": [
+    "span",
+    "p40",
+    906,
+    942
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "DST主要分为三类方法:基于人工规则、基于生成式模型和基于判别模式模型."
+  },
+  {
+   "unit": [
+    "span",
+    "p46",
+    578,
+    676
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "深度强化其有效性得到验证(在预订电影票的任Q学习学习(DQN)务中,epoch=300,任务成功率0.7867,平均对话"
+  },
+  {
+   "unit": [
+    "span",
+    "p46",
+    58,
+    158
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "适用于无训练数据集对于复杂状态的无法手工制定更新机的场景,即冷启动场景制,缺少灵活性相关参数需要人工编写制定,无法根据适"
+  },
+  {
+   "unit": [
+    "span",
+    "p46",
+    833,
+    877
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "在DDQ的基础上,利用判别器区控制模拟数据的质量,这使得对话策略能进行有效且稳健的学习;"
+  },
+  {
+   "unit": [
+    "span",
+    "p47",
+    78,
+    148
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "统计学学习算法将对话过程映射为一个统计模型,并引入强化学习算法来计算对话状态的条件概率分布,例如贝叶斯网络、部分可观测马"
+  },
+  {
+   "unit": [
+    "span",
+    "p57",
+    5,
+    60
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "以通过监督学习、强化学习和模仿学习得到监督学习需要专家手工设计对话策略规则,通过上一步生成的动作进行监督学习."
+  },
+  {
+   "unit": [
+    "span",
+    "p58",
+    398,
+    429
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "DP需要基于目前状态St和可能的动作来选择最高累计奖励的动作."
+  },
+  {
+   "unit": [
+    "span",
+    "p58",
+    5,
+    78
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "强化学替专家手工设计一系列复杂的决策规则习是通过一个马尔可夫决策过程(MarkovDecisionProcess,MDP"
+  },
+  {
+   "unit": [
+    "span",
+    "p58",
+    541,
+    607
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "因此在序列多步决策问题中,强化学习需要频繁地试错,来获得稀疏的奖励,这种“随机”方式的不但搜索空间非常巨大,而且前期收敛"
+  },
+  {
+   "unit": [
+    "span",
+    "p58",
+    651,
+    685
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "模仿学习的原理是通过给智能体提供先验题知识,从而学习、模仿人类行为."
+  },
+  {
+   "unit": [
+    "span",
+    "p62",
+    58,
+    214
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "其中Q-学习算法分成如下两步:1计算当前状态行动下的价值目标函数:Δq(s,a)=r(s′)+γmaxa′qT-1(s′"
+  },
+  {
+   "unit": [
+    "span",
+    "p7",
+    223,
+    223
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": ""
+  },
+  {
+   "unit": [
+    "span",
+    "p75",
+    187,
+    187
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": ""
+  },
+  {
+   "unit": [
+    "span",
+    "p76",
+    13,
+    68
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "例如制定旅行计划任务,在题其中的预订航班和预定酒店两个子任务中,一个自另一种解决方法是通过在线学习,减少用户反"
+  },
+  {
+   "unit": [
+    "span",
+    "p77",
+    23,
+    81
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Su等人动学习和高斯过程模型共同训练对话策略与奖励模型,使用RNN编码器-解码器以无监督的方式生成连续空间对话表示."
+  },
+  {
+   "unit": [
+    "span",
+    "p77",
+    292,
+    365
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": ",T:→=LSTM(ft,h→t-1)(14)h1:←=LSTM(ft,h←t+1)(15)h1:然约束是航班的抵达时间"
+  },
+  {
+   "unit": [
+    "span",
+    "p82",
+    209,
+    297
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "作者采用分层强化学习方法学习了两个Q函数,分别θe和θi由参数化:在子目标中进行*(s,g;θe)函数和选择原始动作来完"
+  },
+  {
+   "unit": [
+    "span",
+    "p89",
+    0,
+    279
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "[127]提出了BBQ网络(Bayesian-By-Backprop等人Networks),BBQ网络是DQN的一种变体"
+  },
+  {
+   "unit": [
+    "span",
+    "p91",
+    15,
+    95
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "使用DQN来优神经网络化策略,方法包含变分信息最大化探索(VariationalInformationMaximizin"
+  },
+  {
+   "unit": [
+    "span",
+    "p95",
+    0,
+    57
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "[136]更有效地应对噪音环境及语言和的方法和MDP语言理解等问题,产生具有良好鲁棒性的DM策[137-138]."
+  },
+  {
+   "unit": [
+    "span",
+    "p95",
+    172,
+    253
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "在对话系统中,虽然用户可能对于对话系统所在的垂直领域比较熟悉,一些超出领域(Out-Of-Domian,OOD)的话语,"
   }
  ]
 }

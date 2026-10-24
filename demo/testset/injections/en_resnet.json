@@ -1,0 +1,76 @@
+{
+ "paper": "en_resnet",
+ "source": "raw/1512.03385.tar.gz",
+ "target": "en_papers/resnet/manuscript_injected.zip",
+ "injections": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "key": "Lin2015pyramid",
+   "match": "Cascaded residual pyramids for",
+   "snippet": "Recent work has also explored "
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "key": "Park2014deepgate",
+   "match": "Gated deep supervision for ver",
+   "snippet": "Another line of research revis"
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "key": "Szegedy2016inception",
+   "match": "Rethinking the inception archi"
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "key": "Chatfield2011",
+   "old_year": "2011",
+   "new_year": "2007",
+   "match": "The devil is in the details: a"
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "snippet": "26].WeadoptFasterR-CNN",
+   "cited_key": "He2014",
+   "intended_key": "Ren2015"
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "snippet": "-scaletestingfollowing",
+   "cited_key": "Jegou2011",
+   "intended_key": "Ren2015a"
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "snippet": "Moreover, these works differ w",
+   "keys": [
+    "Hochreiter1997",
+    "Jegou2012",
+    "Lin2013",
+    "Russakovsky2014",
+    "Simonyan2015",
+    "Szeliski1990"
+   ]
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "wrong": "previuos",
+   "right": "previous",
+   "snippet": "ntially better than previuos netwo"
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "wrong": "acheive",
+   "right": "achieve",
+   "snippet": "et is still able to acheive compe"
+  }
+ ]
+}

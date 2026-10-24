@@ -1,0 +1,199 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2013，数据库记录为 2017']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": false,
+   "detail": "labels=['undetermined'] offtopic=0 findings=0",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 7,
+  "fn": 1,
+  "fp_new": 0,
+  "pre_existing": 11,
+  "tn": 106,
+  "excluded": 4,
+  "claims": 52,
+  "refs": 74,
+  "support_definitive": 34
+ },
+ "lenient": [
+  1.0,
+  0.875,
+  0.9912280701754386
+ ],
+ "strict": [
+  0.3888888888888889,
+  0.875,
+  0.904
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c0"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Generativeadversarialnetworks(GANs),autoregressivemodels,flo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c1"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "therehavebeenremarkableadvancesinenergy-basedmodelingandscor"
+  },
+  {
+   "unit": [
+    "claim",
+    "c19"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "SeeforCIFAR10andCelebA-HQ256×256samples,andforLSUN256×256sam"
+  },
+  {
+   "unit": [
+    "claim",
+    "c27"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "diffusionmodelsmightresembleflows"
+  },
+  {
+   "unit": [
+    "claim",
+    "c28"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "WhilediffusionmodelsmightresembleflowsandVAEs,diffusionmodel"
+  },
+  {
+   "unit": [
+    "claim",
+    "c3"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Inaddition,weshowthatacertainparameterizationofdiffusionmode"
+  },
+  {
+   "unit": [
+    "claim",
+    "c30"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "OthermethodsforlearningtransitionoperatorsofMarkovchainsincl"
+  },
+  {
+   "unit": [
+    "claim",
+    "c31"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Bytheknownconnectionbetweenscorematchingandenergy-basedmodel"
+  },
+  {
+   "unit": [
+    "claim",
+    "c44"
+   ],
+   "alarms": [
+    "support:被引文献只部分支持这条论断"
+   ],
+   "text": "Allmodelshavetwoconvolutionalresidualblocksperresolutionleve"
+  },
+  {
+   "unit": [
+    "span",
+    "p132",
+    0,
+    106
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Whenappliedtox_0∼q(x_0),transmitx_T,,x_0insequenceusingatota"
+  },
+  {
+   "unit": [
+    "span",
+    "p26",
+    194,
+    308
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thecompletesamplingprocedure,,resemblesLangevindynamicswithε"
+  }
+ ]
+}

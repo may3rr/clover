@@ -21,8 +21,9 @@ the reference. For every injected manuscript this script
      alarms are not hand-checked, so the true precision lies in between.
 
 Usage:
-    python demo/testset/evaluate_corpus.py            # reports/ + injections/
-Output: results/<paper>.json, results/summary.md
+    python demo/testset/evaluate_corpus.py            # Chinese docx corpus
+    python demo/testset/evaluate_corpus.py en         # English LaTeX corpus
+Output: results/<paper>.json, results/summary.md (summary_en.md)
 """
 
 from __future__ import annotations
@@ -41,6 +42,13 @@ from citecheck.support.claims import split_sentences  # noqa: E402
 
 PAPERS = ["liuqiao_kg", "luohuilan_odt", "zhaoyangyang_tod",
           "yinhongpeng_odt", "guyingjie_mrc"]
+# English arXiv LaTeX sources (inject_latex.py): references and markers are
+# identified by bib key instead of a printed [n] label
+PAPERS_EN = ["en_resnet", "en_t5", "en_gpt3", "en_ddpm", "en_vit"]
+
+
+def ref_id_by_key(report: Report, key: str | None) -> str | None:
+    return next((r.id for r in report.references if key and r.key == key), None)
 
 
 def norm(s: str) -> str:
@@ -89,6 +97,9 @@ def find_ref_by_inj(report: Report, inj: dict):
     """The injected reference entry: prefer the spec's [label] (unique even
     when the paper already cites a near-duplicate), fall back to a
     whitespace-insensitive match on the raw entry text."""
+    if inj.get("key"):
+        rid = ref_id_by_key(report, inj["key"])
+        return next((r for r in report.references if r.id == rid), None)
     lab = inj.get("label")
     if lab is not None:
         rid = ref_id_by_label(report, str(lab))
@@ -133,17 +144,27 @@ def detect_injection(rep: Report, inj: dict) -> tuple[bool, str, dict]:
 
     if kind == "misattribution":
         para = find_para(rep, inj["snippet"])
-        ref = ref_id_by_label(rep, inj["cited_label"])
+        ref = (ref_id_by_key(rep, inj["cited_key"]) if "cited_key" in inj
+               else ref_id_by_label(rep, inj["cited_label"]))
         span = None
         if para is not None:
             s = locate(rep, para, inj["snippet"])
-            marker = f"[{inj['cited_label']}]"
             pos = None
+            if "cited_key" in inj:
+                # LaTeX: the marker parsed right after the context snippet
+                pos = next((m.start for m in rep.markers
+                            if m.paragraph_id == para.id and s
+                            and abs(m.start - s[1]) <= 4), None)
+                marker = None
+            else:
+                marker = f"[{inj['cited_label']}]"
             # prefer the marker right after the recorded context snippet
-            for m in re.finditer(re.escape(marker), para.text):
+            for m in re.finditer(re.escape(marker), para.text) if marker else []:
                 if s and abs(m.start() - s[1]) <= 4:
                     pos = m.start()
                     break
+            if pos is None and marker is None:
+                pos = s[1] if s else 0
             if pos is None:
                 m = re.search(re.escape(marker), para.text)
                 pos = m.start() if m else (s[1] if s else 0)
@@ -356,7 +377,9 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
         if inj["kind"] == "misattribution":
             # the swap may leave the original entry uncited: a true
             # consequence of the injection, neither positive nor negative
-            rid = ref_id_by_label(rep_inj, inj["intended_label"])
+            rid = (ref_id_by_key(rep_inj, inj["intended_key"])
+                   if "intended_key" in inj
+                   else ref_id_by_label(rep_inj, inj["intended_label"]))
             if rid:
                 excluded.append(("ref", rid))
 
@@ -369,7 +392,7 @@ def score(rep_inj: Report, rep_clean: Report, spec: dict):
     fp = tn = pre = 0
     fp_units, pre_units = [], []
     n_excluded = 0
-    for u in Ui.all_units():
+    for u in sorted(Ui.all_units(), key=str):
         loc = unit_location(Ui, u)
         if _hits(loc, gt_locs):
             continue
@@ -426,6 +449,8 @@ def _fmt(x):
 
 
 def main() -> int:
+    en = sys.argv[1:] == ["en"]
+    papers = PAPERS_EN if en else PAPERS
     reports = HERE / "reports"
     outdir = HERE / "results"
     outdir.mkdir(exist_ok=True)
@@ -435,7 +460,7 @@ def main() -> int:
     fp_types: dict[str, int] = {}
     cover = [0, 0]
     rows = []
-    for paper in PAPERS:
+    for paper in papers:
         inj_path = reports / f"{paper}_injected.json"
         clean_path = reports / f"{paper}_clean.json"
         if not inj_path.exists() or not clean_path.exists():
@@ -469,7 +494,7 @@ def main() -> int:
     p_len = tp / (tp + fp) if tp + fp else 0
     p_str = tp / (tp + fp + pre) if tp + fp + pre else 0
     rec = tp / (tp + fn) if tp + fn else 0
-    out = ["# 测试集评测结果\n",
+    out = [f"# 测试集评测结果（{'英文 arXiv LaTeX' if en else '中文期刊 docx'}）\n",
            "数据点：一条引用句或一条参考文献为一个单元。每处注入落在一个单元上，"
            "按该注入自己的检出规则判定 TP/FN；其余单元为负例，体检在其上报出任一"
            "高/中严重度问题（含错别字修订）即为阳性。\n",
@@ -492,7 +517,7 @@ def main() -> int:
            *[f"- {k}：{v}" for k, v in sorted(fp_types.items(), key=lambda x: -x[1])], "",
            "## 干净稿既有报警的类型（严口径多出的部分）\n",
            *[f"- {k}：{v}" for k, v in sorted(pre_types.items(), key=lambda x: -x[1])], ""]
-    (outdir / "summary.md").write_text("\n".join(out), encoding="utf-8")
+    (outdir / ("summary_en.md" if en else "summary.md")).write_text("\n".join(out), encoding="utf-8")
     print("\n".join(out))
     return 0
 
