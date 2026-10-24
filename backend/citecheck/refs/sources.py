@@ -253,7 +253,12 @@ class RetrievalClient:
         self._timeout = s.retrieval.timeout
         self._retries = s.retrieval.retries
         self._mailto = s.crossref_mailto
-        self._openalex_key = s.openalex_api_key
+        # OPENALEX_API_KEY may hold a comma-separated list: requests round-
+        # robin across the keys, and one that hits its daily budget is
+        # dropped for the rest of the run (see the 429 handler in _do_get)
+        self._openalex_keys = [
+            k.strip() for k in (s.openalex_api_key or "").split(",") if k.strip()]
+        self._openalex_rr = 0
         self._s2_key = s.s2_api_key
         self._cache = cache
         # per-source stats for meta.timings: calls / seconds / cache hits
@@ -366,18 +371,31 @@ class RetrievalClient:
                     resp = await self._client.get(
                         url, params=params, headers=headers)
                 if resp.status_code == 429:
-                    global _openalex_budget_warned
-                    if (
-                        not _openalex_budget_warned
-                        and "Insufficient budget" in resp.text
-                    ):
-                        _openalex_budget_warned = True
-                        log.warning(
-                            "OpenAlex rejected the request: %s — the shared "
-                            "per-IP budget is spent; treating OpenAlex as "
-                            "unavailable. Set OPENALEX_API_KEY in "
-                            "backend/.env to keep it working.",
-                            resp.text.strip()[:160])
+                    if src == "openalex" and "Insufficient budget" in resp.text:
+                        # this key's daily budget is spent — drop it and
+                        # retry immediately with the next configured key
+                        dead = params.get("api_key")
+                        if dead in self._openalex_keys:
+                            self._openalex_keys.remove(dead)
+                        if self._openalex_keys:
+                            log.warning(
+                                "an OpenAlex key ran out of budget — %d "
+                                "key(s) left, retrying with the next one",
+                                len(self._openalex_keys))
+                            stripped = {
+                                k: v for k, v in params.items()
+                                if k not in ("api_key", "mailto")}
+                            return await self._do_get(
+                                url, self._openalex_params(stripped),
+                                cache_key, headers, src)
+                        global _openalex_budget_warned
+                        if not _openalex_budget_warned:
+                            _openalex_budget_warned = True
+                            log.warning(
+                                "OpenAlex rejected the request: %s — every "
+                                "configured key is out of budget; treating "
+                                "OpenAlex as unavailable.",
+                                resp.text.strip()[:160])
                         return SourceResult(
                             ok=False, error="openalex budget exhausted")
                     # Crossref/OpenAlex 429 means "slow down" (too many
@@ -472,8 +490,10 @@ class RetrievalClient:
     def _openalex_params(self, params: dict) -> dict:
         params = dict(params)
         params["mailto"] = self._mailto
-        if self._openalex_key:
-            params["api_key"] = self._openalex_key
+        if self._openalex_keys:
+            params["api_key"] = self._openalex_keys[
+                self._openalex_rr % len(self._openalex_keys)]
+            self._openalex_rr += 1
         return params
 
     async def openalex_search(

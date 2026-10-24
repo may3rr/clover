@@ -351,7 +351,7 @@ async def test_arxiv_feed_parser():
 async def test_source_api_keys(tmp_path, monkeypatch):
     """OPENALEX_API_KEY lands as ?api_key=, S2_API_KEY as x-api-key header."""
     client = RetrievalClient(cache=Cache(tmp_path / "k.sqlite"))
-    client._openalex_key = "OAKEY"
+    client._openalex_keys = ["OAKEY"]
     client._s2_key = "S2KEY"
     seen: list[dict] = []
 
@@ -367,6 +367,30 @@ async def test_source_api_keys(tmp_path, monkeypatch):
     await client.s2_search("anything")
     assert seen[0]["params"]["api_key"] == "OAKEY"
     assert seen[1]["headers"]["x-api-key"] == "S2KEY"
+
+
+@pytest.mark.asyncio
+async def test_openalex_budget_rotation(tmp_path, monkeypatch):
+    """A 429 'Insufficient budget' drops that key and retries with the
+    next configured one; only when all keys are dead does the call fail."""
+    client = RetrievalClient(cache=Cache(tmp_path / "rot.sqlite"))
+    client._openalex_keys = ["DEAD", "LIVE"]
+    used: list[str] = []
+
+    async def capture(url, params=None, headers=None, **kw):
+        used.append((params or {}).get("api_key"))
+        if (params or {}).get("api_key") == "DEAD":
+            body = {"error": "Insufficient budget", "message": "Quota exhausted"}
+            return httpx.Response(
+                429, json=body, request=httpx.Request("GET", url))
+        return httpx.Response(
+            200, json={"results": []}, request=httpx.Request("GET", url))
+
+    monkeypatch.setattr(client._client, "get", capture)
+    r = await client.openalex_doi("10.1/x")
+    assert used == ["DEAD", "LIVE"]
+    assert r.ok
+    assert client._openalex_keys == ["LIVE"]
 
 
 @pytest.mark.asyncio

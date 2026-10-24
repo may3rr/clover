@@ -22,7 +22,7 @@
    "id": "wrongyear",
    "kind": "wrong_year",
    "detected": false,
-   "detail": "status=unverifiable issues=['检索服务暂不可用，未能完成核验']"
+   "detail": "status=verified issues=[]"
   },
   {
    "id": "misattr1",
@@ -34,7 +34,7 @@
    "id": "misattr2",
    "kind": "misattribution",
    "detected": false,
-   "detail": "labels=['undetermined'] findings=0"
+   "detail": "labels=[] findings=0"
   },
   {
    "id": "stacking",
@@ -45,8 +45,8 @@
   {
    "id": "typo1",
    "kind": "typo",
-   "detected": false,
-   "detail": "revisions=0"
+   "detected": true,
+   "detail": "revisions=1"
   },
   {
    "id": "typo2",
@@ -57,39 +57,39 @@
  ],
  "claims": {
   "tp": 1,
-  "fp": 0,
+  "fp": 3,
   "fn": 0,
-  "tn": 158,
-  "total_claims": 170,
-  "support_definitive": 0,
-  "pre_existing_flagged": 11,
+  "tn": 165,
+  "total_claims": 230,
+  "support_definitive": 98,
+  "pre_existing_flagged": 63,
   "undetermined_on_defect": 0,
   "pr_acc": [
+   0.25,
    1.0,
-   1.0,
-   1.0
+   0.9822485207100592
   ]
  },
  "refs": {
   "tp": 1,
-  "fp": 0,
+  "fp": 1,
   "fn": 3,
-  "tn": 208,
+  "tn": 199,
   "pr_acc": [
-   1.0,
+   0.5,
    0.25,
-   0.9858490566037735
+   0.9803921568627451
   ]
  },
  "totals": {
   "tp": 2,
-  "fp": 0,
+  "fp": 4,
   "fn": 3,
-  "tn": 366,
+  "tn": 364,
   "pr_acc": [
-   1.0,
+   0.3333333333333333,
    0.4,
-   0.9919137466307277
+   0.9812332439678284
   ]
  }
 }

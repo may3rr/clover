@@ -3,14 +3,14 @@
   {
    "id": "fake1",
    "kind": "fake_ref",
-   "detected": false,
-   "detail": "status=unverifiable"
+   "detected": true,
+   "detail": "status=not_found"
   },
   {
    "id": "fake2",
    "kind": "fake_ref",
-   "detected": false,
-   "detail": "status=unverifiable"
+   "detected": true,
+   "detail": "status=not_found"
   },
   {
    "id": "uncited",
@@ -21,8 +21,8 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "detected": false,
-   "detail": "status=unverifiable issues=['检索服务暂不可用，未能完成核验']"
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2010，数据库记录为 2014']"
   },
   {
    "id": "misattr1",
@@ -45,51 +45,51 @@
   {
    "id": "typo1",
    "kind": "typo",
-   "detected": false,
-   "detail": "revisions=0"
+   "detected": true,
+   "detail": "revisions=1"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "detected": false,
-   "detail": "revisions=0"
+   "detected": true,
+   "detail": "revisions=1"
   }
  ],
  "claims": {
   "tp": 1,
-  "fp": 0,
-  "fn": 0,
-  "tn": 86,
-  "total_claims": 88,
-  "support_definitive": 0,
-  "pre_existing_flagged": 1,
-  "undetermined_on_defect": 0,
+  "fp": 4,
+  "fn": 1,
+  "tn": 70,
+  "total_claims": 93,
+  "support_definitive": 34,
+  "pre_existing_flagged": 19,
+  "undetermined_on_defect": 1,
   "pr_acc": [
-   1.0,
-   1.0,
-   1.0
+   0.2,
+   0.5,
+   0.9342105263157895
   ]
  },
  "refs": {
-  "tp": 1,
+  "tp": 4,
   "fp": 1,
-  "fn": 3,
-  "tn": 66,
+  "fn": 0,
+  "tn": 53,
   "pr_acc": [
-   0.5,
-   0.25,
-   0.9436619718309859
+   0.8,
+   1.0,
+   0.9827586206896551
   ]
  },
  "totals": {
-  "tp": 2,
-  "fp": 1,
-  "fn": 3,
-  "tn": 152,
+  "tp": 5,
+  "fp": 5,
+  "fn": 1,
+  "tn": 123,
   "pr_acc": [
-   0.6666666666666666,
-   0.4,
-   0.9746835443037974
+   0.5,
+   0.8333333333333334,
+   0.9552238805970149
   ]
  }
 }

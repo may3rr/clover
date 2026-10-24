@@ -34,7 +34,7 @@
    "id": "misattr2",
    "kind": "misattribution",
    "detected": false,
-   "detail": "labels=['undetermined'] findings=0"
+   "detail": "labels=[] findings=0"
   },
   {
    "id": "stacking",
@@ -45,51 +45,51 @@
   {
    "id": "typo1",
    "kind": "typo",
-   "detected": false,
-   "detail": "revisions=0"
+   "detected": true,
+   "detail": "revisions=1"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "detected": false,
-   "detail": "revisions=0"
+   "detected": true,
+   "detail": "revisions=1"
   }
  ],
  "claims": {
-  "tp": 1,
-  "fp": 0,
+  "tp": 0,
+  "fp": 9,
   "fn": 0,
-  "tn": 130,
-  "total_claims": 133,
-  "support_definitive": 0,
-  "pre_existing_flagged": 2,
+  "tn": 114,
+  "total_claims": 167,
+  "support_definitive": 77,
+  "pre_existing_flagged": 48,
   "undetermined_on_defect": 0,
   "pr_acc": [
-   1.0,
-   1.0,
-   1.0
+   0.0,
+   null,
+   0.926829268292683
   ]
  },
  "refs": {
   "tp": 2,
-  "fp": 0,
+  "fp": 3,
   "fn": 2,
-  "tn": 112,
+  "tn": 114,
   "pr_acc": [
-   1.0,
+   0.4,
    0.5,
-   0.9827586206896551
+   0.9586776859504132
   ]
  },
  "totals": {
-  "tp": 3,
-  "fp": 0,
+  "tp": 2,
+  "fp": 12,
   "fn": 2,
-  "tn": 242,
+  "tn": 228,
   "pr_acc": [
-   1.0,
-   0.6,
-   0.9919028340080972
+   0.14285714285714285,
+   0.5,
+   0.9426229508196722
   ]
  }
 }
