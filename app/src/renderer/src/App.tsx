@@ -275,6 +275,7 @@ export default function App() {
       shotState.current.setFilter = (l) => setExtFilter({ layer: l })
       shotState.current.setDrag = (v) => setDragHint(v)
       shotState.current.setPrefs = (p) => setPrefs(p)
+      shotState.current.setShotPanes = (p) => setShotPanes(p)
       shotState.current.setSettingsSection = (s) => setSettingsSection(s)
       shotState.current.setOnboardStep = (n) => setOnboardStep(n)
       shotState.current.setCredits = (v) => setCredits(v ? 'shot' : false)
@@ -292,6 +293,10 @@ export default function App() {
   const [extFilter, setExtFilter] = useState<{ layer: string | null } | null>(
     null
   )
+  const [shotPanes, setShotPanes] = useState<{
+    left: boolean
+    right: boolean
+  } | null>(null)
 
   useEffect(() => {
     if (!window.citecheck.sampleData) return
@@ -401,6 +406,7 @@ export default function App() {
         jobId={jobId}
         externalSelection={extSel}
         externalFilter={extFilter}
+        shotPanes={shotPanes}
         registerExport={(fn) => (exportRef.current = fn)}
         prefs={prefs}
         onOpenSettings={openSettings}

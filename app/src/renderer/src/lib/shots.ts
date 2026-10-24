@@ -19,6 +19,7 @@ export interface ShotCtx {
   setAnchors?: (a: Record<string, SkAnchor[]>) => void
   selectItem?: (id: string | null, open?: boolean) => void
   setFilter?: (layer: string | null) => void
+  setShotPanes?: (p: { left: boolean; right: boolean } | null) => void
   setDrag?: (v: boolean) => void
   setPrefs?: (p: import('./prefs').Prefs) => void
   setOnboardStep?: (n: 0 | 1 | 2 | 3) => void
@@ -50,6 +51,7 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   ctx.setDrag?.(false)
   ctx.selectItem?.(null)
   ctx.setFilter?.(null)
+  ctx.setShotPanes?.(null)
   ctx.setPrefs?.(SAMPLE_PREFS)
   ctx.setCredits?.(false)
 
@@ -131,6 +133,17 @@ export function applyShotState(state: string, ctx: ShotCtx) {
       ctx.setReport?.(report ?? null)
       ctx.setScreen?.('report')
       return
+    case 'report-no-left':
+    case 'report-no-right':
+    case 'report-no-both': {
+      ctx.setReport?.(report ?? null)
+      ctx.setScreen?.('report')
+      ctx.setShotPanes?.({
+        left: state === 'report-no-left' || state === 'report-no-both',
+        right: state === 'report-no-right' || state === 'report-no-both',
+      })
+      return
+    }
     case 'report-selected': {
       ctx.setReport?.(report ?? null)
       ctx.setScreen?.('report')

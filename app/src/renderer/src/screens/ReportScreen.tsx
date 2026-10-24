@@ -24,6 +24,7 @@ import { mathPieces, type Piece } from '../lib/math'
 import { apiFetch, getInfo } from '../lib/api'
 import { assetUrl, layoutBlocks } from '../lib/layout'
 import { morph } from '../lib/vt'
+import { useScrollFade } from '../lib/useScrollFade'
 import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
 import AccountChip from '../components/AccountChip'
@@ -40,6 +41,8 @@ import {
   DocMagnifyIcon,
   SealOkIllustration,
   SevGlyph,
+  SidebarLeadingIcon,
+  SidebarTrailingIcon,
 } from '../components/Icons'
 
 const LAYER_NAMES: Record<string, string> = {
@@ -55,6 +58,8 @@ interface Props {
   jobId: string
   externalSelection?: { id: string | null; open: boolean } | null
   externalFilter?: { layer: string | null } | null
+  /** screenshot driver: force pane collapse for shot states */
+  shotPanes?: { left: boolean; right: boolean } | null
   registerExport: (fn: () => void) => void
   onExported: (path: string | null) => void
   onReset: () => void
@@ -77,6 +82,7 @@ export default function ReportScreen({
   jobId,
   externalSelection,
   externalFilter,
+  shotPanes,
   registerExport,
   onExported,
   onReset,
@@ -115,7 +121,64 @@ export default function ReportScreen({
       // per-viewer convenience only
     }
   }
+
+  // pane collapse — per-viewer layout memory, same pattern as cc-side-tab.
+  // paneAnim stays off through the first frame so a restored collapse lands
+  // in place instead of playing the slide on every report open
+  const [leftCollapsed, setLeftCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('cc-pane-left') === '1'
+    } catch {
+      return false
+    }
+  })
+  const [rightCollapsed, setRightCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('cc-pane-right') === '1'
+    } catch {
+      return false
+    }
+  })
+  const [paneAnim, setPaneAnim] = useState(false)
+  useEffect(() => {
+    const r = requestAnimationFrame(() => setPaneAnim(true))
+    return () => cancelAnimationFrame(r)
+  }, [])
+  // screenshot driver may force pane states (per-shot, not persisted)
+  useEffect(() => {
+    if (!shotPanes) return
+    setLeftCollapsed(shotPanes.left)
+    setRightCollapsed(shotPanes.right)
+  }, [shotPanes])
+  const toggleLeftPane = useCallback(() => {
+    setLeftCollapsed((v) => {
+      const next = !v
+      try {
+        localStorage.setItem('cc-pane-left', next ? '1' : '0')
+      } catch {
+        // per-viewer convenience only
+      }
+      return next
+    })
+  }, [])
+  const toggleRightPane = useCallback(() => {
+    setRightCollapsed((v) => {
+      const next = !v
+      try {
+        localStorage.setItem('cc-pane-right', next ? '1' : '0')
+      } catch {
+        // per-viewer convenience only
+      }
+      return next
+    })
+  }, [])
   const [activeSection, setActiveSection] = useState<string | null>(null)
+
+  // toc/history list edge fade
+  const {
+    ref: sideScrollRef,
+    fadeClass: sideFade,
+  } = useScrollFade<HTMLDivElement>()
 
   const shown = useMemo(
     () => (filter ? items.filter((i) => i.layer === filter) : items),
@@ -305,8 +368,18 @@ export default function ReportScreen({
         setSearchTick((t) => t + 1)
         return
       }
+      if ((e.metaKey || e.ctrlKey) && e.key === '\\') {
+        e.preventDefault()
+        if (e.shiftKey) toggleRightPane()
+        else toggleLeftPane()
+        return
+      }
       const tag = (e.target as HTMLElement)?.tagName
       if (tag === 'SELECT' || tag === 'INPUT' || tag === 'TEXTAREA') return
+      // the inspector is hidden — its list/detail keys would change state
+      // the user cannot see
+      if (rightCollapsed && ['ArrowDown', 'ArrowUp', 'Enter', 'Escape'].includes(e.key))
+        return
       if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
         e.preventDefault()
         const next = moveSelection(
@@ -323,7 +396,16 @@ export default function ReportScreen({
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [shown, selectedId, detailId, select, closeDetail])
+  }, [
+    shown,
+    selectedId,
+    detailId,
+    select,
+    closeDetail,
+    rightCollapsed,
+    toggleLeftPane,
+    toggleRightPane,
+  ])
 
   const filterName = filter ? LAYER_NAMES[filter] : '全部问题'
   const fileName = report.document.filename ?? report.document.title ?? '论文'
@@ -345,120 +427,133 @@ export default function ReportScreen({
   }, [history, jobId, fileName, report, items])
 
   return (
-    <div className="relative h-full overflow-hidden">
+    <div
+      className={`relative h-full overflow-hidden${paneAnim ? ' pane-anim' : ''}`}
+    >
       {/* ---------- flush sidebar pane (vibrancy) ---------- */}
-      <aside className="glass-sidebar flex flex-col">
-        <div className="drag-strip" style={{ height: 52, flex: 'none' }} />
-        <div className="group-label" style={{ fontWeight: 600 }}>
-          检查结果
-        </div>
-        <nav className="flex flex-col" style={{ padding: '0 8px' }}>
-          <SideRow
-            icon={<SideIcon name="all" />}
-            label="全部问题"
-            count={items.length}
-            active={filter === null}
-            onClick={() => changeFilter(null)}
-          />
-          {LAYER_ORDER.map((key) => (
+      <aside className={`glass-sidebar${leftCollapsed ? ' collapsed' : ''}`}>
+        <div className="side-inner">
+          <div className="drag-strip" style={{ height: 52, flex: 'none' }} />
+          <div className="group-label" style={{ fontWeight: 600 }}>
+            检查结果
+          </div>
+          <nav className="flex flex-col" style={{ padding: '0 8px' }}>
             <SideRow
-              key={key}
-              icon={
-                <SideIcon
-                  name={LAYER_SIDE[key].icon}
-                  hue={LAYER_SIDE[key].hue}
-                />
-              }
-              label={LAYER_NAMES[key]}
-              count={counts[key] ?? 0}
-              active={filter === key}
-              onClick={() => changeFilter(key)}
+              icon={<SideIcon name="all" />}
+              label="全部问题"
+              count={items.length}
+              active={filter === null}
+              onClick={() => changeFilter(null)}
             />
-          ))}
-        </nav>
-        <div className="side-tabs" role="tablist">
-          {(
-            [
-              ['toc', '目录'],
-              ['history', '最近检查'],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              role="tab"
-              aria-selected={sideTab === key}
-              className={`side-tab${sideTab === key ? ' on' : ''}`}
-              onClick={() => pickSideTab(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <div
-          className="flex-1 overflow-y-auto flex flex-col gap-1"
-          style={{ padding: '0 8px 8px' }}
-        >
-          {sideTab === 'toc' ? (
-            outline.length ? (
-              outline.map((o) => (
-                <button
-                  key={o.id}
-                  className={`side-row toc-row${activeSection === o.id ? ' sel' : ''}`}
-                  onClick={() => jumpTo(o.pid)}
-                  title={o.title}
-                >
-                  <span className="flex-1 truncate">{o.title}</span>
-                  {o.issues > 0 && (
-                    <span className="t13 secondary">{o.issues}</span>
-                  )}
-                </button>
-              ))
-            ) : (
-              <div className="t13 secondary" style={{ padding: '4px 12px' }}>
-                这篇论文没有识别出章节标题。
-              </div>
-            )
-          ) : (
-            <>
-              <button className="side-row" onClick={onReset}>
-                <SideIcon name="plus" />
-                <span className="font-normal">检查另一篇</span>
+            {LAYER_ORDER.map((key) => (
+              <SideRow
+                key={key}
+                icon={
+                  <SideIcon
+                    name={LAYER_SIDE[key].icon}
+                    hue={LAYER_SIDE[key].hue}
+                  />
+                }
+                label={LAYER_NAMES[key]}
+                count={counts[key] ?? 0}
+                active={filter === key}
+                onClick={() => changeFilter(key)}
+              />
+            ))}
+          </nav>
+          <div className="side-tabs" role="tablist">
+            {(
+              [
+                ['toc', '目录'],
+                ['history', '最近检查'],
+              ] as const
+            ).map(([key, label]) => (
+              <button
+                key={key}
+                role="tab"
+                aria-selected={sideTab === key}
+                className={`side-tab${sideTab === key ? ' on' : ''}`}
+                onClick={() => pickSideTab(key)}
+              >
+                {label}
               </button>
-              {historyList.map((h) => (
-                <HistoryRow
-                  key={h.id}
-                  meta={h}
-                  active={h.id === jobId}
-                  onOpen={() => onOpenReport(h.id)}
-                  onDelete={() => removeReport(h.id)}
-                />
-              ))}
-            </>
-          )}
-        </div>
-        <div style={{ padding: '0 12px 12px' }}>
-          <AccountChip prefs={prefs} onOpen={onOpenSettings} />
+            ))}
+          </div>
+          <div
+            ref={sideScrollRef}
+            className={`side-scroll fade-scroll flex-1 overflow-y-auto flex flex-col gap-1${sideFade ? ` ${sideFade}` : ''}`}
+          >
+            {sideTab === 'toc' ? (
+              outline.length ? (
+                outline.map((o) => (
+                  <button
+                    key={o.id}
+                    className={`side-row toc-row${activeSection === o.id ? ' sel' : ''}`}
+                    onClick={() => jumpTo(o.pid)}
+                    title={o.title}
+                  >
+                    <span className="flex-1 truncate">{o.title}</span>
+                    {o.issues > 0 && (
+                      <span className="t13 secondary">{o.issues}</span>
+                    )}
+                  </button>
+                ))
+              ) : (
+                <div className="t13 secondary" style={{ padding: '4px 12px' }}>
+                  这篇论文没有识别出章节标题。
+                </div>
+              )
+            ) : (
+              <>
+                <button className="side-row" onClick={onReset}>
+                  <SideIcon name="plus" />
+                  <span className="font-normal">检查另一篇</span>
+                </button>
+                {historyList.map((h) => (
+                  <HistoryRow
+                    key={h.id}
+                    meta={h}
+                    active={h.id === jobId}
+                    onOpen={() => onOpenReport(h.id)}
+                    onDelete={() => removeReport(h.id)}
+                  />
+                ))}
+              </>
+            )}
+          </div>
+          <div style={{ padding: '0 12px 12px' }}>
+            <AccountChip prefs={prefs} onOpen={onOpenSettings} />
+          </div>
         </div>
       </aside>
 
       {/* ---------- content between sidebar and inspector ---------- */}
       <div
-        className="flex flex-col h-full"
-        style={{ marginLeft: 240, marginRight: 380, background: 'var(--bg)' }}
+        className={`center-pane flex flex-col h-full${leftCollapsed ? ' no-left' : ''}${rightCollapsed ? ' no-right' : ''}`}
       >
         <div
           className={`drag-strip bar-solid strip-edge flex items-center justify-between${scrolled ? ' scrolled' : ''}`}
-          style={{ height: 52, flex: 'none', padding: '0 24px' }}
+          style={{ height: 52, flex: 'none' }}
         >
-          {searchOpen ? (
-            <PaperSearch
-              rootRef={paperRef}
-              focusTick={searchTick}
-              onClose={() => setSearchOpen(false)}
-            />
-          ) : (
-            <div className="font-semibold">{filterName}</div>
-          )}
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <button
+              className="icon-btn"
+              aria-label={leftCollapsed ? '展开侧栏' : '收起侧栏'}
+              title="切换侧栏 ⌘\\"
+              onClick={toggleLeftPane}
+            >
+              <SidebarLeadingIcon size={15} />
+            </button>
+            {searchOpen ? (
+              <PaperSearch
+                rootRef={paperRef}
+                focusTick={searchTick}
+                onClose={() => setSearchOpen(false)}
+              />
+            ) : (
+              <div className="font-semibold">{filterName}</div>
+            )}
+          </div>
           <div className="relative flex items-center gap-3">
             {!searchOpen && (
               <button
@@ -473,6 +568,14 @@ export default function ReportScreen({
                 <MagnifierIcon size={15} />
               </button>
             )}
+            <button
+              className="icon-btn"
+              aria-label={rightCollapsed ? '展开检查器' : '收起检查器'}
+              title="切换检查器 ⌘⇧\\"
+              onClick={toggleRightPane}
+            >
+              <SidebarTrailingIcon size={15} />
+            </button>
             {exported && (
               <ExportDone
                 path={exported}
@@ -551,25 +654,27 @@ export default function ReportScreen({
 
       {/* ---------- inspector ---------- */}
       <aside
-        className="inspector"
+        className={`inspector${rightCollapsed ? ' collapsed' : ''}`}
         style={{ viewTransitionName: 'cc-panel' }}
       >
-        {detail ? (
-          <Detail
-            item={detail}
-            report={report}
-            backLabel={filterName}
-            onBack={closeDetail}
-          />
-        ) : (
-          <InspectorList
-            items={shown}
-            report={report}
-            grouped={filter === null}
-            selectedId={selectedId}
-            onSelect={(id) => select(id, true)}
-          />
-        )}
+        <div className="insp-inner">
+          {detail ? (
+            <Detail
+              item={detail}
+              report={report}
+              backLabel={filterName}
+              onBack={closeDetail}
+            />
+          ) : (
+            <InspectorList
+              items={shown}
+              report={report}
+              grouped={filter === null}
+              selectedId={selectedId}
+              onSelect={(id) => select(id, true)}
+            />
+          )}
+        </div>
       </aside>
     </div>
   )
@@ -923,6 +1028,9 @@ function InspectorList({
     return out
   }, [items, grouped])
 
+  const { ref: listScrollRef, fadeClass: listFade } =
+    useScrollFade<HTMLDivElement>()
+
   let rowIdx = 0
   const row = (i: ListItem) => {
     // staggered entrance — max 12 rows animate, the rest are instant
@@ -961,7 +1069,8 @@ function InspectorList({
         {items.length} 个问题
       </div>
       <div
-        className="flex-1 overflow-y-auto flex flex-col gap-1"
+        ref={listScrollRef}
+        className={`fade-scroll flex-1 overflow-y-auto flex flex-col gap-1${listFade ? ` ${listFade}` : ''}`}
         style={{ padding: '0 8px 8px' }}
       >
         {items.length === 0 && (

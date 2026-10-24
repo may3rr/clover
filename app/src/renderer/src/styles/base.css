@@ -234,6 +234,21 @@ select {
   padding: 4px 16px;
 }
 
+/* press feedback — buttons settle slightly under the pointer; list rows
+   are excluded, they answer hover with a fill already */
+.pill,
+.pill-accent,
+.pill-quiet {
+  transition: transform 160ms var(--ease);
+}
+.pill:active:not(:disabled),
+.pill-accent:active:not(:disabled),
+.pill-quiet:active:not(:disabled),
+.icon-btn:active:not(:disabled),
+.side-tab:active {
+  transform: scale(0.98);
+}
+
 /* ⌘F search in the reading header */
 .paper-search {
   display: flex;
@@ -269,7 +284,10 @@ select {
   justify-content: center;
   border-radius: 5px;
   color: var(--text-secondary);
-  transition: background-color 160ms var(--ease);
+  transition:
+    background-color 160ms var(--ease),
+    color 160ms var(--ease),
+    transform 160ms var(--ease);
 }
 .icon-btn:hover:not(:disabled) {
   background: var(--fill);
@@ -379,6 +397,12 @@ select {
   font-weight: 500;
 }
 
+/* pane widths — layout constants for the report screen's three columns */
+:root {
+  --pane-left: 240px;
+  --pane-right: 380px;
+}
+
 /* flush left pane — native vibrancy shows through; the 1px separator is
    the only line besides the focus ring */
 .glass-sidebar {
@@ -386,7 +410,7 @@ select {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 240px;
+  width: var(--pane-left);
   /* above the reading area's view-transition stacking context, so the
      separator hairline isn't overpainted by its opaque background */
   z-index: 1;
@@ -402,13 +426,118 @@ select {
   top: 0;
   right: 0;
   bottom: 0;
-  width: 380px;
+  width: var(--pane-right);
   z-index: 1;
   background: var(--bg-subtle);
   box-shadow: -1px 0 0 var(--separator);
   overflow: hidden;
+}
+
+/* ---- pane collapse (toolbar toggles, ⌘\ / ⌘⇧\) ----------------------
+   Shells animate width to 0; the inner wrappers keep the full pane width
+   so content clips instead of reflowing. The collapse rule carries the
+   delayed visibility flip so the pane hides after the slide; expanding
+   uses the base rule, where visibility is instant. .pane-anim is absent
+   during the first frame — a restored collapse lands in place instead of
+   sliding on every report open. */
+.side-inner {
+  width: var(--pane-left);
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+.insp-inner {
+  width: var(--pane-right);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.glass-sidebar.collapsed,
+.inspector.collapsed {
+  width: 0;
+  visibility: hidden;
+  transition:
+    width 240ms var(--ease),
+    visibility 0s linear 240ms;
+}
+.pane-anim .side-inner,
+.pane-anim .insp-inner {
+  transition: opacity 160ms var(--ease);
+}
+.glass-sidebar.collapsed .side-inner,
+.inspector.collapsed .insp-inner {
+  opacity: 0;
+}
+
+/* center column: margins follow the panes */
+.center-pane {
+  margin-left: var(--pane-left);
+  margin-right: var(--pane-right);
+  background: var(--bg);
+}
+.center-pane.no-left {
+  margin-left: 0;
+}
+.center-pane.no-right {
+  margin-right: 0;
+}
+.pane-anim .glass-sidebar:not(.collapsed),
+.pane-anim .inspector:not(.collapsed),
+.pane-anim .center-pane {
+  transition: width 240ms var(--ease), margin 240ms var(--ease);
+}
+.center-pane > .drag-strip {
+  padding: 0 24px;
+  transition: padding 240ms var(--ease);
+}
+/* the traffic lights (x:20) land on this strip once the left pane is
+   gone — keep the toggle and the title clear of them */
+.center-pane.no-left > .drag-strip {
+  padding-left: 84px;
+}
+
+/* ---- scroll edge fade --------------------------------------------------
+   List content dissolves toward an edge only while more content lies that
+   way (can-top / can-bottom from useScrollFade). @property makes the fade
+   depth interpolable; without support the mask still snaps correctly. */
+@property --fade-top {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --fade-bottom {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.fade-scroll {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+  transition:
+    --fade-top 160ms var(--ease),
+    --fade-bottom 160ms var(--ease);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--fade-top),
+    black calc(100% - var(--fade-bottom)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black var(--fade-top),
+    black calc(100% - var(--fade-bottom)),
+    transparent
+  );
+}
+.fade-scroll.can-top {
+  --fade-top: 24px;
+}
+.fade-scroll.can-bottom {
+  --fade-bottom: 24px;
 }
 
 /* white cards inside the inspector (Settings inset-grouped look) */
@@ -483,7 +612,9 @@ select {
   font-size: 13px;
   font-weight: 600;
   color: var(--text-secondary);
-  transition: color 160ms var(--ease);
+  transition:
+    color 160ms var(--ease),
+    transform 160ms var(--ease);
 }
 .side-tab:hover,
 .side-tab.on {
@@ -1643,6 +1774,19 @@ select {
 }
 .run-fill.failed {
   background: var(--high);
+}
+/* a running layer's fill breathes while its fraction stalls behind a long
+   model call — the row stays alive without a second spinner */
+.run-fill:not(.ok):not(.failed) {
+  animation: cc-breathe 2.4s var(--ease) infinite;
+}
+@keyframes cc-breathe {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
 }
 /* mascot | name | bar | status — columns line up across rows */
 .run-row {

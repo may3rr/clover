@@ -333,6 +333,35 @@ export function MagnifierIcon(p: IconProps) {
   )
 }
 
+/** sidebar.leading — filled left column inside an open frame; toggles the
+    left pane in the report toolbar */
+export function SidebarLeadingIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <path
+        fillRule="evenodd"
+        d="M6.25 4.75h11.5a2.5 2.5 0 0 1 2.5 2.5v9.5a2.5 2.5 0 0 1-2.5 2.5H6.25a2.5 2.5 0 0 1-2.5-2.5V7.25a2.5 2.5 0 0 1 2.5-2.5Zm0 2a.5.5 0 0 0-.5.5v9.5c0 .28.22.5.5.5h11.5a.5.5 0 0 0 .5-.5V7.25a.5.5 0 0 0-.5-.5H6.25Z"
+      />
+      <path d="M3.75 7.25a2.5 2.5 0 0 1 2.5-2.5H7.5v14.5H6.25a2.5 2.5 0 0 1-2.5-2.5V7.25Z" />
+    </Fill>
+  )
+}
+
+/** sidebar.trailing — mirror of SidebarLeadingIcon; toggles the inspector */
+export function SidebarTrailingIcon(p: IconProps) {
+  return (
+    <Fill {...p}>
+      <g transform="translate(24,0) scale(-1,1)">
+        <path
+          fillRule="evenodd"
+          d="M6.25 4.75h11.5a2.5 2.5 0 0 1 2.5 2.5v9.5a2.5 2.5 0 0 1-2.5 2.5H6.25a2.5 2.5 0 0 1-2.5-2.5V7.25a2.5 2.5 0 0 1 2.5-2.5Zm0 2a.5.5 0 0 0-.5.5v9.5c0 .28.22.5.5.5h11.5a.5.5 0 0 0 .5-.5V7.25a.5.5 0 0 0-.5-.5H6.25Z"
+        />
+        <path d="M3.75 7.25a2.5 2.5 0 0 1 2.5-2.5H7.5v14.5H6.25a2.5 2.5 0 0 1-2.5-2.5V7.25Z" />
+      </g>
+    </Fill>
+  )
+}
+
 export function ChevronDownIcon({ size = 18, color = 'currentColor' }: IconProps) {
   return (
     <svg
