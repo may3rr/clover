@@ -3,16 +3,26 @@ import type { Report, RefCheck, SectionDist } from '../types/report'
 import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
-import { ChevronLeftIcon } from '../components/Icons'
+import { ChevronDownIcon, ChevronLeftIcon } from '../components/Icons'
 
 interface Props {
   item: ListItem
   report: Report
   backLabel: string
   onBack: () => void
+  /** where this item sits in the current list, for the prev / next pager */
+  position?: { index: number; total: number }
+  onStep?: (delta: number) => void
 }
 
-export default function Detail({ item, report, backLabel, onBack }: Props) {
+export default function Detail({
+  item,
+  report,
+  backLabel,
+  onBack,
+  position,
+  onStep,
+}: Props) {
   return (
     <div className="detail-in flex flex-col flex-1 min-h-0" key={item.id}>
       <div
@@ -26,6 +36,33 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
           <ChevronLeftIcon size={15} />
           {backLabel}
         </button>
+        {position && onStep && (
+          <div className="flex items-center gap-1" style={{ marginLeft: 'auto' }}>
+            <span className="mono secondary" style={{ marginRight: 4 }}>
+              {position.index + 1} / {position.total}
+            </span>
+            <button
+              className="nav-btn"
+              aria-label="上一条（↑）"
+              title="上一条（↑）"
+              disabled={position.index === 0}
+              onClick={() => onStep(-1)}
+            >
+              <span style={{ display: 'inline-flex', transform: 'rotate(180deg)' }}>
+                <ChevronDownIcon size={15} />
+              </span>
+            </button>
+            <button
+              className="nav-btn"
+              aria-label="下一条（↓）"
+              title="下一条（↓）"
+              disabled={position.index === position.total - 1}
+              onClick={() => onStep(1)}
+            >
+              <ChevronDownIcon size={15} />
+            </button>
+          </div>
+        )}
       </div>
       <div className="flex-1 overflow-y-auto">
         <div style={{ padding: '0 16px 16px' }}>
@@ -362,12 +399,14 @@ function FieldRow({
   theirs: string | null
   bad: boolean
 }) {
+  // identifiers read best in the system monospace
+  const mono = label === 'DOI' ? ' mono' : ''
   return (
     <div className="min-w-0">
       <div className="t13 secondary" style={{ marginBottom: 4 }}>
         {label}
       </div>
-      <div className="font-normal" style={{ wordBreak: 'break-word' }}>
+      <div className={`font-normal${mono}`} style={{ wordBreak: 'break-word' }}>
         <span className={bad ? 'hl hl-high' : undefined}>{value || '—'}</span>
       </div>
       {theirs != null && (
@@ -375,7 +414,7 @@ function FieldRow({
           <span className="secondary" style={{ marginRight: 8 }}>
             数据库记录
           </span>
-          {theirs}
+          <span className={mono || undefined}>{theirs}</span>
         </div>
       )}
     </div>

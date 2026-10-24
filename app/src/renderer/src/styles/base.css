@@ -161,15 +161,15 @@ select {
 }
 .pill-accent {
   background: var(--accent);
-  color: white;
+  color: var(--on-accent);
   border-radius: 980px;
   height: 30px;
-  padding: 0 14px;
+  padding: 0 16px;
   font-weight: 500;
   font-size: 15px;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .pill-quiet {
   background: var(--fill);
@@ -453,7 +453,7 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--on-tile);
   flex: none;
 }
 
@@ -656,17 +656,93 @@ select {
 .pill-accent,
 .pill,
 .pill-quiet {
-  transition: transform 160ms var(--ease);
+  transition:
+    transform 160ms var(--ease),
+    opacity 160ms var(--ease);
+}
+.pill-accent:hover:not(:disabled) {
+  opacity: 0.9;
 }
 .pill-accent:active,
 .pill:active,
 .pill-quiet:active {
   transform: scale(0.97);
 }
-/* row hover fades --fill in over 120ms */
+/* row hover fades --fill in over 120ms; pressing a row deepens it at once,
+   so a click registers before the detail morph starts */
 .list-row,
 .side-row {
   transition: background 120ms var(--ease);
+}
+.list-row:active,
+.side-row:active,
+.hist-row:active {
+  background: var(--fill-strong);
+  transition-duration: 0ms;
+}
+
+/* cross-pane hover: pointing at a list row lifts its passage in the paper,
+   pointing at a passage lifts its row in the inspector */
+.list-row.linked:not(.sel) {
+  background: var(--fill);
+}
+.paper .hl.hl-linked.hl-high {
+  background: color-mix(in srgb, var(--high) 32%, transparent);
+}
+.paper .hl.hl-linked.hl-medium {
+  background: color-mix(in srgb, var(--medium) 40%, transparent);
+}
+.paper .hl.hl-linked.hl-low {
+  background: color-mix(in srgb, var(--text-secondary) 26%, transparent);
+}
+.paper .hl.hl-linked.hl-rev {
+  background: color-mix(in srgb, var(--ok) 32%, transparent);
+}
+
+/* identifiers in the system monospace: DOIs, model names, endpoints,
+   position counters, shortcut hints */
+.mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.field-input.mono {
+  font-size: 13px;
+}
+/* shortcut hint row at the foot of the inspector */
+.kbd-hints {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px 12px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  flex: none;
+}
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text);
+  margin-right: 4px;
+}
+/* detail prev / next */
+.nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background 120ms var(--ease);
+}
+.nav-btn:hover:not(:disabled) {
+  background: var(--fill);
+  color: var(--text);
+}
+.nav-btn:active:not(:disabled) {
+  background: var(--fill-strong);
+}
+.nav-btn:disabled {
+  opacity: 0.35;
 }
 
 /* checkmark draw (stroke-dashoffset, 240ms) */
@@ -725,7 +801,7 @@ select {
   display: flex;
   align-items: center;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 8px;
   padding: 0 8px;
   margin: 0 -8px;
 }
@@ -816,7 +892,7 @@ select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--on-tile);
   font-weight: 500;
   object-fit: cover;
   flex: none;
@@ -950,7 +1026,7 @@ select {
   height: 32px;
   border-radius: 50%;
   background: var(--tile-blue);
-  color: white;
+  color: var(--on-tile);
   font-size: 13px;
   font-weight: 600;
   display: flex;

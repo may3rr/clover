@@ -90,6 +90,24 @@ export default function ReportScreen({
   const [exportErr, setExportErr] = useState<string | null>(null)
   const segRefs = useRef(new Map<string, HTMLElement[]>())
 
+  // cross-pane hover link, done on the DOM so pointing never re-renders the
+  // paper: the row and its passage light up together
+  const linkedRef = useRef<string | null>(null)
+  const link = useCallback((id: string | null) => {
+    const paint = (target: string, on: boolean) => {
+      for (const el of segRefs.current.get(target) ?? [])
+        el.classList.toggle('hl-linked', on)
+      document
+        .querySelector(`.list-row[data-id="${CSS.escape(target)}"]`)
+        ?.classList.toggle('linked', on)
+    }
+    const prev = linkedRef.current
+    if (prev === id) return
+    if (prev) paint(prev, false)
+    linkedRef.current = id
+    if (id) paint(id, true)
+  }, [])
+
   const shown = useMemo(
     () => (filter ? items.filter((i) => i.layer === filter) : items),
     [items, filter]
@@ -162,7 +180,11 @@ export default function ReportScreen({
         // and keep the selected list row visible
         setTimeout(() => {
           const segs = segRefs.current.get(id) ?? []
-          segs[0]?.scrollIntoView({ block: 'center' })
+          const behavior = window.matchMedia('(prefers-reduced-motion: reduce)')
+            .matches
+            ? 'auto'
+            : 'smooth'
+          segs[0]?.scrollIntoView({ block: 'center', behavior })
           // a brief pulse so the eye lands on the passage
           for (const el of segs) {
             el.classList.remove('hl-flash')
@@ -233,6 +255,15 @@ export default function ReportScreen({
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [shown, selectedId, detailId, select, closeDetail])
+
+  const step = useCallback(
+    (delta: number) => {
+      const next = moveSelection(shown, detailId ?? selectedId, delta)
+      if (next) select(next, detailId !== null)
+    },
+    [shown, detailId, selectedId, select]
+  )
+  const detailIndex = detail ? shown.findIndex((i) => i.id === detail.id) : -1
 
   const filterName = filter ? LAYER_NAMES[filter] : '全部问题'
   const fileName = report.document.filename ?? report.document.title ?? '论文'
@@ -330,6 +361,7 @@ export default function ReportScreen({
               className="pill-accent"
               onClick={doExport}
               disabled={exporting}
+              title="导出到 Word（⌘E）"
             >
               {exporting ? (
                 <svg
@@ -344,20 +376,20 @@ export default function ReportScreen({
                     cy="7"
                     r="5.5"
                     fill="none"
-                    stroke="white"
+                    stroke="currentColor"
                     strokeOpacity={0.4}
                     strokeWidth="2"
                   />
                   <path
                     d="M 7 1.5 A 5.5 5.5 0 0 1 12.5 7"
                     fill="none"
-                    stroke="white"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                   />
                 </svg>
               ) : (
-                <ArrowUpDocFillIcon size={15} color="white" />
+                <ArrowUpDocFillIcon size={15} />
               )}
               {exporting ? '正在导出' : '导出到 Word'}
             </button>
@@ -379,6 +411,7 @@ export default function ReportScreen({
               filter={filter}
               selectedId={selectedId}
               segRefs={segRefs}
+              onHover={link}
               onPick={(ids) => {
                 const covering = items.filter((i) => ids.includes(i.id))
                 const it = pickItem(covering)
@@ -400,6 +433,12 @@ export default function ReportScreen({
             report={report}
             backLabel={filterName}
             onBack={closeDetail}
+            position={
+              detailIndex >= 0
+                ? { index: detailIndex, total: shown.length }
+                : undefined
+            }
+            onStep={step}
           />
         ) : (
           <InspectorList
@@ -408,6 +447,7 @@ export default function ReportScreen({
             grouped={filter === null}
             selectedId={selectedId}
             onSelect={(id) => select(id, true)}
+            onHover={link}
           />
         )}
       </aside>
@@ -447,6 +487,7 @@ function PaperBody({
   filter,
   selectedId,
   segRefs,
+  onHover,
   onPick,
 }: {
   report: Report
@@ -454,6 +495,7 @@ function PaperBody({
   filter: string | null
   selectedId: string | null
   segRefs: React.MutableRefObject<Map<string, HTMLElement[]>>
+  onHover: (id: string | null) => void
   onPick: (itemIds: string[]) => void
 }) {
   const headingIds = useMemo(
@@ -598,6 +640,13 @@ function PaperBody({
                     }
                   }}
                   onClick={() => onPick(s.itemIds)}
+                  onMouseEnter={() => {
+                    const it = pickItem(
+                      items.filter((i) => s.itemIds.includes(i.id))
+                    )
+                    onHover(it?.id ?? null)
+                  }}
+                  onMouseLeave={() => onHover(null)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
@@ -619,12 +668,14 @@ function InspectorList({
   grouped,
   selectedId,
   onSelect,
+  onHover,
 }: {
   items: ListItem[]
   report: Report
   grouped: boolean
   selectedId: string | null
   onSelect: (id: string) => void
+  onHover: (id: string | null) => void
 }) {
   const groups = useMemo(() => {
     if (!grouped) return null
@@ -646,7 +697,10 @@ function InspectorList({
         key={i.id}
         className={`list-row row-in ${i.id === selectedId ? 'sel' : ''}`}
         style={{ animationDelay: `${delay}ms` }}
+        data-id={i.id}
         onClick={() => onSelect(i.id)}
+        onMouseEnter={() => onHover(i.id)}
+        onMouseLeave={() => onHover(null)}
       >
         <div className="flex items-start gap-2">
           <span style={{ marginTop: 1, flex: 'none' }}>
@@ -697,6 +751,19 @@ function InspectorList({
             ))
           : items.map(row)}
       </div>
+      {items.length > 0 && (
+        <div className="kbd-hints bar-solid-subtle">
+          <span>
+            <span className="kbd">↑↓</span>切换
+          </span>
+          <span>
+            <span className="kbd">⏎</span>查看详情
+          </span>
+          <span>
+            <span className="kbd">⌘E</span>导出
+          </span>
+        </div>
+      )}
     </>
   )
 }

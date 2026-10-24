@@ -3,11 +3,12 @@
   --bg: #ffffff;
   --bg-subtle: #f7f7f5;      /* 区块分隔只靠这一层底色 */
   --text: #37352f;
-  --text-secondary: rgba(55, 53, 47, 0.65);  /* 次要信息：计数、说明、组标签 */
-  --accent: #2383e2;         /* 唯一的交互强调色：主按钮、选中态、链接 */
+  --text-secondary: rgba(55, 53, 47, 0.72);  /* 次要信息：计数、说明、组标签（白底 5.1:1） */
+  --accent: #1f74c9;         /* 唯一的交互强调色：主按钮、选中态、链接（白底 4.8:1） */
+  --on-accent: #ffffff;      /* accent 底上的文字与图标 */
 
   --fill: rgba(55, 53, 47, 0.06);          /* hover / 普通选中 */
-  --fill-strong: rgba(55, 53, 47, 0.09);   /* 按下列表行、低严重度底色 */
+  --fill-strong: rgba(55, 53, 47, 0.1);    /* 选中 / 按下列表行、低严重度底色 */
   --sidebar-tint: rgba(247, 247, 245, 0.55);  /* 侧栏可选叠色，透出 vibrancy */
   --glass-edge: 0 0 0 0.5px rgba(55, 53, 47, 0.09);
   --glass-shadow: 0 8px 24px rgba(55, 53, 47, 0.10);
@@ -59,20 +60,25 @@
   --egg-clover: #34c759;          /* 关于页像素四叶草 */
   --egg-clover-shine: #b8f5c6;
 
+  /* 等宽：DOI、模型名、接口地址、位置计数、快捷键提示。只用于标识符，不用于正文 */
+  --font-mono: 'SF Mono', ui-monospace, Menlo, monospace;
+
   /* 缓动：一次定义，全站共用 */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #191919;
-    --bg-subtle: #202020;
-    --text: rgba(255, 255, 255, 0.87);
-    --text-secondary: rgba(255, 255, 255, 0.48);
-    --accent: #529cca;
+    /* 暖调深色：近黑带一点暖意，和浅色的暖中性一脉相承 */
+    --bg: #1f1e1d;
+    --bg-subtle: #262624;
+    --text: #ebe8e2;
+    --text-secondary: rgba(235, 232, 226, 0.62);
+    --accent: #5aa6e0;
+    --on-accent: #1f1e1d;      /* 亮蓝底上用深色字，白字对比不够 */
 
     --fill: rgba(255, 255, 255, 0.055);
-    --fill-strong: rgba(255, 255, 255, 0.09);
-    --sidebar-tint: rgba(32, 32, 32, 0.5);
+    --fill-strong: rgba(255, 255, 255, 0.1);
+    --sidebar-tint: rgba(38, 38, 36, 0.55);
     --glass-edge: 0 0 0 0.5px rgba(255, 255, 255, 0.10);
     --glass-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     --separator: rgba(255, 255, 255, 0.1);

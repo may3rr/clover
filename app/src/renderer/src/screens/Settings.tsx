@@ -288,7 +288,7 @@ export function ProfileEditor({
                   height={12}
                   viewBox="0 0 12 12"
                   fill="none"
-                  stroke="white"
+                  style={{ stroke: 'var(--on-tile)' }}
                   strokeWidth={2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -984,7 +984,7 @@ export function ModelSection({
             </Field>
             <Field label="Base URL">
               <input
-                className="field-input"
+                className="field-input mono"
                 value={cbase}
                 placeholder="http://127.0.0.1:11434/v1"
                 onChange={(e) => setCbase(e.target.value)}
@@ -1020,7 +1020,7 @@ export function ModelSection({
           hint={cfg.has_api_key ? '已配置，输入新值可替换' : '尚未配置'}
         >
           <input
-            className="field-input"
+            className="field-input mono"
             type="password"
             value={key}
             placeholder="sk-…"
@@ -1029,7 +1029,7 @@ export function ModelSection({
         </Field>
         <Field label="接口地址" hint="OpenAI 兼容的 /v1 地址">
           <input
-            className="field-input"
+            className="field-input mono"
             value={cfg.base_url}
             onChange={(e) => setCfg({ ...cfg, base_url: e.target.value })}
           />
@@ -1046,7 +1046,7 @@ export function ModelSection({
         {TIER_FIELDS.map((t) => (
           <Field key={t.key} label={t.label} hint={t.hint}>
             <input
-              className="field-input"
+              className="field-input mono"
               list="model-list"
               value={cfg[t.key]}
               onChange={(e) => setCfg({ ...cfg, [t.key]: e.target.value })}
