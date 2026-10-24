@@ -32,6 +32,10 @@ _LATIN_WORD = re.compile(r"[A-Za-z0-9]")
 _CJK_CHAR = re.compile(r"[一-鿿]")
 _MIN_LEN = 10
 
+# 规范词对：old/new 都是合法汉语词，改写属于覆盖作者用词，绝不修订
+# （zh_eval 实录：期刊官方模板"AI 使用申明"被模型改成"声明"）
+_NEVER_REVISE = {"申明"}
+
 _PROMPT = """\
 请找出下面段落中的笔误：错别字、明显拼写错误、重复出现的字（如"的的"）。
 只报告笔误。不要修改语法、措辞、风格、术语、专有名词、引用标记
@@ -138,6 +142,10 @@ async def check_typos(
             if not orig or p.text.count(orig) != 1:
                 continue
             if corr == orig or _digits(corr) != _digits(orig):
+                continue
+            # 规范词清单：词在 original/correction 之间的出现状态翻转，
+            # 即是对该词的改写（如 申明→声明），无论最小编辑区间怎么切
+            if any((w in orig) != (w in corr) for w in _NEVER_REVISE):
                 continue
             s0 = p.text.index(orig)
             if any(s0 < e and s0 + len(orig) > s for s, e in spans):

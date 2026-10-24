@@ -432,6 +432,24 @@ def test_second_author_match_no_issue():
     assert not any("第二作者" in i for i in issues)
 
 
+def test_particle_surname_with_initials_is_not_a_mismatch():
+    """zh_eval r46: GB/T 'van Atteveldt W' vs database 'van Atteveldt,
+    Wouter' was flagged — the trailing initial was taken as the surname."""
+    ref = make_ref(
+        "[46] Laurer M, van Atteveldt W, Casas A, et al. Less annotating, "
+        "more classifying. Political Analysis. 2024, 32(1): 66-82.")
+    assert ref.authors[1] == "van Atteveldt W"
+    hit = _hit(
+        title=("Less Annotating, More Classifying: Addressing the Data "
+               "Scarcity Issue of Supervised Machine Learning"),
+        authors=("Laurer, Moritz", "van Atteveldt, Wouter", "Casas, Andreu",
+                 "Welbers, Kasper"),
+        year=2024)
+    issues, author_diff, _ = _evaluate(ref, hit)
+    assert not issues
+    assert author_diff is False
+
+
 def test_arxiv_record_exempt_from_second_author_check():
     """arXiv preprint author lists drift between versions (the word2vec
     preprint omits Sutskever) — the venue record is authoritative."""
@@ -620,3 +638,57 @@ def test_retitled_arxiv_paper_matches_by_its_id():
     assert matches and not matches[0][2]
     wrong = {**rec, "via_id": True, "authors": ["Someone Else"]}
     assert _select(ref, [wrong])[0] == []
+
+
+def test_retitled_preprint_matches_by_shared_head_words():
+    """zh_eval r31: the ICML camera-ready renamed the arXiv preprint's tail
+    ('... On the Overthinking of o1-Like LLMs' -> '... Long Reasoning
+    Models') — similarity fell below the bar and a real work was called
+    not_found. A long shared leading run with first author and year
+    agreeing identifies the work."""
+    from citecheck.refs.verify import _select
+    from citecheck.schema import Reference
+    ref = Reference(
+        id="r1", raw="x", lang="en", year=2025,
+        title="Do NOT Think That Much for 2+3=? On the Overthinking of "
+              "Long Reasoning Models",
+        authors=["Chen X", "Xu J", "Liang T"])
+    arxiv = _hit(
+        title="Do NOT Think That Much for 2+3=? On the Overthinking of "
+              "o1-Like LLMs",
+        authors=("Xuandong Chen", "Mingyu Kim", "Sang-Wook Kim"),
+        year=2024, doi="10.48550/arXiv.2412.21187", source="arxiv")
+    matches, _ = _select(ref, [arxiv])
+    assert matches and not matches[0][2]
+    # a different first author under the same head is a different work
+    other = {**arxiv, "authors": ["Someone Else", "Mingyu Kim"]}
+    assert _select(ref, [other])[0] == []
+    # head agreement under 60% of the shorter title is not safe ground
+    sparse_head = _hit(
+        title="Do NOT Think That Much On the Overthinking of o1-Like LLMs",
+        authors=("Xuandong Chen", "Mingyu Kim"), year=2024, doi=None,
+        source="arxiv")
+    assert _select(ref, [sparse_head])[0] == []
+
+
+def test_arxiv_loose_search_uses_head_words_only(monkeypatch):
+    """The renamed tail word ('Long' exists only in the venue title) must
+    not enter the ANDed loose query — one dead term empties the result."""
+    import asyncio
+
+    client = RetrievalClient()
+    seen: list[str] = []
+
+    async def capture(url, params=None, headers=None, **kw):
+        seen.append((params or {}).get("search_query", ""))
+        return httpx.Response(
+            200, text='<?xml version="1.0"?>'
+                      '<feed xmlns="http://www.w3.org/2005/Atom"/>',
+            request=httpx.Request("GET", url))
+
+    monkeypatch.setattr(client._client, "get", capture)
+    r = asyncio.run(client.arxiv_loose_search(
+        "Do NOT Think That Much for 2+3=? On the Overthinking of "
+        "Long Reasoning Models"))
+    assert r.ok
+    assert seen == ["ti:NOT AND ti:Think AND ti:That AND ti:Much AND ti:for"]

@@ -355,6 +355,23 @@ def _title_prefix(a: str, b: str) -> bool:
         and long_[: len(short)] == short
 
 
+def _title_head(a: str, b: str) -> bool:
+    """Same leading run of words (>= 6 words, >= 60% of the shorter
+    title): a preprint re-titled for the venue version
+    ('... On the Overthinking of o1-Like LLMs' -> '... Long Reasoning
+    Models') — head words stay, the tail is renamed."""
+    wa, wb = _norm(a).split(), _norm(b).split()
+    short = min(len(wa), len(wb))
+    if short < 6:
+        return False
+    n = 0
+    for x, y in zip(wa, wb):
+        if x != y:
+            break
+        n += 1
+    return n >= 6 and n >= 0.6 * short
+
+
 def _select(
     ref: Reference, hits: list[dict]
 ) -> tuple[list[tuple[float, dict, list[str]]], dict | None]:
@@ -381,14 +398,18 @@ def _select(
         # model" for "... for Natural Language Inference"): word-prefix
         # titles count when first author and year both agree
         prefix = score < _TITLE_MIN and _title_prefix(want_title, h["title"])
+        # preprint re-titled for the venue: shared head words stand in for
+        # the similarity the renamed tail destroys — same conservative
+        # author+year-all-agree bar as the prefix case
+        head = score < _TITLE_MIN and _title_head(want_title, h["title"])
         # the record the entry's own arXiv id resolves to: arXiv papers
         # get retitled between versions (nuQmm -> LUT-GEMM), so the id
         # plus agreeing first author and year identify the work
         by_id = score < _TITLE_MIN and bool(h.get("via_id"))
-        if score < _TITLE_MIN and not (prefix or by_id):
+        if score < _TITLE_MIN and not (prefix or head or by_id):
             continue
         issues, author_diff, year_diff = _evaluate(ref, h)
-        if prefix or by_id:
+        if prefix or head or by_id:
             if issues or not (ref.authors and ref.year and h.get("authors")
                               and h.get("year")):
                 continue

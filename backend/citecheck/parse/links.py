@@ -47,6 +47,8 @@ def _numeric_items(raw: str) -> list[int]:
 _PARTICLES = {"van", "von", "de", "der", "den", "del", "della", "di", "da",
               "du", "la", "le", "ter", "ten", "dos", "das", "al", "bin"}
 
+_INITIALS = re.compile(r"(?:[A-Z]\.?-?){1,3}")
+
 
 def latin_surname(name: str) -> str:
     """Surname of a latin-script author in any common order:
@@ -59,7 +61,17 @@ def latin_surname(name: str) -> str:
     toks = n.split()
     if len(toks) <= 1:
         return n
-    if all(re.fullmatch(r"(?:[A-Z]\.?-?){1,3}", t) for t in toks[1:]):
+    # initials never belong to the surname; a particle-led remainder
+    # ('van Atteveldt W' -> 'van Atteveldt') is the surname itself, not
+    # a given name followed by a particle-led surname
+    k = len(toks)
+    while k > 1 and _INITIALS.fullmatch(toks[k - 1]):
+        k -= 1
+    if k != len(toks):
+        toks = toks[:k]
+        if toks[0].lower() in _PARTICLES:
+            return " ".join(toks)
+    if all(_INITIALS.fullmatch(t) for t in toks[1:]):
         return toks[0]
     i = len(toks) - 1
     while i > 1 and toks[i - 1].lower() in _PARTICLES:

@@ -420,6 +420,17 @@ async def test_typos_latin_whole_word():
 
 
 @pytest.mark.asyncio
+async def test_typos_legitimate_word_not_revised():
+    """'申明'是规范词，不是'声明'的错别字——期刊官方模板即用
+    'AI 使用申明'（zh_eval 实录被误改）。合法词不改，也不提示。"""
+    p = _typo_doc(["本文遵守期刊规定，附 AI 使用申明并如实披露相关内容。"])
+    f, revs = await _run_typos(p, {"items": [{
+        "original": "使用申明并", "correction": "使用声明并",
+        "reason": "错别字"}]})
+    assert f == [] and revs == []
+
+
+@pytest.mark.asyncio
 async def test_typos_skips_ref_and_short_paragraphs():
     p = _typo_doc(["短.", "这是一个足够长的段落用于测试错别字检查逻辑。"])
     p.references.append(Reference(id="r1", raw="x", paragraph_id="p0"))

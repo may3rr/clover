@@ -615,9 +615,12 @@ class RetrievalClient:
         self, title: str, author: str | None = None, max_results: int = 5
     ) -> SourceResult:
         """Loose ANDed ti:word query (no phrase); used as the per-ref
-        fallback after a batched phrase lookup finds nothing."""
+        fallback after a batched phrase lookup finds nothing. Head words
+        only: preprints retitle the tail for the venue version
+        ('... o1-Like LLMs' -> '... Long Reasoning Models') and one
+        renamed tail word in the AND kills the whole query."""
         words = [w for w in re.findall(r"[A-Za-z0-9]+", title)
-                 if len(w) > 2][:8]
+                 if len(w) > 2][:5]
         if len(words) <= 1 and not author:
             return SourceResult(ok=True, data=[])
         q = " AND ".join(f"ti:{w}" for w in words)
