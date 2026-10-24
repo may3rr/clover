@@ -498,6 +498,48 @@ select {
   padding-left: 84px;
 }
 
+/* collapsed-pane edge handles — the only recall affordance while a pane
+   is away: a quiet glass pill at the window edge (vertical center),
+   brightening on hover */
+.pane-handle {
+  position: absolute;
+  top: calc(50% - 17px);
+  width: 22px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  background: var(--bg-subtle);
+  box-shadow: var(--glass-edge);
+  opacity: 0.55;
+  z-index: 2;
+  animation: cc-handle-in 240ms var(--ease);
+  transition:
+    opacity 160ms var(--ease),
+    color 160ms var(--ease),
+    transform 160ms var(--ease);
+}
+.pane-handle:hover {
+  opacity: 1;
+  color: var(--text);
+}
+.pane-handle:active {
+  transform: scale(0.96);
+}
+.pane-handle.left {
+  left: 8px;
+}
+.pane-handle.right {
+  right: 8px;
+}
+@keyframes cc-handle-in {
+  from {
+    opacity: 0;
+  }
+}
+
 /* ---- scroll edge fade --------------------------------------------------
    List content dissolves toward an edge only while more content lies that
    way (can-top / can-bottom from useScrollFade). @property makes the fade

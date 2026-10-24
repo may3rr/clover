@@ -37,12 +37,12 @@ import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
 import {
   ArrowUpDocFillIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
   PageIcon,
   DocMagnifyIcon,
   SealOkIllustration,
   SevGlyph,
-  SidebarLeadingIcon,
-  SidebarTrailingIcon,
 } from '../components/Icons'
 
 const LAYER_NAMES: Record<string, string> = {
@@ -433,7 +433,19 @@ export default function ReportScreen({
       {/* ---------- flush sidebar pane (vibrancy) ---------- */}
       <aside className={`glass-sidebar${leftCollapsed ? ' collapsed' : ''}`}>
         <div className="side-inner">
-          <div className="drag-strip" style={{ height: 52, flex: 'none' }} />
+          <div
+            className="drag-strip flex items-center"
+            style={{ height: 52, flex: 'none', paddingLeft: 84 }}
+          >
+            <button
+              className="icon-btn"
+              aria-label="收起侧栏"
+              title="收起侧栏 ⌘\\"
+              onClick={toggleLeftPane}
+            >
+              <ChevronLeftIcon size={15} />
+            </button>
+          </div>
           <div className="group-label" style={{ fontWeight: 600 }}>
             检查结果
           </div>
@@ -535,15 +547,7 @@ export default function ReportScreen({
           className={`drag-strip bar-solid strip-edge flex items-center justify-between${scrolled ? ' scrolled' : ''}`}
           style={{ height: 52, flex: 'none' }}
         >
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <button
-              className="icon-btn"
-              aria-label={leftCollapsed ? '展开侧栏' : '收起侧栏'}
-              title="切换侧栏 ⌘\\"
-              onClick={toggleLeftPane}
-            >
-              <SidebarLeadingIcon size={15} />
-            </button>
+          <div className="flex min-w-0 flex-1 items-center">
             {searchOpen ? (
               <PaperSearch
                 rootRef={paperRef}
@@ -568,14 +572,6 @@ export default function ReportScreen({
                 <MagnifierIcon size={15} />
               </button>
             )}
-            <button
-              className="icon-btn"
-              aria-label={rightCollapsed ? '展开检查器' : '收起检查器'}
-              title="切换检查器 ⌘⇧\\"
-              onClick={toggleRightPane}
-            >
-              <SidebarTrailingIcon size={15} />
-            </button>
             {exported && (
               <ExportDone
                 path={exported}
@@ -664,6 +660,7 @@ export default function ReportScreen({
               report={report}
               backLabel={filterName}
               onBack={closeDetail}
+              onCollapse={toggleRightPane}
             />
           ) : (
             <InspectorList
@@ -672,10 +669,34 @@ export default function ReportScreen({
               grouped={filter === null}
               selectedId={selectedId}
               onSelect={(id) => select(id, true)}
+              onCollapse={toggleRightPane}
             />
           )}
         </div>
       </aside>
+
+      {/* collapsed-pane edge handles — quiet floating affordances at the
+          window edge while a pane is away */}
+      {leftCollapsed && (
+        <button
+          className="pane-handle left"
+          aria-label="展开侧栏"
+          title="展开侧栏 ⌘\\"
+          onClick={toggleLeftPane}
+        >
+          <ChevronRightIcon size={14} />
+        </button>
+      )}
+      {rightCollapsed && (
+        <button
+          className="pane-handle right"
+          aria-label="展开检查器"
+          title="展开检查器 ⌘⇧\\"
+          onClick={toggleRightPane}
+        >
+          <ChevronLeftIcon size={14} />
+        </button>
+      )}
     </div>
   )
 }
@@ -1011,12 +1032,14 @@ function InspectorList({
   grouped,
   selectedId,
   onSelect,
+  onCollapse,
 }: {
   items: ListItem[]
   report: Report
   grouped: boolean
   selectedId: string | null
   onSelect: (id: string) => void
+  onCollapse: () => void
 }) {
   const groups = useMemo(() => {
     if (!grouped) return null
@@ -1063,10 +1086,18 @@ function InspectorList({
   return (
     <>
       <div
-        className="font-semibold bar-solid-subtle drag-strip"
-        style={{ fontSize: 17, padding: '14px 16px', flex: 'none', height: 52 }}
+        className="font-semibold bar-solid-subtle drag-strip flex items-center justify-between"
+        style={{ fontSize: 17, padding: '0 16px', flex: 'none', height: 52 }}
       >
-        {items.length} 个问题
+        <span>{items.length} 个问题</span>
+        <button
+          className="icon-btn"
+          aria-label="收起检查器"
+          title="收起检查器 ⌘⇧\\"
+          onClick={onCollapse}
+        >
+          <ChevronRightIcon size={15} />
+        </button>
       </div>
       <div
         ref={listScrollRef}

@@ -3,7 +3,7 @@ import type { Report, RefCheck, SectionDist } from '../types/report'
 import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
-import { ChevronLeftIcon } from '../components/Icons'
+import { ChevronLeftIcon, ChevronRightIcon } from '../components/Icons'
 import { formatLoc } from '../lib/accept'
 import { HL_CLASS } from '../lib/highlight'
 
@@ -12,13 +12,14 @@ interface Props {
   report: Report
   backLabel: string
   onBack: () => void
+  onCollapse: () => void
 }
 
-export default function Detail({ item, report, backLabel, onBack }: Props) {
+export default function Detail({ item, report, backLabel, onBack, onCollapse }: Props) {
   return (
     <div className="detail-in flex flex-col flex-1 min-h-0" key={item.id}>
       <div
-        className="drag-strip flex items-center"
+        className="drag-strip flex items-center justify-between"
         style={{ height: 52, flex: 'none', padding: '0 16px' }}
       >
         <button
@@ -27,6 +28,14 @@ export default function Detail({ item, report, backLabel, onBack }: Props) {
         >
           <ChevronLeftIcon size={15} />
           {backLabel}
+        </button>
+        <button
+          className="icon-btn"
+          aria-label="收起检查器"
+          title="收起检查器 ⌘⇧\\"
+          onClick={onCollapse}
+        >
+          <ChevronRightIcon size={15} />
         </button>
       </div>
       <div className="flex-1 overflow-y-auto">
