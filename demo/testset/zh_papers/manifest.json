@@ -1,0 +1,196 @@
+{
+ "liuqiao_kg": {
+  "manuscript": "manuscript.pdf",
+  "zh_refs": [
+   {
+    "n": 1,
+    "title_zh": "王元卓,贾岩涛,刘大伟,等.基于开放网络知识的信息检索与数据挖掘[J].计算机研",
+    "pdf": null
+   },
+   {
+    "n": 2,
+    "title_zh": "程学旗,靳小龙,王元卓,等.大数据系统和分析技术综述[J].软件学报.2014,",
+    "pdf": null
+   },
+   {
+    "n": 3,
+    "title_zh": "陈立玮,冯岩松,赵东岩.基于弱监督学习的海量网络数据关系抽取[J].计算机研究与",
+    "pdf": null
+   },
+   {
+    "n": 4,
+    "title_zh": "卢道设,杨世瀚,吴尽昭,等.基于描述逻辑的组合知识库推理[J].计算机应用研究.",
+    "pdf": null
+   },
+   {
+    "n": 5,
+    "title_zh": "赵军,刘康,周光有,等.开放式文本信息抽取[J].中文信息学报.2011,(6)",
+    "pdf": null
+   },
+   {
+    "n": 6,
+    "title_zh": "王宇,谭松波,廖祥文,等.基于扩展领域模型的有名属性抽取[J].计算机研究与发展",
+    "pdf": null
+   },
+   {
+    "n": 7,
+    "title_zh": "刘克彬,李芳,刘磊,等.基于核函数中文关系自动抽取系统的实现[J].计算机研究与",
+    "pdf": null
+   },
+   {
+    "n": 8,
+    "title_zh": "杨莉,胡守仁.知识库推理和维护系统(KBIMS)[J].国防科技大学学报.199",
+    "pdf": null
+   }
+  ],
+  "ref_dir": "zh_papers/liuqiao_kg/ref/"
+ },
+ "luohuilan_odt": {
+  "manuscript": "manuscript.pdf",
+  "zh_refs": [
+   {
+    "n": 1,
+    "title_zh": "裴伟,许晏铭,朱永英,等.改进的SSD航拍目标检测方法[J].软件学报.2019",
+    "pdf": null
+   },
+   {
+    "n": 2,
+    "title_zh": "黄继鹏,史颖欢,高阳.面向小目标的多尺度Faster-RCNN检测算法[J].计",
+    "pdf": null
+   },
+   {
+    "n": 3,
+    "title_zh": "姜维,张重生,殷绪成.基于深度学习的场景文字检测综述[J].电子学报.2019,",
+    "pdf": null
+   },
+   {
+    "n": 4,
+    "title_zh": "周飞燕,金林鹏,董军.卷积神经网络研究综述[J].计算机学报.2017,(6).",
+    "pdf": null
+   },
+   {
+    "n": 5,
+    "title_zh": "毕威,黄伟国,张永萍,等.基于图像显著轮廓的目标检测[J].电子学报.2017,",
+    "pdf": null
+   }
+  ],
+  "ref_dir": "zh_papers/luohuilan_odt/ref/"
+ },
+ "zhaoyangyang_tod": {
+  "manuscript": "manuscript.pdf",
+  "zh_refs": [
+   {
+    "n": 1,
+    "title_zh": "贾熹滨,李让,胡长建,等.智能对话系统研究综述[J].北京工业大学学报.2017",
+    "pdf": null
+   },
+   {
+    "n": 2,
+    "title_zh": "王小捷.关于人机对话系统的思考[J].中兴通讯技术.2017,(4).DOI:1",
+    "pdf": null
+   },
+   {
+    "n": 3,
+    "title_zh": "王俊东,黄沛杰,林仙茂,等.限定领域口语对话系统中超出领域话语的协处理方法[J]",
+    "pdf": null
+   },
+   {
+    "n": 4,
+    "title_zh": "俞凯,陈露,陈博,等.任务型人机对话系统中的认知技术——概念、进展及其未来[J]",
+    "pdf": null
+   },
+   {
+    "n": 5,
+    "title_zh": "傅小兰.开展情感计算研究构建和谐电子社会[J].中国科学院院刊.2008,(5)",
+    "pdf": null
+   },
+   {
+    "n": 6,
+    "title_zh": "拜战胜,蓝岚,彭佳红,等.对话系统中控制模型的比较研究[J].郑州大学学报（理学",
+    "pdf": null
+   },
+   {
+    "n": 7,
+    "title_zh": "罗森林,潘丽敏.情感计算理论与技术[J].系统工程与电子技术.2003,25(7",
+    "pdf": null
+   },
+   {
+    "n": 8,
+    "title_zh": "张波,蔡庆生,郭百宁.口语对话系统的POMDP模型及求解[J].计算机研究与发展",
+    "pdf": null
+   },
+   {
+    "n": 9,
+    "title_zh": "张伟男,张杨子,刘挺.对话系统评价方法综述 被引量:3[J].中国科学（信息科学",
+    "pdf": null
+   },
+   {
+    "n": 10,
+    "title_zh": "黄沛杰,王俊东,柯子烜,等.限定领域口语对话系统中超出领域话语的对话行为识别[J",
+    "pdf": null
+   },
+   {
+    "n": 11,
+    "title_zh": "朱坤鸿.多模态教学对话系统研究与实现[D].2018.",
+    "pdf": null
+   },
+   {
+    "n": 12,
+    "title_zh": "易炼.多模态对话管理系统的研究与实现[D].2014.",
+    "pdf": null
+   },
+   {
+    "n": 13,
+    "title_zh": "曹均阔. 人机对话系统 [M].电子工业出版社,2017.",
+    "pdf": null
+   }
+  ],
+  "ref_dir": "zh_papers/zhaoyangyang_tod/ref/"
+ },
+ "yinhongpeng_odt": {
+  "manuscript": "manuscript.pdf",
+  "zh_refs": [
+   {
+    "n": 12,
+    "title_zh": "Gao Shi-Bo, Cheng Yong-Mei, Xiao Li-Ping",
+    "pdf": null
+   },
+   {
+    "n": 17,
+    "title_zh": "Huang Kai-Qi, Chen Xiao-Tang, Kang Yun-F",
+    "pdf": null
+   },
+   {
+    "n": 19,
+    "title_zh": "Hou Zhi-Qiang, Han Chong-Zhao. A survey ",
+    "pdf": null
+   },
+   {
+    "n": 20,
+    "title_zh": "Wan Ying, Han Yi, Lu Han-Qing. The metho",
+    "pdf": null
+   },
+   {
+    "n": 21,
+    "title_zh": "Zhang Juan, Mao Xiao-Bo, Chen Tie-Jun. S",
+    "pdf": null
+   },
+   {
+    "n": 22,
+    "title_zh": "Niu Xiang-Jie, Huang Yong-Chun. Research",
+    "pdf": null
+   },
+   {
+    "n": 106,
+    "title_zh": "Zheng Yin, Chen Quan-Qi, Zhang Yu-Jin. D",
+    "pdf": null
+   },
+   {
+    "n": 208,
+    "title_zh": "Zha Yu-Fei, Bi Du-Yan, Yang Yuan, Dong S",
+    "pdf": null
+   }
+  ],
+  "ref_dir": "zh_papers/yinhongpeng_odt/ref/"
+ }
+}

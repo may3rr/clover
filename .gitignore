@@ -55,6 +55,7 @@ demo/latex/reports/
 demo/latex/export/
 demo/testset/raw/
 demo/testset/zh_pdfs/
+demo/testset/zh_papers/**/*.pdf
 
 # ---- F7: real Chinese manuscript run (unpublished paper, never committed)
 demo/zh_eval/
