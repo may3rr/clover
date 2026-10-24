@@ -1,0 +1,200 @@
+{
+ "paper": "任务型对话系统研究综述",
+ "source": "万方数据",
+ "ref_count": 48,
+ "wanfang_total": 48,
+ "refs": [
+  {
+   "n": 1,
+   "text": "贾熹滨,李让,胡长建,等.智能对话系统研究综述[J].北京工业大学学报.2017,(9).DOI:10.11936/bjutxb2016090023 ."
+  },
+  {
+   "n": 2,
+   "text": "王小捷.关于人机对话系统的思考[J].中兴通讯技术.2017,(4).DOI:10.3969/j.issn.1009-6868.2017.04.010 ."
+  },
+  {
+   "n": 3,
+   "text": "王俊东,黄沛杰,林仙茂,等.限定领域口语对话系统中超出领域话语的协处理方法[J].中文信息学报.2015,(5).DOI:10.3969/j.issn.1003-0077.2015.05.025 ."
+  },
+  {
+   "n": 4,
+   "text": "俞凯,陈露,陈博,等.任务型人机对话系统中的认知技术——概念、进展及其未来[J].计算机学报.2015,(12).DOI:10.11897/SP.J.1016.2015.02333 ."
+  },
+  {
+   "n": 5,
+   "text": "傅小兰.开展情感计算研究构建和谐电子社会[J].中国科学院院刊.2008,(5).DOI:10.3969/j.issn.1000-3045.2008.05.013 ."
+  },
+  {
+   "n": 6,
+   "text": "拜战胜,蓝岚,彭佳红,等.对话系统中控制模型的比较研究[J].郑州大学学报（理学版）.2006,(4).DOI:10.3969/j.issn.1671-6841.2006.04.024 ."
+  },
+  {
+   "n": 7,
+   "text": "罗森林,潘丽敏.情感计算理论与技术[J].系统工程与电子技术.2003,25(7).905-909.DOI:10.3321/j.issn:1001-506X.2003.07.037 ."
+  },
+  {
+   "n": 8,
+   "text": "张波,蔡庆生,郭百宁.口语对话系统的POMDP模型及求解[J].计算机研究与发展.2002,(2)."
+  },
+  {
+   "n": 9,
+   "text": "张伟男,张杨子,刘挺.对话系统评价方法综述 被引量:3[J].中国科学（信息科学）.2017,(8).953-966."
+  },
+  {
+   "n": 10,
+   "text": "黄沛杰,王俊东,柯子烜,等.限定领域口语对话系统中超出领域话语的对话行为识别[J].中文信息学报.2016,(6). 1 2 3 4 5"
+  },
+  {
+   "n": 11,
+   "text": "朱坤鸿.多模态教学对话系统研究与实现[D].2018."
+  },
+  {
+   "n": 12,
+   "text": "易炼.多模态对话管理系统的研究与实现[D].2014."
+  },
+  {
+   "n": 13,
+   "text": "曹均阔. 人机对话系统 [M].电子工业出版社,2017."
+  },
+  {
+   "n": 14,
+   "text": "Daniel J. Russo,Benjamin Van Roy,Abbas Kazerouni,等.A Tutorial on Thompson Sampling[J].Foundations and trends in machine learning.2018,11(1).1-102.DOI:10.1561/2200000070 ."
+  },
+  {
+   "n": 15,
+   "text": "Gatt, Albert,Krahmer, Emiel.Survey of the State of the Art in Natural Language Generation: Core tasks, applications and evaluation[J].The Journal of Artificial Intelligence Research.2018.6165-170."
+  },
+  {
+   "n": 16,
+   "text": "Hongshen Chen,Xiaorui Liu,Dawei Yin,等.A Survey on Dialogue Systems: Recent Advances and New Frontiers[J].SIGKDD explorations.2017,19(2)."
+  },
+  {
+   "n": 17,
+   "text": "Patrícia Cristina Nascimento Souto.Creating Knowledge with and from the Differences: The Required Dialogicality and Dialogical Competences[J].RAI Revista de Administração e Inovação.2015,12(2).60-89.DOI:10.11606/rai.v12i2.100333 ."
+  },
+  {
+   "n": 18,
+   "text": "Mesnil, Gregoire,Dauphin, Yann,Yao, Kaisheng,等.Using Recurrent Neural Networks for Slot Filling in Spoken Language Understanding[J].IEEE/ACM transactions on audio, speech, and language processing.2015,23(3).530-539."
+  },
+  {
+   "n": 19,
+   "text": "Mnih, Volodymyr,Kavukcuoglu, Koray,Silver, David,等.Human-level control through deep reinforcement learning[J].Nature.2015,518(Feb.26 TN.7540).529-a3.DOI:10.1038/nature14236 ."
+  },
+  {
+   "n": 20,
+   "text": "Shi, Yangyang,Larson, Martha,Jonker, Cathohin M..Recurrent neural network language model adaptation with curriculum learning[J].Computer speech & language.2015,33(1).136-154.DOI:10.1016/j.csl.2014.11.004 . 1 2 3 4 5"
+  },
+  {
+   "n": 21,
+   "text": "Mairesse,François.Stochastic Language Generation in Dialogue Using Factored Language Models.[J].Computational Linguistics.2014,40(4).763-799.DOI:10.1162/COLI_a_00199 ."
+  },
+  {
+   "n": 22,
+   "text": "OLIVIER PIETQUIN,HELEN HASTIE.A survey on metrics for the evaluation of user simulations[J].The knowledge engineering review.2013,28(1).59-73."
+  },
+  {
+   "n": 23,
+   "text": "Victor Lopez Salazar,Eduardo M. Eisman Cabeza,Juan Luis Castro Pena,等.A case based reasoning model for multilingual language generation in dialogues[J].Expert Systems with Application.2012,39(8).7330-7337."
+  },
+  {
+   "n": 24,
+   "text": "Yang, Z.,Levow, G.-A.,Meng, H..Predicting User Satisfaction in Spoken Dialog System Evaluation With Collaborative Filtering[J].IEEE journal of selected topics in signal processing.2012,6(8).971-981."
+  },
+  {
+   "n": 25,
+   "text": "Lemon, O..Learning what to say and how to say it: Joint optimisation of spoken dialogue management and natural language generation[J].Computer speech & language.2011,25(2)."
+  },
+  {
+   "n": 26,
+   "text": "Liu, H.,Lu, R.-Z.,Chen, Y.-Q.,等.Spoken language understanding using weakly supervised learning[J].Computer speech & language.2010,24(2)."
+  },
+  {
+   "n": 27,
+   "text": "Thomson, B.,Young, S..Bayesian update of dialogue state: A POMDP framework for spoken dialogue systems[J].Computer speech & language.2010,24(4).562-588.DOI:10.1016/j.csl.2009.07.003 ."
+  },
+  {
+   "n": 28,
+   "text": "Lemon, O.,Shimodaira, H.,Renals, S.,等.Evaluation of a hierarchical reinforcement learning spoken dialogue system[J].Computer speech & language.2010,24(2)."
+  },
+  {
+   "n": 29,
+   "text": "Lee, C.,Kim, K.,Lee, G.G.,等.Hybrid approach to robust dialog management using agenda and dialog examples[J].Computer speech & language.2010,24(4)."
+  },
+  {
+   "n": 30,
+   "text": "Young, S.,Ga?i?, M.,Keizer, S.,等.The Hidden Information State model: A practical framework for POMDP-based spoken dialogue management[J].Computer speech & language.2010,24(2).150-174.DOI:10.1016/j.csl.2009.04.001 . 1 2 3 4 5"
+  },
+  {
+   "n": 31,
+   "text": "Weinberger, Kilian Q.,Saul, Lawrence K..Distance Metric Learning for Large Margin Nearest Neighbor Classification.[J].Journal of Machine Learning Research.2009,10(2).207-244."
+  },
+  {
+   "n": 32,
+   "text": "Tatsuya Kawahara,Ian Lane,Tomoko Matsui,等.Out-of-Domain Utterance Detection Using Classification Confidences of Multiple Topics[J].IEEE transactions on audio, speech, and language processing: A Publication of the IEEE Signal Processing Society.2007,15(1).150-161."
+  },
+  {
+   "n": 33,
+   "text": "Jason D. Williams,Steve Young.Partially observable Markov decision processes for spoken dialog systems[J].Computer speech & language.2007,21(2).393-422."
+  },
+  {
+   "n": 34,
+   "text": "Peng FC,McCallum A.Information extraction from research papers using conditional random fields[J].Information Processing & Management: Libraries & Information Retrieval Systems & Communication Networks: An International Journal.2006,42(4)."
+  },
+  {
+   "n": 35,
+   "text": "Satinder Singh,Diane Litman,Michael Kearns,等.Optimizing Dialogue Management with Reinforcement Learning: Experiments with the NJFun System[J].The Journal of Artificial Intelligence Research.2002.16105-133."
+  },
+  {
+   "n": 36,
+   "text": "Marilyn A. Walker,Owen C. Rambow,Monica Rogati.Training a sentence planner for spoken dialogue using boosting[J].Computer speech & language.2002,16(3-4).409-433."
+  },
+  {
+   "n": 37,
+   "text": "Glass JR.,Polifroni J.,Seneff S.,等.JUPITER: A telephone-based conversational interface for weather information[J].IEEE Transactions on Speech & Audio Proceeding: A Publication of the IEEE Signal Processing Society.2000,8(1)."
+  },
+  {
+   "n": 38,
+   "text": "Volker Tresp.A Bayesian Committee Machine[J].Neural computation.2000,12(11).2719-2741."
+  },
+  {
+   "n": 39,
+   "text": "felix A. Gers,Jurgen Schmidhuber,Fred Cummins.Learning to Forget: Continual Prediction with LSTM[J].Neural computation.2000,12(10).2451-2471."
+  },
+  {
+   "n": 40,
+   "text": "Hearst M.A.,Dumais S.T..Support vector machines[J].IEEE intelligent systems & their applications.1998,13(4).18-28. 1 2 3 4 5"
+  },
+  {
+   "n": 41,
+   "text": "M. A. Walker,D. J. Litman,C. A. Kamm,等.Evaluating spoken dialogue agents with PARADISE: Two case studies[J].Computer speech & language.1998,12(4).317-347."
+  },
+  {
+   "n": 42,
+   "text": "WATANABE Taro,ARAKI Masahiro,DOSHITA Shuji.Evaluating Dialogue Strategies under Communication Errors Using Computer-to-Computer Simulation[J].IEICE transactions on information & systems.1998,81(9).1025-1033."
+  },
+  {
+   "n": 43,
+   "text": "S, Hochreiter,J, Schmidhuber.Long short-term memory.[J].Neural computation.1997,9(8).1735-80."
+  },
+  {
+   "n": 44,
+   "text": "Marvin Minsky.Society of mind: A response to four reviews[J].Artificial Intelligence.1991,48(3).371-396.DOI:10.1016/0004-3702(91)90036-J ."
+  },
+  {
+   "n": 45,
+   "text": "Rabiner L.R..A tutorial on hidden Markov models and selected applications in speech recognition[J].Proceedings of the IEEE.1989,77(2)."
+  },
+  {
+   "n": 46,
+   "text": "Joseph Weizenbaum.ELIZA - a computer program for the study of natural language communication between man and machine[J].Communications of the ACM.1983,26 (1).23-28.DOI:10.1145/357980.357991 ."
+  },
+  {
+   "n": 47,
+   "text": "Cover, T.,Hart, P..Nearest neighbor pattern classification[J].Information Theory, IEEE Transactions on.1967,13(1).21-27."
+  },
+  {
+   "n": 48,
+   "text": "WILLIAM RTHOMPSON.On the Likelihood That ONE Unknown Probability Exceeds Another in View of the Evidence of Two Samples[J].Biometrika.1933,25(3-4).285-294. 1 2 3 4 5"
+  }
+ ]
+}

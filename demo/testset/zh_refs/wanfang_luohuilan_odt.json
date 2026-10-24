@@ -1,0 +1,76 @@
+{
+ "paper": "基于深度学习的目标检测研究综述",
+ "source": "万方数据",
+ "ref_count": 17,
+ "wanfang_total": 17,
+ "refs": [
+  {
+   "n": 1,
+   "text": "裴伟,许晏铭,朱永英,等.改进的SSD航拍目标检测方法[J].软件学报.2019,(3).DOI:10.13328/j.cnki.jos.005695 ."
+  },
+  {
+   "n": 2,
+   "text": "黄继鹏,史颖欢,高阳.面向小目标的多尺度Faster-RCNN检测算法[J].计算机研究与发展.2019,(2).DOI:10.7544/issn1000-1239.2019.20170749 ."
+  },
+  {
+   "n": 3,
+   "text": "姜维,张重生,殷绪成.基于深度学习的场景文字检测综述[J].电子学报.2019,(5).DOI:10.3969/j.issn.0372-2112.2019.05.024 ."
+  },
+  {
+   "n": 4,
+   "text": "周飞燕,金林鹏,董军.卷积神经网络研究综述[J].计算机学报.2017,(6).DOI:10.11897/SP.J.1016.2017.01229 ."
+  },
+  {
+   "n": 5,
+   "text": "毕威,黄伟国,张永萍,等.基于图像显著轮廓的目标检测[J].电子学报.2017,(8).DOI:10.3969/j.issn.0372-2112.2017.08.014 ."
+  },
+  {
+   "n": 6,
+   "text": "Kartik Umesh Sharma,Nileshsingh V. Thakur.A review and an approach for object detection in images[J].International journal of computational vision and robotics.2017,7(1/2).196-237."
+  },
+  {
+   "n": 7,
+   "text": "Deng, Jia,Khosla, Aditya,Bernstein, Michael,等.ImageNet Large Scale Visual Recognition Challenge[J].International Journal of Computer Vision.2015,115(3)."
+  },
+  {
+   "n": 8,
+   "text": "Uijlings, J.R.R.,Van De Sande, K.E.A.,Smeulders, A.W.M.,等.Selective search for object recognition[J].International Journal of Computer Vision.2013,104(2)."
+  },
+  {
+   "n": 9,
+   "text": "Everingham, M,Winn, J,Van Gool, L,等.The Pascal Visual Object Classes (VOC) Challenge[J].International Journal of Computer Vision.2010,88(2)."
+  },
+  {
+   "n": 10,
+   "text": "Lowe DG.Distinctive image features from scale-invariant keypoints[J].International Journal of Computer Vision.2004,60(2).91-110. 1 2"
+  },
+  {
+   "n": 11,
+   "text": "Kaiming He,Xiangyu Zhang,Shaoqing Ren,等.Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition[C].2014."
+  },
+  {
+   "n": 12,
+   "text": "Tsung-Yi Lin,Michael Maire,Serge Belongie,等.Microsoft COCO: Common Objects in Context[C].2014."
+  },
+  {
+   "n": 13,
+   "text": "Neubeck, A.,Van Gool, L..Efficient Non-Maximum Suppression[C].2006."
+  },
+  {
+   "n": 14,
+   "text": "Dalai, N.,Triggs, B..Histograms of oriented gradients for human detection[C].2005."
+  },
+  {
+   "n": 15,
+   "text": "Girshick, R.,Donahue, J.,Darrell, T.,等.Rich Feature Hierarchies for Accurate Object Detection and Semantic Segmentation[C]."
+  },
+  {
+   "n": 16,
+   "text": "Long, J.,Shelhamer, E.,Darrell, T..Fully convolutional networks for semantic segmentation[C]."
+  },
+  {
+   "n": 17,
+   "text": "Ross Girshick.Fast R-CNN[C]. 1 2"
+  }
+ ]
+}
