@@ -69,6 +69,14 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9一-鿿]+", " ", s).strip()
 
 
+def _title_ratio(want: str, hit: dict) -> float:
+    """Similarity of a normalised ref title to the record's title, or to
+    its main title when the source files a subtitle apart (Crossref): an
+    entry may cite either."""
+    return max(fuzz.token_sort_ratio(want, _norm(t))
+               for t in (hit.get("title"), hit.get("main_title")) if t)
+
+
 def _surname(name: str) -> str:
     """Surname from 'Surname, I.' / 'Vaswani A' / 'Ashish Vaswani' / 中文名.
 
@@ -138,7 +146,7 @@ async def _gather_hits(
             want = _norm(ref.title or ref.raw[:120])
             doi_other = any(
                 h.get("title")
-                and fuzz.token_sort_ratio(want, _norm(h["title"])) < _TITLE_MIN
+                and _title_ratio(want, h) < _TITLE_MIN
                 for h in hits
             )
         else:
@@ -171,7 +179,7 @@ async def _title_hits(ref: Reference, client: RetrievalClient) -> tuple[list[dic
         for h in data or []:
             if not h.get("title"):
                 continue
-            if fuzz.token_sort_ratio(want, _norm(h["title"])) < _TITLE_MIN:
+            if _title_ratio(want, h) < _TITLE_MIN:
                 continue
             years = {y for y in (h.get("year"), h.get("alt_year")) if y}
             if not ref.year or not years or any(
@@ -437,7 +445,7 @@ def _select(
             doi_hit = h
         if not h.get("title"):
             continue
-        score = fuzz.token_sort_ratio(_norm(want_title), _norm(h["title"]))
+        score = _title_ratio(_norm(want_title), h)
         # same DOI and one title contains the other — databases often drop
         # the subtitle ("On the Dangers of Stochastic Parrots")
         if (score < _TITLE_MIN and h is doi_hit
@@ -631,8 +639,7 @@ async def _adjudicate(ref: Reference, hits: list[dict]) -> dict | None:
 
     want = _norm(ref.title or ref.raw[:160])
     scored = sorted(
-        ((fuzz.token_sort_ratio(want, _norm(h["title"])), h)
-         for h in hits if h.get("title")),
+        ((_title_ratio(want, h), h) for h in hits if h.get("title")),
         key=lambda t: -t[0],
     )
     gray: list[dict] = []

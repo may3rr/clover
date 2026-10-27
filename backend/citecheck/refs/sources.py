@@ -110,15 +110,27 @@ def _openalex_abstract(work: dict) -> str | None:
     return " ".join(positions[i] for i in sorted(positions))
 
 
+def _flat(s: str) -> str:
+    return re.sub(r"\W+", "", s.lower())
+
+
 def _norm_hit(source: str, raw: dict) -> dict:
     """Normalize a source-specific record to the matched-dict shape that
     T3 also consumes (abstract / pdf_url / arxiv_id)."""
     hit: dict = {"source": source, "title": None, "authors": [], "year": None,
                  "venue": None, "doi": None, "url": None, "abstract": None,
-                 "pdf_url": None, "arxiv_id": None, "alt_year": None}
+                 "pdf_url": None, "arxiv_id": None, "alt_year": None,
+                 "main_title": None}
     if source == "crossref":
         titles = raw.get("title") or []
         hit["title"] = titles[0] if titles else None
+        # Crossref files the subtitle apart (title "Yago", subtitle "a core
+        # of semantic knowledge"); manuscripts cite the joined title, so
+        # match on that and keep the main title for entries citing only it
+        subs = [s for s in raw.get("subtitle") or [] if s and s.strip()]
+        if hit["title"] and subs and _flat(subs[0]) not in _flat(hit["title"]):
+            hit["main_title"] = hit["title"]
+            hit["title"] = f"{hit['title'].rstrip(' :')}: {subs[0].strip()}"
         hit["authors"] = [
             f"{a.get('family', '')}, {a.get('given', '')}".strip(", ")
             for a in raw.get("author", [])

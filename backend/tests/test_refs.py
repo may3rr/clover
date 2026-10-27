@@ -584,6 +584,47 @@ def test_dropped_subtitle_still_matches():
     assert _select(short, [full])[0] == []
 
 
+_YAGO_CROSSREF = {
+    "title": ["Yago"], "subtitle": ["a core of semantic knowledge"],
+    "author": [{"given": "Fabian M.", "family": "Suchanek"},
+               {"given": "Gjergji", "family": "Kasneci"}],
+    "issued": {"date-parts": [[2007, 5, 8]]},
+    "DOI": "10.1145/1242572.1242667",
+}
+
+
+def test_crossref_subtitle_joined_into_title():
+    """Crossref files the subtitle apart; dropping it left 'Yago' to be
+    matched against 'Yago: A core of semantic knowledge' (not_found)."""
+    from citecheck.refs.sources import _norm_hit
+    h = _norm_hit("crossref", _YAGO_CROSSREF)
+    assert h["title"] == "Yago: a core of semantic knowledge"
+    assert h["main_title"] == "Yago"
+    # a subtitle already inside the title is not appended twice
+    dup = dict(_YAGO_CROSSREF, title=["Yago: a core of semantic knowledge"])
+    h = _norm_hit("crossref", dup)
+    assert h["title"] == "Yago: a core of semantic knowledge"
+    assert h["main_title"] is None
+    assert _norm_hit("crossref", dict(_YAGO_CROSSREF, subtitle=[]))["title"] == "Yago"
+
+
+def test_crossref_subtitle_matches_full_and_main_title():
+    """An entry may cite the joined title or only the main title; both
+    match the record."""
+    from citecheck.refs.sources import _norm_hit
+    from citecheck.refs.verify import _select
+    from citecheck.schema import Reference
+    h = _norm_hit("crossref", _YAGO_CROSSREF)
+    for title in ("Yago: A core of semantic knowledge", "YAGO"):
+        ref = Reference(id="r1", raw="x", title=title,
+                        authors=["F. M. Suchanek", "G. Kasneci"], year=2007)
+        matches, _ = _select(ref, [h])
+        assert matches and matches[0][1] is h and not matches[0][2], title
+    other = Reference(id="r2", raw="x", title="Yago: a knowledge graph of everything",
+                      authors=["F. M. Suchanek"], year=2007)
+    assert _select(other, [h])[0] == []
+
+
 def test_grey_literature_is_not_called_nonexistent():
     """Tech reports, web pages and venue-less entries aren't indexed by the
     databases: when nothing is found they are unverifiable, never
