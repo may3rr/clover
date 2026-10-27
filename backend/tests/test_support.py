@@ -344,6 +344,28 @@ async def test_review_cascade_overrides(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_review_evidence_reask(monkeypatch):
+    """Unlocatable review evidence gets the same single re-ask."""
+    calls = []
+
+    async def fake(task, messages, schema, **kw):
+        calls.append(task)
+        ev = "not in source" if len(calls) == 2 else "real source text"
+        return llm.LLMResult(
+            value=JudgeOut(label="unsupported", evidence=ev, rationale="x"),
+            route="cloud",
+        )
+
+    monkeypatch.setattr(judge_mod, "chat_json", fake)
+    claim = Claim(id="c0", paragraph_id="p0", start=0, end=5, text="claim",
+                  marker_ids=["m0"])
+    check = await evaluate_with_excerpt(
+        claim, "r1", "real source text", "T", "abstract")
+    assert calls == ["judge", "review", "review"]
+    assert check.label == "unsupported"
+
+
+@pytest.mark.asyncio
 async def test_review_not_called_on_supported(monkeypatch):
     calls = []
 

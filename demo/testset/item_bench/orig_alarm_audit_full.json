@@ -1,0 +1,458 @@
+{
+ "guyingjie_mrc:c10:r10:orig": {
+  "label": "F",
+  "note": "举例引用在 MCTest 上做实验的工作，常规写法"
+ },
+ "guyingjie_mrc:c10:r12:orig": {
+  "label": "F",
+  "note": "同上"
+ },
+ "guyingjie_mrc:c12:r10:orig": {
+  "label": "F",
+  "note": "原文 Table 3 与正文：Model 3 为 63.75%，RTE+SWD 为 63.33%，提升 0.42 正确；片段未检索到"
+ },
+ "guyingjie_mrc:c13:r11:orig": {
+  "label": "F",
+  "note": "4.5% 与原文一致"
+ },
+ "guyingjie_mrc:c14:r1:orig": {
+  "label": "F",
+  "note": "CNN/DM 规模与 Attentive Reader 描述与原文相符"
+ },
+ "guyingjie_mrc:c16:r14:orig": {
+  "label": "F",
+  "note": "数值取自 SQuAD 榜单，与 BERT 论文 87.4/93.2 一致"
+ },
+ "guyingjie_mrc:c50:r46:orig": {
+  "label": "F",
+  "note": "FlowQA 输入层含对问题的注意力，描述可接受"
+ },
+ "guyingjie_mrc:c52:r47:orig": {
+  "label": "F",
+  "note": "“首先”无法核实，但不算错引"
+ },
+ "guyingjie_mrc:c58:r53:orig": {
+  "label": "R",
+  "note": "fastText 词向量并非分类算法的副产物，Bojanowski 论文没有这种说法"
+ },
+ "guyingjie_mrc:c61:r59:orig": {
+  "label": "F",
+  "note": "CoVe 的动机转述可接受"
+ },
+ "guyingjie_mrc:c65:r14:orig": {
+  "label": "F",
+  "note": "BERT 用位置嵌入，引用可接受"
+ },
+ "guyingjie_mrc:c73:r47:orig": {
+  "label": "R",
+  "note": "Yu 等人的 QANet 在参考文献表中是 [62]，此处却引 [47] BiDAF"
+ },
+ "guyingjie_mrc:c73:r67:orig": {
+  "label": "R",
+  "note": "同句引 [67] AoA Reader，与 Yu 等人的工作无关"
+ },
+ "guyingjie_mrc:c75:r69:orig": {
+  "label": "R",
+  "note": "Sutskever 2014 的 Seq2Seq 没有注意力机制，归属错误"
+ },
+ "guyingjie_mrc:c78:r67:orig": {
+  "label": "R",
+  "note": "Vaswani 等人的观点引成 [67] AoA Reader"
+ },
+ "guyingjie_mrc:c89:r67:orig": {
+  "label": "R",
+  "note": "Transformer 结构引成 [67] AoA Reader"
+ },
+ "guyingjie_mrc:c90:r81:orig": {
+  "label": "F",
+  "note": "ByteNet 作为神经机器翻译问题的例子，引用偏弱但可接受"
+ },
+ "guyingjie_mrc:c94:r25:orig": {
+  "label": "F",
+  "note": "对 Hill 等人观点的转述，属解读分歧"
+ },
+ "guyingjie_mrc:c126:r96:orig": {
+  "label": "F",
+  "note": "Woodsend & Lapata 作为新闻数据来源的例子，可接受"
+ },
+ "guyingjie_mrc:c130:r120:orig": {
+  "label": "R",
+  "note": "被引的 CNN/Daily Mail 论文全文没有 SQuAD 和 fastText"
+ },
+ "guyingjie_mrc:c131:r105:orig": {
+  "label": "F",
+  "note": "原文附录 Table 7：75.3 对 74.1，EM 提升 1.2 正确；片段未检索到"
+ },
+ "guyingjie_mrc:c135:r48:orig": {
+  "label": "F",
+  "note": "BiDAF 原文同样引 Kim 2014 作为字符级 CNN 的来源，属学界惯例"
+ },
+ "guyingjie_mrc:c138:r122:orig": {
+  "label": "F",
+  "note": "Bahdanau 是注意力机制的通行引用"
+ },
+ "guyingjie_mrc:c139:r47:orig": {
+  "label": "F",
+  "note": "写作过程的描述，不算错"
+ },
+ "guyingjie_mrc:c140:r100:orig": {
+  "label": "R",
+  "note": "原文 Table 2：HMN 75.6 对 2 层 MLP 74.4，F1 提升 1.2，不是 5.5"
+ },
+ "guyingjie_mrc:c142:r78:orig": {
+  "label": "F",
+  "note": "DrQA 对 BiDAF 的 F1 差值与原文一致"
+ },
+ "guyingjie_mrc:c151:r115:orig": {
+  "label": "F",
+  "note": "转述可接受"
+ },
+ "guyingjie_mrc:c152:r107:orig": {
+  "label": "F",
+  "note": "对 MRU 动机的转述可接受"
+ },
+ "guyingjie_mrc:c153:r113:orig": {
+  "label": "R",
+  "note": "re-attention 出自 Hu 等人的 Reinforced Mnemonic Reader，此处引了同一作者的注意力蒸馏论文"
+ },
+ "liuqiao_kg:c1:r1:orig": {
+  "label": "U",
+  "note": "Web of data 出自该文，查询环境与图形返回推理知识的说法文中没有，W3C 的解释无从核实"
+ },
+ "liuqiao_kg:c2:r2:orig": {
+  "label": "U",
+  "note": "被引中文 PDF 字体映射损坏，正文是乱码，无法核实"
+ },
+ "liuqiao_kg:c3:r3:orig": {
+  "label": "F",
+  "note": "[3] 支撑句中列举的 OpenKN、知件、zhishi.me，只是放在 XLore 后面"
+ },
+ "liuqiao_kg:c6:r2:orig": {
+  "label": "C",
+  "note": "句首的 [2] 是 PDF 转换时脚注上标变成的引用标号"
+ },
+ "liuqiao_kg:c9:r1:orig": {
+  "label": "C",
+  "note": "图 1 的图题被解析成引用 [1]"
+ },
+ "liuqiao_kg:c58:r74:orig": {
+  "label": "U",
+  "note": "基于翻译的抽取流程在原文中是否存在，需要通读全文"
+ },
+ "liuqiao_kg:c63:r1:orig": {
+  "label": "C",
+  "note": "Jacana 在参考文献表中是 [79]，这里的 [1] 是脚注上标"
+ },
+ "liuqiao_kg:c63:r2:orig": {
+  "label": "C",
+  "note": "Paralex 在参考文献表中是 [81]，这里的 [2] 是脚注上标"
+ },
+ "luohuilan_odt:c7:r10:orig": {
+  "label": "R",
+  "note": "说 Sharma 等人综述了传统算法，[10] 却是毕威等人提出新方法的论文"
+ },
+ "luohuilan_odt:c23:r21:orig": {
+  "label": "C",
+  "note": "原句是 RPN 采用全卷积网络[22]结构，PDF 转换丢了标号前的方法名，句子从标号开始，论断归属错位"
+ },
+ "luohuilan_odt:c25:r23:orig": {
+  "label": "F",
+  "note": "HyperNet 摘要即写高层语义、中层互补、浅层高分辨率特征，论断正确；片段未检索到"
+ },
+ "luohuilan_odt:c30:r28:orig": {
+  "label": "C",
+  "note": "文字错乱：Couple-位置的敏感性"
+ },
+ "luohuilan_odt:c31:r30:orig": {
+  "label": "F",
+  "note": "[30,31] 同时引 DCN 与 DCN v2，合理"
+ },
+ "luohuilan_odt:c35:r15:orig": {
+  "label": "C",
+  "note": "两栏文字交错：候IOU) 阈值递增的R-CNN选区域"
+ },
+ "luohuilan_odt:c39:r37:orig": {
+  "label": "F",
+  "note": "Softer-NMS 论文的 var voting 即加权平均，描述大体正确"
+ },
+ "luohuilan_odt:c40:r38:orig": {
+  "label": "F",
+  "note": "Relation Networks 确实提出了替代 NMS 的去重模块"
+ },
+ "luohuilan_odt:c42:r32:orig": {
+  "label": "C",
+  "note": "文字错乱：分类置效果"
+ },
+ "luohuilan_odt:c49:r44:orig": {
+  "label": "C",
+  "note": "残句：[45]分类数据集和MS COCO"
+ },
+ "luohuilan_odt:c50:r45:orig": {
+  "label": "C",
+  "note": "原句是 YOLO9000 在 COCO[46] 检测数据集上训练，PDF 转换丢了标号前的方法名，句子从标号开始，论断归属错位"
+ },
+ "luohuilan_odt:c52:r47:orig": {
+  "label": "C",
+  "note": "两栏文字交错：但大大减层,具有与ResNet-152少了计算量"
+ },
+ "luohuilan_odt:c55:r42:orig": {
+  "label": "C",
+  "note": "原句是在 SSD[43] 算法的基础上，PDF 转换丢了标号前的方法名，句子从标号开始，论断归属错位"
+ },
+ "luohuilan_odt:c57:r48:orig": {
+  "label": "C",
+  "note": "残句：[49]替换为Cheng 等人"
+ },
+ "luohuilan_odt:c58:r47:orig": {
+  "label": "C",
+  "note": "两栏文字交错：设计了两ResNet101个特殊的模块"
+ },
+ "luohuilan_odt:c64:r54:orig": {
+  "label": "C",
+  "note": "两栏文字交错：卷了Inception积层"
+ },
+ "luohuilan_odt:c68:r58:orig": {
+  "label": "C",
+  "note": "文字错乱：多层特征金量的GPU 支持"
+ },
+ "luohuilan_odt:c71:r62:orig": {
+  "label": "C",
+  "note": "原句是用 Hourglass[63] 作为特征提取网络，PDF 转换丢了标号前的方法名，句子从标号开始，论断归属错位"
+ },
+ "luohuilan_odt:c77:r66:orig": {
+  "label": "C",
+  "note": "残句：[67]、MS COCO"
+ },
+ "luohuilan_odt:c78:r45:orig": {
+  "label": "C",
+  "note": "残句：[46]、CAL VOC2007"
+ },
+ "luohuilan_odt:c79:r44:orig": {
+  "label": "C",
+  "note": "残句：[45]、Open Images"
+ },
+ "luohuilan_odt:c82:r66:orig": {
+  "label": "C",
+  "note": "两栏文字交错：主要用于图像分类和目PASCAL VOC"
+ },
+ "luohuilan_odt:c87:r67:orig": {
+  "label": "U",
+  "note": "原文 V4 为 1540 万框，稿件写 1600 万，可能取自后续版本或约数"
+ },
+ "yinhongpeng_odt:c81:r93:orig": {
+  "label": "F",
+  "note": "对 TensorFlow 的笼统评价，不算错引"
+ },
+ "yinhongpeng_odt:c106:r114:orig": {
+  "label": "F",
+  "note": "[114] 标注的是 SPPNet 本身，Girshick 等将其用于 R-CNN 的说法与引用不冲突"
+ },
+ "yinhongpeng_odt:c108:r116:orig": {
+  "label": "C",
+  "note": "两栏文字交错：FasterZhu 等[117]，Zhu 等人的论断被挂到 [116] 上"
+ },
+ "zhaoyangyang_tod:c14:r16:orig": {
+  "label": "F",
+  "note": "举例引用，支撑偏弱但不算错"
+ },
+ "zhaoyangyang_tod:c14:r17:orig": {
+  "label": "F",
+  "note": "同上"
+ },
+ "zhaoyangyang_tod:c16:r23:orig": {
+  "label": "F",
+  "note": "C-LSTM 引言确有 CNN 难以捕捉长距离依赖的论述"
+ },
+ "zhaoyangyang_tod:c17:r24:orig": {
+  "label": "C",
+  "note": "两栏文字交错：Recurrent和Lee等人Neural Networks"
+ },
+ "zhaoyangyang_tod:c21:r31:orig": {
+  "label": "C",
+  "note": "正文与表格文字交错：RNN制定任务资源,开发成本高"
+ },
+ "zhaoyangyang_tod:c24:r34:orig": {
+  "label": "C",
+  "note": "两栏文字交错：取代rent Unit,GRU)手工制定的特征"
+ },
+ "zhaoyangyang_tod:c33:r56:orig": {
+  "label": "F",
+  "note": "[55-56] 同时引 SQuAD 2.0 与 1.0，合理"
+ },
+ "zhaoyangyang_tod:c38:r58:orig": {
+  "label": "R",
+  "note": "K-SAN 出自 Chen 等人 2016，[58] 是 Knowledgeable Reader"
+ },
+ "zhaoyangyang_tod:c39:r65:orig": {
+  "label": "F",
+  "note": "ELMo 表示为 1024 维，说法可接受"
+ },
+ "zhaoyangyang_tod:c54:r89:orig": {
+  "label": "C",
+  "note": "两栏文字交错：用MM)于序列建模"
+ },
+ "zhaoyangyang_tod:c59:r97:orig": {
+  "label": "F",
+  "note": "[95-98] 一句多引，主动模仿学习属于模仿学习"
+ },
+ "zhaoyangyang_tod:c61:r100:orig": {
+  "label": "F",
+  "note": "原文提出 AggreVaTe，模型不知道这个名称"
+ },
+ "zhaoyangyang_tod:c63:r101:orig": {
+  "label": "C",
+  "note": "两栏文字交错，标号插在句中"
+ },
+ "zhaoyangyang_tod:c65:r101:orig": {
+  "label": "C",
+  "note": "两栏文字交错：小规模、离散空间问题的局限说的是传统 RL，标号错位到这句"
+ },
+ "zhaoyangyang_tod:c68:r105:orig": {
+  "label": "C",
+  "note": "并列名称被拆开，标号错位"
+ },
+ "zhaoyangyang_tod:c69:r106:orig": {
+  "label": "C",
+  "note": "并列名称被拆开，标号错位"
+ },
+ "zhaoyangyang_tod:c77:r3:orig": {
+  "label": "C",
+  "note": "图题里的图 3 被解析成引用"
+ },
+ "zhaoyangyang_tod:c80:r115:orig": {
+  "label": "C",
+  "note": "两栏文字交错：通过主馈噪声"
+ },
+ "zhaoyangyang_tod:c84:r119:orig": {
+  "label": "C",
+  "note": "两栏文字交错：分层强化等人学习、减轻了奖励性"
+ },
+ "zhaoyangyang_tod:c86:r4:orig": {
+  "label": "C",
+  "note": "图题里的图 4 被解析成引用"
+ },
+ "zhaoyangyang_tod:c96:r124:orig": {
+  "label": "F",
+  "note": "[122,124] 一句多引，委员会方法是先训练通用策略再适配"
+ },
+ "zhaoyangyang_tod:c105:r143:orig": {
+  "label": "C",
+  "note": "残句：该人工负担"
+ },
+ "zhaoyangyang_tod:c120:r164:orig": {
+  "label": "C",
+  "note": "残句：动态神回复的质量"
+ },
+ "zhaoyangyang_tod:c127:r171:orig": {
+  "label": "F",
+  "note": "综述作者自己的评价，引文只是举例"
+ },
+ "zhaoyangyang_tod:c127:r172:orig": {
+  "label": "F",
+  "note": "同上"
+ },
+ "zhaoyangyang_tod:c128:r177:orig": {
+  "label": "U",
+  "note": "修改数据库保证身份一致的说法与个性化对话论文关系不明"
+ },
+ "zhaoyangyang_tod:c130:r159:orig": {
+  "label": "C",
+  "note": "残句：而生成模"
+ },
+ "zhaoyangyang_tod:c130:r161:orig": {
+  "label": "C",
+  "note": "残句：而生成模"
+ },
+ "zhaoyangyang_tod:c133:r120:orig": {
+  "label": "F",
+  "note": "论断只剩基于语料库的方法几个字，应判无法判断"
+ },
+ "zhaoyangyang_tod:c140:r160:orig": {
+  "label": "F",
+  "note": "一句四引，通用回复问题由其余文献支持"
+ },
+ "zhaoyangyang_tod:c140:r196:orig": {
+  "label": "F",
+  "note": "Smart Reply 讨论了回复多样性问题"
+ },
+ "zhaoyangyang_tod:c143:r199:orig": {
+  "label": "F",
+  "note": "Diverse Beam Search 在解码目标中加入多样性项，说法可接受"
+ },
+ "zhaoyangyang_tod:c144:r205:orig": {
+  "label": "F",
+  "note": "KVRet 是监督学习框架并发布了对话数据集"
+ },
+ "zhaoyangyang_tod:c149:r207:orig": {
+  "label": "C",
+  "note": "两栏文字交错：提出基于注意力的具有策略的问题"
+ },
+ "zhaoyangyang_tod:c152:r205:orig": {
+  "label": "R",
+  "note": "KVRet 原文明确不需要显式建模对话状态与信念跟踪，论断说先前方法都要对话状态跟踪"
+ },
+ "zhaoyangyang_tod:c155:r204:orig": {
+  "label": "F",
+  "note": "TSCP 与基线对比，引的是被比较的基线方法"
+ },
+ "zhaoyangyang_tod:c155:r208:orig": {
+  "label": "F",
+  "note": "同上"
+ },
+ "zhaoyangyang_tod:c155:r209:orig": {
+  "label": "F",
+  "note": "同上"
+ },
+ "zhaoyangyang_tod:c156:r210:orig": {
+  "label": "F",
+  "note": "细节片段未覆盖，原文就是隐式状态表示"
+ },
+ "zhaoyangyang_tod:c158:r211:orig": {
+  "label": "C",
+  "note": "残句：端到端的强深度化出"
+ },
+ "zhaoyangyang_tod:c161:r213:orig": {
+  "label": "F",
+  "note": "[213-214] 一句双引，[213] 是 HCN 的前身"
+ },
+ "zhaoyangyang_tod:c161:r214:orig": {
+  "label": "F",
+  "note": "HCN 原文，细节片段未覆盖"
+ },
+ "zhaoyangyang_tod:c175:r115:orig": {
+  "label": "U",
+  "note": "在线主动奖励学习能否算评估的混合方法，存在解释分歧"
+ },
+ "zhaoyangyang_tod:c177:r29:orig": {
+  "label": "C",
+  "note": "表格文字被当成论断，[29] 来自表格"
+ },
+ "zhaoyangyang_tod:c182:r212:orig": {
+  "label": "F",
+  "note": "原文结论写明 E2E 智能体在真实用户上过拟合"
+ },
+ "zhaoyangyang_tod:c184:r230:orig": {
+  "label": "C",
+  "note": "表格文字被当成论断"
+ },
+ "liuqiao_kg:c14:r10:orig": {
+  "label": "F",
+  "note": "FIGER 原文：112 类、CRF 切分、感知机分类、优于 Stanford NER，均一致",
+  "source": "ctx3_cascade"
+ },
+ "liuqiao_kg:c64:r3:orig": {
+  "label": "U",
+  "note": "中文 PDF 抽取乱码，无法确认综述是否提到 SEMPRE",
+  "source": "ctx3_cascade"
+ },
+ "luohuilan_odt:c10:r13:orig": {
+  "label": "C",
+  "note": "两栏文字交错：[13] 属于 Zhao 等人的综述，不平衡问题是另一篇",
+  "source": "ctx3_cascade"
+ },
+ "zhaoyangyang_tod:c37:r64:orig": {
+  "label": "F",
+  "note": "语义树是对知识图谱传播方法的宽松转述",
+  "source": "ctx3_cascade"
+ }
+}

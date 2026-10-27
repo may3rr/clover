@@ -348,6 +348,14 @@ async def evaluate_with_excerpt(
         else:
             label, evidence, rationale, span = _apply_verdict(rev, excerpt)
             final = rev
+            if rationale == "证据未能在原文中定位":
+                # same single re-ask as the first pass, on the review model
+                rev2 = await ask(task="review", correction=True)
+                if rev2 is not None:
+                    label, evidence, rationale, span = _apply_verdict(rev2, excerpt)
+                    final = rev2
+                    if rev2.label == "undetermined" and not rev2.rationale:
+                        rationale = "证据未能在原文中定位"
 
     # a verified unsupported verdict that names the cited work as a
     # different one is a likely miscitation

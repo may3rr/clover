@@ -233,7 +233,8 @@ async def _judge(item: dict, src: _Sources, sem) -> dict:
 
 
 async def run(name: str, kinds: set[str] | None, concurrency: int,
-              ids: set[str] | None = None, model: str | None = None) -> None:
+              ids: set[str] | None = None, model: str | None = None,
+              review_model: str | None = None) -> None:
     items = [i for i in _load(ITEMS) if (kinds is None or i["kind"] in kinds)
              and (ids is None or i["id"] in ids)]
     if model:
@@ -241,6 +242,11 @@ async def run(name: str, kinds: set[str] | None, concurrency: int,
         models = get_settings().llm.models
         for task in ("judge", "review", "review_fallback"):
             setattr(models, task, model)
+    if review_model:
+        # the cascade: first pass as configured, escalations on this model
+        models = get_settings().llm.models
+        for task in ("review", "review_fallback"):
+            setattr(models, task, review_model)
     cache = Cache(get_settings().cache_path)
     src = _Sources(cache, {i["paper"] for i in items})
     sem = asyncio.Semaphore(concurrency)
@@ -302,6 +308,7 @@ def main() -> int:
     r.add_argument("--concurrency", type=int, default=32)
     r.add_argument("--ids", type=Path, help="file with one item id per line")
     r.add_argument("--model", help="override the judge/review models, e.g. qwen3.8-max")
+    r.add_argument("--review-model", help="override the review models only")
     a = sub.add_parser("alter")
     a.add_argument("name", help="run whose supported orig verdicts seed the edits")
     p = sub.add_parser("report")
@@ -312,7 +319,8 @@ def main() -> int:
     elif args.cmd == "run":
         kinds = set(args.kinds.split(",")) if args.kinds else None
         ids = set(args.ids.read_text("utf-8").split()) if args.ids else None
-        asyncio.run(run(args.name, kinds, args.concurrency, ids, args.model))
+        asyncio.run(run(args.name, kinds, args.concurrency, ids, args.model,
+                        args.review_model))
     elif args.cmd == "alter":
         asyncio.run(make_alter(args.name))
     else:
