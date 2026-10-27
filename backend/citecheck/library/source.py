@@ -32,8 +32,25 @@ def local_source(pdf: LocalPdf, claim_text: str) -> SourceText:
     body = _drop_reference_tail(body)
     if not body.strip():
         return SourceText("none", None, pdf.doc.title)
-    excerpt = _bm25_excerpt(body, claim_text, _FULLTEXT_EXCERPT_LIMIT)
+    excerpt = _bm25_excerpt(body, claim_text, _FULLTEXT_EXCERPT_LIMIT,
+                            head=_HEAD_CHARS)
     return SourceText("fulltext", excerpt, pdf.doc.title)
+
+
+# opening of the paper put ahead of the BM25 windows: title, authors and
+# the abstract tell the judge which work it is reading
+_HEAD_CHARS = 600
+
+
+def local_title(pdf: LocalPdf, matched: dict | None, ref: Reference | None) -> str | None:
+    """Title shown to the judge for a linked PDF. The largest-font line is
+    the title for most papers, but an arXiv side stamp or a broken font
+    map yields something that names no paper; then the verified record's
+    title, then the manuscript entry's, stand in."""
+    t = pdf.doc.title
+    if t and _legible(t) and not t.lower().startswith("arxiv:") and len(t) >= 8:
+        return t
+    return (matched or {}).get("title") or (ref.title if ref else None) or t
 
 
 def page_of(pdf: LocalPdf, evidence: str | None) -> int | None:

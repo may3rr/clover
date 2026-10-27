@@ -47,6 +47,7 @@ class SupportRun:
         local: dict[str, Any] | None = None,
     ):
         self._parsed = parsed
+        self._ref_by_id = {r.id: r for r in parsed.references}
         # ref_id -> LocalPdf from the user's reference folder: the local
         # full text replaces the network source for that reference
         self._local = local or {}
@@ -149,16 +150,19 @@ class SupportRun:
         # PDF host must not hold a slot that a ready judge call could use
         matched = self._matched.get(rid)
         pdf = self._local.get(rid)
+        ref = self._ref_by_id.get(rid)
         if pdf is not None:
-            from ..library.source import local_source
+            from ..library.source import local_source, local_title
 
             source = await asyncio.to_thread(local_source, pdf, c.text)
-            matched = {**(matched or {}), "title": pdf.doc.title}
+            matched = {**(matched or {}),
+                       "title": local_title(pdf, matched, ref)}
         else:
             source = await build_source(
                 matched, c.text, cache=self._cache, client=self._http)
         async with self._judge_sem:
-            out = await _judge_with_source(c, rid, matched, source)
+            out = await _judge_with_source(
+                c, rid, matched, source, entry=ref.raw if ref else None)
             if pdf is not None and source.kind != "none":
                 from ..library.source import page_of
 
@@ -221,7 +225,8 @@ def _support_findings(
                     id="", layer="support", severity="high",
                     anchor=Anchor(paragraph_id=claim.paragraph_id,
                                   start=claim.start, end=claim.end),
-                    title="被引文献不支持这条论断",
+                    title=("被引文献与这条论断说的不是同一项工作，可能引错了文献"
+                           if check.off_topic else "被引文献不支持这条论断"),
                     detail=f"依据：{check.rationale or '模型判断原文不支持该论断'}\n"
                            "建议：核对论断与文献内容，考虑删除引用或修改论断。",
                     refs=[rid],
@@ -274,6 +279,8 @@ def _support_findings(
 
 _POSITIVE = {"supported", "partial", "unsupported"}
 _ESCALATE = {"partial", "unsupported"}
+# labels a review may give while confirming an unrelated subject
+_OFF_TOPIC_OK = {"unsupported", "undetermined"}
 
 
 def _apply_verdict(
@@ -293,7 +300,8 @@ def _apply_verdict(
 
 
 async def evaluate_with_excerpt(
-    claim: Claim, ref_id: str, excerpt: str, title: str | None, source_kind: str
+    claim: Claim, ref_id: str, excerpt: str, title: str | None, source_kind: str,
+    entry: str | None = None,
 ) -> SupportCheck:
     """Judge + §5.3 evidence verification on a ready excerpt.
 
@@ -301,11 +309,14 @@ async def evaluate_with_excerpt(
     partial/unsupported is escalated to the 'review' model (same prompt,
     same §5.3 check); on review API failure it retries once via the
     'review_fallback' model, and if that fails too the first-pass
-    verified result stands.
+    verified result stands. ``entry`` is the manuscript's reference-list
+    entry for this citation (authors, year, title as the author cites it).
     """
-    out = await judge_claim(
-        claim.text, title, excerpt, sentence=claim.sentence
-    )
+    def ask(**kw):
+        return judge_claim(claim.text, title, excerpt,
+                           sentence=claim.sentence, entry=entry, **kw)
+
+    out = await ask()
     if out is None:
         return SupportCheck(
             claim_id=claim.id, ref_id=ref_id, label="undetermined",
@@ -314,28 +325,21 @@ async def evaluate_with_excerpt(
             source_title=title, source_excerpt=excerpt,
         )
     label, evidence, rationale, span = _apply_verdict(out, excerpt)
+    final = out
     if rationale == "证据未能在原文中定位":
         # exactly one re-ask: the model must copy a contiguous span
         # verbatim or concede undetermined (§5.3 unchanged)
-        out2 = await judge_claim(
-            claim.text, title, excerpt,
-            sentence=claim.sentence, correction=True,
-        )
+        out2 = await ask(correction=True)
         if out2 is not None:
             label, evidence, rationale, span = _apply_verdict(out2, excerpt)
+            final = out2
             if out2.label == "undetermined" and not out2.rationale:
                 rationale = "证据未能在原文中定位"
 
     if label in _ESCALATE:
-        rev = await judge_claim(
-            claim.text, title, excerpt,
-            sentence=claim.sentence, task="review",
-        )
+        rev = await ask(task="review")
         if rev is None:
-            rev = await judge_claim(
-                claim.text, title, excerpt,
-                sentence=claim.sentence, task="review_fallback",
-            )
+            rev = await ask(task="review_fallback")
         if rev is None:
             log.warning(
                 "review cascade failed for claim %s; keeping first-pass %s",
@@ -343,14 +347,16 @@ async def evaluate_with_excerpt(
             )
         else:
             label, evidence, rationale, span = _apply_verdict(rev, excerpt)
+            final = rev
 
-    # unrelated subject: the fast model's hunch must be confirmed by the
-    # review model before it is shown as a likely miscitation
-    off_topic = False
-    if label == "undetermined" and out.off_topic:
-        rev = await judge_claim(
-            claim.text, title, excerpt, sentence=claim.sentence, task="review")
-        if rev is not None and rev.off_topic and rev.label not in _POSITIVE:
+    # a verified unsupported verdict that names the cited work as a
+    # different one is a likely miscitation
+    off_topic = label == "unsupported" and final.off_topic
+    # unrelated subject without located evidence: the fast model's hunch
+    # must be confirmed by the review model before it is shown
+    if label == "undetermined" and final.off_topic:
+        rev = await ask(task="review")
+        if rev is not None and rev.off_topic and rev.label in _OFF_TOPIC_OK:
             off_topic = True
             rationale = rev.rationale or rationale
 
@@ -370,7 +376,8 @@ async def _judge_pair(
 
 
 async def _judge_with_source(
-    claim: Claim, ref_id: str, matched: dict | None, source
+    claim: Claim, ref_id: str, matched: dict | None, source,
+    entry: str | None = None,
 ) -> SupportCheck:
     if source.kind == "none" or not source.excerpt:
         return SupportCheck(
@@ -380,5 +387,5 @@ async def _judge_with_source(
         )
     return await evaluate_with_excerpt(
         claim, ref_id, source.excerpt,
-        matched.get("title") if matched else None, source.kind,
+        matched.get("title") if matched else None, source.kind, entry=entry,
     )

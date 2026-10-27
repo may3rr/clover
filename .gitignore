@@ -69,3 +69,6 @@ demo/ui-drafts/
 
 # ---- F7: real Chinese manuscript run (unpublished paper, never committed)
 demo/zh_eval/
+
+# 逐条扰动基准的逐条结果：含被引文献原文片段，只留在本地
+demo/testset/item_bench/runs/

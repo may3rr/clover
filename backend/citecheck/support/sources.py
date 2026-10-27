@@ -187,34 +187,59 @@ def _tokenize(text: str) -> list[str]:
     return out
 
 
-def _bm25_excerpt(fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT) -> str:
-    """Top-ranked ~3-sentence windows, concatenated up to `limit` chars."""
+_ARXIV_STAMP = re.compile(r"arXiv:\d{4}\.\d{4,5}v\d+\s*\[[^\]]*\]\s*\d{1,2}\s+\w{3}\s+\d{4}")
+
+
+def _bm25_excerpt(
+    fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT, head: int = 0
+) -> str:
+    """Top-ranked ~3-sentence windows, concatenated up to `limit` chars.
+
+    With ``head`` > 0 the paper's opening sentences (title, authors,
+    abstract; about ``head`` chars) lead the excerpt, so the judge knows
+    which work this is even when the windows are off target."""
     from rank_bm25 import BM25Okapi
 
     from .claims import split_sentences
 
-    sents = [s.text for s in split_sentences(fulltext)]
+    sents = [s.text for s in split_sentences(_ARXIV_STAMP.sub(" ", fulltext))]
     if not sents:
         return fulltext[:limit]
-    windows = [" ".join(sents[i : i + 3]) for i in range(len(sents))]
+    lead: list[str] = []
+    if head:
+        while len(lead) < len(sents) and sum(map(len, lead)) < head:
+            lead.append(sents[len(lead)])
+    start = len(lead)
+    windows = [(i, " ".join(sents[i : i + 3])) for i in range(start, len(sents))]
     # bibliography entries that survived the tail cut are not evidence
-    windows = [w for w in windows if not _looks_like_ref_entry(w)]
-    if not windows:
-        return fulltext[:limit]
-    bm25 = BM25Okapi([_tokenize(w) for w in windows])
+    windows = [(i, w) for i, w in windows if not _looks_like_ref_entry(w)]
+    prefix = " ".join(lead)
+    room = limit - len(prefix)
+    if not windows or room <= 0:
+        return (prefix or fulltext)[:limit]
+    bm25 = BM25Okapi([_tokenize(w) for _, w in windows])
     scores = bm25.get_scores(_tokenize(claim))
-    order = sorted(range(len(windows)), key=lambda i: -scores[i])
+    order = sorted(range(len(windows)), key=lambda k: -scores[k])
     parts: list[str] = []
+    taken: list[int] = []
     used = 0
-    for i in order:
-        if scores[i] <= 0:
+    for k in order:
+        if scores[k] <= 0:
             break
-        w = windows[i]
+        i, w = windows[k]
+        # overlapping windows repeat sentences: keep the budget for new text
+        if any(abs(i - j) < 3 for j in taken):
+            continue
         parts.append(w)
+        taken.append(i)
         used += len(w) + 1
-        if used >= limit or len(parts) >= 5:
+        if used >= room or len(parts) >= 5:
             break
-    return " ".join(parts)[:limit] if parts else fulltext[:limit]
+    if not parts:
+        body = " ".join(sents[start:])
+        return (f"{prefix}\n\n{body}" if prefix else body)[:limit]
+    passages = " ".join(parts)
+    return (f"{prefix}\n\n{passages}" if prefix else passages)[:limit]
 
 
 async def _arxiv_fetch(params: dict, client: httpx.AsyncClient) -> str | None:
