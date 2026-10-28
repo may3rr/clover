@@ -397,6 +397,8 @@ async def test_evidence_reask_recovers(monkeypatch):
     calls = []
 
     async def fake(task, messages, schema, **kw):
+        if schema is judge_mod.DetailOut:
+            return llm.LLMResult(value=schema(), route="cloud")
         calls.append(task)
         ev = "not in source" if len(calls) == 1 else "real source text"
         return llm.LLMResult(
@@ -500,6 +502,8 @@ async def test_review_not_called_on_supported(monkeypatch):
     calls = []
 
     async def fake(task, messages, schema, **kw):
+        if schema is judge_mod.DetailOut:
+            return llm.LLMResult(value=schema(), route="cloud")
         calls.append(task)
         return llm.LLMResult(
             value=JudgeOut(label="supported", evidence="real source text",
@@ -514,6 +518,36 @@ async def test_review_not_called_on_supported(monkeypatch):
         claim, "r1", "real source text", "T", "abstract")
     assert calls == ["judge"]
     assert check.label == "supported"
+
+
+@pytest.mark.asyncio
+async def test_detail_conflict_sends_supported_to_review(monkeypatch):
+    """A located contradiction in one detail escalates a supported verdict;
+    a quote that is not in the excerpt does not."""
+    for quote, want_calls, want in (
+            ("real source text", ["judge", "review"], "unsupported"),
+            ("not in source", ["judge"], "supported")):
+        calls = []
+
+        async def fake(task, messages, schema, **kw):
+            if schema is judge_mod.DetailOut:
+                return llm.LLMResult(
+                    value=schema(conflict=True, quote=quote, detail="d"),
+                    route="cloud")
+            calls.append(task)
+            label = "supported" if task == "judge" else "unsupported"
+            return llm.LLMResult(
+                value=JudgeOut(label=label, evidence="real source text",
+                               rationale="x"),
+                route="cloud")
+
+        monkeypatch.setattr(judge_mod, "chat_json", fake)
+        claim = Claim(id="c0", paragraph_id="p0", start=0, end=5, text="claim",
+                      marker_ids=["m0"])
+        check = await evaluate_with_excerpt(
+            claim, "r1", "real source text", "T", "abstract")
+        assert calls == want_calls
+        assert check.label == want
 
 
 @pytest.mark.asyncio
@@ -746,6 +780,8 @@ async def test_judge_pair_accuracy(pair, monkeypatch):
                        rationale=rec.get("rationale", ""))
 
         async def fake(task, messages, schema, **kw):
+            if schema is judge_mod.DetailOut:
+                return llm.LLMResult(value=schema(), route="cloud")
             return llm.LLMResult(value=out, route="cloud")
 
         monkeypatch.setattr(judge_mod, "chat_json", fake)

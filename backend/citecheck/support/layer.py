@@ -24,7 +24,7 @@ from ..parse.parser import ParsedDocument
 from ..schema import Anchor, Claim, Finding, RefCheck, SupportCheck
 from .claims import extract_claims
 from .evidence import locate_evidence, locate_spliced
-from .judge import JudgeOut, judge_claim, search_terms
+from .judge import JudgeOut, check_details, judge_claim, search_terms
 from .sources import build_source
 
 log = logging.getLogger(__name__)
@@ -323,7 +323,9 @@ async def evaluate_with_excerpt(
     """Judge + §5.3 evidence verification on a ready excerpt.
 
     First pass uses task 'judge'. A verdict that survives verification as
-    partial/unsupported is escalated to the 'review' model (same prompt,
+    partial/unsupported is escalated to the 'review' model; so is a
+    supported one when a second fast-model look (``check_details``) quotes
+    a located sentence that states one detail differently (same prompt,
     same §5.3 check); on review API failure it retries once via the
     'review_fallback' model, and if that fails too the first-pass
     verified result stands. ``entry`` is the manuscript's reference-list
@@ -372,7 +374,12 @@ async def evaluate_with_excerpt(
             if out2.label == "undetermined" and not out2.rationale:
                 rationale = "证据未能在原文中定位"
 
-    if label in _ESCALATE:
+    escalate = label in _ESCALATE
+    if label == "supported":
+        # a located contradiction in one detail sends it to the review too
+        d = await check_details(claim.text, title, excerpt, sentence=claim.sentence)
+        escalate = bool(d and d.conflict and locate_evidence(d.quote, excerpt))
+    if escalate:
         wide = await widened()
         rev = await ask(wide, task="review")
         if rev is None:

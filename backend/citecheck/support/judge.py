@@ -129,3 +129,45 @@ async def search_terms(claim_text: str, sentence: str | None = None) -> list[str
         _Terms,
     )
     return [t for t in (res.value.terms if res.value else []) if t.strip()][:12]
+
+
+class DetailOut(BaseModel):
+    conflict: bool = False
+    quote: str | None = None
+    detail: str = ""
+
+
+_DETAIL_PROMPT = (
+    "下面是一条学术论断和被引文献的原文片段，上一步已判断文献大体支持论断。"
+    "这一步只核对论断中归属给这篇文献的具体细节：数值、名称、网址、比较方向、"
+    "程度、先后、单数与复数、有与无等限定词。逐项在片段中找对应的原文。"
+    "某一项片段明确写出、并且与论断相反或不同时，conflict 填 true，quote 原样"
+    "摘抄片段中写明这一项的那一句，detail 用一句中文说明哪一项不一致。"
+    "片段没写到的细节、约数、四舍五入、同义改写都不算不一致；论断里属于作者"
+    "本人或同处其他文献的内容不算。\n"
+    "论断：{claim}\n"
+    "{sentence_line}"
+    "被引文献标题：{title}\n"
+    "被引文献原文片段：{excerpt}\n\n"
+    "只输出 JSON：{{\"conflict\": false, \"quote\": \"\", \"detail\": \"\"}}。"
+)
+
+
+async def check_details(
+    claim_text: str, ref_title: str | None, excerpt: str,
+    *, sentence: str | None = None,
+) -> DetailOut | None:
+    """Second look at a first-pass 'supported' verdict, on the fast model:
+    one concrete detail the excerpt states differently sends the claim
+    on to the review."""
+    res = await chat_json(
+        "judge",
+        [{"role": "user", "content": _DETAIL_PROMPT.format(
+            claim=claim_text,
+            sentence_line=f"所在句子：{sentence}\n" if sentence else "",
+            title=ref_title or "（无标题）",
+            excerpt=excerpt,
+        )}],
+        DetailOut,
+    )
+    return res.value
