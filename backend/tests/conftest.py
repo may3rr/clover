@@ -6,6 +6,8 @@ import pytest
 @pytest.fixture(autouse=True)
 def _isolate_cache(tmp_path, monkeypatch):
     monkeypatch.setenv("CITECHECK_CACHE", str(tmp_path / "cache.sqlite"))
+    # no embedding calls from tests; embedding tests patch the client
+    monkeypatch.setenv("CITECHECK_EMBED", "0")
 
 
 @pytest.fixture(autouse=True)

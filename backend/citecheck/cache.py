@@ -57,6 +57,10 @@ class Cache:
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS kv (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
         )
+        # embedding vectors (float16 bytes), kept apart from the JSON kv rows
+        self._conn.execute(
+            "CREATE TABLE IF NOT EXISTS vectors (key TEXT PRIMARY KEY, vec BLOB NOT NULL)"
+        )
         cols = {r[1] for r in self._conn.execute("PRAGMA table_info(kv)")}
         if "created_at" not in cols:
             self._conn.execute(
@@ -124,6 +128,24 @@ class Cache:
                 "VALUES (?, ?, ?)",
                 (key, payload, int(time.time())),
             )
+            self._conn.commit()
+
+    def get_vectors(self, keys: list[str]) -> dict[str, bytes]:
+        out: dict[str, bytes] = {}
+        with self._lock:
+            for i in range(0, len(keys), 500):
+                chunk = keys[i:i + 500]
+                rows = self._conn.execute(
+                    f"SELECT key, vec FROM vectors WHERE key IN ({','.join('?' * len(chunk))})",
+                    chunk,
+                ).fetchall()
+                out.update(rows)
+        return out
+
+    def set_vectors(self, items: dict[str, bytes]) -> None:
+        with self._lock:
+            self._conn.executemany(
+                "INSERT OR REPLACE INTO vectors (key, vec) VALUES (?, ?)", items.items())
             self._conn.commit()
 
     def record_usage(

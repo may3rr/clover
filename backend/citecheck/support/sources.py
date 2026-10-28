@@ -198,7 +198,10 @@ def _bm25_excerpt(
 
     With ``head`` > 0 the paper's opening sentences (title, authors,
     abstract; about ``head`` chars) lead the excerpt, so the judge knows
-    which work this is even when the windows are off target."""
+    which work this is even when the windows are off target. Windows are
+    ranked by BM25; with embeddings enabled, BM25 and embedding similarity
+    are fused by reciprocal rank (item bench: the key passage lands in a
+    2500-char excerpt 0.49 of the time instead of 0.38, results.md §12)."""
     from rank_bm25 import BM25Okapi
 
     from .claims import split_sentences
@@ -220,6 +223,9 @@ def _bm25_excerpt(
         return (prefix or fulltext)[:limit]
     bm25 = BM25Okapi([_tokenize(w) for _, w in windows])
     scores = bm25.get_scores(_tokenize(claim))
+    dense = _dense_scores([w for _, w in windows], claim)
+    if dense is not None:
+        scores = _rrf(scores, dense)
     order = sorted(range(len(windows)), key=lambda k: -scores[k])
     parts: list[str] = []
     taken: list[int] = []
@@ -241,6 +247,29 @@ def _bm25_excerpt(
         return (f"{prefix}\n\n{body}" if prefix else body)[:limit]
     passages = " ".join(parts)
     return (f"{prefix}\n\n{passages}" if prefix else passages)[:limit]
+
+
+def _dense_scores(windows: list[str], query: str):
+    from ..llm.embed import embed
+
+    vecs = embed(windows)
+    if vecs is None:
+        return None
+    q = embed([query], query=True)
+    return None if q is None else vecs @ q[0]
+
+
+def _rrf(*rankings, k: int = 60):
+    """Reciprocal rank fusion; every score is positive, so a fused ranking
+    always fills the excerpt budget."""
+    import numpy as np
+
+    out = np.zeros(len(rankings[0]))
+    for sc in rankings:
+        ranks = np.empty(len(sc))
+        ranks[np.argsort(-np.asarray(sc, dtype=float), kind="stable")] = np.arange(len(sc))
+        out += 1.0 / (k + ranks + 1)
+    return out
 
 
 async def _arxiv_fetch(params: dict, client: httpx.AsyncClient) -> str | None:

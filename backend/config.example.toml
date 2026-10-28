@@ -29,6 +29,14 @@ model = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 hf_endpoint = "https://hf-mirror.com"
 timeout = 20
 
+[llm.embedding]
+# Qwen3-Embedding fused with BM25 when ranking excerpt windows. Sends the
+# cited PDFs' text to the embedding service, so it is off by default.
+enabled = false
+base_url = "https://api.siliconflow.cn/v1"
+model = "Qwen/Qwen3-Embedding-0.6B"
+api_key_env = "SILICONFLOW_API_KEY"
+
 [retrieval]
 concurrency = 4
 timeout = 15

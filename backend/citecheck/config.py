@@ -98,11 +98,25 @@ class LocalSettings(BaseModel):
     timeout: float = 20
 
 
+class EmbeddingSettings(BaseModel):
+    """Qwen3-Embedding for excerpt retrieval, fused with BM25. Off by
+    default: it sends the cited PDFs' text to the embedding service."""
+
+    enabled: bool = False
+    base_url: str = "https://api.siliconflow.cn/v1"
+    model: str = "Qwen/Qwen3-Embedding-0.6B"
+    api_key_env: str = "SILICONFLOW_API_KEY"
+    timeout: float = 60
+    batch: int = 32
+    max_concurrency: int = 4
+
+
 class LLMSettings(BaseModel):
     temperature: float = 0
     cloud: CloudSettings = Field(default_factory=CloudSettings)
     models: ModelNames = Field(default_factory=ModelNames)
     local: LocalSettings = Field(default_factory=LocalSettings)
+    embedding: EmbeddingSettings = Field(default_factory=EmbeddingSettings)
     prices: dict[str, PriceSettings] = Field(
         default_factory=lambda: {
             k: PriceSettings(**v) for k, v in _DEFAULT_PRICES.items()
@@ -132,6 +146,7 @@ class Settings(BaseModel):
     crossref_mailto: str | None = None
     openalex_api_key: str | None = None
     s2_api_key: str | None = None
+    embedding_api_key: str | None = None
     # Bumped into every LLM cache key: change it to invalidate all cached
     # model verdicts after a model upgrade or a prompt fix (retrieval
     # entries expire on their own 30-day TTL).
@@ -147,6 +162,12 @@ class Settings(BaseModel):
         return Path(raw).expanduser()
 
 
+def _embedding_key(data: dict, env: dict[str, str]) -> str | None:
+    name = data.get("llm", {}).get("embedding", {}).get("api_key_env",
+                                                       EmbeddingSettings().api_key_env)
+    return os.environ.get(name) or env.get(name)
+
+
 def _load_settings() -> Settings:
     env = _load_dotenv(_ENV_PATH)
     toml_path = _CONFIG_PATH if _CONFIG_PATH.exists() else _CONFIG_EXAMPLE_PATH
@@ -158,6 +179,7 @@ def _load_settings() -> Settings:
         crossref_mailto=os.environ.get("CROSSREF_MAILTO") or env.get("CROSSREF_MAILTO"),
         openalex_api_key=os.environ.get("OPENALEX_API_KEY") or env.get("OPENALEX_API_KEY"),
         s2_api_key=os.environ.get("S2_API_KEY") or env.get("S2_API_KEY"),
+        embedding_api_key=_embedding_key(data, env),
         cache_version=str(data.get("cache_version", "1")),
         llm=LLMSettings(**data.get("llm", {})),
         retrieval=RetrievalSettings(**data.get("retrieval", {})),

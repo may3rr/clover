@@ -1,0 +1,370 @@
+{
+ "说明": "flash_bm25 与 flash_fused 在干净子集上结论不一致的 73 条，按 labeling_guideline.md 的宽松口径裁定。bm25：BM25 检索组对；fused：融合检索组对；U：无法判断；C：转换问题，不计入。orig 中已有 R、F 标签的直接按标签判。",
+ "items": {
+  "guyingjie_mrc:c0:r1:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "背景句，换上的语义解析问答论文与话题相关"
+  },
+  "guyingjie_mrc:c12:r10:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "换上的 Sachan 等结果是 67.8 对 59.9，不支持提升 0.42"
+  },
+  "guyingjie_mrc:c14:r1:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "已核对为 F：CNN/DM 规模与 Attentive Reader 描述与原文相符"
+  },
+  "guyingjie_mrc:c16:r14:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "已核对为 F：数值取自 SQuAD 榜单，与 BERT 论文 87.4/93.2 一致"
+  },
+  "guyingjie_mrc:c27:r25:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "CLOTH 只在相关工作里提到 CBT"
+  },
+  "guyingjie_mrc:c32:r30:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "SQA 不是 ComplexWebQuestions"
+  },
+  "guyingjie_mrc:c41:r39:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "换上的 Match-LSTM 正是句中列举的模型之一"
+  },
+  "guyingjie_mrc:c82:r77:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "Pointer Networks 是指针机制的出处，按宽松口径算成立"
+  },
+  "guyingjie_mrc:c101:r21:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "ARC 不是 SciQ"
+  },
+  "guyingjie_mrc:c132:r110:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "SLQA 不是 Read + Verify"
+  },
+  "guyingjie_mrc:c137:r78:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "已核对为 R：原文 Table 5 的特征消融报告的是 F1（Full 78.8，去掉 ftoken 78.0，去掉 exact match 77.3），稿件写成 EM"
+  },
+  "guyingjie_mrc:c140:r100:orig": {
+   "kind": "orig",
+   "winner": "fused",
+   "note": "已核对为 R：原文 Table 2：HMN 75.6 对 2 层 MLP 74.4，F1 提升 1.2，不是 5.5"
+  },
+  "guyingjie_mrc:c141:r126:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "DCN 不是 Reinforced Mnemonic Reader"
+  },
+  "guyingjie_mrc:c157:r105:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "FusionNet 不是 PhaseConductor"
+  },
+  "guyingjie_mrc:c160:r119:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "Nishida 等的工作不是 DFGN"
+  },
+  "guyingjie_mrc:c161:r128:orig": {
+   "kind": "orig",
+   "winner": "U",
+   "note": "已核对为 U"
+  },
+  "guyingjie_mrc:c166:r32:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "ComplexWebQuestions 不是生成式数据集"
+  },
+  "liuqiao_kg:c2:r2:orig": {
+   "kind": "orig",
+   "winner": "U",
+   "note": "已核对为 U"
+  },
+  "liuqiao_kg:c3:r3:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "换上的大数据综述没有 XLore"
+  },
+  "liuqiao_kg:c13:r9:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "FIGER 是 112 类"
+  },
+  "liuqiao_kg:c50:r62:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "1991 年的缺省推理论文与跨语言知识链接无关"
+  },
+  "liuqiao_kg:c55:r70:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "缺省推理论文与描述逻辑 Tableau 无关"
+  },
+  "liuqiao_kg:c58:r74:orig": {
+   "kind": "orig",
+   "winner": "U",
+   "note": "已核对为 U"
+  },
+  "luohuilan_odt:c34:r33:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "IoU-Net 不是 Cascade R-CNN 的出处"
+  },
+  "luohuilan_odt:c37:r35:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "Soft-NMS 不是 Guided Anchoring"
+  },
+  "luohuilan_odt:c39:r37:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "已核对为 F：Softer-NMS 论文的 var voting 即加权平均，描述大体正确"
+  },
+  "luohuilan_odt:c56:r50:orig": {
+   "kind": "orig",
+   "winner": "C",
+   "note": "残句"
+  },
+  "luohuilan_odt:c87:r67:orig": {
+   "kind": "orig",
+   "winner": "U",
+   "note": "已核对为 U"
+  },
+  "yinhongpeng_odt:c19:r12:swap": {
+   "kind": "swap",
+   "winner": "U",
+   "note": "残句"
+  },
+  "yinhongpeng_odt:c24:r17:swap": {
+   "kind": "swap",
+   "winner": "C",
+   "note": "表格残片"
+  },
+  "yinhongpeng_odt:c64:r54:swap": {
+   "kind": "swap",
+   "winner": "C",
+   "note": "表格残片"
+  },
+  "yinhongpeng_odt:c83:r98:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "LeNet 论文不是 Theano 的出处"
+  },
+  "yinhongpeng_odt:c105:r113:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "DeCAF 不是 R-CNN"
+  },
+  "yinhongpeng_odt:c113:r113:swap": {
+   "kind": "swap",
+   "winner": "C",
+   "note": "表格残片"
+  },
+  "yinhongpeng_odt:c113:r124:swap": {
+   "kind": "swap",
+   "winner": "C",
+   "note": "表格残片"
+  },
+  "yinhongpeng_odt:c113:r128:swap": {
+   "kind": "swap",
+   "winner": "C",
+   "note": "表格残片"
+  },
+  "yinhongpeng_odt:c126:r144:orig": {
+   "kind": "orig",
+   "winner": "C",
+   "note": "两栏交错"
+  },
+  "yinhongpeng_odt:c221:r128:orig": {
+   "kind": "orig",
+   "winner": "fused",
+   "note": "已核对为 F：MDNet 第一由 [128] 支持，Deep-SRDCF 第二由同句 [129] 负责，一句多引"
+  },
+  "yinhongpeng_odt:c223:r130:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "SRDCF 不是 SODLT"
+  },
+  "zhaoyangyang_tod:c2:r3:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "换上的是另一篇对话综述，没有认知技术视角"
+  },
+  "zhaoyangyang_tod:c33:r56:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "已核对为 F：[55-56] 同时引 SQuAD 2.0 与 1.0，合理"
+  },
+  "zhaoyangyang_tod:c34:r59:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "CoQA 是数据集，与知识融合无关"
+  },
+  "zhaoyangyang_tod:c57:r91:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "背景句，多域状态跟踪论文也写了跨域难以迁移"
+  },
+  "zhaoyangyang_tod:c67:r104:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "Action Gap 不是 Double Q-learning"
+  },
+  "zhaoyangyang_tod:c89:r124:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "NDQN 不是策略委员会"
+  },
+  "zhaoyangyang_tod:c96:r124:orig": {
+   "kind": "orig",
+   "winner": "fused",
+   "note": "已核对为 F：[122,124] 一句多引，委员会方法是先训练通用策略再适配"
+  },
+  "zhaoyangyang_tod:c118:r160:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "MMI 目标函数论文没有这个编码机制"
+  },
+  "zhaoyangyang_tod:c127:r171:orig": {
+   "kind": "orig",
+   "winner": "bm25",
+   "note": "已核对为 F：综述作者自己的评价，引文只是举例"
+  },
+  "zhaoyangyang_tod:c133:r120:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "换上的统计强化学习对话管理也算基于数据的方法"
+  },
+  "zhaoyangyang_tod:c153:r205:orig": {
+   "kind": "orig",
+   "winner": "fused",
+   "note": "KVRet 原文写明在 seq2seq 结构上增强，算成立"
+  },
+  "zhaoyangyang_tod:c155:r204:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "Bordes 等不是 TSCP"
+  },
+  "zhaoyangyang_tod:c155:r208:swap": {
+   "kind": "swap",
+   "winner": "fused",
+   "note": "Eric 和 Manning 不是 TSCP"
+  },
+  "zhaoyangyang_tod:c176:r223:orig": {
+   "kind": "orig",
+   "winner": "C",
+   "note": "两栏交错"
+  },
+  "zhaoyangyang_tod:c178:r100:orig": {
+   "kind": "orig",
+   "winner": "C",
+   "note": "残句"
+  },
+  "zhaoyangyang_tod:c180:r223:swap": {
+   "kind": "swap",
+   "winner": "bm25",
+   "note": "PARADISE 是评估框架，不讲语料质量"
+  },
+  "zhaoyangyang_tod:c187:r234:swap": {
+   "kind": "swap",
+   "winner": "U",
+   "note": "句子错乱"
+  },
+  "guyingjie_mrc:c16:r14:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "86.2 与 92.2 是 BERT 原文 Table 2 的开发集数值，改动后仍成立"
+  },
+  "guyingjie_mrc:c95:r35:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "中文改成英文语料确实错"
+  },
+  "guyingjie_mrc:c137:r78:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "改成 F1 后与原文一致"
+  },
+  "guyingjie_mrc:c138:r1:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "[1] 是阅读理解工作，改成机器翻译确实错"
+  },
+  "liuqiao_kg:c13:r9:alter": {
+   "kind": "alter",
+   "winner": "fused",
+   "note": "原文提出的是约 150 类"
+  },
+  "luohuilan_odt:c15:r15:alter": {
+   "kind": "alter",
+   "winner": "C",
+   "note": "残句"
+  },
+  "luohuilan_odt:c59:r51:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "YOLOv3 晚于 RetinaNet，改动确实错"
+  },
+  "luohuilan_odt:c69:r62:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "[62] 是姿态估计的关键点工作，改成语义分割确实错"
+  },
+  "luohuilan_odt:c72:r63:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "原文是一个中心点"
+  },
+  "yinhongpeng_odt:c79:r91:alter": {
+   "kind": "alter",
+   "winner": "U",
+   "note": "原文写了语音识别，没写自然语言处理，视觉被删掉不算矛盾"
+  },
+  "yinhongpeng_odt:c106:r114:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "SPPNet 原文确有 ZF-5 上的实验，改动后仍成立"
+  },
+  "yinhongpeng_odt:c206:r128:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "表格残片，改动不可判，按 N 计"
+  },
+  "zhaoyangyang_tod:c4:r5:alter": {
+   "kind": "alter",
+   "winner": "fused",
+   "note": "[5] 综述深度学习进展，改成传统统计模型确实错"
+  },
+  "zhaoyangyang_tod:c29:r17:alter": {
+   "kind": "alter",
+   "winner": "fused",
+   "note": "原文是跨领域，改成跨语言确实错"
+  },
+  "zhaoyangyang_tod:c32:r52:alter": {
+   "kind": "alter",
+   "winner": "fused",
+   "note": "QuAC 强调更难，改成更简单确实错"
+  },
+  "zhaoyangyang_tod:c33:r55:alter": {
+   "kind": "alter",
+   "winner": "fused",
+   "note": "SQuAD 2.0 加入的是不可回答的问题"
+  },
+  "zhaoyangyang_tod:c133:r186:alter": {
+   "kind": "alter",
+   "winner": "bm25",
+   "note": "BAGEL 是数据驱动方法，改成基于规则确实错"
+  }
+ }
+}
