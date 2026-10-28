@@ -23,7 +23,7 @@ from ..config import get_settings
 from ..parse.parser import ParsedDocument
 from ..schema import Anchor, Claim, Finding, RefCheck, SupportCheck
 from .claims import extract_claims
-from .evidence import locate_evidence
+from .evidence import locate_evidence, locate_spliced
 from .judge import JudgeOut, judge_claim, search_terms
 from .sources import build_source
 
@@ -307,6 +307,8 @@ def _apply_verdict(
     if not evidence or not evidence.strip():
         return "undetermined", None, "模型未给出原文证据", None
     span = locate_evidence(evidence, excerpt)
+    if span is None and (spliced := locate_spliced(evidence, excerpt)):
+        evidence, span = spliced
     if span is None:
         return "undetermined", None, "证据未能在原文中定位", None
     return label, evidence, rationale, span

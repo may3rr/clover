@@ -518,5 +518,9 @@
  "zhaoyangyang_tod:c147:r204:orig": {
   "label": "C",
   "note": "句子从标号开始，前文丢失，论断残缺"
+ },
+ "luohuilan_odt:c66:r59:orig": {
+  "label": "C",
+  "note": "与 c66:r60 同一句，两栏交错，[57~61] 的论断不可读"
  }
 }

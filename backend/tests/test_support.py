@@ -19,7 +19,7 @@ from citecheck.schema import CitationMarker, Claim, Paragraph
 from citecheck.support import claims as claims_mod
 from citecheck.support import judge as judge_mod
 from citecheck.support.claims import extract_claims, split_sentences
-from citecheck.support.evidence import locate_evidence, normalize_text
+from citecheck.support.evidence import locate_evidence, locate_spliced, normalize_text
 from citecheck.support.judge import JudgeOut
 from citecheck.support.layer import evaluate_with_excerpt
 from citecheck.cache import Cache
@@ -49,6 +49,25 @@ def test_locate_evidence_nfkc_fullwidth():
     span = locate_evidence("[见图]", excerpt)
     assert span is not None
     assert excerpt[span[0] : span[1]] == "［见图］"
+
+
+def test_locate_evidence_joins_pdf_line_hyphens():
+    src = "a benchmark in object category classi- fication and detection"
+    span = locate_evidence("object category classification and detection", src)
+    assert span is not None
+    assert src[span[0]:span[1]] == "object category classi- fication and detection"
+    # a hyphen before a capital or digit is real text, not a line break
+    assert locate_evidence("FasterR-CNN", "Faster R- CNN") is None
+
+
+def test_locate_spliced_keeps_longest_verbatim_piece():
+    src = "We built a corpus. It has many parts. We collected 93k articles from CNN."
+    piece, span = locate_spliced("We built a corpus... We collected 93k articles from CNN.", src)
+    assert piece == "We collected 93k articles from CNN."
+    assert src[span[0]:span[1]] == piece
+    # every piece must be in the source, in order
+    assert locate_spliced("We collected 93k articles... We built a corpus.", src) is None
+    assert locate_spliced("We built a corpus... a sentence not in it", src) is None
 
 
 def test_locate_evidence_failure():

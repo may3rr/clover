@@ -3,11 +3,14 @@
 The model's ``evidence`` must appear verbatim in the cited source text.
 Both sides are normalized (Unicode NFKC, whitespace collapsed, quotes
 unified) before substring matching; an offset map keeps the located span
-in ORIGINAL excerpt coordinates for ``evidence_span``.
+in ORIGINAL excerpt coordinates for ``evidence_span``. For matching only,
+a PDF line-break hyphen between lowercase letters ("classi- fication") is
+joined on both sides, since the model copies the word whole.
 """
 
 from __future__ import annotations
 
+import re
 import unicodedata
 
 _QUOTE_MAP = {
@@ -66,6 +69,22 @@ def normalize_text(text: str) -> str:
     return normalize(text)[0]
 
 
+def _join_hyphens(text: str, mapping: list[int]) -> tuple[str, list[int]]:
+    """Drop "- " between two ASCII lowercase letters, keeping the map."""
+    out: list[str] = []
+    out_map: list[int] = []
+    i, n = 0, len(text)
+    while i < n:
+        if (text[i] == "-" and i + 2 < n and text[i + 1] == " " and out
+                and "a" <= out[-1] <= "z" and "a" <= text[i + 2] <= "z"):
+            i += 2
+            continue
+        out.append(text[i])
+        out_map.append(mapping[i])
+        i += 1
+    return "".join(out), out_map
+
+
 def locate_evidence(evidence: str | None, excerpt: str | None) -> tuple[int, int] | None:
     """Find ``evidence`` verbatim (post-normalization) inside ``excerpt``.
 
@@ -73,8 +92,8 @@ def locate_evidence(evidence: str | None, excerpt: str | None) -> tuple[int, int
     """
     if not evidence or not excerpt or not evidence.strip():
         return None
-    n_src, src_map = normalize(excerpt)
-    n_ev, _ = normalize(evidence)
+    n_src, src_map = _join_hyphens(*normalize(excerpt))
+    n_ev, _ = _join_hyphens(*normalize(evidence))
     if not n_ev:
         return None
     idx = n_src.find(n_ev)
@@ -83,3 +102,32 @@ def locate_evidence(evidence: str | None, excerpt: str | None) -> tuple[int, int
     start = src_map[idx]
     end = src_map[idx + len(n_ev) - 1] + 1
     return start, end
+
+
+_ELLIPSIS = re.compile(r"\.{3,}|…+|⋯+")
+
+
+def locate_spliced(
+    evidence: str | None, excerpt: str | None
+) -> tuple[str, tuple[int, int]] | None:
+    """Evidence the model spliced with an ellipsis ("A... B"): every piece
+    must be found verbatim, in order, in ``excerpt``; the longest piece is
+    then kept as the evidence, so what is shown stays one verbatim span.
+    Returns (piece, span) or None."""
+    if not evidence or not excerpt:
+        return None
+    pieces = [p.strip() for p in _ELLIPSIS.split(evidence)]
+    pieces = [p for p in pieces if len(p) >= 8]
+    if len(pieces) < 2:
+        return None
+    n_src, src_map = _join_hyphens(*normalize(excerpt))
+    pos, found = 0, []
+    for p in pieces:
+        n_p, _ = _join_hyphens(*normalize(p))
+        idx = n_src.find(n_p, pos)
+        if not n_p or idx < 0:
+            return None
+        found.append((len(n_p), p, src_map[idx], src_map[idx + len(n_p) - 1] + 1))
+        pos = idx + len(n_p)
+    _, piece, start, end = max(found, key=lambda f: f[0])
+    return piece, (start, end)
