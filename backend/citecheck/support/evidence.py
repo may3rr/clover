@@ -5,7 +5,9 @@ Both sides are normalized (Unicode NFKC, whitespace collapsed, quotes
 unified) before substring matching; an offset map keeps the located span
 in ORIGINAL excerpt coordinates for ``evidence_span``. For matching only,
 a PDF line-break hyphen between lowercase letters ("classi- fication") is
-joined on both sides, since the model copies the word whole.
+joined on both sides, since the model copies the word whole; when that
+still fails, spaces are ignored on both sides, because pypdf also splits
+Latin words apart ("convolutional n etwork") and the model rejoins them.
 """
 
 from __future__ import annotations
@@ -85,6 +87,27 @@ def _join_hyphens(text: str, mapping: list[int]) -> tuple[str, list[int]]:
     return "".join(out), out_map
 
 
+def _drop_spaces(text: str, mapping: list[int]) -> tuple[str, list[int]]:
+    keep = [i for i, c in enumerate(text) if c != " "]
+    return "".join(text[i] for i in keep), [mapping[i] for i in keep]
+
+
+def _find(evidence: str, src: tuple[str, list[int]], start: int = 0,
+          ) -> tuple[int, int, int] | None:
+    """(normalized end, original start, original end) of ``evidence`` in
+    ``src``, a source already through ``_drop_spaces``, searching from
+    normalized position ``start``."""
+    n_src, src_map = src
+    n_ev = _join_hyphens(*normalize(evidence))[0].replace(" ", "")
+    if not n_ev:
+        return None
+    idx = n_src.find(n_ev, start)
+    if idx < 0:
+        return None
+    end = idx + len(n_ev)
+    return end, src_map[idx], src_map[end - 1] + 1
+
+
 def locate_evidence(evidence: str | None, excerpt: str | None) -> tuple[int, int] | None:
     """Find ``evidence`` verbatim (post-normalization) inside ``excerpt``.
 
@@ -97,11 +120,10 @@ def locate_evidence(evidence: str | None, excerpt: str | None) -> tuple[int, int
     if not n_ev:
         return None
     idx = n_src.find(n_ev)
-    if idx < 0:
-        return None
-    start = src_map[idx]
-    end = src_map[idx + len(n_ev) - 1] + 1
-    return start, end
+    if idx >= 0:
+        return src_map[idx], src_map[idx + len(n_ev) - 1] + 1
+    hit = _find(evidence, _drop_spaces(n_src, src_map))
+    return hit[1:] if hit else None
 
 
 _ELLIPSIS = re.compile(r"\.{3,}|…+|⋯+")
@@ -120,14 +142,13 @@ def locate_spliced(
     pieces = [p for p in pieces if len(p) >= 8]
     if len(pieces) < 2:
         return None
-    n_src, src_map = _join_hyphens(*normalize(excerpt))
+    src = _drop_spaces(*_join_hyphens(*normalize(excerpt)))
     pos, found = 0, []
     for p in pieces:
-        n_p, _ = _join_hyphens(*normalize(p))
-        idx = n_src.find(n_p, pos)
-        if not n_p or idx < 0:
+        hit = _find(p, src, pos)
+        if hit is None:
             return None
-        found.append((len(n_p), p, src_map[idx], src_map[idx + len(n_p) - 1] + 1))
-        pos = idx + len(n_p)
+        pos, start, end = hit
+        found.append((len(p), p, start, end))
     _, piece, start, end = max(found, key=lambda f: f[0])
     return piece, (start, end)

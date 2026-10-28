@@ -56,8 +56,16 @@ def test_locate_evidence_joins_pdf_line_hyphens():
     span = locate_evidence("object category classification and detection", src)
     assert span is not None
     assert src[span[0]:span[1]] == "object category classi- fication and detection"
-    # a hyphen before a capital or digit is real text, not a line break
-    assert locate_evidence("FasterR-CNN", "Faster R- CNN") is None
+    # a hyphen before a capital or digit is real text, never dropped
+    assert locate_evidence("Faster RCNN", "Faster R- CNN") is None
+
+
+def test_locate_evidence_ignores_split_latin_words():
+    src = "we investigate the effect of the convolutional n etwork depth on t he accuracy"
+    span = locate_evidence("the convolutional network depth on the accuracy", src)
+    assert span is not None
+    assert src[span[0]:span[1]] == "the convolutional n etwork depth on t he accuracy"
+    assert locate_evidence("the convolutional network width", src) is None
 
 
 def test_locate_spliced_keeps_longest_verbatim_piece():
