@@ -108,6 +108,40 @@ _PROMPT = (
 )
 
 
+_FLAT_TABLE_MIN_CHARS = 500
+_FLAT_TABLE_MIN_COLONS = 10
+_FLAT_TABLE_END = re.compile(r"[。！？!?]|[.](?:\s+|$)")
+
+
+def _is_flattened_table(text: str) -> bool:
+    compact = re.sub(r"\s+", "", text)
+    if len(compact) < _FLAT_TABLE_MIN_CHARS:
+        return False
+    digits = sum(c.isdigit() for c in compact)
+    colons = len(re.findall(r"[:：∶]", compact))
+    if (
+        colons < _FLAT_TABLE_MIN_COLONS
+        or digits / len(compact) < 0.08
+        or colons / len(compact) < 0.015
+    ):
+        return False
+    return _FLAT_TABLE_END.search(text) is None
+
+
+def _is_table_fragment(text: str) -> bool:
+    compact = re.sub(r"\s+", "", text)
+    if len(compact) < 40:
+        return False
+    digits = sum(c.isdigit() for c in compact)
+    colons = len(re.findall(r"[:：∶]", compact))
+    return (
+        digits >= 12
+        and colons >= 3
+        and digits / len(compact) >= 0.08
+        and colons / len(compact) >= 0.015
+    )
+
+
 async def extract_claims(
     paragraph: Paragraph, markers: list[CitationMarker]
 ) -> list[Claim]:
@@ -117,7 +151,12 @@ async def extract_claims(
         return []
     claims: list[Claim] = []
     sentences = split_sentences(paragraph.text)
+    flattened_table = _is_flattened_table(paragraph.text)
     for sent in sentences:
+        if _is_flattened_table(sent.text) or (
+            flattened_table and _is_table_fragment(sent.text)
+        ):
+            continue
         in_sent = [m for m in markers if m.start >= sent.start and m.end <= sent.end]
         if not in_sent:
             continue

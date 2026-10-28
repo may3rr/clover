@@ -45,6 +45,42 @@ def test_full_width_numeric():
     assert len(ms) == 1 and ms[0].raw == "［3］" and ms[0].kind == "numeric"
 
 
+def test_float_numbers_are_not_citations():
+    samples = [
+        "图[3] 网络结构", "表[2] 实验结果", "如图[3]所示", "见表[2]",
+        "Fig.[4] Architecture", "Figure [4] Architecture", "Table [1] Results",
+        "如图 3 所示", "见表 2", "Fig. 4", "Table 1",
+    ]
+    for sample in samples:
+        _, ms, _ = detect(run(f"<w:t>{sample}</w:t>"))
+        assert ms == [], sample
+
+
+def test_float_context_does_not_remove_real_citations():
+    cases = {
+        "文献[3]指出": ["[3]"],
+        "Vaswani 等[3]": ["[3]"],
+        "[3,4]": ["[3,4]"],
+        "代表[3]指出": ["[3]"],
+        "如图[3]所示，文献[4]指出": ["[4]"],
+    }
+    for sample, expected in cases.items():
+        _, ms, _ = detect(run(f"<w:t>{sample}</w:t>"))
+        assert [m.raw for m in ms] == expected, sample
+
+
+def test_superscript_float_number_is_not_citation():
+    sup = '<w:rPr><w:vertAlign w:val="superscript"/></w:rPr>'
+    _, ms, _ = detect(
+        run("<w:t>图</w:t>") + run("<w:t>[3]</w:t>", sup)
+    )
+    assert ms == []
+    _, ms, _ = detect(
+        run("<w:t>文献</w:t>") + run("<w:t>[3]</w:t>", sup)
+    )
+    assert [m.raw for m in ms] == ["[3]"]
+
+
 def test_author_year_paren():
     text, ms, _ = detect(
         run("<w:t>Prior work (Smith, 2020) and (Smith et al., 2020; Lee, 2021) "

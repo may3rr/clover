@@ -83,6 +83,73 @@ def test_sentence_offsets():
 # ------------------------------------------------------------ claims
 
 
+def test_flattened_table_detection_zh_and_en():
+    zh = "任务型对话数据集统计 " + "训练集:13084句 验证集:766句 测试集:1521句 " * 24
+    en = "Dialogue dataset statistics " + "train: 13084 validation: 766 test: 1521 " * 20
+    assert claims_mod._is_flattened_table(zh)
+    assert claims_mod._is_flattened_table(en)
+
+
+def test_flattened_table_detection_preserves_numeric_prose():
+    en = ("The cohort contains 1200 patients: 600 received treatment: "
+          "600 received placebo. ") * 10
+    zh = ("实验包含1200名受试者：600名接受干预：600名接受安慰剂。"
+          "两组在年龄与性别上保持平衡。") * 12
+    short_table = "训练集:13084句 验证集:766句 测试集:1521句"
+    assert not claims_mod._is_flattened_table(en)
+    assert not claims_mod._is_flattened_table(zh)
+    assert not claims_mod._is_flattened_table(short_table)
+
+
+@pytest.mark.asyncio
+async def test_extract_skips_flattened_table_without_llm(monkeypatch):
+    body = "任务型对话数据集统计 " + "训练集:13084句 验证集:766句 测试集:1521句 " * 24
+    text = body + "[29]"
+    para = Paragraph(id="p0", section_id="s0", text=text, char_offset=0)
+    marker = CitationMarker(
+        id="m0", paragraph_id="p0", start=len(body), end=len(text),
+        raw="[29]", ref_ids=["r29"],
+    )
+
+    async def unexpected(task, messages, schema, **kw):
+        raise AssertionError("flattened table must not reach the extract model")
+
+    monkeypatch.setattr(claims_mod, "chat_json", unexpected)
+    assert await extract_claims(para, [marker]) == []
+    assert para.text == text
+
+
+@pytest.mark.asyncio
+async def test_extract_preserves_prose_in_mixed_table_paragraph(monkeypatch):
+    normal = "在实践中经常观察到用户模拟器过拟合[212]."
+    table = ("一种方法通过用户目标评估系统"
+             + "训练集:13084句 验证集:766句 测试集:1521句 " * 16
+             + "[230-231].")
+    tail = "另一种方法仍然需要人工评估[232-233].实际上仍需继续评估"
+    text = normal + table + tail
+    para = Paragraph(id="p0", section_id="s0", text=text, char_offset=0)
+    markers = []
+    for i, raw in enumerate(["[212]", "[230-231]", "[232-233]"]):
+        start = text.index(raw)
+        markers.append(CitationMarker(
+            id=f"m{i}", paragraph_id="p0", start=start, end=start + len(raw),
+            raw=raw, ref_ids=[f"r{i}"],
+        ))
+    prompts = []
+
+    async def fake(task, messages, schema, **kw):
+        prompts.append(messages[0]["content"])
+        return llm.LLMResult(value=None, route="local")
+
+    monkeypatch.setattr(claims_mod, "chat_json", fake)
+    found = await extract_claims(para, markers)
+    assert len(prompts) == 2
+    assert all("训练集" not in prompt for prompt in prompts)
+    assert len(found) == 2
+    assert {c.marker_ids[0] for c in found} == {"m0", "m2"}
+    assert para.text == text
+
+
 @pytest.mark.asyncio
 async def test_extract_claims_with_fake_llm(monkeypatch):
     para = Paragraph(

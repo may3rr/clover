@@ -110,8 +110,19 @@ def _field_markers(
     return out, managed
 
 
+_FLOAT_LABEL_RE = re.compile(
+    r"(?:(?<![A-Za-z])(?:Fig(?:ure)?\.?|Table)|(?<![一-鿿])[图表]|(?:如|见)[图表])"
+    r"\s*$",
+    re.IGNORECASE,
+)
+
+
+def _is_float_number(text: str, start: int) -> bool:
+    return bool(_FLOAT_LABEL_RE.search(text[max(0, start - 16) : start]))
+
+
 def _superscript_markers(
-    segments: list[dx.Segment], covered: list[bool]
+    text: str, segments: list[dx.Segment], covered: list[bool]
 ) -> list[DetectedMarker]:
     out: list[DetectedMarker] = []
     cluster: list[dx.Segment] = []
@@ -121,7 +132,12 @@ def _superscript_markers(
             return
         raw = "".join(s.text for s in cluster)
         span_covered = any(covered[cluster[0].start : cluster[-1].end])
-        if not span_covered and SUPERSCRIPT_RE.match(raw) and any(c.isdigit() for c in raw):
+        if (
+            not span_covered
+            and SUPERSCRIPT_RE.match(raw)
+            and any(c.isdigit() for c in raw)
+            and not _is_float_number(text, cluster[0].start)
+        ):
             out.append(
                 DetectedMarker(
                     start=cluster[0].start, end=cluster[-1].end, raw="", kind="superscript"
@@ -149,7 +165,7 @@ def _regex_markers(
         return not any(covered[m.start() : m.end()])
 
     for m in _NUMERIC_RE.finditer(text):
-        if free(m):
+        if free(m) and not _is_float_number(text, m.start()):
             found.append(DetectedMarker(m.start(), m.end(), "", "numeric"))
     for m in _PAREN_RE.finditer(text):
         if free(m):
@@ -189,7 +205,7 @@ def detect_markers(
     for d in detected:
         cover(d)
 
-    sup = _superscript_markers(segments, covered)
+    sup = _superscript_markers(text, segments, covered)
     for d in sup:
         cover(d)
     detected += sup
