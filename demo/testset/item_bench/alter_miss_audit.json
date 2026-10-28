@@ -1,0 +1,125 @@
+{
+ "说明": "ctx8_cascade 干净子集中 alter 漏检且判为支持的样本随机抽 30 条（seed 7）人工核对。G：改动确实与原文矛盾，属漏检；N：改动后论断仍成立、改动只是补充片段未写的细节或论断是表格残片，不应计为漏检；U：无法确定。",
+ "items": {
+  "guyingjie_mrc:c137:r78:alter": {
+   "label": "N",
+   "note": "EM 改成 F1 后反而与原文 Table 5 一致"
+  },
+  "guyingjie_mrc:c166:r32:alter": {
+   "label": "N",
+   "note": "改的是同句另一个数据集，[32] 只负责 NarrativeQA"
+  },
+  "guyingjie_mrc:c24:r22:alter": {
+   "label": "N",
+   "note": "只改 URL 中的波浪号写法"
+  },
+  "guyingjie_mrc:c27:r25:alter": {
+   "label": "G",
+   "note": "URL 路径改错，原文为 fb.ai/babi"
+  },
+  "guyingjie_mrc:c29:r27:alter": {
+   "label": "G",
+   "note": "URL 改成 squad，原文为 coqa"
+  },
+  "guyingjie_mrc:c33:r31:alter": {
+   "label": "G",
+   "note": "URL 改成 complexwebq，原文为 compwebq"
+  },
+  "guyingjie_mrc:c37:r35:alter": {
+   "label": "N",
+   "note": "完形填空改为阅读理解，二者都成立"
+  },
+  "guyingjie_mrc:c39:r37:alter": {
+   "label": "N",
+   "note": "简单改为复杂，原文没有这方面的说法"
+  },
+  "guyingjie_mrc:c56:r51:alter": {
+   "label": "N",
+   "note": "原文也评估了 NCE"
+  },
+  "guyingjie_mrc:c63:r14:alter": {
+   "label": "G",
+   "note": "把并非完全双向反转为完全双向"
+  },
+  "guyingjie_mrc:c74:r62:alter": {
+   "label": "N",
+   "note": "QANet 含自注意力编码，改动后仍可接受"
+  },
+  "guyingjie_mrc:c83:r27:alter": {
+   "label": "N",
+   "note": "不可回答改为可回答，CoQA 两种都有"
+  },
+  "liuqiao_kg:c13:r9:alter": {
+   "label": "U",
+   "note": "150 改 100，模型称原文有约 100 类的说法，未核实"
+  },
+  "liuqiao_kg:c55:r70:alter": {
+   "label": "G",
+   "note": "相似性改为差异性，原文写相似性"
+  },
+  "luohuilan_odt:c0:r1:alter": {
+   "label": "N",
+   "note": "很大改为极大，语义相同"
+  },
+  "luohuilan_odt:c33:r32:alter": {
+   "label": "N",
+   "note": "补了一个片段没写的目的，按规则不算不一致"
+  },
+  "luohuilan_odt:c37:r35:alter": {
+   "label": "N",
+   "note": "图像特征改为语义特征，反而与原文一致"
+  },
+  "luohuilan_odt:c51:r46:alter": {
+   "label": "N",
+   "note": "补了池化层，原文未提及"
+  },
+  "luohuilan_odt:c87:r67:alter": {
+   "label": "N",
+   "note": "1600 万改为 1540 万，反而与原文一致"
+  },
+  "yinhongpeng_odt:c113:r114:alter": {
+   "label": "N",
+   "note": "论断混入表格，改动不可判"
+  },
+  "yinhongpeng_odt:c206:r128:alter": {
+   "label": "N",
+   "note": "表格数值残片"
+  },
+  "yinhongpeng_odt:c24:r21:alter": {
+   "label": "N",
+   "note": "表格残片"
+  },
+  "yinhongpeng_odt:c83:r97:alter": {
+   "label": "N",
+   "note": "只修正拼写"
+  },
+  "zhaoyangyang_tod:c123:r166:alter": {
+   "label": "G",
+   "note": "指定属性改为随机属性，原文为属性受控"
+  },
+  "zhaoyangyang_tod:c140:r160:alter": {
+   "label": "G",
+   "note": "不具有意义改为具有意义"
+  },
+  "zhaoyangyang_tod:c144:r205:alter": {
+   "label": "N",
+   "note": "多个改为单个，原文没有写组件数量"
+  },
+  "zhaoyangyang_tod:c164:r203:alter": {
+   "label": "G",
+   "note": "难获得改为易获得，方向反转"
+  },
+  "zhaoyangyang_tod:c34:r58:alter": {
+   "label": "G",
+   "note": "推断之前改为之后，原文写 before inferring"
+  },
+  "zhaoyangyang_tod:c75:r110:alter": {
+   "label": "U",
+   "note": "论断残缺，在线离线与原文 batch RL 的关系不清"
+  },
+  "zhaoyangyang_tod:c89:r124:alter": {
+   "label": "G",
+   "note": "多域改为单域，原文写 multi-domain"
+  }
+ }
+}

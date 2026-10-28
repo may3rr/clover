@@ -191,7 +191,8 @@ _ARXIV_STAMP = re.compile(r"arXiv:\d{4}\.\d{4,5}v\d+\s*\[[^\]]*\]\s*\d{1,2}\s+\w
 
 
 def _bm25_excerpt(
-    fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT, head: int = 0
+    fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT, head: int = 0,
+    max_parts: int = 5,
 ) -> str:
     """Top-ranked ~3-sentence windows, concatenated up to `limit` chars.
 
@@ -233,7 +234,7 @@ def _bm25_excerpt(
         parts.append(w)
         taken.append(i)
         used += len(w) + 1
-        if used >= room or len(parts) >= 5:
+        if used >= room or len(parts) >= max_parts:
             break
     if not parts:
         body = " ".join(sents[start:])

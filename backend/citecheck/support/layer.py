@@ -24,7 +24,7 @@ from ..parse.parser import ParsedDocument
 from ..schema import Anchor, Claim, Finding, RefCheck, SupportCheck
 from .claims import extract_claims
 from .evidence import locate_evidence
-from .judge import JudgeOut, judge_claim
+from .judge import JudgeOut, judge_claim, search_terms
 from .sources import build_source
 
 log = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ class SupportRun:
         self._matched: dict[str, dict | None] = {}
         self._out: dict[tuple[str, str], SupportCheck] = {}
         self._queued: set[tuple[str, str]] = set()
+        self._claim_refs: dict[str, list[str]] = {}
         self._queue_tasks: list[asyncio.Task] = []
         self._judge_tasks: list[asyncio.Task] = []
         # bounds how many judge coroutines are in flight at once — a
@@ -118,6 +119,7 @@ class SupportRun:
                             wanted.append(rid)
             for rid in wanted:
                 jobs.append((c, rid))
+            self._claim_refs[c.id] = wanted
         self._jobs = jobs
         return claims
 
@@ -152,18 +154,28 @@ class SupportRun:
         matched = self._matched.get(rid)
         pdf = self._local.get(rid)
         ref = self._ref_by_id.get(rid)
+        expand = None
         if pdf is not None:
-            from ..library.source import local_source, local_title
+            from ..library.source import local_expanded, local_source, local_title
 
-            source = await asyncio.to_thread(local_source, pdf, c.text)
+            # the excerpt is ranked on the claim plus bilingual search
+            # terms: a Chinese claim shares only names and numbers with an
+            # English paper under BM25
+            terms = await search_terms(c.text, c.sentence)
+            source = await asyncio.to_thread(
+                local_source, pdf, " ".join([c.text, *terms]))
             matched = {**(matched or {}),
                        "title": local_title(pdf, matched, ref)}
+            expand = lambda q: local_expanded(pdf, q)  # noqa: E731
         else:
             source = await build_source(
                 matched, c.text, cache=self._cache, client=self._http)
+        cocited = [self._ref_by_id[o].raw for o in self._claim_refs.get(c.id, [])
+                   if o != rid and o in self._ref_by_id]
         async with self._judge_sem:
             out = await _judge_with_source(
-                c, rid, matched, source, entry=ref.raw if ref else None)
+                c, rid, matched, source, entry=ref.raw if ref else None,
+                cocited=cocited, expand=expand)
             if pdf is not None and source.kind != "none":
                 from ..library.source import page_of
 
@@ -303,6 +315,8 @@ def _apply_verdict(
 async def evaluate_with_excerpt(
     claim: Claim, ref_id: str, excerpt: str, title: str | None, source_kind: str,
     entry: str | None = None,
+    cocited: list[str] | None = None,
+    expand: Callable[[str], str | None] | None = None,
 ) -> SupportCheck:
     """Judge + §5.3 evidence verification on a ready excerpt.
 
@@ -311,11 +325,28 @@ async def evaluate_with_excerpt(
     same §5.3 check); on review API failure it retries once via the
     'review_fallback' model, and if that fails too the first-pass
     verified result stands. ``entry`` is the manuscript's reference-list
-    entry for this citation (authors, year, title as the author cites it).
+    entry for this citation (authors, year, title as the author cites it);
+    ``cocited`` are the entries of the other works cited at the same place.
+    ``expand`` (local full text only) builds a larger excerpt from a query:
+    before the review pass the claim plus bilingual search terms re-rank
+    the full text, and the review and its §5.3 check read that excerpt.
     """
-    def ask(**kw):
-        return judge_claim(claim.text, title, excerpt,
-                           sentence=claim.sentence, entry=entry, **kw)
+    def ask(text: str | None = None, **kw):
+        return judge_claim(claim.text, title, text or excerpt,
+                           sentence=claim.sentence, entry=entry,
+                           cocited=cocited, **kw)
+
+    review_excerpt: str | None = None
+
+    async def widened() -> str:
+        nonlocal review_excerpt
+        if review_excerpt is None:
+            review_excerpt = excerpt
+            if expand is not None:
+                terms = await search_terms(claim.text, claim.sentence)
+                query = " ".join([claim.text, *terms])
+                review_excerpt = (await asyncio.to_thread(expand, query)) or excerpt
+        return review_excerpt
 
     out = await ask()
     if out is None:
@@ -327,6 +358,8 @@ async def evaluate_with_excerpt(
         )
     label, evidence, rationale, span = _apply_verdict(out, excerpt)
     final = out
+    # the excerpt the final verdict's evidence span refers to
+    used = excerpt
     if rationale == "证据未能在原文中定位":
         # exactly one re-ask: the model must copy a contiguous span
         # verbatim or concede undetermined (§5.3 unchanged)
@@ -338,22 +371,24 @@ async def evaluate_with_excerpt(
                 rationale = "证据未能在原文中定位"
 
     if label in _ESCALATE:
-        rev = await ask(task="review")
+        wide = await widened()
+        rev = await ask(wide, task="review")
         if rev is None:
-            rev = await ask(task="review_fallback")
+            rev = await ask(wide, task="review_fallback")
         if rev is None:
             log.warning(
                 "review cascade failed for claim %s; keeping first-pass %s",
                 claim.id, label,
             )
         else:
-            label, evidence, rationale, span = _apply_verdict(rev, excerpt)
+            label, evidence, rationale, span = _apply_verdict(rev, wide)
             final = rev
+            used = wide
             if rationale == "证据未能在原文中定位":
                 # same single re-ask as the first pass, on the review model
-                rev2 = await ask(task="review", correction=True)
+                rev2 = await ask(wide, task="review", correction=True)
                 if rev2 is not None:
-                    label, evidence, rationale, span = _apply_verdict(rev2, excerpt)
+                    label, evidence, rationale, span = _apply_verdict(rev2, wide)
                     final = rev2
                     if rev2.label == "undetermined" and not rev2.rationale:
                         rationale = "证据未能在原文中定位"
@@ -364,7 +399,7 @@ async def evaluate_with_excerpt(
     # unrelated subject without located evidence: the fast model's hunch
     # must be confirmed by the review model before it is shown
     if label == "undetermined" and final.off_topic:
-        rev = await ask(task="review")
+        rev = await ask(await widened(), task="review")
         if rev is not None and rev.off_topic and rev.label in _OFF_TOPIC_OK:
             off_topic = True
             rationale = rev.rationale or rationale
@@ -373,7 +408,7 @@ async def evaluate_with_excerpt(
         claim_id=claim.id, ref_id=ref_id, label=label, evidence=evidence,
         source_kind=source_kind,  # type: ignore[arg-type]
         rationale=rationale, source_title=title,
-        source_excerpt=excerpt, evidence_span=span, off_topic=off_topic,
+        source_excerpt=used, evidence_span=span, off_topic=off_topic,
     )
 
 
@@ -387,6 +422,8 @@ async def _judge_pair(
 async def _judge_with_source(
     claim: Claim, ref_id: str, matched: dict | None, source,
     entry: str | None = None,
+    cocited: list[str] | None = None,
+    expand: Callable[[str], str | None] | None = None,
 ) -> SupportCheck:
     if source.kind == "none" or not source.excerpt:
         return SupportCheck(
@@ -397,4 +434,5 @@ async def _judge_with_source(
     return await evaluate_with_excerpt(
         claim, ref_id, source.excerpt,
         matched.get("title") if matched else None, source.kind, entry=entry,
+        cocited=cocited, expand=expand,
     )

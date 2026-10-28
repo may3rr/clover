@@ -29,6 +29,7 @@ _PROMPT = (
     "论断：{claim}\n"
     "{sentence_line}"
     "{entry_line}"
+    "{cocited_line}"
     "被引文献标题：{title}\n"
     "被引文献原文片段（文献开头与和论断最相关的段落）：{excerpt}\n\n"
     "输出 JSON：{{\"label\": \"supported|partial|unsupported|undetermined\", "
@@ -45,13 +46,16 @@ _PROMPT = (
     "2. 文献就是论断所说的工作时，逐项核对论断归属给它的具体内容：数值、比较方向、"
     "程度、对象、数据集或知识库名称、因果和先后关系。原文明确写的与论断不一致时，"
     "核心内容不一致用 unsupported，次要细节不一致用 partial，不能因为大意相近判 "
-    "supported。片段里没写到的内容不算不一致；约数、四舍五入和换算后的数值算一致。\n"
+    "supported。片段里没写到的内容不算不一致；约数、四舍五入和换算后的数值算一致。"
+    "论断的主要内容得到片段支持、其余细节片段没有写到时，用 supported，不用 "
+    "partial：partial 只用于片段明确写出、并且与论断不一致的次要细节。\n"
     "3. 文献主题一致、但片段没有涉及论断的具体内容时，label 用 undetermined，"
     "不要猜测。\n"
     "规则：evidence 必须是片段中一段连续的原文，原样摘抄，不超过两句，不要用省略号"
     "拼接不相邻的句子，保持原文的语言，论断是中文而原文是英文时也不要翻译；"
     "rationale 用一句中文说明判断依据。\n"
-    "所在句子同时引了多篇文献时，这篇文献只需支持句中与它相关的那一部分，例如"
+    "所在句子同时引了多篇文献时（上面列出了同处其他文献的条目），这篇文献只需支持"
+    "句中与它相关的那一部分，例如"
     "句中提到的某个方法、模型或数据集正是它提出的；其余部分由别的文献负责，不能"
     "因此判 partial 或 unsupported。句中没有任何部分与它相关时才按第 1 步处理。\n"
     "只判断论断中归属给这篇被引文献的内容。论断里属于作者本人的做法、实验设置、"
@@ -75,6 +79,7 @@ async def judge_claim(
     *,
     sentence: str | None = None,
     entry: str | None = None,
+    cocited: list[str] | None = None,
     correction: bool = False,
     task: str = "judge",
 ) -> JudgeOut | None:
@@ -84,6 +89,10 @@ async def judge_claim(
         claim=claim_text,
         sentence_line=f"所在句子：{sentence}\n" if sentence else "",
         entry_line=f"被引文献条目（稿件参考文献表中的著录）：{entry}\n" if entry else "",
+        cocited_line=(
+            "同一处还引用了下列文献，论断中属于它们的内容由它们负责：\n"
+            + "".join(f"- {e}\n" for e in cocited)
+        ) if cocited else "",
         title=ref_title or "（无标题）",
         excerpt=excerpt,
     )
@@ -95,3 +104,28 @@ async def judge_claim(
         JudgeOut,
     )
     return res.value
+
+
+class _Terms(BaseModel):
+    terms: list[str] = []
+
+
+_TERMS_PROMPT = (
+    "下面是一条学术论断，要在被引文献的英文或中文全文里检索与它有关的段落。"
+    "列出 5 到 12 个检索词：论断中的方法、模型、数据集、指标名称，数值，"
+    "以及关键概念的英文说法和中文说法。只输出 JSON："
+    "{{\"terms\": [\"...\"]}}。\n论断：{claim}\n{sentence_line}"
+)
+
+
+async def search_terms(claim_text: str, sentence: str | None = None) -> list[str]:
+    """Bilingual search terms for a second retrieval pass: a Chinese claim
+    shares only names and numbers with an English paper under BM25."""
+    res = await chat_json(
+        "judge",
+        [{"role": "user", "content": _TERMS_PROMPT.format(
+            claim=claim_text,
+            sentence_line=f"所在句子：{sentence}\n" if sentence else "")}],
+        _Terms,
+    )
+    return [t for t in (res.value.terms if res.value else []) if t.strip()][:12]

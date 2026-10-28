@@ -411,6 +411,42 @@ async def test_review_cascade_overrides(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_review_reads_expanded_excerpt(monkeypatch):
+    """The review judges a larger excerpt ranked on the claim plus search
+    terms; its evidence is verified against that excerpt, and co-cited
+    entries reach every prompt."""
+    prompts, queries = [], []
+
+    async def fake(task, messages, schema, **kw):
+        if schema is judge_mod._Terms:
+            return llm.LLMResult(value=schema(terms=["attention"]), route="cloud")
+        if task == "judge":
+            out = JudgeOut(label="partial", evidence="short text", rationale="x")
+        else:
+            out = JudgeOut(label="supported", evidence="only in the wide text",
+                           rationale="y")
+        prompts.append((task, messages[0]["content"]))
+        return llm.LLMResult(value=out, route="cloud")
+
+    def expand(q):
+        queries.append(q)
+        return "short text. only in the wide text."
+
+    monkeypatch.setattr(judge_mod, "chat_json", fake)
+    claim = Claim(id="c0", paragraph_id="p0", start=0, end=5, text="claim",
+                  marker_ids=["m0"])
+    check = await evaluate_with_excerpt(
+        claim, "r1", "short text", "T", "fulltext",
+        cocited=["[2] Other A. Another work"], expand=expand)
+    assert check.label == "supported"
+    assert check.source_excerpt == "short text. only in the wide text."
+    assert queries == ["claim attention"]
+    judged = [p for t, p in prompts if t in ("judge", "review")]
+    assert len(judged) == 2 and all("[2] Other A. Another work" in p for p in judged)
+    assert "only in the wide text" in judged[1] and "only in the wide text" not in judged[0]
+
+
+@pytest.mark.asyncio
 async def test_review_evidence_reask(monkeypatch):
     """Unlocatable review evidence gets the same single re-ask."""
     calls = []

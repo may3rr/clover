@@ -31,6 +31,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import re
 import sys
 import time
 from collections import Counter, defaultdict
@@ -176,9 +177,13 @@ class _Sources:
         self.local: dict[tuple[str, str], object] = {}
         self.refs: dict[tuple[str, str], Reference] = {}
         self.matched: dict[tuple[str, str], dict | None] = {}
+        # (paper, claim_id) -> refs cited by that claim, in report order
+        self.claim_refs: dict[tuple[str, str], list[str]] = {}
         for paper, rep in _papers():
             if paper not in papers:
                 continue
+            for sc in rep["support_checks"]:
+                self.claim_refs.setdefault((paper, sc["claim_id"]), []).append(sc["ref_id"])
             for r in rep["references"]:
                 self.refs[(paper, r["id"])] = Reference.model_validate(r)
             for rc in rep.get("ref_checks", []):
@@ -206,11 +211,18 @@ async def _source(item: dict, src: _Sources):
     pdf = src.local.get(key)
     if pdf is None:
         return SourceText("none", None, None), None
-    source = await asyncio.to_thread(local_source, pdf, item["claim"])
+    from citecheck.support.judge import search_terms
+
+    terms = await search_terms(item["claim"], item.get("sentence"))
+    source = await asyncio.to_thread(local_source, pdf, " ".join([item["claim"], *terms]))
     return source, local_title(pdf, src.matched.get(key), src.refs.get(key))
 
 
+_ENTRY_NUM = re.compile(r"^\s*[\[［]\s*\d+\s*[\]］]")
+
+
 async def _judge(item: dict, src: _Sources, sem) -> dict:
+    from citecheck.library.source import local_expanded
     from citecheck.support.layer import evaluate_with_excerpt
 
     async with sem:
@@ -222,12 +234,27 @@ async def _judge(item: dict, src: _Sources, sem) -> dict:
                     "source_kind": "none", "flag": False, "rationale": "未能获取被引文献原文",
                     "no_source": True}
         ref = src.refs.get((item["paper"], item["ref_id"]))
+        # the swap takes the original ref's place; the rest stay co-cited
+        own = item.get("orig_ref_id", item["ref_id"])
+        cocited = [src.refs[(item["paper"], o)].raw
+                   for o in src.claim_refs.get((item["paper"], item["claim_id"]), [])
+                   if o not in (own, item["ref_id"]) and (item["paper"], o) in src.refs]
+        pdf = src.local.get((item["paper"], item["ref_id"]))
+        expand = (lambda q: local_expanded(pdf, q)) if pdf is not None else None
+        entry = ref.raw if ref else None
+        if entry and "orig_ref_id" in item:
+            # a real miscitation shows the sentence's own number in front of
+            # the wrong entry: give the swapped entry the original's number
+            orig = src.refs.get((item["paper"], item["orig_ref_id"]))
+            num = _ENTRY_NUM.match(orig.raw) if orig else None
+            entry = _ENTRY_NUM.sub(num.group(0), entry, count=1) if num else entry
         chk = await evaluate_with_excerpt(claim, item["ref_id"], source.excerpt, title, source.kind,
-                                          entry=ref.raw if ref else None)
+                                          entry=entry,
+                                          cocited=cocited or None, expand=expand)
         return {
             "id": item["id"], "label": chk.label, "off_topic": chk.off_topic,
             "source_kind": chk.source_kind, "evidence": chk.evidence,
-            "rationale": chk.rationale, "title": title, "excerpt": source.excerpt,
+            "rationale": chk.rationale, "title": title, "excerpt": chk.source_excerpt,
             "flag": chk.label in ("unsupported", "partial") or chk.off_topic,
         }
 

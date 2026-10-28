@@ -454,5 +454,69 @@
   "label": "F",
   "note": "语义树是对知识图谱传播方法的宽松转述",
   "source": "ctx3_cascade"
+ },
+ "guyingjie_mrc:c129:r103:orig": {
+  "label": "U",
+  "note": "原文写明词嵌入按均匀分布随机初始化并取得最好结果，“使用何种词嵌入影响不大”这一观点文中没有，转述与否难定"
+ },
+ "guyingjie_mrc:c133:r111:orig": {
+  "label": "F",
+  "note": "原文 Table 2：RMR 的 All EM 66.9，RMR + ELMo 71.4，提升 4.5，稿件正确；复核把 Model-III 的提升当成了 ELMo"
+ },
+ "guyingjie_mrc:c137:r78:orig": {
+  "label": "R",
+  "note": "原文 Table 5 的特征消融报告的是 F1（Full 78.8，去掉 ftoken 78.0，去掉 exact match 77.3），稿件写成 EM"
+ },
+ "guyingjie_mrc:c98:r20:orig": {
+  "label": "F",
+  "note": "原文写明科学考试问答需要信息抽取、阅读理解与常识推理，并强调选项要 plausible，与稿件一致"
+ },
+ "yinhongpeng_odt:c224:r129:orig": {
+  "label": "C",
+  "note": "表格数值 MIL0.423.11 与正文拼在同一句，论断混入表格"
+ },
+ "zhaoyangyang_tod:c138:r195:orig": {
+  "label": "C",
+  "note": "两栏交错：原句为 Han 等人[194]和 Zhu 等人[195]，转换后 Han 等人的论断挂到 [195]"
+ },
+ "zhaoyangyang_tod:c150:r204:orig": {
+  "label": "C",
+  "note": "句子从标号开始，原句为与 [204] 不同，对比对象丢失，论断归属错位"
+ },
+ "zhaoyangyang_tod:c180:r223:orig": {
+  "label": "U",
+  "note": "[221-223] 一句多引，Ultes 2015 讨论交互质量标注，与训练语料质量的关系不明"
+ },
+ "liuqiao_kg:c43:r46:orig": {
+  "label": "F",
+  "note": "原文用 C4.5 构建 RESOLVE 并在 MUC-5 语料上优于手工规则，稿件转述可接受；模型把 after the MUC-5 evaluation 读成了反例"
+ },
+ "luohuilan_odt:c32:r31:orig": {
+  "label": "R",
+  "note": "次要概念错误：原文写明 Mask R-CNN 做的是实例分割 instance segmentation，稿件写成语义分割"
+ },
+ "luohuilan_odt:c66:r60:orig": {
+  "label": "C",
+  "note": "两栏交错：SSD 最新的改进研究与另一栏文字拼在一起，[57~61] 的论断不可读"
+ },
+ "guyingjie_mrc:c161:r128:orig": {
+  "label": "U",
+  "note": "76 分钟出自 LAMB，64 个 TPU 训练约 4 天出自 BERT 原文，LAMB 写的基线是 3 天；这句是否另引了 BERT 无法从句子确定"
+ },
+ "yinhongpeng_odt:c221:r128:orig": {
+  "label": "F",
+  "note": "MDNet 第一由 [128] 支持，Deep-SRDCF 第二由同句 [129] 负责，一句多引"
+ },
+ "zhaoyangyang_tod:c119:r163:orig": {
+  "label": "C",
+  "note": "句子从标号开始，前文丢失，论断只剩解码器生成更好的回答内容"
+ },
+ "zhaoyangyang_tod:c143:r202:orig": {
+  "label": "F",
+  "note": "[199-202] 一句多引，稿件写大都，Lison 等的实例加权用于检索式模型，不构成错引"
+ },
+ "zhaoyangyang_tod:c147:r204:orig": {
+  "label": "C",
+  "note": "句子从标号开始，前文丢失，论断残缺"
  }
 }

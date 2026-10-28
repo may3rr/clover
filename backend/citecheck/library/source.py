@@ -37,6 +37,21 @@ def local_source(pdf: LocalPdf, claim_text: str) -> SourceText:
     return SourceText("fulltext", excerpt, pdf.doc.title)
 
 
+def local_expanded(pdf: LocalPdf, query: str) -> str | None:
+    """A larger excerpt for the review pass, ranked on ``query`` (the claim
+    plus bilingual search terms): the first excerpt often misses the
+    passage that holds the detail a partial verdict says is absent."""
+    if not pdf.doc.readable or not pdf.pages:
+        return None
+    body = _drop_reference_tail(pdf.body()[0])
+    if not body.strip():
+        return None
+    return _bm25_excerpt(body, query, _REVIEW_EXCERPT_LIMIT, head=_HEAD_CHARS,
+                         max_parts=12)
+
+
+_REVIEW_EXCERPT_LIMIT = 6000
+
 # opening of the paper put ahead of the BM25 windows: title, authors and
 # the abstract tell the judge which work it is reading
 _HEAD_CHARS = 600
