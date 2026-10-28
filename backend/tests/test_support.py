@@ -873,3 +873,54 @@ async def test_arxiv_title_retry_then_cached(tmp_path, monkeypatch):
         assert calls["n"] == 2
     finally:
         await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_dual_excerpt_keeps_only_confirmed_flags(monkeypatch):
+    """A flag stands only when the cascade on the alternate excerpt flags
+    the pair too; otherwise the pair ends undetermined."""
+    for alt_label, want in (("supported", "undetermined"), ("unsupported", "unsupported")):
+        async def fake(task, messages, schema, **kw):
+            if schema is judge_mod.DetailOut:
+                return llm.LLMResult(value=schema(), route="cloud")
+            prompt = messages[0]["content"]
+            if "alt source text" in prompt:
+                out = JudgeOut(label=alt_label, evidence="alt source text", rationale="alt")
+            else:
+                out = JudgeOut(label="unsupported", evidence="real source text",
+                               rationale="first")
+            return llm.LLMResult(value=out, route="cloud")
+
+        monkeypatch.setattr(judge_mod, "chat_json", fake)
+        claim = Claim(id="c0", paragraph_id="p0", start=0, end=5, text="claim",
+                      marker_ids=["m0"])
+        check = await evaluate_with_excerpt(
+            claim, "r1", "real source text", "T", "fulltext",
+            alternate=lambda: ("alt source text", None))
+        assert check.label == want
+        if want == "unsupported":
+            assert check.rationale == "first"
+
+
+@pytest.mark.asyncio
+async def test_dual_excerpt_skipped_when_unflagged_or_same(monkeypatch):
+    calls = []
+
+    def alternate():
+        calls.append(1)
+        return "real source text", None
+
+    async def fake(task, messages, schema, **kw):
+        if schema is judge_mod.DetailOut:
+            return llm.LLMResult(value=schema(), route="cloud")
+        return llm.LLMResult(
+            value=JudgeOut(label="unsupported", evidence="real source text", rationale="x"),
+            route="cloud")
+
+    monkeypatch.setattr(judge_mod, "chat_json", fake)
+    claim = Claim(id="c0", paragraph_id="p0", start=0, end=5, text="claim",
+                  marker_ids=["m0"])
+    # an identical alternate excerpt adds no second opinion
+    check = await evaluate_with_excerpt(
+        claim, "r1", "real source text", "T", "fulltext", alternate=alternate)
+    assert check.label == "unsupported" and calls == [1]

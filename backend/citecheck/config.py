@@ -137,6 +137,13 @@ class RetrievalSettings(BaseModel):
     retries: int = 2
 
 
+class SupportSettings(BaseModel):
+    # re-judge every flagged pair on a second, BM25-only excerpt and keep
+    # the flag only when both agree (needs embeddings for the excerpts to
+    # differ; results.md §14)
+    dual_excerpt: bool = False
+
+
 class CacheSettings(BaseModel):
     path: str = "~/Library/Application Support/citecheck/cache.sqlite"
 
@@ -153,6 +160,7 @@ class Settings(BaseModel):
     cache_version: str = "1"
     llm: LLMSettings = Field(default_factory=LLMSettings)
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
+    support: SupportSettings = Field(default_factory=SupportSettings)
     cache: CacheSettings = Field(default_factory=CacheSettings)
 
     @property
@@ -183,6 +191,7 @@ def _load_settings() -> Settings:
         cache_version=str(data.get("cache_version", "1")),
         llm=LLMSettings(**data.get("llm", {})),
         retrieval=RetrievalSettings(**data.get("retrieval", {})),
+        support=SupportSettings(**data.get("support", {})),
         cache=CacheSettings(**data.get("cache", {})),
     )
 

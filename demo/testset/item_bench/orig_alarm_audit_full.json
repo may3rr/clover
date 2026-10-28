@@ -534,5 +534,13 @@
  "luohuilan_odt:c74:r62:orig": {
   "label": "C",
   "note": "两栏交错，句子残缺，网络作为测的思想不可读"
+ },
+ "luohuilan_odt:c61:r48:orig": {
+  "label": "C",
+  "note": "两栏交错，SSD 的描述与 VGG16 拼在一起"
+ },
+ "zhaoyangyang_tod:c166:r203:orig": {
+  "label": "C",
+  "note": "两栏交错，论断残缺"
  }
 }

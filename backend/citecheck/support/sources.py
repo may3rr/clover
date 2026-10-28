@@ -192,7 +192,7 @@ _ARXIV_STAMP = re.compile(r"arXiv:\d{4}\.\d{4,5}v\d+\s*\[[^\]]*\]\s*\d{1,2}\s+\w
 
 def _bm25_excerpt(
     fulltext: str, claim: str, limit: int = _EXCERPT_LIMIT, head: int = 0,
-    max_parts: int = 5,
+    max_parts: int = 5, dense: bool = True,
 ) -> str:
     """Top-ranked ~3-sentence windows, concatenated up to `limit` chars.
 
@@ -201,7 +201,9 @@ def _bm25_excerpt(
     which work this is even when the windows are off target. Windows are
     ranked by BM25; with embeddings enabled, BM25 and embedding similarity
     are fused by reciprocal rank (item bench: the key passage lands in a
-    2500-char excerpt 0.49 of the time instead of 0.38, results.md §12)."""
+    2500-char excerpt 0.49 of the time instead of 0.38, results.md §12).
+    ``dense=False`` ranks with BM25 alone: the second excerpt of the dual
+    check in ``support/layer.py``."""
     from rank_bm25 import BM25Okapi
 
     from .claims import split_sentences
@@ -223,9 +225,9 @@ def _bm25_excerpt(
         return (prefix or fulltext)[:limit]
     bm25 = BM25Okapi([_tokenize(w) for _, w in windows])
     scores = bm25.get_scores(_tokenize(claim))
-    dense = _dense_scores([w for _, w in windows], claim)
-    if dense is not None:
-        scores = _rrf(scores, dense)
+    sim = _dense_scores([w for _, w in windows], claim) if dense else None
+    if sim is not None:
+        scores = _rrf(scores, sim)
     order = sorted(range(len(windows)), key=lambda k: -scores[k])
     parts: list[str] = []
     taken: list[int] = []

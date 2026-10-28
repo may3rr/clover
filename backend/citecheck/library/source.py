@@ -25,7 +25,7 @@ from .scan import LocalPdf
 from .text import squash
 
 
-def local_source(pdf: LocalPdf, claim_text: str) -> SourceText:
+def local_source(pdf: LocalPdf, claim_text: str, dense: bool = True) -> SourceText:
     if not pdf.doc.readable or not pdf.pages:
         return SourceText("none", None, pdf.doc.title)
     body, _ = pdf.body()
@@ -33,11 +33,11 @@ def local_source(pdf: LocalPdf, claim_text: str) -> SourceText:
     if not body.strip():
         return SourceText("none", None, pdf.doc.title)
     excerpt = _bm25_excerpt(body, claim_text, _FULLTEXT_EXCERPT_LIMIT,
-                            head=_HEAD_CHARS)
+                            head=_HEAD_CHARS, dense=dense)
     return SourceText("fulltext", excerpt, pdf.doc.title)
 
 
-def local_expanded(pdf: LocalPdf, query: str) -> str | None:
+def local_expanded(pdf: LocalPdf, query: str, dense: bool = True) -> str | None:
     """A larger excerpt for the review pass, ranked on ``query`` (the claim
     plus bilingual search terms): the first excerpt often misses the
     passage that holds the detail a partial verdict says is absent."""
@@ -47,7 +47,7 @@ def local_expanded(pdf: LocalPdf, query: str) -> str | None:
     if not body.strip():
         return None
     return _bm25_excerpt(body, query, _REVIEW_EXCERPT_LIMIT, head=_HEAD_CHARS,
-                         max_parts=12)
+                         max_parts=12, dense=dense)
 
 
 _REVIEW_EXCERPT_LIMIT = 6000

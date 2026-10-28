@@ -154,7 +154,7 @@ class SupportRun:
         matched = self._matched.get(rid)
         pdf = self._local.get(rid)
         ref = self._ref_by_id.get(rid)
-        expand = None
+        expand = alternate = None
         if pdf is not None:
             from ..library.source import local_expanded, local_source, local_title
 
@@ -167,6 +167,12 @@ class SupportRun:
             matched = {**(matched or {}),
                        "title": local_title(pdf, matched, ref)}
             expand = lambda q: local_expanded(pdf, q)  # noqa: E731
+            if get_settings().support.dual_excerpt:
+                query = " ".join([c.text, *terms])
+
+                def alternate():
+                    alt = local_source(pdf, query, dense=False)
+                    return alt.excerpt, lambda q: local_expanded(pdf, q, dense=False)
         else:
             source = await build_source(
                 matched, c.text, cache=self._cache, client=self._http)
@@ -175,7 +181,7 @@ class SupportRun:
         async with self._judge_sem:
             out = await _judge_with_source(
                 c, rid, matched, source, entry=ref.raw if ref else None,
-                cocited=cocited, expand=expand)
+                cocited=cocited, expand=expand, alternate=alternate)
             if pdf is not None and source.kind != "none":
                 from ..library.source import page_of
 
@@ -314,7 +320,48 @@ def _apply_verdict(
     return label, evidence, rationale, span
 
 
+def _flagged(chk: SupportCheck) -> bool:
+    return chk.label in _ESCALATE or chk.off_topic
+
+
 async def evaluate_with_excerpt(
+    claim: Claim, ref_id: str, excerpt: str, title: str | None, source_kind: str,
+    entry: str | None = None,
+    cocited: list[str] | None = None,
+    expand: Callable[[str], str | None] | None = None,
+    alternate: Callable[[], tuple[str | None, Callable[[str], str | None] | None]]
+    | None = None,
+) -> SupportCheck:
+    """The judging cascade on ``excerpt``, plus the dual check.
+
+    ``alternate`` (local full text with ``[support] dual_excerpt`` on)
+    builds a second excerpt and its review expander, ranked differently
+    (BM25 alone). A flagged verdict is re-judged through the same cascade
+    on that excerpt and kept only when the second run flags it too;
+    otherwise the pair ends undetermined. The flash judge flips on about
+    four in five of the pairs where two excerpts disagree even though both
+    hold the deciding passage (results.md §13), so one flag alone is weak
+    evidence."""
+    chk = await _cascade(claim, ref_id, excerpt, title, source_kind,
+                         entry=entry, cocited=cocited, expand=expand)
+    if alternate is None or not _flagged(chk):
+        return chk
+    alt_excerpt, alt_expand = await asyncio.to_thread(alternate)
+    if not alt_excerpt or alt_excerpt == excerpt:
+        return chk
+    second = await _cascade(claim, ref_id, alt_excerpt, title, source_kind,
+                            entry=entry, cocited=cocited, expand=alt_expand)
+    if _flagged(second):
+        return chk
+    return SupportCheck(
+        claim_id=claim.id, ref_id=ref_id, label="undetermined", evidence=None,
+        source_kind=source_kind,  # type: ignore[arg-type]
+        rationale="换一份原文片段复判时没有确认这个问题",
+        source_title=title, source_excerpt=chk.source_excerpt,
+    )
+
+
+async def _cascade(
     claim: Claim, ref_id: str, excerpt: str, title: str | None, source_kind: str,
     entry: str | None = None,
     cocited: list[str] | None = None,
@@ -433,6 +480,7 @@ async def _judge_with_source(
     entry: str | None = None,
     cocited: list[str] | None = None,
     expand: Callable[[str], str | None] | None = None,
+    alternate=None,
 ) -> SupportCheck:
     if source.kind == "none" or not source.excerpt:
         return SupportCheck(
@@ -443,5 +491,5 @@ async def _judge_with_source(
     return await evaluate_with_excerpt(
         claim, ref_id, source.excerpt,
         matched.get("title") if matched else None, source.kind, entry=entry,
-        cocited=cocited, expand=expand,
+        cocited=cocited, expand=expand, alternate=alternate,
     )

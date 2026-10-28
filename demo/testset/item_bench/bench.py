@@ -247,6 +247,7 @@ _ENTRY_NUM = re.compile(r"^\s*[\[［]\s*\d+\s*[\]］]")
 
 async def _judge(item: dict, src: _Sources, sem) -> dict:
     from citecheck.library.source import local_expanded
+    from citecheck.support.judge import search_terms
     from citecheck.support.layer import evaluate_with_excerpt
 
     async with sem:
@@ -264,10 +265,20 @@ async def _judge(item: dict, src: _Sources, sem) -> dict:
                    for o in src.claim_refs.get((item["paper"], item["claim_id"]), [])
                    if o not in (own, item["ref_id"]) and (item["paper"], o) in src.refs]
         pdf = src.local.get((item["paper"], item["ref_id"]))
+        alternate = None
         if FULLTEXT:
             expand = None  # the first excerpt is already the whole body
         else:
             expand = (lambda q: local_expanded(pdf, q)) if pdf is not None else None
+            if pdf is not None and get_settings().support.dual_excerpt:
+                from citecheck.library.source import local_source
+
+                terms = await search_terms(item["claim"], item.get("sentence"))
+                query = " ".join([item["claim"], *terms])
+
+                def alternate():
+                    alt = local_source(pdf, query, dense=False)
+                    return alt.excerpt, lambda q: local_expanded(pdf, q, dense=False)
         entry = ref.raw if ref else None
         if entry and "orig_ref_id" in item:
             # a real miscitation shows the sentence's own number in front of
@@ -277,7 +288,8 @@ async def _judge(item: dict, src: _Sources, sem) -> dict:
             entry = _ENTRY_NUM.sub(num.group(0), entry, count=1) if num else entry
         chk = await evaluate_with_excerpt(claim, item["ref_id"], source.excerpt, title, source.kind,
                                           entry=entry,
-                                          cocited=cocited or None, expand=expand)
+                                          cocited=cocited or None, expand=expand,
+                                          alternate=alternate)
         return {
             "id": item["id"], "label": chk.label, "off_topic": chk.off_topic,
             "source_kind": chk.source_kind, "evidence": chk.evidence,
@@ -368,6 +380,8 @@ def main() -> int:
     r.add_argument("--review-model", help="override the review models only")
     r.add_argument("--fulltext", action="store_true",
                    help="judge on the cited paper's whole body, not BM25 windows")
+    r.add_argument("--dual", action="store_true",
+                   help="dual check: keep a flag only when a BM25-only excerpt flags it too")
     a = sub.add_parser("alter")
     a.add_argument("name", help="run whose supported orig verdicts seed the edits")
     p = sub.add_parser("report")
@@ -378,6 +392,8 @@ def main() -> int:
     elif args.cmd == "run":
         global FULLTEXT
         FULLTEXT = args.fulltext
+        if args.dual:
+            get_settings().support.dual_excerpt = True
         kinds = set(args.kinds.split(",")) if args.kinds else None
         ids = set(args.ids.read_text("utf-8").split()) if args.ids else None
         asyncio.run(run(args.name, kinds, args.concurrency, ids, args.model,

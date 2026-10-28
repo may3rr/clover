@@ -37,6 +37,11 @@ base_url = "https://api.siliconflow.cn/v1"
 model = "Qwen/Qwen3-Embedding-0.6B"
 api_key_env = "SILICONFLOW_API_KEY"
 
+[support]
+# re-judge each flagged pair on a second, BM25-only excerpt and keep the
+# flag only when both agree; needs [llm.embedding] for the excerpts to differ
+dual_excerpt = false
+
 [retrieval]
 concurrency = 4
 timeout = 15
