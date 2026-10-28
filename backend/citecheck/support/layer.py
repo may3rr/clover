@@ -4,8 +4,9 @@ Finding。三层规则：
 - source_kind=none：不问模型，直接 undetermined；
 - label 为 supported/partial/unsupported 但 evidence 为空或无法逐字
   定位 → 降级 undetermined（§5.3）；
-- Findings：unsupported=高、partial=中、off_topic（复核确认主题无关）=中；每个拿不到原文的参考文献给一
-  条低优先级提示（挂在参考文献段落上）。
+- Findings：unsupported=高、partial=低、off_topic（复核确认主题无关）=中；每个拿不到原文的参考文献给一
+  条低优先级提示（挂在参考文献段落上）。partial 复核后仍是 orig 误报的
+  主要来源（item_bench results.md 第 7 节），只作供作者参考的提示。
 """
 
 from __future__ import annotations
@@ -235,7 +236,7 @@ def _support_findings(
         elif check.label == "partial":
             findings.append(
                 Finding(
-                    id="", layer="support", severity="medium",
+                    id="", layer="support", severity="low",
                     anchor=Anchor(paragraph_id=claim.paragraph_id,
                                   start=claim.start, end=claim.end),
                     title="被引文献只部分支持这条论断",

@@ -506,6 +506,25 @@ async def test_supportcheck_refs_bounded_by_claim_markers(monkeypatch, tmp_path)
         assert sc.ref_id in allowed
 
 
+def test_support_finding_severities():
+    from citecheck.parse.parser import ParsedDocument
+    from citecheck.schema import Document, SupportCheck
+    from citecheck.support.layer import _support_findings
+
+    parsed = ParsedDocument(document=Document())
+    claim = Claim(id="c0", paragraph_id="p0", start=0, end=4,
+                  text="论断", marker_ids=[])
+    labels = [("unsupported", False), ("partial", False),
+              ("undetermined", True)]
+    checks = [SupportCheck(claim_id="c0", ref_id=f"r{i}", label=lab,
+                           source_kind="fulltext", rationale="x",
+                           off_topic=ot)
+              for i, (lab, ot) in enumerate(labels)]
+    jobs = [(claim, c.ref_id) for c in checks]
+    sev = [f.severity for f in _support_findings(parsed, jobs, checks)]
+    assert sev == ["high", "low", "medium"]
+
+
 # ------------------------------------------------------------ sources
 
 
