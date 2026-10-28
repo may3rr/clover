@@ -522,5 +522,17 @@
  "luohuilan_odt:c66:r59:orig": {
   "label": "C",
   "note": "与 c66:r60 同一句，两栏交错，[57~61] 的论断不可读"
+ },
+ "zhaoyangyang_tod:c127:r169:orig": {
+  "label": "F",
+  "note": "不可控是综述作者的评价，[169] 提供的是神经网络生成模型本身"
+ },
+ "guyingjie_mrc:c87:r14:orig": {
+  "label": "F",
+  "note": "结合两个模型是对 BERT 的宽松转述，不算错引"
+ },
+ "luohuilan_odt:c74:r62:orig": {
+  "label": "C",
+  "note": "两栏交错，句子残缺，网络作为测的思想不可读"
  }
 }

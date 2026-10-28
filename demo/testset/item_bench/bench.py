@@ -214,8 +214,32 @@ async def _source(item: dict, src: _Sources):
     from citecheck.support.judge import search_terms
 
     terms = await search_terms(item["claim"], item.get("sentence"))
-    source = await asyncio.to_thread(local_source, pdf, " ".join([item["claim"], *terms]))
+    query = " ".join([item["claim"], *terms])
+    if FULLTEXT:
+        text = await asyncio.to_thread(_fulltext, pdf, query)
+        source = SourceText("fulltext" if text else "none", text, pdf.doc.title)
+    else:
+        source = await asyncio.to_thread(local_source, pdf, query)
     return source, local_title(pdf, src.matched.get(key), src.refs.get(key))
+
+
+# --fulltext: every pass reads the cited paper's whole body (reference list
+# dropped) instead of BM25 windows; bodies past the cap keep their
+# best-ranked windows up to the cap
+FULLTEXT = False
+_FULLTEXT_CAP = 100_000
+
+
+def _fulltext(pdf, query: str) -> str | None:
+    from citecheck.library.source import _drop_reference_tail
+    from citecheck.support.sources import _bm25_excerpt
+
+    if not pdf.doc.readable or not pdf.pages:
+        return None
+    body = _drop_reference_tail(pdf.body()[0]).strip()
+    if len(body) <= _FULLTEXT_CAP:
+        return body or None
+    return _bm25_excerpt(body, query, _FULLTEXT_CAP, head=600, max_parts=1000)
 
 
 _ENTRY_NUM = re.compile(r"^\s*[\[［]\s*\d+\s*[\]］]")
@@ -240,7 +264,10 @@ async def _judge(item: dict, src: _Sources, sem) -> dict:
                    for o in src.claim_refs.get((item["paper"], item["claim_id"]), [])
                    if o not in (own, item["ref_id"]) and (item["paper"], o) in src.refs]
         pdf = src.local.get((item["paper"], item["ref_id"]))
-        expand = (lambda q: local_expanded(pdf, q)) if pdf is not None else None
+        if FULLTEXT:
+            expand = None  # the first excerpt is already the whole body
+        else:
+            expand = (lambda q: local_expanded(pdf, q)) if pdf is not None else None
         entry = ref.raw if ref else None
         if entry and "orig_ref_id" in item:
             # a real miscitation shows the sentence's own number in front of
@@ -295,7 +322,10 @@ async def run(name: str, kinds: set[str] | None, concurrency: int,
 
 def _rows(name: str) -> dict[str, dict]:
     path = RUNS / f"{name}.jsonl"
-    return {o["id"]: o for o in map(json.loads, path.read_text(encoding="utf-8").splitlines())}
+    # split on "\n" only: splitlines() also breaks on U+2028 and friends,
+    # which full-text excerpts carry inside a JSON line
+    lines = [ln for ln in path.read_text(encoding="utf-8").split("\n") if ln.strip()]
+    return {o["id"]: o for o in map(json.loads, lines)}
 
 
 def report(names: list[str]) -> None:
@@ -336,6 +366,8 @@ def main() -> int:
     r.add_argument("--ids", type=Path, help="file with one item id per line")
     r.add_argument("--model", help="override the judge/review models, e.g. qwen3.8-max")
     r.add_argument("--review-model", help="override the review models only")
+    r.add_argument("--fulltext", action="store_true",
+                   help="judge on the cited paper's whole body, not BM25 windows")
     a = sub.add_parser("alter")
     a.add_argument("name", help="run whose supported orig verdicts seed the edits")
     p = sub.add_parser("report")
@@ -344,6 +376,8 @@ def main() -> int:
     if args.cmd == "build":
         build()
     elif args.cmd == "run":
+        global FULLTEXT
+        FULLTEXT = args.fulltext
         kinds = set(args.kinds.split(",")) if args.kinds else None
         ids = set(args.ids.read_text("utf-8").split()) if args.ids else None
         asyncio.run(run(args.name, kinds, args.concurrency, ids, args.model,
