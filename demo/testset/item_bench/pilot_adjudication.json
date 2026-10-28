@@ -1,0 +1,73 @@
+{
+ "说明": "pilot_base 与 pilot_full 结论不一致的 17 条，逐条对照被引原文裁定。full：全文组对；excerpt：片段组对；convention：取决于判定口径，严格口径下全文组对，宽松的引用惯例下片段组对；unclear：无法判断。",
+ "items": {
+  "guyingjie_mrc:c140:r100:orig": {
+   "winner": "full",
+   "note": "原文 Table 2 中 HMN 只比两层 MLP 高 1.2，稿件写 5.5，全文组判 partial 正确"
+  },
+  "luohuilan_odt:c87:r67:orig": {
+   "winner": "excerpt",
+   "note": "V4 原文为 1540 万框，也没有实例分割任务，片段组判 partial 正确"
+  },
+  "zhaoyangyang_tod:c127:r172:orig": {
+   "winner": "convention",
+   "note": "[172] 提出的 SC-LSTM 恰恰强调可控，严格看不支持不可控的评价；按引用惯例这是作者自己的归纳"
+  },
+  "zhaoyangyang_tod:c127:r169:orig": {
+   "winner": "convention",
+   "note": "[169] 没有写不可控风险；严格看不支持，按惯例是作者的归纳"
+  },
+  "guyingjie_mrc:c87:r14:orig": {
+   "winner": "convention",
+   "note": "BERT 原文强调与 ELMo、GPT 不同，严格看结合两个模型的说法不准确，按惯例算宽松转述"
+  },
+  "luohuilan_odt:c74:r62:orig": {
+   "winner": "full",
+   "note": "句子是两栏交错的残句；[62] 是 Newell 的堆叠沙漏网络，Hourglass-104 出自 CornerNet，全文组的判断成立"
+  },
+  "zhaoyangyang_tod:c59:r97:orig": {
+   "winner": "convention",
+   "note": "[95-98] 合引的背景句；[97] 讲主动模仿学习降低标注量，严格看没有说模仿学习能很好地解决多步决策"
+  },
+  "liuqiao_kg:c13:r9:alter": {
+   "winner": "full",
+   "note": "原文先写曾有约 100 类，随后写 We now propose 约 150 类；改成 100 确实错，片段只取到前一句"
+  },
+  "guyingjie_mrc:c95:r35:alter": {
+   "winner": "excerpt",
+   "note": "原文是中文数据集，改成英文语料确实错，全文组放过"
+  },
+  "zhaoyangyang_tod:c2:r3:alter": {
+   "winner": "excerpt",
+   "note": "[3] 讲任务型对话，改成非任务型确实错，全文组证据定位失败"
+  },
+  "guyingjie_mrc:c134:r117:alter": {
+   "winner": "excerpt",
+   "note": "原文写 F1 下降 7.15%，改成 EM 确实错，全文组当成笔误放过"
+  },
+  "zhaoyangyang_tod:c133:r120:swap": {
+   "winner": "full",
+   "note": "换上的 [120] 是统计强化学习对话管理，也算基于数据的方法，这条 swap 不是真错引，全文组判支持正确"
+  },
+  "zhaoyangyang_tod:c155:r208:swap": {
+   "winner": "full",
+   "note": "论断讲 TSCP，换上的 Eric 和 Manning 不支持，全文组判 unsupported 正确"
+  },
+  "zhaoyangyang_tod:c164:r203:swap": {
+   "winner": "convention",
+   "note": "[203] 本来就在句中合引；原文说语料多但噪声大，严格看不支持数据难获得"
+  },
+  "zhaoyangyang_tod:c187:r234:swap": {
+   "winner": "unclear",
+   "note": "句子错乱，无法判断"
+  },
+  "liuqiao_kg:c55:r70:swap": {
+   "winner": "full",
+   "note": "换上的是 1991 年的缺省推理论文，与描述逻辑 Tableau 算法无关，全文组判 unsupported 正确"
+  },
+  "liuqiao_kg:c2:r2:swap": {
+   "winner": "excerpt",
+   "note": "换上的 Linked Data 综述确实转述了 Berners-Lee 2006 的规则，能支持；全文组抓 OWL 细节判 partial 过严"
+  }
+ }
+}
