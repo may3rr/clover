@@ -29,6 +29,7 @@ from ..parse.links import latin_surname
 from ..schema import Library, LibraryLink, Reference
 from .scan import LocalPdf, filename_meta
 from .text import squash
+from .venue_match import annotate_venues, clean_venue, match_target
 
 log = logging.getLogger(__name__)
 
@@ -109,10 +110,18 @@ async def _ask_model(ref: Reference, cands: list[LocalPdf]) -> LocalPdf | None:
     return cands[res.value.choice - 1]
 
 
+def _venue_key(name: str) -> str:
+    """Registry name for a known journal, else the cleaned name."""
+    from ..distribution.registry import find_venue
+
+    v = find_venue(clean_venue(name))
+    return v["name"] if v else clean_venue(name)
+
+
 def detect_venue(pdfs: list[LocalPdf], linked: set[str]) -> str | None:
     """The journal most of the unlinked PDFs come from — the folder holds
     the author's yardstick papers for it. Needs at least three."""
-    venues = Counter(p.doc.venue for p in pdfs
+    venues = Counter(_venue_key(p.doc.venue) for p in pdfs
                      if p.doc.id not in linked and p.doc.venue and p.doc.readable)
     if not venues:
         return None
@@ -123,7 +132,11 @@ def detect_venue(pdfs: list[LocalPdf], linked: set[str]) -> str | None:
 async def link_library(
     refs: list[Reference], pdfs: list[LocalPdf], folder: str,
     *, use_model: bool = True, venue: str | None = None,
+    guess_venues: bool = False, exemplar_ids: list[str] | None = None,
+    fallback_venue: str | None = None, manuscript_type: str = "research",
 ) -> Library:
+    """``guess_venues``: ask the model for the journal of uncited PDFs no
+    local rule could place (needs ``use_model``)."""
     heads = {p.doc.id: squash(p.first_pages) for p in pdfs}
     pairs: list[tuple[float, str, str, str, bool | None]] = []
     for r in refs:
@@ -163,17 +176,46 @@ async def link_library(
                                  score=round(s, 1), status="review")
         used.add(pick.doc.id)
 
-    return assemble([links[r.id] for r in refs if r.id in links], pdfs, folder, venue)
+    final = [links[r.id] for r in refs if r.id in links]
+    await annotate_venues(pdfs, {x.doc_id for x in final},
+                          use_model=use_model and guess_venues)
+    return assemble(final, pdfs, folder, venue, exemplar_ids=exemplar_ids,
+                    fallback_venue=fallback_venue, manuscript_type=manuscript_type)
 
 
 def assemble(links: list[LibraryLink], pdfs: list[LocalPdf], folder: str,
-             venue: str | None = None) -> Library:
-    """Library record from final links: unlinked PDFs of the target venue
-    become the exemplars (detected when ``venue`` is not given)."""
+             venue: str | None = None, *, exemplar_ids: list[str] | None = None,
+             fallback_venue: str | None = None, manuscript_type: str = "research",
+             ) -> Library:
+    """Library record from final links. The target journal: ``venue``
+    (the user's), else the folder's majority journal, else
+    ``fallback_venue`` (traces in the manuscript). Its uncited PDFs are
+    the matches; the exemplars are ``exemplar_ids`` when the user picked
+    them, else the matches of the manuscript's paper type."""
+    from ..distribution.registry import find_venue
+
     used = {x.doc_id for x in links}
-    venue = venue or detect_venue(pdfs, used)
-    exemplars = [p.doc.id for p in pdfs
-                 if venue and p.doc.id not in used and p.doc.readable
-                 and p.doc.venue == venue]
+    source = None
+    if venue:
+        venue, source = clean_venue(venue), "user"
+    elif (venue := detect_venue(pdfs, used)):
+        source = "folder"
+    elif fallback_venue:
+        venue, source = fallback_venue, "manuscript"
+    entry = find_venue(venue)
+    free = [p for p in pdfs if p.doc.id not in used and p.doc.readable]
+    matches = []
+    for p in free:
+        how = match_target(p, venue, entry)
+        if how:
+            matches.append(p)
+            if how == "header" and not p.doc.venue:
+                p.doc.venue, p.doc.venue_via = venue, "header"
+    if exemplar_ids is not None:
+        free_ids = {p.doc.id for p in free}
+        exemplars = [i for i in dict.fromkeys(exemplar_ids) if i in free_ids]
+    else:
+        exemplars = [p.doc.id for p in matches if p.doc.paper_type == manuscript_type]
     return Library(folder=folder, docs=[p.doc for p in pdfs], links=links,
-                   exemplar_ids=exemplars, venue=venue)
+                   exemplar_ids=exemplars, venue=venue or None, venue_source=source,
+                   venue_match_ids=[p.doc.id for p in matches])

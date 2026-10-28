@@ -117,15 +117,23 @@ async def test_link_fixture_manuscript(library):
     assert _docname(lib, "r4") is None  # no PDF for Qwen3
     assert _docname(lib, "r5") == "fact-check.pdf"  # renamed file
     assert all(x.status == "auto" for x in lib.links)
-    # the three uncited DAKD papers are the yardsticks; the duplicate is
-    # merged, the cited ones and the scan are not exemplars
-    assert lib.venue == "数据分析与知识发现"
-    names = sorted(d.filename for d in lib.docs if d.id in lib.exemplar_ids)
-    assert names == sorted([
+    # the three uncited DAKD papers match the journal; the duplicate is
+    # merged, the cited ones and the scan are not candidates. The review
+    # (研究现状) is offered but not selected for a research manuscript
+    assert lib.venue == "数据分析与知识发现" and lib.venue_source == "folder"
+    matched = sorted(d.filename for d in lib.docs if d.id in lib.venue_match_ids)
+    assert matched == sorted([
         "基于多提示学习的方面级情感分析研究_钱玲飞.pdf",
         "基于分布式认知的多智能体虚假新闻检测研究_邹逢源.pdf",
         "基于大语言模型的命名实体识别研究现状_阮光册.pdf",
     ])
+    names = sorted(d.filename for d in lib.docs if d.id in lib.exemplar_ids)
+    assert names == sorted([
+        "基于多提示学习的方面级情感分析研究_钱玲飞.pdf",
+        "基于分布式认知的多智能体虚假新闻检测研究_邹逢源.pdf",
+    ])
+    review = next(d for d in lib.docs if "研究现状" in d.filename)
+    assert review.paper_type == "review" and review.venue_via == "cnki_cover"
 
 
 @pytest.mark.asyncio

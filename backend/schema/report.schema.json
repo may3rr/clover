@@ -293,6 +293,20 @@
           },
           "title": "Venue Stats",
           "type": "array"
+        },
+        "exemplars": {
+          "items": {
+            "$ref": "#/$defs/ExemplarInfo"
+          },
+          "title": "Exemplars",
+          "type": "array"
+        },
+        "venue_metrics": {
+          "items": {
+            "$ref": "#/$defs/VenueMetric"
+          },
+          "title": "Venue Metrics",
+          "type": "array"
         }
       },
       "required": [
@@ -387,6 +401,80 @@
       "title": "Document",
       "type": "object"
     },
+    "ExemplarInfo": {
+      "description": "A PDF the baseline was built from (or offered for it).",
+      "properties": {
+        "doc_id": {
+          "title": "Doc Id",
+          "type": "string"
+        },
+        "filename": {
+          "title": "Filename",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Title"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "paper_type": {
+          "default": "research",
+          "enum": [
+            "research",
+            "review"
+          ],
+          "title": "Paper Type",
+          "type": "string"
+        },
+        "used": {
+          "default": true,
+          "title": "Used",
+          "type": "boolean"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "similar": {
+          "default": false,
+          "title": "Similar",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "doc_id",
+        "filename"
+      ],
+      "title": "ExemplarInfo",
+      "type": "object"
+    },
     "ExemplarPaper": {
       "description": "A recently published paper from the target venue, used as a yardstick.",
       "properties": {
@@ -440,6 +528,56 @@
       "title": "ExemplarPaper",
       "type": "object"
     },
+    "ExemplarValue": {
+      "description": "One exemplar's value of a metric, and where in its PDF it comes\nfrom (1-based page, a verbatim line such as the section heading or\nthe model's evidence).",
+      "properties": {
+        "doc_id": {
+          "title": "Doc Id",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "page": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Page"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote"
+        }
+      },
+      "required": [
+        "doc_id"
+      ],
+      "title": "ExemplarValue",
+      "type": "object"
+    },
     "Finding": {
       "properties": {
         "id": {
@@ -489,6 +627,13 @@
             "type": "string"
           },
           "title": "Refs",
+          "type": "array"
+        },
+        "metrics": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Metrics",
           "type": "array"
         }
       },
@@ -590,6 +735,30 @@
           ],
           "default": null,
           "title": "Venue"
+        },
+        "venue_source": {
+          "anyOf": [
+            {
+              "enum": [
+                "user",
+                "folder",
+                "manuscript"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue Source"
+        },
+        "venue_match_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Venue Match Ids",
+          "type": "array"
         },
         "unsupported": {
           "items": {
@@ -711,6 +880,35 @@
           ],
           "default": null,
           "title": "Arxiv Id"
+        },
+        "venue_via": {
+          "anyOf": [
+            {
+              "enum": [
+                "cnki_cover",
+                "cnki_citation",
+                "doi_prefix",
+                "issn",
+                "header",
+                "model"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venue Via"
+        },
+        "paper_type": {
+          "default": "research",
+          "enum": [
+            "research",
+            "review"
+          ],
+          "title": "Paper Type",
+          "type": "string"
         }
       },
       "required": [
@@ -1654,6 +1852,125 @@
         "col"
       ],
       "title": "TableCell",
+      "type": "object"
+    },
+    "VenueMetric": {
+      "description": "The manuscript vs the target journal's exemplars on one measure.\nkind \"share\" values are fractions (unit \"%\"); kind \"bool\" compares\nthe manuscript's yes/no against ``rate``, the share of exemplars\nwith a yes.",
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "group": {
+          "enum": [
+            "structure",
+            "distribution",
+            "references",
+            "functions",
+            "elements",
+            "length"
+          ],
+          "title": "Group",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "default": "",
+          "title": "Unit",
+          "type": "string"
+        },
+        "kind": {
+          "default": "number",
+          "enum": [
+            "number",
+            "share",
+            "bool"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "bench": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Stat"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rate"
+        },
+        "flag": {
+          "default": "na",
+          "enum": [
+            "below",
+            "within",
+            "above",
+            "na"
+          ],
+          "title": "Flag",
+          "type": "string"
+        },
+        "exemplars": {
+          "items": {
+            "$ref": "#/$defs/ExemplarValue"
+          },
+          "title": "Exemplars",
+          "type": "array"
+        },
+        "anchors": {
+          "items": {
+            "$ref": "#/$defs/Anchor"
+          },
+          "title": "Anchors",
+          "type": "array"
+        },
+        "quote": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quote"
+        }
+      },
+      "required": [
+        "key",
+        "group",
+        "label"
+      ],
+      "title": "VenueMetric",
       "type": "object"
     },
     "VenueStat": {

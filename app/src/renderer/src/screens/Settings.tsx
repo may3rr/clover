@@ -59,6 +59,7 @@ interface ModelCfg {
   fast: string
   deep: string
   dense_retrieval: boolean
+  venue_model: boolean
 }
 
 interface UsageRow {
@@ -538,6 +539,7 @@ const SHOT_CFG: ModelCfg = {
   fast: 'qwen3.8-flash',
   deep: 'qwen3.8-max',
   dense_retrieval: true,
+  venue_model: true,
 }
 
 const SHOT_USAGE: Usage = {
@@ -879,6 +881,7 @@ export function ModelSection({
         fast: cfg.fast,
         deep: cfg.deep,
         dense_retrieval: cfg.dense_retrieval,
+        venue_model: cfg.venue_model,
       }),
     }).catch(() => null)
     if (r && r.ok) {
@@ -1077,6 +1080,26 @@ export function ModelSection({
             aria-labelledby="dense-label"
             className={`switch${cfg.dense_retrieval ? ' on' : ''}`}
             onClick={() => setCfg({ ...cfg, dense_retrieval: !cfg.dense_retrieval })}
+          >
+            <span className="switch-knob" />
+          </button>
+        </div>
+      </div>
+      <div className="group-label">期刊对标</div>
+      <div className="card">
+        <div className="switch-row">
+          <div className="flex-1">
+            <div id="venue-model-label">用模型细化范文对标</div>
+            <div className="field-hint">
+              给范文的章节标题归类，读出数据集个数、消融实验等研究要素，并给范文的引用分类。开启后范文的标题、摘要、章节标题、图表题注和含引用的句子会发送到模型服务商，每个文件夹只在第一次花费，约 0.3 元。关闭后只做本地统计。
+            </div>
+          </div>
+          <button
+            role="switch"
+            aria-checked={cfg.venue_model}
+            aria-labelledby="venue-model-label"
+            className={`switch${cfg.venue_model ? ' on' : ''}`}
+            onClick={() => setCfg({ ...cfg, venue_model: !cfg.venue_model })}
           >
             <span className="switch-knob" />
           </button>

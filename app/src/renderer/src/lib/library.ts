@@ -1,17 +1,53 @@
 import type { Library, LibraryDoc, LibraryLink } from '../types/report'
 
+export interface Baseline {
+  source: 'exemplars' | 'builtin' | null
+  name: string | null
+  n_papers: number
+}
+
+/** A journal the registry knows: rules, maybe a built-in baseline. */
+export interface VenueEntry {
+  id: string
+  name: string
+  n_papers: number
+}
+
 /** POST /library/scan response: the confirmation step before a run. */
 export interface LibraryScan {
   paper: string
   candidates: string[]
   kind: string
-  baseline: {
-    source: 'exemplars' | 'builtin' | null
-    name: string | null
-    n_papers: number
-  }
+  baseline: Baseline
+  entry?: VenueEntry | null
+  paper_type?: 'research' | 'review'
+  /** journal named by the manuscript's template traces */
+  manuscript_venue?: string | null
   library: Library
   references: ScanRef[]
+}
+
+/** The target journal and its exemplar candidates; POST /library/venue
+ *  returns a fresh one when the user changes the journal. */
+export interface VenueState {
+  venue: string | null
+  source: Library['venue_source']
+  matchIds: string[]
+  /** the default selection: matches of the manuscript's paper type */
+  defaultIds: string[]
+  docs: LibraryDoc[]
+  entry: VenueEntry | null
+}
+
+export function venueState(scan: LibraryScan): VenueState {
+  return {
+    venue: scan.library.venue ?? null,
+    source: scan.library.venue_source ?? null,
+    matchIds: scan.library.venue_match_ids ?? [],
+    defaultIds: scan.library.exemplar_ids ?? [],
+    docs: scan.library.docs ?? [],
+    entry: scan.entry ?? null,
+  }
 }
 
 export interface ScanRef {
@@ -39,7 +75,6 @@ export interface LinkCounts {
   linked: number
   review: number
   none: number
-  exemplars: number
 }
 
 /** Rows still waiting for the user: model picks they haven't touched. */
@@ -60,12 +95,7 @@ export function counts(
     if (choice[r.id]) linked++
     else none++
   }
-  return {
-    linked,
-    review: review.size,
-    none,
-    exemplars: exemplarIds(scan, choice).length,
-  }
+  return { linked, review: review.size, none }
 }
 
 export function rowState(
@@ -79,15 +109,71 @@ export function rowState(
   return choice[refId] ? 'linked' : 'none'
 }
 
-/** Exemplars follow the user's edits: a PDF linked by hand is no longer
- *  a yardstick, one unlinked from its entry becomes one again. */
-export function exemplarIds(scan: LibraryScan, choice: LinkChoice): string[] {
+/** PDFs that can serve as exemplars: readable and not linked to an
+ *  entry (a PDF linked by hand stops being one, one unlinked becomes one
+ *  again). The target journal's matches come first. */
+export function exemplarCandidates(vs: VenueState, choice: LinkChoice): LibraryDoc[] {
   const used = new Set(Object.values(choice).filter(Boolean))
-  const venue = scan.library.venue
-  if (!venue) return []
-  return (scan.library.docs ?? [])
-    .filter((d) => d.readable !== false && d.venue === venue && !used.has(d.id))
+  const match = new Set(vs.matchIds)
+  return vs.docs
+    .filter((d) => d.readable !== false && !used.has(d.id))
+    .sort(
+      (a, b) =>
+        Number(match.has(b.id)) - Number(match.has(a.id)) ||
+        (a.title ?? a.filename).localeCompare(b.title ?? b.filename, 'zh')
+    )
+}
+
+/** The user's selection, minus PDFs that have since been linked. */
+export function pickedExemplars(
+  picked: Set<string>,
+  vs: VenueState,
+  choice: LinkChoice
+): string[] {
+  return exemplarCandidates(vs, choice)
     .map((d) => d.id)
+    .filter((id) => picked.has(id))
+}
+
+export const MIN_EXEMPLARS = 5
+
+/** What the run will compare against, in one sentence. */
+export function baselineText(vs: VenueState, nPicked: number): string {
+  const v = vs.venue ? `《${vs.venue}》` : '目标期刊'
+  if (nPicked >= MIN_EXEMPLARS)
+    return `用文件夹中 ${nPicked} 篇${v}论文作为对标范文，逐篇统计后和本文比较。`
+  if (vs.entry?.n_papers)
+    return `已选范文不足 ${MIN_EXEMPLARS} 篇，改用《${vs.entry.name}》的内置基线对标，只比较统计量。`
+  if (vs.entry)
+    return `已选范文不足 ${MIN_EXEMPLARS} 篇。按《${vs.entry.name}》的投稿要求检查，引用分布与英文语料对比，只比较占比。`
+  if (vs.venue)
+    return `已选范文不足 ${MIN_EXEMPLARS} 篇，引用分布与英文语料对比，只比较占比。可以在对标范文中勾选更多论文。`
+  return '没有识别出目标期刊。填写目标期刊后，文件夹里该刊的论文会列为对标范文。'
+}
+
+export function venueSourceText(source: VenueState['source']): string | null {
+  if (source === 'user') return '你填写的目标期刊'
+  if (source === 'folder') return '从文件夹中未被引用的论文识别'
+  if (source === 'manuscript') return '从稿件首页的期刊模板痕迹识别'
+  return null
+}
+
+const VIA: Record<string, string> = {
+  cnki_cover: '知网封面刊名',
+  cnki_citation: '引用本文条目',
+  doi_prefix: 'DOI 前缀',
+  issn: 'ISSN 或 CN 号',
+  header: '页眉页脚刊名',
+  model: '模型从首页读出的刊名',
+}
+
+/** "《数据分析与知识发现》，2026，知网封面刊名，综述" */
+export function exemplarMeta(d: LibraryDoc): string {
+  const bits = [d.venue ? `《${d.venue}》` : '刊名未知']
+  if (d.year) bits.push(String(d.year))
+  if (d.venue && d.venue_via) bits.push(VIA[d.venue_via] ?? '')
+  if (d.paper_type === 'review') bits.push('综述')
+  return bits.filter(Boolean).join('，')
 }
 
 /** Links to send with /analyze — starting the run confirms every row.

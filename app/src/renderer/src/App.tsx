@@ -10,7 +10,7 @@ import ErrorScreen from './screens/Error'
 import Settings from './screens/Settings'
 import Onboarding, { type OnboardStep } from './screens/Onboarding'
 import Credits from './components/Credits'
-import { applyShotState, type ShotCtx } from './lib/shots'
+import { applyShotState, type ShotCtx, type VenueSample } from './lib/shots'
 import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
@@ -279,8 +279,16 @@ export default function App() {
       shotState.current.setSettingsSection = (s) => setSettingsSection(s)
       shotState.current.setOnboardStep = (n) => setOnboardStep(n)
       shotState.current.setCredits = (v) => setCredits(v ? 'shot' : false)
+      shotState.current.setScan = (sc, f) => {
+        setScan(sc)
+        setShotLibFilter(f ?? null)
+      }
+    })
+    window.citecheck.sampleVenue?.().then((v) => {
+      shotState.current.venue = v as VenueSample
     })
   }, [])
+  const [shotLibFilter, setShotLibFilter] = useState<'links' | 'exemplars' | null>(null)
   const [shotLayers, setShotLayers] = useState<LayerUI | null>(null)
   const [shotOutline, setShotOutline] = useState<Outline | null>(null)
   const [shotAnchors, setShotAnchors] = useState<
@@ -366,14 +374,17 @@ export default function App() {
   if (screen === 'library' && scan) {
     return (
       <LibraryConfirm
+        key={shotLibFilter ?? 'run'}
+        initialFilter={shotLibFilter === 'exemplars' ? 'exemplars' : undefined}
         scan={scan}
         libraryDir={scan.library.folder}
         onCancel={reset}
         error={jobError}
-        onStart={({ paper, links, venue: libVenue }) =>
+        onStart={({ paper, links, venue: libVenue, exemplars }) =>
           startJob(paper, {
             library: scan.library.folder,
             links: JSON.stringify(links),
+            exemplars: JSON.stringify(exemplars),
             ...(libVenue ? { library_venue: libVenue } : {}),
           })
         }

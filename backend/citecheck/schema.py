@@ -186,6 +186,9 @@ class Finding(BaseModel):
     title: str
     detail: str
     refs: list[str] = Field(default_factory=list)
+    # distribution only: keys into Distribution.venue_metrics that back
+    # this finding (the detail view lists each exemplar's value)
+    metrics: list[str] = Field(default_factory=list)
 
 
 RevisionKind = Literal["typo", "ref_reorder", "marker_renumber"]
@@ -250,6 +253,52 @@ class VenueStat(BaseModel):
     flag: DistFlag = "na"
 
 
+VenueMetricGroup = Literal["structure", "distribution", "references", "functions",
+                          "elements", "length"]
+
+
+class ExemplarValue(BaseModel):
+    """One exemplar's value of a metric, and where in its PDF it comes
+    from (1-based page, a verbatim line such as the section heading or
+    the model's evidence)."""
+    doc_id: str
+    value: float | None = None
+    page: int | None = None
+    quote: str | None = None
+
+
+class VenueMetric(BaseModel):
+    """The manuscript vs the target journal's exemplars on one measure.
+    kind "share" values are fractions (unit "%"); kind "bool" compares
+    the manuscript's yes/no against ``rate``, the share of exemplars
+    with a yes."""
+    key: str
+    group: VenueMetricGroup
+    label: str
+    unit: str = ""
+    kind: Literal["number", "share", "bool"] = "number"
+    value: float | None = None
+    bench: Stat | None = None
+    rate: float | None = None
+    flag: DistFlag = "na"
+    exemplars: list[ExemplarValue] = Field(default_factory=list)
+    # manuscript paragraphs behind the value, and the model's evidence
+    anchors: list[Anchor] = Field(default_factory=list)
+    quote: str | None = None
+
+
+class ExemplarInfo(BaseModel):
+    """A PDF the baseline was built from (or offered for it)."""
+    doc_id: str
+    filename: str
+    title: str | None = None
+    year: int | None = None
+    paper_type: Literal["research", "review"] = "research"
+    used: bool = True
+    note: str | None = None  # why it could not be used
+    similar: bool = False  # among the closest to the manuscript's topic
+
+
 class Distribution(BaseModel):
     benchmark_id: str
     benchmark_name: str
@@ -265,6 +314,9 @@ class Distribution(BaseModel):
     venue: str | None = None
     venue_source: Literal["exemplars", "builtin"] | None = None
     venue_stats: list[VenueStat] = Field(default_factory=list)
+    # exemplar baselines only: every measure with per-exemplar values
+    exemplars: list[ExemplarInfo] = Field(default_factory=list)
+    venue_metrics: list[VenueMetric] = Field(default_factory=list)
 
 
 LayerStatusValue = Literal["pending", "running", "done", "failed"]
@@ -344,6 +396,10 @@ class LibraryDoc(BaseModel):
     year: int | None = None
     doi: str | None = None
     arxiv_id: str | None = None
+    # how the journal was recognised (None: unknown) and the paper type
+    venue_via: Literal["cnki_cover", "cnki_citation", "doi_prefix", "issn",
+                       "header", "model"] | None = None
+    paper_type: Literal["research", "review"] = "research"
 
 
 LinkMethod = Literal["doi", "title", "filename", "llm", "user"]
@@ -366,6 +422,12 @@ class Library(BaseModel):
     # unlinked PDFs published in the target venue: yardsticks for 对标
     exemplar_ids: list[str] = Field(default_factory=list)
     venue: str | None = None  # target venue the exemplars come from
+    # user (typed on the confirmation page) | folder (most uncited PDFs) |
+    # manuscript (template traces on its first page)
+    venue_source: Literal["user", "folder", "manuscript"] | None = None
+    # uncited PDFs recognised as the target journal's; exemplar_ids is the
+    # selection (default: those of the manuscript's paper type)
+    venue_match_ids: list[str] = Field(default_factory=list)
     unsupported: list[str] = Field(default_factory=list)  # .caj etc.
 
 

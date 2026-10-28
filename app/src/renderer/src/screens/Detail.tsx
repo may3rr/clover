@@ -3,9 +3,18 @@ import type { Report, RefCheck, SectionDist } from '../types/report'
 import type { ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
-import { ChevronLeftIcon, SidebarTrailingIcon } from '../components/Icons'
+import { ChevronDownIcon, ChevronLeftIcon, SidebarTrailingIcon } from '../components/Icons'
 import { formatLoc } from '../lib/accept'
 import { HL_CLASS } from '../lib/highlight'
+import {
+  boolSummary,
+  exemplarRows,
+  fmtMetric,
+  GROUP_LABEL,
+  groupedMetrics,
+  metricsFor,
+} from '../lib/venue'
+import type { ExemplarInfo, VenueMetric } from '../types/report'
 
 interface Props {
   item: ListItem
@@ -13,9 +22,11 @@ interface Props {
   backLabel: string
   onBack: () => void
   onCollapse: () => void
+  /** scroll the paper to a paragraph (venue measures point at several) */
+  onJump?: (paragraphId: string) => void
 }
 
-export default function Detail({ item, report, backLabel, onBack, onCollapse }: Props) {
+export default function Detail({ item, report, backLabel, onBack, onCollapse, onJump }: Props) {
   return (
     <div className="detail-in flex flex-col flex-1 min-h-0" key={item.id}>
       <div
@@ -56,7 +67,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse }: 
             <DetailLines detail={item.detail} />
             <SourceSnippet item={item} />
             {item.kind === 'group' && item.layer === 'distribution' ? (
-              <DistributionDetail item={item} report={report} />
+              <DistributionDetail item={item} report={report} onJump={onJump} />
             ) : item.kind === 'group' ? (
               <ReorderDetail item={item} report={report} />
             ) : item.kind === 'revision' ? (
@@ -65,7 +76,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse }: 
                 tex={report.document.source_format === 'tex'}
               />
             ) : (
-              <FindingDetail item={item} report={report} />
+              <FindingDetail item={item} report={report} onJump={onJump} />
             )}
           </div>
         </div>
@@ -122,13 +133,21 @@ function anchoredText(report: Report, item: ListItem): string | null {
 
 // ------------------------------------------------------------- support
 
-function FindingDetail({ item, report }: { item: ListItem; report: Report }) {
+function FindingDetail({
+  item,
+  report,
+  onJump,
+}: {
+  item: ListItem
+  report: Report
+  onJump?: (paragraphId: string) => void
+}) {
   if (item.layer === 'support')
     return <SupportDetail item={item} report={report} />
   if (item.layer === 'authenticity')
     return <AuthenticityDetail item={item} report={report} />
   if (item.layer === 'distribution')
-    return <DistributionDetail item={item} report={report} />
+    return <DistributionDetail item={item} report={report} onJump={onJump} />
   return <NormsDetail item={item} report={report} />
 }
 
@@ -449,11 +468,20 @@ function FieldRow({
 function DistributionDetail({
   item,
   report,
+  onJump,
 }: {
   item: ListItem
   report: Report
+  onJump?: (paragraphId: string) => void
 }) {
   const d = report.distribution
+  // exemplar baselines: every measure behind the finding, paper by paper
+  const keys =
+    item.kind === 'group'
+      ? (item.findings ?? []).flatMap((f) => f.metrics ?? [])
+      : (item.finding?.metrics ?? [])
+  if (keys.length && metricsFor(d, keys).length)
+    return <VenueMetricsDetail keys={keys} report={report} onJump={onJump} />
   const secs = d ? comparedSections(d) : []
   // a single section finding zooms to its section; the collapsed group
   // shows every compared section together
@@ -614,6 +642,162 @@ function MetricGroup({
         </div>
         <span style={{ minWidth: 104 }} />
       </div>
+    </div>
+  )
+}
+
+// ---------------------------------------------------- venue exemplars
+
+function VenueMetricsDetail({
+  keys,
+  report,
+  onJump,
+}: {
+  keys: string[]
+  report: Report
+  onJump?: (paragraphId: string) => void
+}) {
+  const d = report.distribution
+  const [all, setAll] = useState(false)
+  const infos = d?.exemplars ?? []
+  const near = infos.filter((e) => e.similar).map((e) => `《${e.title || e.filename}》`)
+  const metrics = metricsFor(d, keys)
+  const shown = new Set(metrics.map((m) => m.key))
+  return (
+    <>
+      <div className="t13 secondary">
+        对标文献文件夹中《{d?.venue}》的 {d?.n_papers ?? 0} 篇论文，每项可以展开查看各篇范文的取值和出处。
+        {near.length > 0 && `主题最接近本文的是${near.join('、')}。`}
+      </div>
+      <div className="card flex flex-col" style={{ gap: 16 }}>
+        {metrics.map((m, i) => (
+          // the first measure opens on its exemplars: provenance at a glance
+          <VenueMetricRow key={m.key} m={m} infos={infos} onJump={onJump} defaultOpen={i === 0} />
+        ))}
+      </div>
+      <button
+        className="link-accent flex items-center gap-1"
+        style={{ alignSelf: 'flex-start' }}
+        aria-expanded={all}
+        onClick={() => setAll(!all)}
+      >
+        {all ? '收起其他对标指标' : '查看其他对标指标'}
+        <span style={{ transform: all ? 'rotate(180deg)' : undefined, display: 'flex' }}>
+          <ChevronDownIcon size={13} />
+        </span>
+      </button>
+      {all &&
+        groupedMetrics(d).map(([g, list]) => {
+          const rest = list.filter((m) => !shown.has(m.key))
+          if (!rest.length) return null
+          return (
+            <div key={g} className="flex flex-col" style={{ gap: 8 }}>
+              <div className="t13 secondary">{GROUP_LABEL[g]}</div>
+              <div className="card flex flex-col" style={{ gap: 16 }}>
+                {rest.map((m) => (
+                  <VenueMetricRow key={m.key} m={m} infos={infos} onJump={onJump} />
+                ))}
+              </div>
+            </div>
+          )
+        })}
+    </>
+  )
+}
+
+function VenueMetricRow({
+  m,
+  infos,
+  onJump,
+  defaultOpen = false,
+}: {
+  m: VenueMetric
+  infos: ExemplarInfo[]
+  onJump?: (paragraphId: string) => void
+  defaultOpen?: boolean
+}) {
+  const [open, setOpen] = useState(defaultOpen)
+  const [next, setNext] = useState(0)
+  const anchors = m.anchors ?? []
+  const rows = exemplarRows(m, infos)
+  const fmt = (x: number) => fmtMetric(m, x)
+  return (
+    <div>
+      {m.kind === 'bool' ? (
+        <>
+          <div className="t13 secondary">{m.label}</div>
+          <div className="font-normal" style={{ marginTop: 4 }}>
+            {boolSummary(m)}
+          </div>
+        </>
+      ) : m.value === null || m.value === undefined ? (
+        <>
+          <div className="t13 secondary">{m.label}</div>
+          <div className="font-normal" style={{ marginTop: 4 }}>
+            本文无法判断
+            {m.bench && `，范文常见 ${fmt(m.bench.q1)} 至 ${fmt(m.bench.q3)}`}
+          </div>
+        </>
+      ) : (
+        <MetricGroup label={m.label} value={m.value} bench={m.bench ?? null} fmt={fmt} />
+      )}
+      {m.quote && (
+        <div className="t13 secondary" style={{ marginTop: 8 }}>
+          本文依据：{m.quote}
+        </div>
+      )}
+      <div className="flex items-center flex-wrap" style={{ gap: 12, marginTop: 8 }}>
+        {anchors.length > 0 && onJump && (
+          <button
+            className="link-accent t13"
+            onClick={() => {
+              onJump(anchors[next % anchors.length].paragraph_id)
+              setNext(next + 1)
+            }}
+          >
+            {anchors.length > 1
+              ? `在正文中查看第 ${(next % anchors.length) + 1} 处，共 ${anchors.length} 处`
+              : '在正文中查看'}
+          </button>
+        )}
+        {rows.length > 0 && (
+          <button
+            className="link-accent t13 flex items-center gap-1"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+          >
+            {open ? '收起各篇范文' : `查看 ${rows.length} 篇范文的取值`}
+            <span style={{ transform: open ? 'rotate(180deg)' : undefined, display: 'flex' }}>
+              <ChevronDownIcon size={13} />
+            </span>
+          </button>
+        )}
+      </div>
+      {open && (
+        <div className="flex flex-col" style={{ gap: 8, marginTop: 8 }}>
+          {rows.map(({ value, info }) => (
+            <div key={value.doc_id} className="flex items-start gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="t13" style={{ wordBreak: 'break-word' }}>
+                  {info?.title || info?.filename || value.doc_id}
+                </div>
+                <div className="t13 secondary" style={{ wordBreak: 'break-word' }}>
+                  {[
+                    info?.similar ? '主题接近' : '',
+                    value.page ? `第 ${value.page} 页` : '',
+                    value.quote ?? '',
+                  ]
+                    .filter(Boolean)
+                    .join('，')}
+                </div>
+              </div>
+              <span className="t13" style={{ flex: 'none' }}>
+                {fmtMetric(m, value.value)}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

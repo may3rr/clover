@@ -681,6 +681,7 @@ export default function ReportScreen({
               backLabel={filterName}
               onBack={closeDetail}
               onCollapse={toggleRightPane}
+              onJump={jumpTo}
             />
           ) : (
             <InspectorList

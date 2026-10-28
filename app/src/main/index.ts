@@ -220,6 +220,11 @@ ipcMain.handle('citecheck:sample-report', () => {
   const p = path.resolve(app.getAppPath(), 'fixtures/report.sample.json')
   return JSON.parse(fs.readFileSync(p, 'utf-8'))
 })
+// journal benchmarking shots: a confirmation scan + exemplar measures
+ipcMain.handle('citecheck:sample-venue', () => {
+  const p = path.resolve(app.getAppPath(), 'fixtures/venue.sample.json')
+  return JSON.parse(fs.readFileSync(p, 'utf-8'))
+})
 ipcMain.on('citecheck:e2e-done', (_e, info: unknown) => {
   console.log(`E2E_RESULT ${JSON.stringify(info)}`)
   app.quit()
@@ -247,6 +252,9 @@ const SHOT_STATES = [
   'detail-distribution',
   'detail-norms',
   'detail-revision',
+  'library-links',
+  'library-exemplars',
+  'detail-venue',
   'settings-account',
   'settings-comments',
   'settings-model',

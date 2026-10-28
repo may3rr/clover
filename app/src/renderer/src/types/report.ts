@@ -112,21 +112,47 @@ export type Unit = string;
 export type Value = number | null;
 export type Flag = "below" | "within" | "above" | "na";
 export type VenueStats = VenueStat[];
-export type Id5 = string;
-export type Layer = "authenticity" | "support" | "distribution" | "norms";
-export type Severity = "high" | "medium" | "low";
+export type DocId = string;
+export type Filename1 = string;
+export type Title4 = string | null;
+export type Year1 = number | null;
+export type PaperType = "research" | "review";
+export type Used = boolean;
+export type Note1 = string | null;
+export type Similar = boolean;
+export type Exemplars = ExemplarInfo[];
+export type Key2 = string;
+export type Group = "structure" | "distribution" | "references" | "functions" | "elements" | "length";
+export type Label3 = string;
+export type Unit1 = string;
+export type Kind1 = "number" | "share" | "bool";
+export type Value1 = number | null;
+export type Rate = number | null;
+export type Flag1 = "below" | "within" | "above" | "na";
+export type DocId1 = string;
+export type Value2 = number | null;
+export type Page = number | null;
+export type Quote = string | null;
+export type Exemplars1 = ExemplarValue[];
 export type ParagraphId3 = string;
 export type Start3 = number;
 export type End3 = number;
 export type Loc = string | null;
 export type Snippet = string | null;
 export type SnippetHl = [unknown, unknown] | null;
-export type Title4 = string;
+export type Anchors = Anchor[];
+export type Quote1 = string | null;
+export type VenueMetrics = VenueMetric[];
+export type Id5 = string;
+export type Layer = "authenticity" | "support" | "distribution" | "norms";
+export type Severity = "high" | "medium" | "low";
+export type Title5 = string;
 export type Detail = string;
 export type Refs = string[];
+export type Metrics = string[];
 export type Findings = Finding[];
 export type Id6 = string;
-export type Kind1 = "typo" | "ref_reorder" | "marker_renumber";
+export type Kind2 = "typo" | "ref_reorder" | "marker_renumber";
 export type Old = string;
 export type New = string;
 export type Reason = string;
@@ -137,39 +163,43 @@ export type VenueId = string;
 export type VenueName = string;
 export type Overall = "below" | "near" | "at" | "above" | "na";
 export type Comment = string;
-export type Key2 = string;
-export type Label3 = string;
+export type Key3 = string;
+export type Label4 = string;
 export type Tier = "below" | "near" | "at" | "above" | "na";
-export type Note1 = string;
+export type Note2 = string;
 export type Dims = OverviewDim[];
 export type Id7 = string;
-export type Title5 = string;
-export type Year1 = number | null;
+export type Title6 = string;
+export type Year2 = number | null;
 export type Url = string;
-export type Exemplars = ExemplarPaper[];
-export type Note2 = string | null;
+export type Exemplars2 = ExemplarPaper[];
+export type Note3 = string | null;
 export type Folder = string;
 export type Id8 = string;
-export type Filename1 = string;
+export type Filename2 = string;
 export type Duplicates = string[];
 export type Pages = number;
 export type Readable = boolean;
 export type Source = "cnki_cover" | "cnki_citation" | "layout" | "doi" | "filename";
-export type Title6 = string | null;
+export type Title7 = string | null;
 export type Authors1 = string[];
 export type Venue2 = string | null;
-export type Year2 = number | null;
+export type Year3 = number | null;
 export type Doi1 = string | null;
 export type ArxivId = string | null;
+export type VenueVia = ("cnki_cover" | "cnki_citation" | "doi_prefix" | "issn" | "header" | "model") | null;
+export type PaperType1 = "research" | "review";
 export type Docs = LibraryDoc[];
 export type RefId2 = string;
-export type DocId = string;
+export type DocId2 = string;
 export type Method = "doi" | "title" | "filename" | "llm" | "user";
 export type Score = number;
 export type Status2 = "auto" | "review" | "confirmed";
 export type Links = LibraryLink[];
 export type ExemplarIds = string[];
 export type Venue3 = string | null;
+export type VenueSource1 = ("user" | "folder" | "manuscript") | null;
+export type VenueMatchIds = string[];
 export type Unsupported = string[];
 export type Local = number;
 export type Cloud = number;
@@ -308,6 +338,8 @@ export interface Distribution {
   venue?: Venue1;
   venue_source?: VenueSource;
   venue_stats?: VenueStats;
+  exemplars?: Exemplars;
+  venue_metrics?: VenueMetrics;
 }
 export interface SectionDist {
   section_id: SectionId1;
@@ -350,14 +382,49 @@ export interface VenueStat {
   bench?: Stat | null;
   flag?: Flag;
 }
-export interface Finding {
-  id: Id5;
-  layer: Layer;
-  severity: Severity;
-  anchor?: Anchor | null;
-  title: Title4;
-  detail: Detail;
-  refs?: Refs;
+/**
+ * A PDF the baseline was built from (or offered for it).
+ */
+export interface ExemplarInfo {
+  doc_id: DocId;
+  filename: Filename1;
+  title?: Title4;
+  year?: Year1;
+  paper_type?: PaperType;
+  used?: Used;
+  note?: Note1;
+  similar?: Similar;
+}
+/**
+ * The manuscript vs the target journal's exemplars on one measure.
+ * kind "share" values are fractions (unit "%"); kind "bool" compares
+ * the manuscript's yes/no against ``rate``, the share of exemplars
+ * with a yes.
+ */
+export interface VenueMetric {
+  key: Key2;
+  group: Group;
+  label: Label3;
+  unit?: Unit1;
+  kind?: Kind1;
+  value?: Value1;
+  bench?: Stat | null;
+  rate?: Rate;
+  flag?: Flag1;
+  exemplars?: Exemplars1;
+  anchors?: Anchors;
+  quote?: Quote1;
+}
+/**
+ * One exemplar's value of a metric, and where in its PDF it comes
+ * from (1-based page, a verbatim line such as the section heading or
+ * the model's evidence).
+ */
+export interface ExemplarValue {
+  doc_id: DocId1;
+  value?: Value2;
+  page?: Page;
+  quote?: Quote;
 }
 export interface Anchor {
   paragraph_id: ParagraphId3;
@@ -367,9 +434,19 @@ export interface Anchor {
   snippet?: Snippet;
   snippet_hl?: SnippetHl;
 }
+export interface Finding {
+  id: Id5;
+  layer: Layer;
+  severity: Severity;
+  anchor?: Anchor | null;
+  title: Title5;
+  detail: Detail;
+  refs?: Refs;
+  metrics?: Metrics;
+}
 export interface Revision {
   id: Id6;
-  kind: Kind1;
+  kind: Kind2;
   anchor: Anchor;
   old: Old;
   new: New;
@@ -388,23 +465,23 @@ export interface Overview {
   overall?: Overall;
   comment?: Comment;
   dims?: Dims;
-  exemplars?: Exemplars;
+  exemplars?: Exemplars2;
   manuscript?: Manuscript;
-  note?: Note2;
+  note?: Note3;
 }
 export interface OverviewDim {
-  key: Key2;
-  label: Label3;
+  key: Key3;
+  label: Label4;
   tier?: Tier;
-  note?: Note1;
+  note?: Note2;
 }
 /**
  * A recently published paper from the target venue, used as a yardstick.
  */
 export interface ExemplarPaper {
   id: Id7;
-  title: Title5;
-  year?: Year1;
+  title: Title6;
+  year?: Year2;
   url: Url;
   stats?: Stats;
 }
@@ -420,6 +497,8 @@ export interface Library {
   links?: Links;
   exemplar_ids?: ExemplarIds;
   venue?: Venue3;
+  venue_source?: VenueSource1;
+  venue_match_ids?: VenueMatchIds;
   unsupported?: Unsupported;
 }
 /**
@@ -427,17 +506,19 @@ export interface Library {
  */
 export interface LibraryDoc {
   id: Id8;
-  filename: Filename1;
+  filename: Filename2;
   duplicates?: Duplicates;
   pages?: Pages;
   readable?: Readable;
   source?: Source;
-  title?: Title6;
+  title?: Title7;
   authors?: Authors1;
   venue?: Venue2;
-  year?: Year2;
+  year?: Year3;
   doi?: Doi1;
   arxiv_id?: ArxivId;
+  venue_via?: VenueVia;
+  paper_type?: PaperType1;
 }
 /**
  * Reference entry -> local PDF. ``review`` links came from a weak
@@ -445,7 +526,7 @@ export interface LibraryDoc {
  */
 export interface LibraryLink {
   ref_id: RefId2;
-  doc_id: DocId;
+  doc_id: DocId2;
   method: Method;
   score: Score;
   status?: Status2;

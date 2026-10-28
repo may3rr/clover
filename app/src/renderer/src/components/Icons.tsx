@@ -259,6 +259,32 @@ export function CheckCircleFillIcon({
   )
 }
 
+/** checkmark.square.fill: accent square + check when on, a quiet filled
+ *  square when off (no outline — the spec keeps strokes for checks) */
+export function CheckSquareIcon({ size = 18, on = false }: { size?: number; on?: boolean }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 20 20"
+      aria-hidden
+      style={{ flex: 'none', display: 'block' }}
+    >
+      <rect x="2" y="2" width="16" height="16" rx="4.5" fill={on ? 'var(--accent)' : 'var(--fill-strong)'} />
+      {on && (
+        <path
+          d="M6.2 10.3l2.5 2.5 5.1-5.6"
+          fill="none"
+          stroke="var(--on-brand)"
+          strokeWidth={1.8}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      )}
+    </svg>
+  )
+}
+
 // chevrons stay stroke-only per the spec
 
 export function PersonFillIcon(p: IconProps) {

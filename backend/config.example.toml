@@ -62,5 +62,11 @@ concurrency = 4
 timeout = 15
 retries = 2
 
+[venue]
+# 期刊对标细化：用模型给范文的章节标题归类、读出研究要素、给范文的引用
+# 分类。会把范文的标题、摘要、章节标题、图表题注和含引用的句子发送到
+# 模型服务商；关闭后只做本地规则统计。
+model = true
+
 [cache]
 path = "~/Library/Application Support/citecheck/cache.sqlite"

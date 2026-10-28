@@ -73,6 +73,7 @@ CANONICAL_KEYWORDS: dict[str, list[str]] = {
         "结论",
         "总结",
         "结语",
+        "结束语",
         "展望",
     ],
 }

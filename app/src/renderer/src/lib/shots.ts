@@ -1,6 +1,7 @@
 import type { Report } from '../types/report'
 import type { LayerUI } from '../screens/Running'
 import { buildItems } from './items'
+import type { LibraryScan } from './library'
 import {
   anchorsFromReport,
   outlineFromReport,
@@ -8,11 +9,21 @@ import {
   type SkAnchor,
 } from './outline'
 
+/** fixtures/venue.sample.json: a confirmation scan and the exemplar
+ *  measures of a 《数据分析与知识发现》 manuscript */
+export interface VenueSample {
+  scan: LibraryScan
+  distribution: Partial<NonNullable<Report['distribution']>>
+  findings: NonNullable<Report['findings']>
+}
+
 export interface ShotCtx {
   report?: Report
+  venue?: VenueSample
   setScreen?: (
-    s: 'empty' | 'running' | 'report' | 'error' | 'settings' | 'onboarding'
+    s: 'empty' | 'running' | 'report' | 'error' | 'settings' | 'onboarding' | 'library'
   ) => void
+  setScan?: (s: LibraryScan | null, filter?: 'links' | 'exemplars') => void
   setReport?: (r: Report | null) => void
   setLayers?: (l: LayerUI) => void
   setOutline?: (o: Outline | null) => void
@@ -63,6 +74,28 @@ export function applyShotState(state: string, ctx: ShotCtx) {
   const counts = layerCounts(report)
   const done = (k: string) => ({ status: 'done' as const, findings: counts[k] })
   const ALL_DONE: LayerUI = Object.fromEntries(LAYER_KEYS.map((k) => [k, done(k)]))
+
+  if (state === 'library-links' || state === 'library-exemplars') {
+    if (!ctx.venue) return
+    ctx.setScan?.(ctx.venue.scan, state === 'library-exemplars' ? 'exemplars' : 'links')
+    ctx.setScreen?.('library')
+    return
+  }
+  if (state === 'detail-venue') {
+    if (!report || !ctx.venue) return
+    const merged: Report = {
+      ...report,
+      distribution: { ...report.distribution!, ...ctx.venue.distribution },
+      findings: [...ctx.venue.findings, ...(report.findings ?? [])],
+    }
+    ctx.setReport?.(merged)
+    ctx.setScreen?.('report')
+    // the references measures: per-exemplar pages, jump links
+    const pick =
+      ctx.venue.findings.find((f) => (f.metrics ?? []).includes('n_refs')) ?? ctx.venue.findings[0]
+    ctx.selectItem?.(pick?.id ?? null)
+    return
+  }
 
   // item:<id> — report with that inspector item's detail open (the web
   // replica on the landing page points each section at one finding)

@@ -30,7 +30,10 @@ from .lint.attribution import check_attribution
 from .lint.norms import check_norms
 from .lint.reorder import plan_reorder
 from .distribution.registry import builtin_baseline, detect_from_manuscript, find_venue
-from .distribution.venue import MIN_EXEMPLARS, build_venue_benchmark
+from .config import venue_model_enabled
+from .distribution.venue import MIN_EXEMPLARS
+from .distribution.venue_metrics import prepare_venue
+from .library.venue_match import paper_type
 from .library import build_library, scan_folder
 from .lint.venue_rules import check_venue_rules
 from .lint.typos import check_typos
@@ -123,6 +126,7 @@ async def run_pipeline(
     library_dir: str | Path | None = None,
     library_links: list[LibraryLink] | None = None,
     library_venue: str | None = None,
+    library_exemplars: list[str] | None = None,
 ) -> Report:
     send = emit or (lambda _e: None)
     t0 = time.monotonic()
@@ -253,9 +257,13 @@ async def run_pipeline(
                         "authenticity", 0.15 * d / max(t, 1),
                         f"读取文献文件夹 {d}/{t} 篇"))
                 await structured
+                trace = detect_from_manuscript(parsed)
                 lib, local, pdfs = await build_library(
                     parsed.references, library_dir, links=library_links,
-                    venue=library_venue, cache=cache, pdfs=pdfs)
+                    venue=library_venue, cache=cache, pdfs=pdfs,
+                    exemplar_ids=library_exemplars,
+                    fallback_venue=trace["name"] if trace else None,
+                    manuscript_type=paper_type(parsed.document.title))
             except Exception as e:  # noqa: BLE001 — the run goes on without it
                 log.warning("reference library failed: %s", e)
                 return None, {}, []
@@ -266,10 +274,11 @@ async def run_pipeline(
         library_task = asyncio.create_task(_library())
 
         async def _venue():
-            """(registry entry or None, benchmark dict or None, source):
-            the target journal and the baseline to compare against —
-            exemplars from the folder first, the built-in baseline next,
-            the default benchmark otherwise (distribution falls back)."""
+            """(registry entry or None, name, benchmark dict or None,
+            source, VenueContext or None): the target journal and the
+            baseline to compare against — exemplars from the folder
+            first, the built-in baseline next, the default benchmark
+            otherwise (distribution falls back)."""
             lib, _local, pdfs = await library_task
             await structured
             entry = (find_venue(library_venue) or find_venue(lib.venue if lib else None)
@@ -280,15 +289,16 @@ async def run_pipeline(
                 by_id = {p.doc.id: p for p in pdfs}
                 ex = [by_id[i] for i in lib.exemplar_ids if i in by_id]
                 try:
-                    bench = await asyncio.to_thread(
-                        build_venue_benchmark, ex, lib.venue, cache)
+                    bench, ctx = await prepare_venue(
+                        ex, name or "目标期刊", parsed, cache,
+                        use_model=venue_model_enabled())
                 except Exception as e:  # noqa: BLE001
                     log.warning("venue benchmark failed: %s", e)
-                    bench = None
+                    bench, ctx = None, None
                 if bench is not None:
-                    return entry, name, bench, "exemplars"
+                    return entry, name or "目标期刊", bench, "exemplars", ctx
             bench = builtin_baseline(entry)
-            return entry, name, bench, "builtin" if bench else None
+            return entry, name, bench, "builtin" if bench else None, None
 
         venue_task = asyncio.create_task(_venue())
         # let the structuring batches reach the cloud semaphore before the
@@ -354,11 +364,12 @@ async def run_pipeline(
                 nonlocal dist, dist_findings
                 _layer("distribution", "running")
                 await structured
-                _entry, vname, vbench, vsource = await venue_task
+                _entry, vname, vbench, vsource, vctx = await venue_task
                 try:
                     dist, dist_findings = await run_distribution(
                         parsed, bench_path=benchmark_path(benchmark_id),
                         bench=vbench, venue=vname, venue_source=vsource,
+                        venue_ctx=vctx,
                         progress=lambda d, t: _progress(
                             "distribution", d / max(t, 1),
                             f"分类引用功能 {d}/{t} 段"))

@@ -112,9 +112,15 @@ async def run_distribution(
     classify: bool = True,
     route: str = "auto",
     progress: Callable[[int, int], None] | None = None,
+    venue_ctx=None,
 ) -> tuple[Distribution, list[Finding]]:
     """progress(done, total) fires as each paragraph's citation functions
-    are classified."""
+    are classified. ``venue_ctx`` (venue_metrics.VenueContext): the
+    exemplar baseline's per-paper data, compared measure by measure."""
+    from .venue_metrics import compare, section_overrides
+
+    override = section_overrides(parsed, venue_ctx)
+    canon = {s.id: override.get(s.id, s.canonical) for s in parsed.sections}
     bench = bench or load_benchmark(bench_path)
     bench_sections: dict[str, dict] = bench.get("sections", {})
     bench_lang = bench.get("language", "en")
@@ -147,7 +153,7 @@ async def run_distribution(
         words = sec_words[s.id]
         share = cites / total_cites if total_cites else 0.0
         density = cites * 1000.0 / words if words else 0.0
-        bsec = bench_sections.get(s.canonical)
+        bsec = bench_sections.get(canon[s.id])
         # only compare canonicals the benchmark actually covers: the
         # section must appear in >=50% of benchmark papers and the IQR
         # must have width > 0 (a degenerate [0,0] range flags everything)
@@ -160,7 +166,7 @@ async def run_distribution(
         if bdensity and bdensity.q3 - bdensity.q1 <= 0:
             bdensity = None
         dist_sections.append(SectionDist(
-            section_id=s.id, canonical=s.canonical, title=s.title,
+            section_id=s.id, canonical=canon[s.id], title=s.title,  # type: ignore[arg-type]
             words=words, citations=cites, share=share, density=density,
             bench_share=bshare, bench_density=bdensity,
             share_flag=_flag(share, bshare),
@@ -258,6 +264,12 @@ async def run_distribution(
     venue_findings: list[Finding] = []
     if bench.get("venue_stats"):
         dist.venue_stats, venue_findings = _venue_stats(parsed, bench, venue)
+    if venue_ctx is not None:
+        # the finer per-exemplar comparison replaces the summary findings
+        dist.venue_metrics, venue_findings, dist.exemplars = compare(
+            parsed, venue_ctx, dist_sections=dist_sections, canon=canon,
+            citing_counts=citing_counts, marker_functions=marker_functions if classify else None,
+            comparable=comparable)
 
     # ---- findings --------------------------------------------------------
     findings: list[Finding] = []
@@ -297,8 +309,10 @@ async def run_distribution(
             findings.append(Finding(
                 id="", layer="distribution", severity="low", anchor=anchor,
                 title=f"{name}部分的引用分布偏离该领域常见范围",
+                metrics=[f"share:{sd.canonical}", f"density:{sd.canonical}"]
+                if venue_ctx is not None else [],
                 detail=f"依据：本文{name}部分{'，'.join(bits)}，对标的 "
-                       f"{n_papers} 篇{bname}论文。\n"
+                       f"{n_papers} 篇{bname}{'' if bname.endswith('范文') else '论文'}。\n"
                        f"建议：确认{name}部分对已有方法、数据集和工具"
                        "的引用是否恰当。",
                 refs=[],

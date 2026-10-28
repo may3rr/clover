@@ -32,6 +32,8 @@ export interface CitecheckApi {
   sampleData: boolean
   e2eFile: string | null
   sampleReport(): Promise<unknown>
+  /** journal benchmarking fixture (shots only) */
+  sampleVenue?(): Promise<unknown>
   onShotState(cb: (state: string) => void): () => void
   shotReady(): void
   e2eDone(info: { jobId: string | null; exportPath: string | null }): void
@@ -68,6 +70,7 @@ const api: CitecheckApi = {
   sampleData: !!process.env.CITECHECK_SHOTS,
   e2eFile: process.env.CITECHECK_E2E || null,
   sampleReport: () => ipcRenderer.invoke('citecheck:sample-report'),
+  sampleVenue: () => ipcRenderer.invoke('citecheck:sample-venue'),
   onShotState: (cb) => {
     const h = (_e: unknown, s: string) => cb(s)
     ipcRenderer.on('citecheck:shot-state', h)

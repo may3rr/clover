@@ -159,6 +159,13 @@ class SupportSettings(BaseModel):
     dual_excerpt: bool = False
 
 
+class VenueSettings(BaseModel):
+    # 期刊对标细化：model reads of the exemplars (heading types, research
+    # elements, citation functions) and the journal of unplaced PDFs. Off:
+    # rule-based statistics only, nothing about the exemplars leaves the Mac
+    model: bool = True
+
+
 class CacheSettings(BaseModel):
     path: str = "~/Library/Application Support/citecheck/cache.sqlite"
 
@@ -177,6 +184,7 @@ class Settings(BaseModel):
     llm: LLMSettings = Field(default_factory=LLMSettings)
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
     support: SupportSettings = Field(default_factory=SupportSettings)
+    venue: VenueSettings = Field(default_factory=VenueSettings)
     cache: CacheSettings = Field(default_factory=CacheSettings)
 
     @property
@@ -227,6 +235,7 @@ def _load_settings() -> Settings:
         llm=LLMSettings(**data.get("llm", {})),
         retrieval=RetrievalSettings(**data.get("retrieval", {})),
         support=SupportSettings(**data.get("support", {})),
+        venue=VenueSettings(**data.get("venue", {})),
         cache=CacheSettings(**data.get("cache", {})),
     )
 
@@ -234,3 +243,9 @@ def _load_settings() -> Settings:
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return _load_settings()
+
+
+def venue_model_enabled() -> bool:
+    """期刊对标的模型细化开关 (settings page); CITECHECK_VENUE_MODEL=0
+    turns it off for tests."""
+    return get_settings().venue.model and os.environ.get("CITECHECK_VENUE_MODEL") != "0"

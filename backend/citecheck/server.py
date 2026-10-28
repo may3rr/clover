@@ -177,17 +177,43 @@ async def venues() -> list[dict]:
     return out
 
 
+def _venue_info(lib, parsed=None) -> dict:
+    """Target journal of a library record: the registry entry it maps to
+    (rules, built-in baseline size) and the baseline the run will use."""
+    from .distribution.registry import builtin_baseline, find_venue
+    from .distribution.venue import MIN_EXEMPLARS
+
+    entry = find_venue(lib.venue)
+    b = builtin_baseline(entry)
+    n_ex = len(lib.exemplar_ids)
+    if n_ex >= MIN_EXEMPLARS:
+        baseline = {"source": "exemplars", "name": lib.venue, "n_papers": n_ex}
+    elif b is not None:
+        baseline = {"source": "builtin", "name": entry["name"], "n_papers": b["n_papers"]}
+    else:
+        baseline = {"source": None, "name": lib.venue, "n_papers": n_ex}
+    return {
+        "baseline": baseline,
+        "entry": {"id": entry["id"], "name": entry["name"],
+                  "n_papers": b["n_papers"] if b else 0} if entry else None,
+    }
+
+
 @app.post("/library/scan")
 async def library_scan(
     path: str = Form(...),
     library: str | None = Form(None),
+    venue: str | None = Form(None),
 ):
     """Confirmation step before a folder run: which file is the paper,
-    which folder holds the PDFs, and the proposed reference ↔ PDF links.
-    Nothing is sent to the cloud except the model's multiple-choice
-    question for ambiguous links."""
+    which folder holds the PDFs, the proposed reference ↔ PDF links and
+    the target journal's exemplars. Nothing is sent to the cloud except
+    the model's multiple-choice question for ambiguous links and, when
+    期刊对标细化 is on, the first page of PDFs whose journal is unknown."""
+    from .distribution.registry import detect_from_manuscript
     from .library import build_library
     from .library.folder import resolve_folder
+    from .library.venue_match import paper_type
     from .parse import parse_document
 
     layout = resolve_folder(path)
@@ -205,22 +231,16 @@ async def library_scan(
         log.exception("library scan: cannot parse %s", layout.paper)
         return JSONResponse({"detail": "无法读取论文文件。请确认它是 .docx 格式，然后重新拖入。"},
                             status_code=400)
-    lib, _local, _pdfs = await build_library(parsed.references, lib_dir)
-    from .distribution.registry import builtin_baseline, detect_from_manuscript, find_venue
-    from .distribution.venue import MIN_EXEMPLARS
-
-    entry = find_venue(lib.venue) or detect_from_manuscript(parsed)
-    n_ex = len(lib.exemplar_ids)
-    if lib.venue and n_ex >= MIN_EXEMPLARS:
-        baseline = {"source": "exemplars", "name": lib.venue, "n_papers": n_ex}
-    elif (b := builtin_baseline(entry)) is not None:
-        baseline = {"source": "builtin", "name": entry["name"], "n_papers": b["n_papers"]}
-    else:
-        baseline = {"source": None, "name": lib.venue or (entry["name"] if entry else None),
-                    "n_papers": n_ex}
+    trace = detect_from_manuscript(parsed)
+    ptype = paper_type(parsed.document.title)
+    lib, _local, _pdfs = await build_library(
+        parsed.references, lib_dir, venue=venue or None,
+        fallback_venue=trace["name"] if trace else None, manuscript_type=ptype)
     return {
-        "baseline": baseline,
+        **_venue_info(lib),
         "paper": str(layout.paper),
+        "paper_type": ptype,
+        "manuscript_venue": trace["name"] if trace else None,
         "candidates": [str(p) for p in layout.candidates],
         "kind": layout.kind,
         "library": lib.model_dump(mode="json"),
@@ -230,6 +250,45 @@ async def library_scan(
             for r in parsed.references if r.origin == "list"
         ],
     }
+
+
+@app.post("/library/venue")
+async def library_venue(
+    library: str = Form(...),
+    venue: str = Form(""),
+    linked: str = Form("[]"),
+    paper_type: str = Form("research"),
+    manuscript_venue: str | None = Form(None),
+):
+    """The confirmation page changed the target journal: which uncited
+    PDFs are its papers now. ``linked``: doc ids the user's links use.
+    Re-reads the folder from the scan cache; no model call beyond the
+    (cached) journal guesses of the first scan."""
+    from .library import scan_folder
+    from .library.link import assemble
+    from .library.venue_match import annotate_venues
+    from .schema import LibraryLink
+
+    lib_dir = Path(library)
+    if not lib_dir.is_dir():
+        return JSONResponse({"detail": _LIBRARY_HINT}, status_code=400)
+    try:
+        used = [str(x) for x in json.loads(linked)]
+    except (ValueError, TypeError):
+        return JSONResponse({"detail": "连接表格式不正确"}, status_code=400)
+    from .config import venue_model_enabled
+
+    pdfs = await asyncio.to_thread(scan_folder, lib_dir)
+    await annotate_venues(pdfs, set(used), use_model=venue_model_enabled())
+    links = [LibraryLink(ref_id=f"_{i}", doc_id=d, method="user", score=100)
+             for i, d in enumerate(used)]
+    lib = assemble(links, pdfs, str(lib_dir), venue.strip() or None,
+                   fallback_venue=manuscript_venue or None,
+                   manuscript_type="review" if paper_type == "review" else "research")
+    return {**_venue_info(lib), "library": {
+        "venue": lib.venue, "venue_source": lib.venue_source,
+        "venue_match_ids": lib.venue_match_ids, "exemplar_ids": lib.exemplar_ids,
+        "docs": [d.model_dump(mode="json") for d in lib.docs]}}
 
 
 @app.post("/analyze")
@@ -245,6 +304,9 @@ async def analyze(
     library: str | None = Form(None),
     links: str | None = Form(None),
     library_venue: str | None = Form(None),
+    # the user's exemplar selection on the confirmation page (JSON list
+    # of LibraryDoc ids); absent = the journal's matches by paper type
+    exemplars: str | None = Form(None),
 ):
     if file is not None and file.filename:
         _UPLOADS.mkdir(parents=True, exist_ok=True)
@@ -278,6 +340,12 @@ async def analyze(
             return JSONResponse({"detail": "连接表格式不正确"}, status_code=400)
     if library and not Path(library).is_dir():
         return JSONResponse({"detail": _LIBRARY_HINT}, status_code=400)
+    picked = None
+    if exemplars:
+        try:
+            picked = [str(x) for x in json.loads(exemplars)]
+        except (ValueError, TypeError):
+            return JSONResponse({"detail": "范文列表格式不正确"}, status_code=400)
 
     job = Job(id=secrets.token_hex(8), src_path=src)
     JOBS[job.id] = job
@@ -291,7 +359,8 @@ async def analyze(
             job.report = await run_pipeline(
                 src, benchmark_id=benchmark, emit=emit,
                 venue_id=venue or None, library_dir=library,
-                library_links=confirmed, library_venue=library_venue or None)
+                library_links=confirmed, library_venue=library_venue or None,
+                library_exemplars=picked)
             _save_report(job.id, src, benchmark, job.report)
         except PipelineError as e:
             job.error = str(e)
@@ -557,6 +626,8 @@ async def get_config() -> dict:
         "has_api_key": bool(s.dashscope_api_key),
         # embeddings + reranking when picking excerpts; one switch for both
         "dense_retrieval": s.llm.embedding.enabled,
+        # 期刊对标细化: model reads of the exemplars
+        "venue_model": s.venue.model,
     }
 
 
@@ -592,6 +663,9 @@ async def put_config(request: Request):
     if isinstance(dense, bool):
         text = _toml_set(text, "llm.embedding", "enabled", dense)
         text = _toml_set(text, "llm.rerank", "enabled", dense)
+    vm = body.get("venue_model")
+    if isinstance(vm, bool):
+        text = _toml_set(text, "venue", "model", vm)
 
     try:
         _CONFIG_PATH.write_text(text, encoding="utf-8")
