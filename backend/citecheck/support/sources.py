@@ -228,6 +228,7 @@ def _bm25_excerpt(
     sim = _dense_scores([w for _, w in windows], claim) if dense else None
     if sim is not None:
         scores = _rrf(scores, sim)
+        scores = _reranked(scores, [w for _, w in windows], claim)
     order = sorted(range(len(windows)), key=lambda k: -scores[k])
     parts: list[str] = []
     taken: list[int] = []
@@ -259,6 +260,25 @@ def _dense_scores(windows: list[str], query: str):
         return None
     q = embed([query], query=True)
     return None if q is None else vecs @ q[0]
+
+
+def _reranked(scores, windows: list[str], query: str):
+    """Rerank the top fused candidates with the cross-encoder; the other
+    windows drop to zero so the excerpt is filled from the reranked ones."""
+    import numpy as np
+
+    from ..config import get_settings
+    from ..llm.rerank import rerank
+
+    n = get_settings().llm.rerank.candidates
+    top = list(np.argsort(-np.asarray(scores, dtype=float), kind="stable")[:n])
+    rs = rerank(query, [windows[k] for k in top])
+    if rs is None:
+        return scores
+    out = np.zeros(len(windows))
+    for k, v in zip(top, rs):
+        out[k] = v + 1e-9  # keep every candidate above the stop threshold
+    return out
 
 
 def _rrf(*rankings, k: int = 60):

@@ -111,12 +111,25 @@ class EmbeddingSettings(BaseModel):
     max_concurrency: int = 4
 
 
+class RerankSettings(BaseModel):
+    """Qwen3-Reranker over the top fused candidates before the excerpt is
+    filled. Off by default, for the same reason as embeddings."""
+
+    enabled: bool = False
+    base_url: str = "https://api.siliconflow.cn/v1"
+    model: str = "Qwen/Qwen3-Reranker-0.6B"
+    api_key_env: str = "SILICONFLOW_API_KEY"
+    candidates: int = 40
+    timeout: float = 60
+
+
 class LLMSettings(BaseModel):
     temperature: float = 0
     cloud: CloudSettings = Field(default_factory=CloudSettings)
     models: ModelNames = Field(default_factory=ModelNames)
     local: LocalSettings = Field(default_factory=LocalSettings)
     embedding: EmbeddingSettings = Field(default_factory=EmbeddingSettings)
+    rerank: RerankSettings = Field(default_factory=RerankSettings)
     prices: dict[str, PriceSettings] = Field(
         default_factory=lambda: {
             k: PriceSettings(**v) for k, v in _DEFAULT_PRICES.items()

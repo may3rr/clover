@@ -68,3 +68,27 @@ def test_excerpt_fuses_dense_ranking(monkeypatch):
     fused = sources._bm25_excerpt(body, "taxonomy", 200, max_parts=1)
     assert "taxonomy taxonomy" in plain and "150" not in plain
     assert "150" in fused
+
+
+def test_rerank_reorders_fused_candidates(monkeypatch):
+    """The cross-encoder's order decides among the top fused candidates."""
+    from citecheck.llm import rerank as rerank_mod
+
+    filler = "Delta epsilon zeta. " * 12
+    body = (filler + "The taxonomy taxonomy section is long. " + filler
+            + "The taxonomy holds about 150 named entity types. " + filler)
+
+    def fake_dense(windows, query):
+        return np.array([0.5 if "taxonomy" in w else 0.0 for w in windows])
+
+    def fake_rerank(query, docs):
+        return [1.0 if "150" in d else 0.1 for d in docs]
+
+    monkeypatch.setattr(sources, "_dense_scores", fake_dense)
+    monkeypatch.setattr(rerank_mod, "rerank", fake_rerank)
+    out = sources._bm25_excerpt(body, "taxonomy", 200, max_parts=1)
+    assert "150" in out
+    # reranker unavailable: the fused order stands
+    monkeypatch.setattr(rerank_mod, "rerank", lambda q, d: None)
+    out = sources._bm25_excerpt(body, "taxonomy", 200, max_parts=1)
+    assert "taxonomy taxonomy" in out
