@@ -53,10 +53,12 @@ app.add_middleware(
 def _warn_retrieval_keys() -> None:
     s = get_settings()
     if s.llm.embedding.enabled and not s.embedding_api_key:
-        log.warning("embedding is enabled but %s is not set; using BM25 only",
+        log.warning("embedding is enabled but %s is not set or belongs to another "
+                    "provider; using BM25 only",
                     s.llm.embedding.api_key_env)
     if s.llm.rerank.enabled and not s.rerank_api_key:
-        log.warning("rerank is enabled but %s is not set; keeping the fused ranking",
+        log.warning("rerank is enabled but %s is not set or belongs to another "
+                    "provider; keeping the fused ranking",
                     s.llm.rerank.api_key_env)
 
 
@@ -508,9 +510,10 @@ async def usage() -> dict:
 # ---------------------------------------------------------------- config
 
 
-def _toml_set(text: str, section: str, key: str, value: str) -> str:
-    """Replace `key = "v"` inside `[section]`, preserving everything else.
-    Appends the key (or section) when absent."""
+def _toml_set(text: str, section: str, key: str, value: str | bool) -> str:
+    """Replace `key = "v"` (or `key = true`) inside `[section]`, preserving
+    everything else. Appends the key (or section) when absent."""
+    val = ("true" if value else "false") if isinstance(value, bool) else f'"{value}"'
     lines = text.splitlines()
     out: list[str] = []
     in_sec = False
@@ -521,7 +524,7 @@ def _toml_set(text: str, section: str, key: str, value: str) -> str:
         m = sec_re.match(ln)
         if m:
             if in_sec and not done:
-                out.append(f'{key} = "{value}"')
+                out.append(f"{key} = {val}")
                 done = True
             in_sec = m.group(1).strip() == section
             out.append(ln)
@@ -529,16 +532,16 @@ def _toml_set(text: str, section: str, key: str, value: str) -> str:
         if in_sec and not done:
             km = key_re.match(ln)
             if km:
-                out.append(f'{km.group(1)}"{value}"')
+                out.append(f"{km.group(1)}{val}")
                 done = True
                 continue
         out.append(ln)
     if not done:
         if in_sec:
-            out.append(f'{key} = "{value}"')
+            out.append(f"{key} = {val}")
         else:
             out.append(f"[{section}]")
-            out.append(f'{key} = "{value}"')
+            out.append(f"{key} = {val}")
     return "\n".join(out) + "\n"
 
 
@@ -552,6 +555,8 @@ async def get_config() -> dict:
         "fast": s.llm.models.judge,
         "deep": s.llm.models.review,
         "has_api_key": bool(s.dashscope_api_key),
+        # embeddings + reranking when picking excerpts; one switch for both
+        "dense_retrieval": s.llm.embedding.enabled,
     }
 
 
@@ -583,6 +588,10 @@ async def put_config(request: Request):
     base_url = body.get("base_url")
     if isinstance(base_url, str) and base_url.strip().startswith("http"):
         text = _toml_set(text, "llm.cloud", "base_url", base_url.strip())
+    dense = body.get("dense_retrieval")
+    if isinstance(dense, bool):
+        text = _toml_set(text, "llm.embedding", "enabled", dense)
+        text = _toml_set(text, "llm.rerank", "enabled", dense)
 
     try:
         _CONFIG_PATH.write_text(text, encoding="utf-8")

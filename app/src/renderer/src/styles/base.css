@@ -1812,3 +1812,32 @@ select {
     transition: none;
   }
 }
+
+/* on/off switch (settings): fills only, knob slides with transform */
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.switch {
+  flex: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 980px;
+  background: var(--switch-off);
+  padding: 2px;
+}
+.switch.on {
+  background: var(--accent);
+}
+.switch-knob {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 980px;
+  background: var(--switch-knob);
+  transition: transform 160ms var(--ease);
+}
+.switch.on .switch-knob {
+  transform: translateX(16px);
+}

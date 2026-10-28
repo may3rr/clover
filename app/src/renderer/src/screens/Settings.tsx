@@ -58,6 +58,7 @@ interface ModelCfg {
   has_api_key: boolean
   fast: string
   deep: string
+  dense_retrieval: boolean
 }
 
 interface UsageRow {
@@ -536,6 +537,7 @@ const SHOT_CFG: ModelCfg = {
   has_api_key: true,
   fast: 'qwen3.8-flash',
   deep: 'qwen3.8-max',
+  dense_retrieval: true,
 }
 
 const SHOT_USAGE: Usage = {
@@ -876,6 +878,7 @@ export function ModelSection({
         dashscope_api_key: key || undefined,
         fast: cfg.fast,
         deep: cfg.deep,
+        dense_retrieval: cfg.dense_retrieval,
       }),
     }).catch(() => null)
     if (r && r.ok) {
@@ -1058,6 +1061,26 @@ export function ModelSection({
             <option key={m} value={m} />
           ))}
         </datalist>
+      </div>
+      <div className="group-label">挑选被引原文片段</div>
+      <div className="card">
+        <div className="switch-row">
+          <div className="flex-1">
+            <div id="dense-label">向量检索与重排</div>
+            <div className="field-hint">
+              用百炼的向量与重排模型挑选证据片段，命中率更高。开启后被引文献的正文会切成片段发送到百炼。需要百炼的 API Key，选择其他服务商时不会启用。
+            </div>
+          </div>
+          <button
+            role="switch"
+            aria-checked={cfg.dense_retrieval}
+            aria-labelledby="dense-label"
+            className={`switch${cfg.dense_retrieval ? ' on' : ''}`}
+            onClick={() => setCfg({ ...cfg, dense_retrieval: !cfg.dense_retrieval })}
+          >
+            <span className="switch-knob" />
+          </button>
+        </div>
       </div>
       {actions}
       {!compact && (

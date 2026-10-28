@@ -186,9 +186,25 @@ class Settings(BaseModel):
         return Path(raw).expanduser()
 
 
+def _domain(url: str) -> str:
+    from urllib.parse import urlparse
+
+    return ".".join((urlparse(url).hostname or "").split(".")[-2:])
+
+
 def _retrieval_key(data: dict, env: dict[str, str], section: str,
                    default_env: str) -> str | None:
-    name = data.get("llm", {}).get(section, {}).get("api_key_env", default_env)
+    llm = data.get("llm", {})
+    sec = llm.get(section, {})
+    name = sec.get("api_key_env", default_env)
+    # the settings page stores whichever provider's key the user enters as
+    # DASHSCOPE_API_KEY; never send it to a retrieval service on another
+    # domain than the chat endpoint it was entered for
+    if name == "DASHSCOPE_API_KEY":
+        chat = llm.get("cloud", {}).get("base_url", CloudSettings().base_url)
+        default_url = (EmbeddingSettings if section == "embedding" else RerankSettings)().base_url
+        if _domain(chat) != _domain(sec.get("base_url", default_url)):
+            return None
     return os.environ.get(name) or env.get(name)
 
 

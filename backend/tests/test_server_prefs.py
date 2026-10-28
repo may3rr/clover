@@ -121,3 +121,33 @@ def test_put_config_tiers_fan_out(tmp_path, monkeypatch):
                 assert body["models"][t] == f"m-{tier}"
     finally:
         get_settings.cache_clear()
+
+
+def test_put_config_dense_retrieval_switch(tmp_path, monkeypatch):
+    """One switch turns embeddings and reranking off and on together; the
+    example config ships with both on."""
+    import tomllib
+
+    import citecheck.config as cfgmod
+    from citecheck.config import get_settings
+
+    cfg = tmp_path / "config.toml"
+    cfg.write_text(cfgmod._CONFIG_EXAMPLE_PATH.read_text(encoding="utf-8"),
+                   encoding="utf-8")
+    monkeypatch.setattr(cfgmod, "_CONFIG_PATH", cfg)
+    monkeypatch.setattr(cfgmod, "_ENV_PATH", tmp_path / ".env")
+    get_settings.cache_clear()
+    try:
+        client = TestClient(app)
+        assert client.get("/config", headers=H).json()["dense_retrieval"] is True
+        body = client.put("/config", headers=H, json={"dense_retrieval": False}).json()
+        assert body["dense_retrieval"] is False
+        data = tomllib.loads(cfg.read_text(encoding="utf-8"))
+        assert data["llm"]["embedding"]["enabled"] is False
+        assert data["llm"]["rerank"]["enabled"] is False
+        # other keys of the sections survive
+        assert data["llm"]["rerank"]["model"] == "qwen3-rerank"
+        body = client.put("/config", headers=H, json={"dense_retrieval": True}).json()
+        assert body["dense_retrieval"] is True
+    finally:
+        get_settings.cache_clear()

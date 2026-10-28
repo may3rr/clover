@@ -44,6 +44,8 @@
   --brand-qwen: #6336e7;
   --brand-deepseek: #4d6bfe;
   --on-brand: #ffffff;       /* 品牌色块上的白色 glyph */
+  --switch-off: rgba(55, 53, 47, 0.2);   /* 开关关闭时的轨道 */
+  --switch-knob: #ffffff;
 
   /* 骨架页细边 / 占位微光 / SVG 页边描线（唯一允许线条的几处数据图形） */
   --hairline: var(--separator);
@@ -109,6 +111,8 @@
     --brand-qwen: #6336e7;
     --brand-deepseek: #4d6bfe;
     --on-brand: #ffffff;
+    --switch-off: rgba(255, 255, 255, 0.22);
+    --switch-knob: #ffffff;
 
     --shimmer: rgba(255, 255, 255, 0.12);
   }

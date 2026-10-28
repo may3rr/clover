@@ -207,3 +207,24 @@ def test_missing_retrieval_keys_warn_at_startup(monkeypatch, caplog):
     _warn_retrieval_keys()
     assert "TEST_EMBED_KEY" in caplog.text and "using BM25 only" in caplog.text
     assert "TEST_RERANK_KEY" in caplog.text and "keeping the fused ranking" in caplog.text
+
+
+def test_retrieval_key_stays_with_its_provider(monkeypatch):
+    """The settings page saves any provider's key as DASHSCOPE_API_KEY; it is
+    only reused for retrieval when the chat endpoint is on the same domain."""
+    from citecheck.config import _retrieval_key
+
+    monkeypatch.setenv("DASHSCOPE_API_KEY", "sk-x")
+    emb = {"base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+           "api_key_env": "DASHSCOPE_API_KEY"}
+    bailian = {"llm": {"cloud": {"base_url": "https://ws1.cn-beijing.maas.aliyuncs.com/compatible-mode/v1"},
+                       "embedding": emb}}
+    deepseek = {"llm": {"cloud": {"base_url": "https://api.deepseek.com/v1"}, "embedding": emb}}
+    assert _retrieval_key(bailian, {}, "embedding", "X") == "sk-x"
+    assert _retrieval_key(deepseek, {}, "embedding", "X") is None
+    # a key of its own is used whatever the chat endpoint
+    monkeypatch.setenv("SILICONFLOW_API_KEY", "sf")
+    own = {"llm": {"cloud": {"base_url": "https://api.deepseek.com/v1"},
+                   "embedding": {"base_url": "https://api.siliconflow.cn/v1",
+                                 "api_key_env": "SILICONFLOW_API_KEY"}}}
+    assert _retrieval_key(own, {}, "embedding", "X") == "sf"
