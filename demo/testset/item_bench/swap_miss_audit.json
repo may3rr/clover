@@ -1,0 +1,125 @@
+{
+ "说明": "ctx8_cascade 干净子集中 swap 漏检且判为支持的样本随机抽 30 条（seed 7）人工核对。G：换上的文献确实不支持论断，属漏检；N：换上的文献也能支持论断，不应计为漏检；U：论断是残句或无法确定。",
+ "items": {
+  "guyingjie_mrc:c138:r122:swap": {
+   "label": "N",
+   "note": "Chen 等的 CNN/Daily Mail 论文也用了注意力模型"
+  },
+  "guyingjie_mrc:c13:r11:swap": {
+   "label": "N",
+   "note": "换上的文献是同句所列三种模型之一，表格含 63.33"
+  },
+  "guyingjie_mrc:c13:r12:swap": {
+   "label": "N",
+   "note": "同上"
+  },
+  "guyingjie_mrc:c165:r118:swap": {
+   "label": "N",
+   "note": "换上的文献也写了榜单模型未发表"
+  },
+  "guyingjie_mrc:c32:r30:swap": {
+   "label": "G",
+   "note": "SQA 网址被说成 ComplexWebQuestions，模型自行编造了对应关系"
+  },
+  "guyingjie_mrc:c51:r47:swap": {
+   "label": "N",
+   "note": "FlowQA 也对问题做注意力生成段落表示"
+  },
+  "guyingjie_mrc:c53:r48:swap": {
+   "label": "N",
+   "note": "论断描述的正是 BiDAF，换上的文献反而更合适"
+  },
+  "guyingjie_mrc:c59:r54:swap": {
+   "label": "U",
+   "note": "论断是残句，模型理由有编造"
+  },
+  "guyingjie_mrc:c77:r72:swap": {
+   "label": "N",
+   "note": "Bahdanau 等的注意力机制，能支持注意力广泛用于 NLP 的背景句"
+  },
+  "luohuilan_odt:c0:r1:swap": {
+   "label": "N",
+   "note": "泛泛的背景句，场景文字检测综述也写了检测难点"
+  },
+  "luohuilan_odt:c11:r15:swap": {
+   "label": "U",
+   "note": "论断是残句"
+  },
+  "luohuilan_odt:c15:r15:swap": {
+   "label": "U",
+   "note": "论断是残句"
+  },
+  "yinhongpeng_odt:c14:r15:swap": {
+   "label": "N",
+   "note": "换上的综述也对典型跟踪算法做了性能对比"
+  },
+  "zhaoyangyang_tod:c115:r158:swap": {
+   "label": "N",
+   "note": "换上的文献也基于 Seq2Seq"
+  },
+  "zhaoyangyang_tod:c117:r157:swap": {
+   "label": "N",
+   "note": "NRM 采用编码器解码器生成短文本回复，也能支持"
+  },
+  "zhaoyangyang_tod:c127:r169:swap": {
+   "label": "N",
+   "note": "Hu 等也指出现有生成方法不可控"
+  },
+  "zhaoyangyang_tod:c133:r120:swap": {
+   "label": "U",
+   "note": "论断只有一个短语"
+  },
+  "zhaoyangyang_tod:c139:r194:swap": {
+   "label": "N",
+   "note": "换上的正是句中的 Han 等人"
+  },
+  "zhaoyangyang_tod:c144:r206:swap": {
+   "label": "N",
+   "note": "泛泛的背景句，换上的文献也写了用对话语料训练"
+  },
+  "zhaoyangyang_tod:c14:r17:swap": {
+   "label": "N",
+   "note": "Kim 2014 的 CNN 句子分类能支持神经网络方法成绩不错"
+  },
+  "zhaoyangyang_tod:c152:r205:swap": {
+   "label": "N",
+   "note": "换上的文献也写了手工定义状态和动作空间"
+  },
+  "zhaoyangyang_tod:c153:r205:swap": {
+   "label": "N",
+   "note": "换上的端到端任务型对话系统也能支持"
+  },
+  "zhaoyangyang_tod:c153:r207:swap": {
+   "label": "N",
+   "note": "换上的文献 NLU 模块用了 Seq2Seq"
+  },
+  "zhaoyangyang_tod:c155:r208:swap": {
+   "label": "G",
+   "note": "论断说的是 TSCP，换上的是 Eric 和 Manning 的复制增强模型"
+  },
+  "zhaoyangyang_tod:c164:r203:swap": {
+   "label": "N",
+   "note": "换上的文献也写了需要大量对话数据"
+  },
+  "zhaoyangyang_tod:c165:r213:swap": {
+   "label": "N",
+   "note": "KB-InfoBot 把知识库检索纳入动作空间"
+  },
+  "zhaoyangyang_tod:c187:r234:swap": {
+   "label": "U",
+   "note": "论断文字错乱"
+  },
+  "zhaoyangyang_tod:c32:r54:swap": {
+   "label": "N",
+   "note": "SQuAD 2.0 也能支持面向更复杂数据"
+  },
+  "zhaoyangyang_tod:c40:r67:swap": {
+   "label": "N",
+   "note": "BERT 基于 Transformer 编码器，能支持"
+  },
+  "zhaoyangyang_tod:c90:r125:swap": {
+   "label": "N",
+   "note": "换上的正是多域对话策略委员会论文"
+  }
+ }
+}
