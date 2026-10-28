@@ -50,6 +50,19 @@ app.add_middleware(
 )
 
 
+def _warn_retrieval_keys() -> None:
+    s = get_settings()
+    if s.llm.embedding.enabled and not s.embedding_api_key:
+        log.warning("embedding is enabled but %s is not set; using BM25 only",
+                    s.llm.embedding.api_key_env)
+    if s.llm.rerank.enabled and not s.rerank_api_key:
+        log.warning("rerank is enabled but %s is not set; keeping the fused ranking",
+                    s.llm.rerank.api_key_env)
+
+
+app.add_event_handler("startup", _warn_retrieval_keys)
+
+
 @app.middleware("http")
 async def _auth(request: Request, call_next):
     # OPTIONS is the CORS preflight — it carries no credentials; the real

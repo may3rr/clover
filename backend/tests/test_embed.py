@@ -92,3 +92,118 @@ def test_rerank_reorders_fused_candidates(monkeypatch):
     monkeypatch.setattr(rerank_mod, "rerank", lambda q, d: None)
     out = sources._bm25_excerpt(body, "taxonomy", 200, max_parts=1)
     assert "taxonomy taxonomy" in out
+
+
+def test_embed_dashscope_compatible_request(monkeypatch):
+    _on(monkeypatch)
+    cfg = get_settings().llm.embedding
+    monkeypatch.setattr(cfg, "base_url",
+                        "https://dashscope.aliyuncs.com/compatible-mode/v1")
+    monkeypatch.setattr(cfg, "model", "test-embedding")
+    sent = {}
+
+    def fake_post(url, headers, json, timeout):
+        sent.update(url=url, headers=headers, json=json)
+        return httpx.Response(
+            200,
+            json={"data": [{"index": 0, "embedding": [3.0, 4.0]}],
+                  "usage": {"total_tokens": 2}},
+            request=httpx.Request("POST", url),
+        )
+
+    monkeypatch.setattr(embed_mod.httpx, "post", fake_post)
+    out = embed_mod.embed(["claim"])
+    assert sent["url"].endswith("/compatible-mode/v1/embeddings")
+    assert sent["headers"]["Authorization"] == "Bearer test-key"
+    assert sent["json"] == {"model": "test-embedding", "input": ["claim"]}
+    assert np.allclose(out, [[0.6, 0.8]], atol=1e-3)
+
+
+def _rerank_on(monkeypatch, api_format):
+    from citecheck.llm import rerank as rerank_mod
+
+    s = get_settings()
+    monkeypatch.setenv("CITECHECK_RERANK", "1")
+    monkeypatch.setattr(s.llm.rerank, "enabled", True)
+    monkeypatch.setattr(s.llm.rerank, "api_format", api_format)
+    monkeypatch.setattr(s.llm.rerank, "model", f"test-{api_format}")
+    monkeypatch.setattr(s, "rerank_api_key", "test-key")
+    monkeypatch.setattr(rerank_mod, "_cache", None)
+    monkeypatch.setattr(rerank_mod, "_down_until", 0.0)
+    return rerank_mod, s.llm.rerank
+
+
+def test_rerank_dashscope_native_request(monkeypatch):
+    rerank_mod, cfg = _rerank_on(monkeypatch, "dashscope")
+    monkeypatch.setattr(cfg, "base_url", "https://dashscope.aliyuncs.com/native-rerank")
+    sent = {}
+
+    def fake_post(url, headers, json, timeout):
+        sent.update(url=url, json=json)
+        return httpx.Response(
+            200,
+            json={"output": {"results": [
+                {"index": 1, "relevance_score": 0.9},
+                {"index": 0, "relevance_score": 0.1},
+            ]}, "usage": {"total_tokens": 7}},
+            request=httpx.Request("POST", url),
+        )
+
+    monkeypatch.setattr(rerank_mod.httpx, "post", fake_post)
+    assert rerank_mod.rerank("query", ["a", "b"]) == [0.1, 0.9]
+    assert sent["url"] == "https://dashscope.aliyuncs.com/native-rerank"
+    assert sent["json"] == {
+        "model": "test-dashscope",
+        "input": {"query": "query", "documents": ["a", "b"]},
+        "parameters": {"return_documents": False},
+    }
+
+
+def test_rerank_siliconflow_request_unchanged(monkeypatch):
+    rerank_mod, cfg = _rerank_on(monkeypatch, "siliconflow")
+    monkeypatch.setattr(cfg, "base_url", "https://api.siliconflow.cn/v1")
+    sent = {}
+
+    def fake_post(url, headers, json, timeout):
+        sent.update(url=url, json=json)
+        return httpx.Response(
+            200,
+            json={"results": [{"index": 0, "relevance_score": 0.4}],
+                  "meta": {"tokens": {"input_tokens": 5}}},
+            request=httpx.Request("POST", url),
+        )
+
+    monkeypatch.setattr(rerank_mod.httpx, "post", fake_post)
+    assert rerank_mod.rerank("query", ["a"]) == [0.4]
+    assert sent["url"] == "https://api.siliconflow.cn/v1/rerank"
+    assert sent["json"]["documents"] == ["a"]
+    assert "input" not in sent["json"]
+
+
+def test_retrieval_keys_read_separate_environment_names(monkeypatch):
+    from citecheck.config import _retrieval_key
+
+    data = {"llm": {
+        "embedding": {"api_key_env": "TEST_EMBED_KEY"},
+        "rerank": {"api_key_env": "TEST_RERANK_KEY"},
+    }}
+    monkeypatch.setenv("TEST_EMBED_KEY", "process-value")
+    env = {"TEST_EMBED_KEY": "file-value", "TEST_RERANK_KEY": "rerank-value"}
+    assert _retrieval_key(data, env, "embedding", "UNUSED") == "process-value"
+    assert _retrieval_key(data, env, "rerank", "UNUSED") == "rerank-value"
+
+
+def test_missing_retrieval_keys_warn_at_startup(monkeypatch, caplog):
+    from citecheck.server import _warn_retrieval_keys
+
+    s = get_settings()
+    monkeypatch.setattr(s.llm.embedding, "enabled", True)
+    monkeypatch.setattr(s.llm.rerank, "enabled", True)
+    monkeypatch.setattr(s.llm.embedding, "api_key_env", "TEST_EMBED_KEY")
+    monkeypatch.setattr(s.llm.rerank, "api_key_env", "TEST_RERANK_KEY")
+    monkeypatch.setattr(s, "embedding_api_key", None)
+    monkeypatch.setattr(s, "rerank_api_key", None)
+    caplog.set_level("WARNING", logger="citecheck.server")
+    _warn_retrieval_keys()
+    assert "TEST_EMBED_KEY" in caplog.text and "using BM25 only" in caplog.text
+    assert "TEST_RERANK_KEY" in caplog.text and "keeping the fused ranking" in caplog.text

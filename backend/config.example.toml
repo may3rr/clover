@@ -39,10 +39,12 @@ api_key_env = "SILICONFLOW_API_KEY"
 
 [llm.rerank]
 # Qwen3-Reranker over the top fused candidates (needs [llm.embedding]).
+# api_format = "dashscope" uses base_url as the full native rerank endpoint.
 enabled = false
 base_url = "https://api.siliconflow.cn/v1"
 model = "Qwen/Qwen3-Reranker-0.6B"
 api_key_env = "SILICONFLOW_API_KEY"
+api_format = "siliconflow"
 
 [support]
 # re-judge each flagged pair on a second, BM25-only excerpt and keep the

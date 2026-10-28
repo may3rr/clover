@@ -14,6 +14,7 @@ import os
 import tomllib
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -119,6 +120,7 @@ class RerankSettings(BaseModel):
     base_url: str = "https://api.siliconflow.cn/v1"
     model: str = "Qwen/Qwen3-Reranker-0.6B"
     api_key_env: str = "SILICONFLOW_API_KEY"
+    api_format: Literal["siliconflow", "dashscope"] = "siliconflow"
     candidates: int = 40
     timeout: float = 60
 
@@ -167,6 +169,7 @@ class Settings(BaseModel):
     openalex_api_key: str | None = None
     s2_api_key: str | None = None
     embedding_api_key: str | None = None
+    rerank_api_key: str | None = None
     # Bumped into every LLM cache key: change it to invalidate all cached
     # model verdicts after a model upgrade or a prompt fix (retrieval
     # entries expire on their own 30-day TTL).
@@ -183,9 +186,9 @@ class Settings(BaseModel):
         return Path(raw).expanduser()
 
 
-def _embedding_key(data: dict, env: dict[str, str]) -> str | None:
-    name = data.get("llm", {}).get("embedding", {}).get("api_key_env",
-                                                       EmbeddingSettings().api_key_env)
+def _retrieval_key(data: dict, env: dict[str, str], section: str,
+                   default_env: str) -> str | None:
+    name = data.get("llm", {}).get(section, {}).get("api_key_env", default_env)
     return os.environ.get(name) or env.get(name)
 
 
@@ -200,7 +203,10 @@ def _load_settings() -> Settings:
         crossref_mailto=os.environ.get("CROSSREF_MAILTO") or env.get("CROSSREF_MAILTO"),
         openalex_api_key=os.environ.get("OPENALEX_API_KEY") or env.get("OPENALEX_API_KEY"),
         s2_api_key=os.environ.get("S2_API_KEY") or env.get("S2_API_KEY"),
-        embedding_api_key=_embedding_key(data, env),
+        embedding_api_key=_retrieval_key(
+            data, env, "embedding", EmbeddingSettings().api_key_env),
+        rerank_api_key=_retrieval_key(
+            data, env, "rerank", RerankSettings().api_key_env),
         cache_version=str(data.get("cache_version", "1")),
         llm=LLMSettings(**data.get("llm", {})),
         retrieval=RetrievalSettings(**data.get("retrieval", {})),

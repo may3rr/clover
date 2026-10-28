@@ -1,9 +1,10 @@
 """Text embeddings for excerpt retrieval (AGENTS §5.2: model calls live in
 llm/).
 
-Qwen3-Embedding through an OpenAI-compatible ``/embeddings`` endpoint,
-model and endpoint from ``[llm.embedding]`` in config.toml. Synchronous,
-because excerpts are built in worker threads. Vectors are L2-normalized
+Qwen3 embeddings through the OpenAI-compatible ``/embeddings`` endpoints
+of DashScope or SiliconFlow. Model, endpoint and key variable come from
+``[llm.embedding]`` in config.toml. Synchronous, because excerpts are built
+in worker threads. Vectors are L2-normalized
 and cached per text (key: model + text) as float16 in the cache's
 ``vectors`` table. ``embed`` returns None when embeddings are disabled,
 no key is set, or the service fails, and retrieval then ranks with BM25

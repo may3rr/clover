@@ -546,3 +546,102 @@ SemanticCite 开源了在其数据上微调的 Qwen3-4B 判断模型。我们下
 - SemanticCite 上它的标准准确率略高。该模型就在这份数据上训练，抽样的 400 条与其训练数据大概率重叠，这个结果偏乐观；即便如此，报警准确率仍低于我们的流程。
 - 两者都报警才算时，Citation-Integrity 上报警准确率 0.78，查出 0.39；只看我们流程的中高严重度报警是 0.78 与 0.24。同样的报警准确率下多查出 15 个百分点，可以作为日后的备选。代价是每条报警多一次约 6 秒的本地推理，并需要用户下载 2.3 GB 模型，当前不接入产品。
 - 评测用完后删除了本地模型文件，复现需要从 hf-mirror 重新下载 `semanticcite-checker-qwen3-4b.Q4_K_M.gguf`。
+
+
+## 16. 百炼向量与重排的官方能力调研
+
+第 12 节与第 15.2 节的向量与重排走硅基流动，用的是开源规格的 Qwen3-Embedding 与 Qwen3-Reranker。百炼是第一方渠道，产品的对话模型也已走 DashScope 兼容接口。本节依据阿里云官方文档查证百炼侧的对应能力，包括准确模型名、是否基于 Qwen3、接口地址与请求格式、价格与限流。本节只记录文档事实，不做本地效果对比。信息于 2026 年 10 月 28 日访问，各来源页面的更新日期列在文末。
+
+### 16.1 模型名与模型来源
+
+| 用途 | 模型名 | 官方表述 | 北京上架时间 |
+| --- | --- | --- | --- |
+| 文本向量 | `text-embedding-v4` | 基于 Qwen3 训练的多语言文本统一向量模型，总览页标注属于 Qwen3-Embedding 系列 | 2025-06-05 |
+| 文本向量 | `qwen3.7-text-embedding` | 基于 Qwen3.7 训练，总览页推荐的当前默认模型 | 2026-07-15 |
+| 文本向量 | `qwen3.7-text-embedding-flash` | 基于 Qwen3.7 训练的轻量版，面向成本与吞吐敏感场景 | 2026-09-01 |
+| 文本重排 | `qwen3-rerank` | 基于 Qwen LLM 底座训练，效果对齐开源 Qwen3-Rerank 系列模型 | 2025-10-21 |
+| 文本重排 | `qwen3.7-text-rerank` | 基于 Qwen3.7 底座训练，官方称较 qwen3-rerank 在 websearch 评测上相对提升约 35% | 2026-09-01 |
+| 文本重排 | `gte-rerank-v2` | 通义实验室自研 gte 系列，不属于 Qwen3，官方公告 2026-05-30 下线并推荐用 qwen3-rerank 替代 | 2025-03-20 |
+
+百炼的向量与重排模型名都不带参数规格，官方文档没有说明 text-embedding-v4 与 qwen3-rerank 对应开源系列的哪个尺寸，因此无法与第 12 节用的 0.6B 与 4B 一一对应。官方在总览页给出 text-embedding-v4 的基准分：1024 维时 MTEB 68.36、CMTEB 70.14，2048 维时 MTEB 71.58、CMTEB 检索子项 75.01。
+
+### 16.2 接口地址与请求格式
+
+向量接口有两套，模型名相同。
+
+- OpenAI 兼容接口，POST `https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/compatible-mode/v1/embeddings`，请求体为 `model`、`input`、`dimensions`。维度可选，text-embedding-v4 为 64 到 2048 默认 1024，qwen3.7-text-embedding 为 256 到 2560 默认 1024。现有 `llm/embed.py` 走的就是这种形式，迁移只需改 base_url、模型名与鉴权。
+- DashScope 原生接口，POST `https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api/v1/services/embeddings/text-embedding/text-embedding`，请求体为 `model`、`input.texts` 与 `parameters`，参数含 `dimension`、`text_type`、`instruct`、`output_type`。区分查询与文档的 `text_type`、英文任务指令 `instruct`、稀疏向量 `output_type` 只在 DashScope 接口可用，OpenAI 兼容接口不支持。
+
+批量上限：text-embedding-v4 单次请求最多 10 条文本，单批 33000 token；qwen3.7-text-embedding 单次 20 条，单批 128000 token，上下文 128K。
+
+重排不是 OpenAI 标准接口，文档给出两套地址。
+
+- 兼容式重排，POST `https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/compatible-api/v1/reranks`，请求体扁平，含 `model`、`query`、`documents`、`top_n`、`instruct`。路径前缀是 compatible-api，与对话和向量用的 compatible-mode 不同，路径名是复数 reranks，格式接近 Cohere 的重排接口。旧版文档示例使用 `https://dashscope.aliyuncs.com/compatible-api/v1/reranks`，两套域名目前都在官方示例中出现，文档未说明旧域名何时停用。
+- DashScope 原生接口，POST `https://{WorkspaceId}.cn-beijing.maas.aliyuncs.com/api/v1/services/rerank/text-rerank/text-rerank`，请求体为 `model`、`input.query`、`input.documents` 与 `parameters`，参数含 `top_n`、`return_documents`、`instruct`。
+
+qwen3-rerank 单次请求最多 500 篇文档，单条查询或文档最长 4000 token，单次请求最长 120000 token，超限返回 HTTP 400 且不截断。返回的 relevance_score 在 0 到 1 之间，官方注明只对当次请求内部排序有效，不能跨请求比较。instruct 仅 qwen3.7-text-rerank、qwen3-rerank、qwen3-vl-rerank 支持，gte-rerank-v2 不支持。
+
+对现有代码的影响：`llm/rerank.py` 现在向 `{base_url}/rerank` 发扁平请求体，字段与百炼兼容式重排一致，迁移主要是端点路径从 rerank 换成 reranks 并改鉴权；若改用 DashScope 原生接口，则需要改成 input 与 parameters 嵌套结构。
+
+### 16.3 价格
+
+北京地域原价，按输入 token 计费，输出不计费，单位为元每百万 token。向量模型 Batch 调用半价。各模型免费额度 100 万 token，有效期 90 天。
+
+| 模型 | 原价 | Batch 价 |
+| --- | --- | --- |
+| qwen3.7-text-embedding | 0.5 | 0.25 |
+| qwen3.7-text-embedding-flash | 0.125 | 0.063 |
+| text-embedding-v4 | 0.5 | 0.25 |
+| qwen3.7-text-rerank | 0.5 | 价格页未列 |
+| qwen3-rerank | 0.5 | 价格页未列 |
+| gte-rerank-v2 | 0.8 | 价格页未列 |
+
+对照第 12 节硅基流动每百万 token 0.02 美元约 0.14 元，百炼向量原价约为其 3.5 倍。按第 13 节 302 篇 PDF 约 633 万 token 计，百炼全量编码一次约 3.2 元，仍在个位数。价格页注明展示的是原价，活动优惠以控制台为准。
+
+### 16.4 限流
+
+限流按主账号合并计算，账号下所有 RAM 子账号、业务空间与 API Key 共享额度，超出后请求被拒绝，通常一分钟内恢复。北京地域默认额度：
+
+| 模型 | 每分钟请求数 | 每分钟 token 数 |
+| --- | --- | --- |
+| qwen3.7-text-embedding | 24000 | 100 万 |
+| qwen3.7-text-embedding-flash | 24000 | 100 万 |
+| text-embedding-v4 | 1800 | 120 万 |
+| qwen3.7-text-rerank | 3000 | 900 万 |
+| qwen3-rerank | 5400 | 50 亿 |
+| gte-rerank-v2 | 5040 | 49.8 亿 |
+
+text-embedding 系列注明 Batch API 调用不受限流限制。第 15.2 节在硅基流动遇到的重排限流较严，客户端只能并发两个请求；百炼 qwen3-rerank 的标称额度是每分钟 5400 次，比当时的自建约束宽裕得多，实际并发仍以账号实测为准。充值不提升限流额度，提额需要联系商务。
+
+### 16.5 结论
+
+- 百炼与现有实现对位的模型是 text-embedding-v4 与 qwen3-rerank，官方确认前者基于 Qwen3、后者效果对齐开源 Qwen3-Rerank 系列，满足只用 Qwen 系列模型的约束。
+- 文档当前默认推荐 qwen3.7-text-embedding 与 qwen3.7-text-rerank，基于更新的 Qwen3.7 底座，向量的 instruct、稀疏向量与 text_type 只在 DashScope 原生接口可用。
+- 重排接口不属于 OpenAI 标准，接入需要单独适配端点与请求体。本地效果对比见第 16.6 节。
+
+### 16.6 百炼与硅基流动的同数据对比
+
+在同一套 Citation-Integrity 486 条人工证据句上，分别用两家服务运行 `python demo/testset/item_bench/external_eval.py retrieval`。脚本从当前配置读取模型，不再写死硅基流动模型名。百炼向量走 OpenAI 兼容接口，重排走 DashScope 原生接口，两项都复用 DASHSCOPE_API_KEY。
+
+| 服务商与方法 | 首轮 2500 字 | 复核 6000 字 |
+| --- | --- | --- |
+| BM25 | 340/486 = 0.70 | 393/486 = 0.81 |
+| 硅基流动，Qwen3-Embedding-0.6B 融合 | 344/486 = 0.71 | 408/486 = 0.84 |
+| 百炼，text-embedding-v4 融合 | 345/486 = 0.71 | 416/486 = 0.86 |
+| 硅基流动，融合加 Qwen3-Reranker-0.6B | 363/486 = 0.75 | 420/486 = 0.86 |
+| 百炼，融合加 qwen3-rerank | 370/486 = 0.76 | 424/486 = 0.87 |
+
+百炼重排比硅基流动首轮多命中 7 条，复核多命中 4 条。百炼模型没有公开参数规格，这里比较的是同一检索流程下的服务效果，不是同尺寸模型对比。本轮只评测检索，没有运行端到端判断评测，不能据此推断报警准确率与查出率的变化。
+
+百炼本轮记录向量 604.5 万 token、重排 429.8 万 token，按第 16.3 节原价估算约 5.17 元，实际费用以控制台为准。百炼两种检索阶段都不低于硅基流动，并可复用现有密钥。建议把示例配置改为默认开启百炼向量与重排，当前尚未切换，等待确认。
+
+### 来源
+
+- 向量化总览 https://help.aliyun.com/zh/model-studio/embedding ，页面更新 2026-10-09
+- 重排序总览 https://help.aliyun.com/zh/model-studio/rerank ，页面更新 2026-10-26
+- 通用文本排序模型 API 详情 https://help.aliyun.com/zh/model-studio/text-rerank-api ，页面更新 2026-07-28
+- 模型调用价格 https://help.aliyun.com/zh/model-studio/model-pricing ，页面更新 2026-07-28
+- 限流 https://help.aliyun.com/zh/model-studio/rate-limit ，页面更新 2026-10-25
+- 模型上下架与更新 https://help.aliyun.com/zh/model-studio/newly-released-models ，页面更新 2026-10-26
+
+阿里云帮助中心页面更新频繁，以上数字以访问日 2026 年 10 月 28 日的页面为准，页面日期可能滞后于实际内容。

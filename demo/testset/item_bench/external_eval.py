@@ -186,17 +186,24 @@ async def retrieval() -> None:
         terms = await search_terms(claim)
         items.append((" ".join([claim, *terms]), "\n\n".join(paras),
                       [normalize_text(g)[:80] for g in gold]))
-    rr = get_settings().llm.rerank
-    methods = [("BM25", False, None), ("BM25 与向量融合", True, None),
-               ("融合加重排 0.6B", True, "Qwen/Qwen3-Reranker-0.6B"),
-               ("融合加重排 4B", True, "Qwen/Qwen3-Reranker-4B")]
+    from citecheck.llm.embed import enabled as embed_enabled
+    from citecheck.llm.rerank import enabled as rerank_enabled
+
+    settings = get_settings()
+    emb = settings.llm.embedding
+    rr = settings.llm.rerank
+    rr.enabled = True
+    if not embed_enabled() or not rerank_enabled():
+        raise RuntimeError("retrieval evaluation needs configured embedding and rerank keys")
+    methods = [("BM25", False, False),
+               (f"BM25 与向量融合 {emb.model}", True, False),
+               (f"融合加重排 {rr.model}", True, True)]
+    print(f"向量模型 {emb.model}，重排模型 {rr.model}")
     print(f"有人工证据句的引用 {len(items)} 条")
     print("| 方法 | 首轮 2500 字 | 复核 6000 字 |")
     print("| --- | --- | --- |")
-    for name, dense, model in methods:
-        rr.enabled = model is not None
-        if model:
-            rr.model = model
+    for name, dense, use_rerank in methods:
+        rr.enabled = use_rerank
         cells = []
         for budget, parts in ((2500, 5), (6000, 12)):
             def hit(it):
