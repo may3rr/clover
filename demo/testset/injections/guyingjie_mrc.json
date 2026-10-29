@@ -33,43 +33,43 @@
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": ";同样是SQuAD1.1数据集,Chen等人",
-   "cited_label": "122",
-   "intended_label": "78"
+   "snippet": "第3.1.7小节.Weissenborn等人",
+   "cited_label": "126",
+   "intended_label": "101"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "NLP领域取得巨大成功后,Vaswani等人",
-   "cited_label": "19",
-   "intended_label": "67"
+   "snippet": "力机制运用于机器阅读理解任务的是Wang等人",
+   "cited_label": "123",
+   "intended_label": "75"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
+    "12",
+    "18",
     "21",
-    "26",
     "59",
     "60",
-    "75",
-    "98"
+    "75"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "布署",
-   "right": "部署",
-   "snippet": "Jia等人[130]通过对抗性实验发现:如果我们在段"
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "Hermann等人[1]在2015年提出了第一个大规"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "wrong": "侯选",
-   "right": "候选",
-   "snippet": "Hermann等人[1]在2015年提出了第一个大规"
+   "wrong": "布署",
+   "right": "部署",
+   "snippet": "Jia等人[130]通过对抗性实验发现:如果我们在段"
   }
  ]
 }

@@ -189,9 +189,13 @@ def is_title_style(sid: str, styles: dict[str, StyleInfo]) -> bool:
 
 
 def heading_level(
-    p: etree._Element, text: str, styles: dict[str, StyleInfo]
+    p: etree._Element, text: str, styles: dict[str, StyleInfo],
+    text_rules: bool = True,
 ) -> int | None:
-    """Heading level (1-based) of a paragraph, or None if body text."""
+    """Heading level (1-based) of a paragraph, or None if body text.
+
+    ``text_rules=False`` (the document styles its headings) keeps only the
+    standalone names (参考文献, References …) among the text-based rules."""
     sid = dx.paragraph_style_id(p)
     if sid:
         lvl = style_heading_level(sid, styles)
@@ -214,6 +218,8 @@ def heading_level(
     bare = re.sub(r"^\s*[\d.]*\s*", "", stripped).rstrip(":：").strip().lower()
     if bare in STANDALONE_HEADINGS:
         return 1
+    if not text_rules:
+        return None
     m = _NUMBERED_HEADING_RE.match(stripped)
     # the title part must be words, not more numbers ("56.4", "12 0.3")
     if (m and m.group(1).count(".") <= 4 and _HAS_WORD_RE.search(m.group(2))
@@ -225,6 +231,14 @@ def heading_level(
     if _ZH_NUMBERED_HEADING_RE.match(stripped):
         return 1
     return None
+
+
+_NUMBERED_TOP_RE = re.compile(r"^\s*(\d{1,2}|[一二三四五六七八九十]+)[\s　.、．]")
+
+
+def is_numbered_heading(title: str) -> bool:
+    """'1 引言' / '2. Method' / '三、结论' — a numbered top-level heading."""
+    return bool(_NUMBERED_TOP_RE.match(title))
 
 
 def canonical_for(title: str) -> str:

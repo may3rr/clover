@@ -32,14 +32,14 @@
    "id": "misattr1",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=2",
+   "detail": "labels=['unsupported'] offtopic=1 findings=2",
    "located": true
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=2",
+   "detail": "labels=['undetermined'] offtopic=0 findings=1",
    "located": true
   },
   {
@@ -68,12 +68,12 @@
   "tp": 9,
   "fn": 0,
   "fp_new": 0,
-  "pre_existing": 80,
-  "tn": 227,
+  "pre_existing": 76,
+  "tn": 236,
   "excluded": 4,
   "claims": 171,
   "refs": 133,
-  "support_definitive": 84
+  "support_definitive": 115
  },
  "lenient": [
   1.0,
@@ -81,26 +81,48 @@
   1.0
  ],
  "strict": [
-  0.10112359550561797,
+  0.10588235294117647,
   1.0,
-  0.7468354430379747
+  0.7632398753894081
  ],
  "fp_units": [],
  "pre_existing_units": [
   {
    "unit": [
     "claim",
-    "c0"
+    "c10"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": "教会机器理解自然语言文本并能够正确回答相关问题,是自然语言处理(naturallanguageprocessing,简称"
+   "text": "研究者们尝试将机器阅读理解定义为一种监督学习(supervisedlearning)问题"
   },
   {
    "unit": [
     "claim",
-    "c10"
+    "c102"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "目前,在多项选择类数据集中,最具有挑战性的数据集是Clark等人在2018年提出的ARC数据集"
+  },
+  {
+   "unit": [
+    "claim",
+    "c113"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Nguyen等人在2016年首次提出了生成式数据集MSMARCO,他们提出该数据集的目的是希望机器能够在若干摘要段落中找"
+  },
+  {
+   "unit": [
+    "claim",
+    "c12"
    ],
    "alarms": [
     "label:unsupported",
@@ -111,129 +133,100 @@
   {
    "unit": [
     "claim",
-    "c11"
-   ],
-   "alarms": [
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "其中,最为重要的工作之一是Richardson在2013年提出的MCTest数据集(http://research.mi"
-  },
-  {
-   "unit": [
-    "claim",
-    "c115"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Nguyen等人在2016年首次提出了生成式数据集MSMARCO"
-  },
-  {
-   "unit": [
-    "claim",
-    "c12"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "上述3种模型相比于基线模型(63.33%)各自提升了0.42%"
-  },
-  {
-   "unit": [
-    "claim",
-    "c121"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在早期较为著名的工作有Microsoft’AskMSR"
-  },
-  {
-   "unit": [
-    "claim",
     "c122"
    ],
    "alarms": [
-    "revision:typo"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "在早期较为著名的工作有Microsoft’AskMSR和IBM’sDeepQA"
+   "text": "他们采用文档检索结合神经网络的方法构建了QA模型,将Wikipedia作为知识源,利用SQuAD数据集来训练模型,并在T"
   },
   {
    "unit": [
     "claim",
-    "c124"
+    "c127"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": "并在TREC、WebQuestions和WikiMovies这3个数据集上进行测试"
+   "text": "通过对比表2的内容,我们发现完形填空和多项选择类数据集中的段落大都是来源于完整的、结构化的垂直领域数据,例如新闻、少儿图"
   },
   {
    "unit": [
     "claim",
-    "c125"
+    "c131"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": "基于规则的生成方法具有一定的局限性"
+   "text": "Chen等人通过实验证明了使用Fasttext词向量替代GloVe可以使模型在SQuAD1.1数据集上的性能提升1%."
   },
   {
    "unit": [
     "claim",
-    "c129"
+    "c133"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "完形填空和多项选择类数据集中的段落大都是来源于完整的、结构化的垂直领域数据,例如新闻、少儿图书以及学科考试等"
+   "text": "Wang等人提出的SLQA模型使用了ELMo上下文嵌入后,在SQuAD1.1数据集上EM值提升了2.4%"
   },
   {
    "unit": [
     "claim",
-    "c13"
+    "c134"
    ],
    "alarms": [
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "虽然这些机器学习模型相比于早期基于规则的方法取得了一定的进展,例如,针对MCTest-500数据集,上述3种模型相比于基"
+   "text": "Hu等人提出的Read+Verify模型使用了ELMo上下文嵌入后,在SQuAD2.0数据集上EM值提升了4.5%."
   },
   {
    "unit": [
     "claim",
-    "c141"
+    "c136"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "前人在阅读理解中使用注意力机制"
+   "text": "在早期,研究者们主要利用1DCNN模型获取的字符级别(char-level)的嵌入来解决数据集中单词的OOV(out-o"
   },
   {
    "unit": [
     "claim",
-    "c142"
+    "c139"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "在总结了前人在阅读理解中使用注意力机制的研究工作之后提出了BiDAF模型,该模型是奠定神经阅读理解模型架构的重要模型之一"
+  },
+  {
+   "unit": [
+    "claim",
+    "c140"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "Seo等人在总结了前人在阅读理解中使用注意力机制的研究工作之后提出了BiDAF模型,该模型是奠定神经阅读理解模型架构的重"
   },
   {
    "unit": [
     "claim",
-    "c149"
+    "c147"
    ],
    "alarms": [
     "label:unsupported",
-    "support:被引文献不支持这条论断"
+    "support:正文作者归属与文献作者不一致，可能引错了文献",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": "通过将交互层进行粒度划分,提出了基于分层注意力融合网络的SLQA模型,他们利用不同粒度的注意力机制来分重点捕获问题和段落"
+   "text": "Wang等人通过将交互层进行粒度划分,提出了基于分层注意力融合网络的SLQA模型,他们利用不同粒度的注意力机制来分重点捕"
   },
   {
    "unit": [
@@ -241,39 +234,40 @@
     "c154"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": "问题的信息是作为提取候选答案的高层特征信息的关键"
+   "text": "Hu等人针对不同层次的注意力缺失和冗余的问题,提出了重注意力机制(re-attentionmechanism),用来获取"
   },
   {
    "unit": [
     "claim",
-    "c161"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "首次将图神经网络(graphneuralnetwork,简称GNN)运用于会话类数据集,他们首先在每一轮对话上动态构建了"
-  },
-  {
-   "unit": [
-    "claim",
-    "c165"
+    "c160"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "这些模型仍然会犯很多低级的错误,比如:模型无法理解“BdefeatedA”就是“Bwon”的意思,且涉及“比较类”问题就"
+   "text": "Xiao等人受人类在回答问题时会按步推理的启发,提出了动态融合图网络(dynamicallyfusedgraphnetw"
   },
   {
    "unit": [
     "claim",
-    "c166"
+    "c163"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "revision:typo"
    ],
-   "text": "通过对抗性实验发现:如果我们在段落末尾加入一些无关句子(distractingsentence),这些句子与问题会有一些"
+   "text": "针对SQuAD1.1数据集,虽然现有的模型已经获得了超过人类水平的性能,但仔细研究后发现,这些模型仍然会犯很多低级的错误"
+  },
+  {
+   "unit": [
+    "claim",
+    "c168"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "此外,尽管现有数据集中已有生成式类型(例如NarrativeQA和DuReader),但其仍缺乏考验机器抽象能力的问题,"
   },
   {
    "unit": [
@@ -283,7 +277,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "TriviaQA(http://nlp.cs.washington.edu/triviaqa/)"
+   "text": "抽取式(extractive)类别的TriviaQA(http://nlp.cs.washington.edu/triv"
   },
   {
    "unit": [
@@ -333,7 +327,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "SciQ(http://allenai.org/data.html)"
+   "text": "多项选择(multiplechoice)类别的SciQ(http://allenai.org/data.html)"
   },
   {
    "unit": [
@@ -383,7 +377,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "CBT(http://fb.ai/babi/)"
+   "text": "CLOTH(https://www.cs.cmu.edu/~glai1/data/cloth/)"
   },
   {
    "unit": [
@@ -393,7 +387,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "CLOTH(https://www.cs.cmu.edu/~glai1/data/cloth/)"
+   "text": "会话(conversation)类别的CoQA(https://stanfordnlp.github.io/coqa/)"
   },
   {
    "unit": [
@@ -403,7 +397,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "CoQA(https://stanfordnlp.github.io/coqa/)"
+   "text": "QuAC(http://quac.ai/)"
   },
   {
    "unit": [
@@ -413,7 +407,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "QuAC(http://quac.ai/)"
+   "text": "CSQA(https://github.com/iitm-nlp-miteshk/AmritaSaha/tree/mas"
   },
   {
    "unit": [
@@ -423,7 +417,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "CSQA(https://github.com/iitm-nlp-miteshk/AmritaSaha/tree/mas"
+   "text": "SQA(http://aka.ms/sqa)"
   },
   {
    "unit": [
@@ -433,7 +427,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "SQA(http://aka.ms/sqa)"
+   "text": "CQA(http://nlp.cs.tau.ac.il/compwebq)"
   },
   {
    "unit": [
@@ -443,7 +437,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "CQA(http://nlp.cs.tau.ac.il/compwebq)"
+   "text": "MSMARCO(http://www.msmarco.org)"
   },
   {
    "unit": [
@@ -453,7 +447,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "NarrativeQA(http://deepmind.com/publications)"
+   "text": "最新的多跳(multi-hop)推理的HotpotQA(https://HotpotQA.github.io)"
   },
   {
    "unit": [
@@ -463,37 +457,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "MSMARCO(http://www.msmarco.org)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c37"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "HotpotQA(https://HotpotQA.github.io)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c5"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "尝试使用有监督的机器学习模型解决MRC任务"
-  },
-  {
-   "unit": [
-    "claim",
-    "c51"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Lai等人于2018年发表了一篇关于深度学习技术在答案选择(answerselection)中的应用综述,但他仅仅归纳了"
+   "text": "尽管SQuAD数据集的提出是MRC领域的里程碑,但这并不意味着该数据集代表着整个MRC领域的终极目标,因此之后,学者们提"
   },
   {
    "unit": [
@@ -501,95 +465,71 @@
     "c57"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Word2Vec词向量本质上是利用一个浅层的神经网络模型在大规模数据集上进行训练得到的结果"
-  },
-  {
-   "unit": [
-    "claim",
-    "c59"
-   ],
-   "alarms": [
     "revision:typo"
    ],
-   "text": "提出了一种结合局部上下文窗口和全局矩阵分解方法的全局对数双线性回归模型(globallog-bilinaerregres"
+   "text": "Word2Vec词向量本质上是利用一个浅层的神经网络模型在大规模数据集上进行训练得到的结果,该模型具体可以分为连续词袋模"
   },
   {
    "unit": [
     "claim",
-    "c63"
+    "c66"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "一个单词除了和与之有着语义相似性的单词在向量空间中距离较近以外,还和出现这个单词的句子中的上下文单词也有着一定的关联."
+   "text": "特征嵌入本质上就是将单词在句子中的一些固有特征表示成低维度的向量,包括单词的位置特征(position)、词性特征(PO"
   },
   {
    "unit": [
     "claim",
-    "c79"
+    "c75"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "注意力机制被广泛应用于各种NLP任务中"
+   "text": "在不失准确率的情况下,Yu等人提出的模型在训练时间上较先前的模型快了3~13倍"
   },
   {
    "unit": [
     "claim",
-    "c83"
+    "c77"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "将自注意力机制应用于问题和段落拼接后的向量,不仅可以使模型学习到了问题和段落内部的融合信息,还同时学习到了问题和段落之间"
+   "text": "在自然语言处理领域,该机制最早由Sutskever等人"
   },
   {
    "unit": [
     "claim",
-    "c84"
+    "c80"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:正文作者归属与文献作者不一致，可能引错了文献",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "因此,模型需要通过获取起始和结束位置的概率分布来找到对应的索引"
+   "text": "当注意力机制在NLP领域取得巨大成功后,Vaswani等人猜测:既然注意力机制能让模型学习到两个序列的权重状态,那是否可"
   },
   {
    "unit": [
     "claim",
-    "c89"
+    "c90"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出了将上述两个模型结合的BERT预训练模型"
-  },
-  {
-   "unit": [
-    "claim",
-    "c9"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "在2013年~2015年之间,由于机器学习方法的崛起,研究者们尝试将机器阅读理解定义为一种监督学习(supervised"
-  },
-  {
-   "unit": [
-    "claim",
-    "c91"
-   ],
-   "alarms": [
+    "label:unsupported",
     "revision:typo",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "support:被引文献不支持这条论断"
    ],
    "text": "Transformer架构由6个相同的编码-解码模块组成,其中,每个编码模块包括了自注意力模块(self-attenti"
   },
   {
    "unit": [
     "claim",
-    "c92"
+    "c91"
    ],
    "alarms": [
     "label:unsupported",
@@ -600,73 +540,23 @@
   {
    "unit": [
     "claim",
-    "c96"
+    "c98"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "revision:typo"
    ],
-   "text": "CNN/DailyMail使用匿名标记进行实体替代和置换这一方法虽然可以保证数据集问答对的纯粹性,即无需依赖外部知识辅助"
-  },
-  {
-   "unit": [
-    "claim",
-    "c99"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "收集了1076个中学理科课程,提出了包含有26260个多项选择问题的多项选择类数据集TQA."
+   "text": "Kembhavi等人收集了1076个中学理科课程,提出了包含有26260个多项选择问题的多项选择类数据集TQA."
   },
   {
    "unit": [
     "ref",
-    "r101"
+    "r118"
    ],
    "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
+    "authenticity:文献信息与本地原文不一致",
     "status:mismatch"
    ],
-   "text": "[101]WeissenbornD,WieseG,SeiffeL,etal.MakingneuralQAassimple"
-  },
-  {
-   "unit": [
-    "ref",
-    "r104"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[104]LiuR,WeiW,MaoW,etal.Phaseconductoronmulti-layeredattent"
-  },
-  {
-   "unit": [
-    "ref",
-    "r108"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[108]LiuX,ShenY,DuhK,etal.Stochasticanswernetworksformachine"
-  },
-  {
-   "unit": [
-    "ref",
-    "r109"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[109]RadfordA,NarasimhanK,SalimansT,etal.Improvinglanguageun"
-  },
-  {
-   "unit": [
-    "ref",
-    "r114"
-   ],
-   "alarms": [
-    "norms:这篇参考文献在正文中没有被引用"
-   ],
-   "text": "[114]YatskarM.AqualitativecomparisonofCoQA,SQuAD2.0andQuAC.a"
+   "text": "[118]XiaoY,QuY,QiuL,etal.Dynamicallyfusedgraphnetworkformult"
   },
   {
    "unit": [
@@ -677,6 +567,17 @@
     "norms:这条参考文献与前面的条目重复"
    ],
    "text": "[122]BahdanauD,ChoK,BengioY,etal.Neuralmachinetranslationbyj"
+  },
+  {
+   "unit": [
+    "ref",
+    "r19"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[19]DunnM,SagunL,HigginsM,etal.SearchQA:AnewQ&Adatasetaugmen"
   },
   {
    "unit": [
@@ -695,7 +596,7 @@
     "r32"
    ],
    "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
+    "authenticity:文献信息与本地原文不一致",
     "status:mismatch"
    ],
    "text": "[32]KociskýT,SchwarzJ,BlunsomP,etal.TheNarrativeQAreadingcom"
@@ -747,12 +648,34 @@
   {
    "unit": [
     "ref",
+    "r72"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[72]RocktaschelT,GrefenstetteE,HermannKM,etal.Reasoningabout"
+  },
+  {
+   "unit": [
+    "ref",
     "r89"
    ],
    "alarms": [
     "norms:这条参考文献与前面的条目重复"
    ],
    "text": "[89]BerantJ,ChouAK,FrostigR,etal.Semanticparsingonfreebasefr"
+  },
+  {
+   "unit": [
+    "ref",
+    "r96"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[96]WoodsendK,LapataM.Automaticgenerationofstoryhighlights.I"
   },
   {
    "unit": [
@@ -768,127 +691,31 @@
   {
    "unit": [
     "span",
-    "p101",
-    0,
-    145
+    "p1044",
+    182,
+    325
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "本文认为:在现有的多轮对话数据集中,每一个对话框中的对话流之间规律性太强,例如在CoQA中,一个问题一般与前几个问答对关"
+   "text": "然而通过分析经典数据集的Leaderboard(SquAD,ARC,CoQA以及HotpotQA)后我们发现:虽然基于B"
   },
   {
    "unit": [
     "span",
-    "p125",
-    151,
-    371
+    "p106",
+    103,
+    325
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "但也有少数研究者尝试使用其他单词级别的嵌入方法来替代GloVe,例如:Pan等人[102]注意到,同一单词在不同语境下应"
+   "text": "具体地,我们假设问题Q和段落C是一个Tokens序列(即已经通过预训练的词嵌入或上下文嵌入模型表示成词向量)x=x1,x"
   },
   {
    "unit": [
     "span",
-    "p13",
-    0,
-    100
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "(4)会话:在这类数据集中,目标与机器进行交互式问答,因此,答案可以是文本自由形式(free-textform),即可以"
-  },
-  {
-   "unit": [
-    "span",
-    "p133",
-    204,
-    314
-   ],
-   "alarms": [
-    "support:正文作者归属与文献作者不一致，可能引错了文献"
-   ],
-   "text": "Wang等人[91]通过将交互层进行粒度划分,提出了基于分层注意力融合网络的SLQA模型,他们利用不同粒度的注意力机制来"
-  },
-  {
-   "unit": [
-    "span",
-    "p133",
-    834,
-    875
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "消融实验表明:这个通用节点确实��习到了一些全局信息,使模型性能提高了2.4%."
-  },
-  {
-   "unit": [
-    "span",
-    "p135",
-    73,
-    182
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "他们提出了对话框中的对话流顺序与段落内容顺序具有相似的进行趋势的假设,即每一轮问题的答案与段落位置顺序有较大的关联,并基"
-  },
-  {
-   "unit": [
-    "span",
-    "p21",
-    0,
-    136
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Rouge(recall-orientedunderstudyforgistingevaluation)同时也是自动文本"
-  },
-  {
-   "unit": [
-    "span",
-    "p26",
-    0,
-    43
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "(2)编码层:使用循环或卷��神经网络对段落和问题序列进行编码,用以提取内部特征;"
-  },
-  {
-   "unit": [
-    "span",
-    "p34",
-    0,
-    143
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Word2Vec词向量[50]本质上是利用一个浅层的神经网络模型在大规模数据集上进行训练得到的结果,该模型具体可以分为连"
-  },
-  {
-   "unit": [
-    "span",
-    "p46",
-    326,
-    354
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "关于BERT预模型及其优势将会在第2.5节详细加以介绍."
-  },
-  {
-   "unit": [
-    "span",
-    "p52",
+    "p109",
     100,
     270
    ],
@@ -900,7 +727,19 @@
   {
    "unit": [
     "span",
-    "p7",
+    "p181",
+    0,
+    77
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "使用连续句子预测来训练BERT模型,可以很大程度上提高模型在类似机器阅读理解(MRC)以及自然语言推理(NLI)这些需要"
+  },
+  {
+   "unit": [
+    "span",
+    "p19",
     510,
     592
    ],
@@ -912,26 +751,170 @@
   {
    "unit": [
     "span",
-    "p84",
-    0,
-    85
+    "p24",
+    135,
+    234
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "综上所述,本文认为:BERT模型的提出,对于机器阅读理解任务来说,除了为建立更高性能的模型提供新的思路以外,更是证明了�"
+   "text": "由于数据集的类型不同,问题和答案会被表示成不同的形式,表1中的6个例子分别来自6种类型中具有代表性的数据集:CBT、Sc"
   },
   {
    "unit": [
     "span",
-    "p87",
-    186,
-    320
+    "p30",
+    234,
+    263
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "图6所示为神经网络时代下的MRC主要数据集以及模型发展时间线(蓝色为数据集,绿色为模型),我们可以看到:在最近3年的时间"
+   "text": "“Tommylookedveryindignant."
+  },
+  {
+   "unit": [
+    "span",
+    "p38",
+    166,
+    202
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "I’llgetthehangofthiseventuall."
+  },
+  {
+   "unit": [
+    "span",
+    "p438",
+    0,
+    54
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Fig.8Schematicdiagramofmultiple-roundconversation"
+  },
+  {
+   "unit": [
+    "span",
+    "p56",
+    0,
+    229
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "{P_n}=\\frac{{\\sum\\limits_{C\\in\\{Candidates\\}}{\\sum\\limits_{n"
+  },
+  {
+   "unit": [
+    "span",
+    "p59",
+    0,
+    136
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Rouge(recall-orientedunderstudyforgistingevaluation)同时也是自动文本"
+  },
+  {
+   "unit": [
+    "span",
+    "p76",
+    281,
+    383
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "而高维映射的词嵌入方法可以有效解决上述方法带来的问题,即语义相似的单词可以在几何空间中被编码成距离相近的向量,例如,co"
+  },
+  {
+   "unit": [
+    "span",
+    "p8",
+    270,
+    409
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "MRC之所以在近期能够得到快速发展,其最重要的两个原因是:(1)百科类知识库(例如WikiPedia)、众包群智服务模式"
+  },
+  {
+   "unit": [
+    "span",
+    "p84",
+    65,
+    258
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为了填补Word2Vec的局限性,Pennington等人[52]提出了一种结合局部上下文窗口和全局矩阵分解方法的全局对"
+  },
+  {
+   "unit": [
+    "span",
+    "p86",
+    163,
+    297
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "他们将每一个单词都视为字符袋(bag-of-character)n-gram模型,通过加入边界符号〈和〉来表示词袋的起始"
+  },
+  {
+   "unit": [
+    "span",
+    "p943",
+    398,
+    503
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "MRU采用了称为“合约与扩展(contract-and-expand)”的操作,将段落按合约分成1、2、4、8等子段落,"
+  },
+  {
+   "unit": [
+    "span",
+    "p944",
+    73,
+    182
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "他们提出了对话框中的对话流顺序与段落内容顺序具有相似的进行趋势的假设,即每一轮问题的答案与段落位置顺序有较大的关联,并基"
+  },
+  {
+   "unit": [
+    "span",
+    "p946",
+    0,
+    259
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "本文认为:虽然包括ARC、SquAD、CoQA以及HotpotQA等在内的各类数据集榜单纪录不断地被加入BERT架构的神"
+  },
+  {
+   "unit": [
+    "span",
+    "p98",
+    326,
+    354
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "关于BERT预模型及其优势将会在第2.5节详细加以介绍."
   }
  ]
 }

@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from citecheck.cache import Cache
-from citecheck.library.scan import scan_folder, unsupported_files
+from citecheck.library.scan import is_arxiv_stamp, scan_folder, unsupported_files
 from citecheck.library.text import clean_page, squash_cjk_spaces
 from libgen import build_library
 
@@ -171,3 +171,9 @@ async def test_mid_band_goes_to_model_and_needs_review(library, monkeypatch):
     monkeypatch.setattr(llm, "chat_json", none)
     lib = await link_library([r], pdfs, str(ref))
     assert lib.links == []
+
+
+def test_arxiv_margin_stamp_is_not_a_title():
+    assert is_arxiv_stamp("arXiv:1711.01731v3 [cs.CL] 11 Jan 2018")
+    assert is_arxiv_stamp("arXiv:1408.5882 [cs.CL]")
+    assert not is_arxiv_stamp("A Survey on Dialogue Systems: Recent Advances and New Frontiers")

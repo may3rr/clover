@@ -185,11 +185,11 @@ def find_body_and_refs(doc):
     """(body_idx list, ref_idx list, ref_heading_idx) by paragraph index."""
     ref_head = None
     for i, p in enumerate(doc.paragraphs):
-        if p.text.strip() == "References":
+        if p.text.strip() in ("References", "参考文献"):
             ref_head = i
             break
     if ref_head is None:
-        raise RuntimeError("References heading not found")
+        raise RuntimeError("reference list heading not found")
     body = [i for i in range(ref_head) if "[" in doc.paragraphs[i].text or
             len(doc.paragraphs[i].text) > 60]
     refs = [i for i in range(ref_head + 1, len(doc.paragraphs))

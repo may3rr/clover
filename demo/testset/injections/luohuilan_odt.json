@@ -26,34 +26,34 @@
   {
    "id": "wrongyear",
    "kind": "wrong_year",
-   "old_year": "2018",
-   "new_year": "2014",
-   "match": "KUZNETSOVA A,ROM H,ALLDRIN N,e"
+   "old_year": "2017",
+   "new_year": "2013",
+   "match": "LIN T Y,DOLLARP,GIRSHICK R,et "
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "2]提出了CornerNet算法,借鉴了文献",
-   "cited_label": "23",
-   "intended_label": "63"
+   "snippet": "ageNet[45]分类数据集和MSCOCO",
+   "cited_label": "1",
+   "intended_label": "46"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "目标的检测框进行去除冗余操作.RM借鉴了文献",
-   "cited_label": "13",
-   "intended_label": "40"
+   "snippet": "为了解决这个问题，2017年，Bodla等人",
+   "cited_label": "69",
+   "intended_label": "37"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "4",
-    "5",
-    "12",
     "14",
-    "56",
+    "20",
+    "28",
+    "36",
+    "44",
     "69"
    ]
   },
@@ -62,14 +62,7 @@
    "kind": "typo",
    "wrong": "侯选",
    "right": "候选",
-   "snippet": "[1],使得目标检测具有很大的挑战性.的影响传统的目"
-  },
-  {
-   "id": "typo2",
-   "kind": "typo",
-   "wrong": "座标",
-   "right": "坐标",
-   "snippet": "[38]提出了Softer NMS 算法,不是直接选"
+   "snippet": "传统的目标检测算法采用类似穷举的滑动窗口方式或图像分"
   }
  ]
 }

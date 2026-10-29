@@ -24,7 +24,7 @@ _ABBREV_RE = re.compile(
     r"Inc|Ltd|Jr|Sr|vol|pp|Eq|Eqs|Sec|Chap|eds|al)\.$"
 )
 _INITIAL_RE = re.compile(r"(?:^|[\s,;(（])[A-Z]$")
-_BOUNDARY = re.compile(r"[.!?;。！？；]|[.!?;。！？；]['\"”’》）\]】]+")
+_BOUNDARY = re.compile(r"[.!?;。．！？；]|[.!?;。．！？；]['\"”’》）\]】]+")
 
 
 @dataclass
@@ -110,7 +110,7 @@ _PROMPT = (
 
 _FLAT_TABLE_MIN_CHARS = 500
 _FLAT_TABLE_MIN_COLONS = 10
-_FLAT_TABLE_END = re.compile(r"[。！？!?]|[.](?:\s+|$)")
+_FLAT_TABLE_END = re.compile(r"[。．！？!?]|[.](?:\s+|$)")
 
 
 def _is_flattened_table(text: str) -> bool:

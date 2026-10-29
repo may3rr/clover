@@ -33,43 +33,43 @@
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "tureofknowledgegraph.图",
-   "cited_label": "76",
-   "intended_label": "1"
+   "snippet": "确保推理的知识加入知识库后不会产生矛盾和冗余",
+   "cited_label": "54",
+   "intended_label": "69"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": ".为促进知识库融合的标准化,Mendes等人",
-   "cited_label": "4",
-   "intended_label": "53"
+   "snippet": "有效消除同名实体间的歧义．Bunescu等人",
+   "cited_label": "6",
+   "intended_label": "38"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "4",
-    "12",
-    "28",
+    "11",
+    "13",
     "30",
-    "65",
-    "72"
+    "38",
+    "49",
+    "82"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "侯选",
-   "right": "候选",
-   "snippet": "4 知识图谱的应用通过知识图谱,不仅可以将互联网的信"
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "随着统计机器学习方法被引入该领域，共指消解技术进入了"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "wrong": "背境",
-   "right": "背景",
-   "snippet": "[47]通过实验发现,语义背境知识对于构造共指消解算"
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "信息抽取（information extractio"
   }
  ]
 }

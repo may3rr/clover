@@ -34,7 +34,7 @@ log = logging.getLogger(__name__)
 
 _MAX_PDF_BYTES = 80 * 1024 * 1024
 _MIN_TEXT_CHARS = 200  # first three pages; less = scanned / image-only
-_CACHE_VERSION = "5"
+_CACHE_VERSION = "6"
 
 _DOI_RE = re.compile(r"\b(10\.\d{4,9}/[^\s\"<>，。；)）\]]+)")
 _DOI_LABEL_RE = re.compile(r"DOI\s*[:：]\s*(10\s*\.\s*\d{4,9}\s*/\s*[0-9a-z]+(?:\s*[./\-_]\s*[0-9a-z][0-9A-Za-z]*)*)")
@@ -82,6 +82,16 @@ def _sha256(path: Path) -> str:
     return h.hexdigest()
 
 
+# the identifier arXiv prints sideways down the left margin is drawn
+# larger than the paper's title
+_ARXIV_STAMP_RE = re.compile(r"^arXiv:\s*\d{4}\.\d{4,5}(v\d+)?\b", re.I)
+
+
+def is_arxiv_stamp(text: str) -> bool:
+    """'arXiv:1711.01731v3 [cs.CL] 11 Jan 2018' — not a title."""
+    return bool(_ARXIV_STAMP_RE.match(text.strip()))
+
+
 def _largest_text(page) -> str | None:
     """Text drawn in the largest font on a page — the title of most
     papers. Fragments too short to be a title (drop caps, logos) are
@@ -101,7 +111,8 @@ def _largest_text(page) -> str | None:
     for size in sorted({s for s, _ in pieces}, reverse=True)[:4]:
         text = squash_cjk_spaces(
             re.sub(r"\s+", " ", " ".join(t for s, t in pieces if s == size))).strip()
-        if len(re.sub(r"\W", "", text)) >= 8 and len(text) <= 300:
+        if len(re.sub(r"\W", "", text)) >= 8 and len(text) <= 300 \
+                and not is_arxiv_stamp(text):
             return text
     return None
 

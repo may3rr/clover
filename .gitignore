@@ -62,6 +62,9 @@ demo/testset/reports/
 # earlier runs kept for comparison (degraded-mode baseline, pre-fix backup)
 demo/testset/reports_*/
 demo/testset/zh_papers/**/*.pdf
+# 软件学报 HTML full text and figures: fetched by build_docx.py
+demo/testset/zh_html/*.html
+demo/testset/zh_html/jos_mrc_6048/
 # English injected projects: regenerable from raw/ (inject_latex.py, seed=42)
 demo/testset/en_papers/
 # UI design drafts moved from the old latex-import worktree, kept local

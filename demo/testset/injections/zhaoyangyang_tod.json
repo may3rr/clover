@@ -33,43 +33,43 @@
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "决了可变长度的句子的输入问题,但由于其网络视",
-   "cited_label": "237",
-   "intended_label": "23"
+   "snippet": "方法对对话系统评估是合理的，例如Shah等人",
+   "cited_label": "21",
+   "intended_label": "234"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "义相似度、命名实体识别、情感分析和问答匹配等",
-   "cited_label": "83",
-   "intended_label": "1"
+   "snippet": "学习方法（DoubleQ-Learning）",
+   "cited_label": "238",
+   "intended_label": "104"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "2",
-    "72",
-    "151",
-    "195",
-    "208",
-    "223"
+    "21",
+    "60",
+    "75",
+    "198",
+    "219",
+    "222"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "布署",
-   "right": "部署",
-   "snippet": "[36]和单例学习是迁移学习的特例,也被经零次学习常"
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "②多模态人机DM方法．目前的人机对话系统，例如goo"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "wrong": "背境",
-   "right": "背景",
-   "snippet": "[145]等对话系统也逐渐往此方向发展.因此,设计蜜"
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "领域识别和意图检测都属于一个文本分类任务，它根据当前"
   }
  ]
 }

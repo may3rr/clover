@@ -149,7 +149,10 @@ def _find_ref_span(
 def _is_front_matter_line(text: str) -> bool:
     """Author / affiliation lines: short and without a sentence."""
     t = text.strip()
-    return len(t) <= 200 and not re.search(r"[。！？]|[.!?](\s|$)", t.rstrip(".)） "))
+    # "．" is the full stop of 计算机学报-style Chinese text; an ASCII "."
+    # straight before a Chinese character ends a sentence as well
+    return len(t) <= 200 and not re.search(
+        r"[。！？．]|[.!?](\s|$|[\u4e00-\u9fff])", t.rstrip(".)） "))
 
 
 def _classify_marker_style(m: DetectedMarker) -> str:
@@ -217,8 +220,15 @@ def parse_docx(path: str | Path) -> ParsedDocument:
         if prefixes[i]:
             auto_labels[p_ids[i]] = prefixes[i]
 
+    # a document that marks its headings with Word heading styles has
+    # told us its structure: numbered list items ("1)实体消歧") are not
+    # headings there
+    styled = sum(1 for p in p_elems
+                 if (sid := dx.paragraph_style_id(p))
+                 and hd.style_heading_level(sid, styles) is not None)
     heading_levels = [
-        hd.heading_level(p, t, styles) for p, t in zip(p_elems, texts)
+        hd.heading_level(p, t, styles, text_rules=styled < 3)
+        for p, t in zip(p_elems, texts)
     ]
 
     # ---- sections -----------------------------------------------------
@@ -240,11 +250,12 @@ def parse_docx(path: str | Path) -> ParsedDocument:
         para_section.append(cur.id)
 
     # front matter ends at the first recognised body heading (引言 /
-    # Introduction …); author and affiliation lines above it carry
+    # Introduction …, or any numbered top-level heading); author and affiliation lines above it carry
     # superscript affiliation numbers ("吕浩博1，2"), not citations
     body_start = next(
         (i for i, t in enumerate(texts)
-         if heading_levels[i] == 1 and hd.canonical_for(t) != "other"), 0)
+         if heading_levels[i] == 1 and (hd.canonical_for(t) != "other"
+                                        or hd.is_numbered_heading(t))), 0)
 
     # ---- reference list ----------------------------------------------
     ref_span = _find_ref_span(p_elems, texts, heading_levels)

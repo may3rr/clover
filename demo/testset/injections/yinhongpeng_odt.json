@@ -33,43 +33,43 @@
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "snippet": "跟踪评测的公开视频序列比较多[3],[4],",
-   "cited_label": "128",
-   "intended_label": "5"
+   "snippet": "基于自编码机(Autoencoder,AE)",
+   "cited_label": "116",
+   "intended_label": "100"
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "snippet": "cbcl.mit.edu/software-",
-   "cited_label": "76",
-   "intended_label": "139"
+   "snippet": "光照变化和背景动态变化等情况.Sobral等",
+   "cited_label": "92",
+   "intended_label": "48"
   },
   {
    "id": "stacking",
    "kind": "stacking",
    "snippet": "此外,上述工作在数据集构建、模型结构、训练策略以及评测协议等",
    "labels": [
-    "40",
-    "56",
-    "72",
-    "87",
-    "88",
-    "197"
+    "21",
+    "32",
+    "98",
+    "119",
+    "139",
+    "188"
    ]
   },
   {
    "id": "typo1",
    "kind": "typo",
-   "wrong": "侯选",
-   "right": "候选",
-   "snippet": "10 小时视频,[143]Pedestrian是64"
+   "wrong": "背境",
+   "right": "背景",
+   "snippet": "随着对基于视觉的目标检测与跟踪研究的深入,大量的相关"
   },
   {
    "id": "typo2",
    "kind": "typo",
-   "wrong": "辩识",
-   "right": "辨识",
-   "snippet": "6 届视觉与学习青年研讨会(Vision and L"
+   "wrong": "侯选",
+   "right": "候选",
+   "snippet": "基于稀疏表示的方法通常假设跟踪目标在一个由目标模板所"
   }
  ]
 }

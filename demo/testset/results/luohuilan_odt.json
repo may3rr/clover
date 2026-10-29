@@ -25,21 +25,21 @@
    "id": "wrongyear",
    "kind": "wrong_year",
    "detected": true,
-   "detail": "status=mismatch issues=['年份不一致：文中写 2014，数据库记录为 2018']",
+   "detail": "status=mismatch issues=['年份不一致：文中写 2013，数据库记录为 2016', '本地原文年份为 2016，文中写 2013']",
    "located": true
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
-   "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "detected": false,
+   "detail": "labels=['supported'] offtopic=0 findings=0",
    "located": true
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
-   "detected": false,
-   "detail": "labels=['undetermined'] offtopic=0 findings=0",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
    "located": true
   },
   {
@@ -55,69 +55,72 @@
    "detected": true,
    "detail": "revisions=1",
    "located": true
-  },
-  {
-   "id": "typo2",
-   "kind": "typo",
-   "detected": true,
-   "detail": "revisions=1",
-   "located": true
   }
  ],
  "counts": {
-  "tp": 8,
+  "tp": 7,
   "fn": 1,
   "fp_new": 0,
-  "pre_existing": 52,
-  "tn": 112,
-  "excluded": 7,
-  "claims": 92,
-  "refs": 71,
-  "support_definitive": 37
+  "pre_existing": 30,
+  "tn": 107,
+  "excluded": 4,
+  "claims": 75,
+  "refs": 72,
+  "support_definitive": 63
  },
  "lenient": [
   1.0,
-  0.8888888888888888,
-  0.9917355371900827
+  0.875,
+  0.991304347826087
  ],
  "strict": [
-  0.13333333333333333,
-  0.8888888888888888,
-  0.6936416184971098
+  0.1891891891891892,
+  0.875,
+  0.7862068965517242
  ],
  "fp_units": [],
  "pre_existing_units": [
   {
    "unit": [
     "claim",
-    "c10"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "从检法中不平衡问题的角度进行了综述"
-  },
-  {
-   "unit": [
-    "claim",
-    "c18"
+    "c15"
    ],
    "alarms": [
     "label:unsupported",
-    "revision:typo",
-    "support:被引文献不支持这条论断"
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": ")运用在目标检(ConvolutionalNeuralNetworks,CNN"
+   "text": "RPN是一种全卷积神经网络(FullyConvolutionalNetwork，FCN)结构"
   },
   {
    "unit": [
     "claim",
-    "c26"
+    "c21"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "2018年Bharat等人提出了图像金字塔的尺度归一化方法(ScaleNormalizationforImagePyra"
+  },
+  {
+   "unit": [
+    "claim",
+    "c22"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "算法用于去除冗特征生成目标的候选区域"
+   "text": "2016年Dai等人提出了基于区域的全卷积神经网络(Region-basedFullyConvolutionalNetw"
+  },
+  {
+   "unit": [
+    "claim",
+    "c24"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "2017年Dai等人提出了形变卷积网络(DeformationConvolutionNetwork，DCN)，设计了可形"
   },
   {
    "unit": [
@@ -125,19 +128,10 @@
     "c27"
    ],
    "alarms": [
-    "revision:typo"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "提出了HyperNet算法,通过融合多层卷积层的特征图,得到具有多尺度信息的Hy-per特征,该特征结合了卷积层高层的强"
-  },
-  {
-   "unit": [
-    "claim",
-    "c28"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "采用多尺度思想,在特征提取网络的高层和低层人中提取多个不同尺度的特征分别进行预测."
+   "text": "2017年，Zhao等人提出了CascadeR-CNN算法"
   },
   {
    "unit": [
@@ -147,131 +141,101 @@
    "alarms": [
     "revision:typo"
    ],
-   "text": "提出了特征金字塔网络(Fea-turePyramidNetwork,FPN),FPN构造了一种自顶向下带有横向连接的层次"
+   "text": "与此不同，2018年Chen等人在RPN阶段引入上下文信息对候选区域进行微调，使得网络定位的更加准确．"
   },
   {
    "unit": [
     "claim",
-    "c31"
+    "c3"
    ],
    "alarms": [
-    "revision:typo"
-   ],
-   "text": "提出了基于区域的全卷积神经网络(Region-basedFullyConvolutionalNetwork,R-FCN)"
-  },
-  {
-   "unit": [
-    "claim",
-    "c33"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "revision:typo",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "提出了形变卷积网络(De-formationConvolutionNetwork,DCN),设计了可形变卷积和可形变RO"
-  },
-  {
-   "unit": [
-    "claim",
-    "c35"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "进一步改进了ROIPooling提出了精准的感兴趣人区域池化(PreciseROIPooling,PrROIPoolin"
-  },
-  {
-   "unit": [
-    "claim",
-    "c39"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "提大小和长宽比等超参数的问题,2019年,Wang等人出了Guided-Anchoring方法,通过图像特征来指导An-"
-  },
-  {
-   "unit": [
-    "claim",
-    "c44"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "检测结果中存在分类置效果"
-  },
-  {
-   "unit": [
-    "claim",
-    "c50"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出了YOLOv2算法,对YOLO算法进行了一系列改进,重点解决召回率低和定位精度差的问题."
-  },
-  {
-   "unit": [
-    "claim",
-    "c52"
-   ],
-   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
     "label:unsupported",
     "support:被引文献不支持这条论断"
    ],
-   "text": "检测数据集上在ImageNet同步训练,实现超过9000个目标类别的实时检测任务."
+   "text": "Sharma等人仅仅综述了传统的目标检测算法"
   },
   {
    "unit": [
     "claim",
-    "c53"
+    "c37"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "2019年Hamid等人提出了GIOU作为边界框回归损失函数，在计算检测框与真值框IOU的基础上，添加了对这两个框的最小"
+  },
+  {
+   "unit": [
+    "claim",
+    "c4"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Chahal等人对基于深度学习的目标检测算法从算法实现的角度进行了综述"
+  },
+  {
+   "unit": [
+    "claim",
+    "c5"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Kemal等人从目标检测算法中不平衡问题的角度进行了综述"
+  },
+  {
+   "unit": [
+    "claim",
+    "c51"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "提出了YOLOv3算法,它借鉴残差网络中跳跃连接的思路,构建了名为DarNet-53的53层基准网络,该网络只采用3×3"
+   "text": "在此基础上，Lin等人提出了RetinaNet算法，针对SSD算法因密集采样导致的难易样本严重失衡问题，提出了Focal"
   },
   {
    "unit": [
     "claim",
-    "c54"
+    "c56"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "SSD最新的改进研究更加关注于合理和高效的运用FPN结构，提取具有丰富上下文信息和空间信息的多尺度特征，解决目标尺度变化"
+  },
+  {
+   "unit": [
+    "claim",
+    "c57"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "Ghaisi等人受到神经结构搜索(NeuralArchitectureSearch，NAS)的启发，提出了NAS-FPN"
+  },
+  {
+   "unit": [
+    "claim",
+    "c6"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Zhao等人从检测框架和检测子任务两个角度进行了综述"
+  },
+  {
+   "unit": [
+    "claim",
+    "c63"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "相仿的分类准确率,但大大减层,具有与ResNet-152少了计算量;"
-  },
-  {
-   "unit": [
-    "claim",
-    "c58"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出了DSSD算法,将VGG16"
-  },
-  {
-   "unit": [
-    "claim",
-    "c61"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出了RetinaNet算法,针对SSD算法因密集采样导致的难易样本严重失衡问题,提出了FocalLoss函数,其是在交"
-  },
-  {
-   "unit": [
-    "claim",
-    "c65"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "提出了RFB-Net算法,通过模拟人类视觉感受野,设计了感受野模块(ReceptiveFieldBlock,RFB)增加"
+   "text": "Duan等人发现ConerNet只使用左右角点会造成大量的误检，为了解决这个问题，提出了CenterNet算法，它在Co"
   },
   {
    "unit": [
@@ -279,165 +243,120 @@
     "c66"
    ],
    "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
     "revision:typo"
    ],
-   "text": "引入三个不同扩张率的3×3卷了Inception积层增大感受野,并且将这三个卷积的输出以串接方式进行特征融合."
-  },
-  {
-   "unit": [
-    "claim",
-    "c67"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "提出了RefineDet算法,结合了一阶段和二阶段检测算法的优点,设计了两个模块:物体检测模块和Anchor微调模块,前"
-  },
-  {
-   "unit": [
-    "claim",
-    "c68"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "更加关注于合理和高效SSD最新的改进研究的运用FPN结构,提取具有丰富上下文信息和空间信息的多尺度特征,解决目标尺度变化"
-  },
-  {
-   "unit": [
-    "claim",
-    "c69"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "受到神经结构搜索(NeuralArchitectureSearch,人NAS)的启发,提出了NAS-FPN算法,该网络模"
-  },
-  {
-   "unit": [
-    "claim",
-    "c7"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "仅仅综述了传统的目标检测算法"
-  },
-  {
-   "unit": [
-    "claim",
-    "c70"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "提出了多层特征金量的GPU支持"
-  },
-  {
-   "unit": [
-    "claim",
-    "c73"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "作为特征提取网络,直接预测物体的左上角点网络和右下角点来得到检测框,将目标检测问题当作关键点检测问题来解决."
-  },
-  {
-   "unit": [
-    "claim",
-    "c75"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "发现ConerNet只息,使得检测更加稳定."
-  },
-  {
-   "unit": [
-    "claim",
-    "c76"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "网络作为测的思想,使用非常庞大的Hourglass-104特征提取网络"
-  },
-  {
-   "unit": [
-    "claim",
-    "c8"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "对基于深度学习的目标检测算法从算法Chahal等人实现的角度进行了综述"
-  },
-  {
-   "unit": [
-    "claim",
-    "c84"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "ImageNet数据集主要用于图像分类和目PASCALVOC"
-  },
-  {
-   "unit": [
-    "claim",
-    "c85"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "数据标检测任务,主要流行的有PASCALVOC2007"
-  },
-  {
-   "unit": [
-    "claim",
-    "c87"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "数据集用于目标检测、语义分割、人体MSCOCO关键点检测和字幕生成等任务,对于目标检测任务,它学报是挑战性最大的数据集之"
+   "text": "当前通用目标检测任务中流行的数据集有:PAS-CALVOC2007、PASCALVOC2012、MSCOCO、Image"
   },
   {
    "unit": [
     "ref",
-    "r10"
+    "r12"
    ],
    "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
+    "authenticity:文献信息与本地原文不一致",
     "status:mismatch"
    ],
-   "text": "[10]毕威,黄伟国,张永萍,等.基于图像显著轮廓的目标检BIWei,HANGWei-guo,ZHANGYongping"
+   "text": "[12]OKSUZKemal,CAMBarisCan,KALKANS,etal.ImbalanceProblemsinO"
   },
   {
    "unit": [
     "ref",
-    "r17"
+    "r15"
    ],
    "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
    ],
-   "text": "[18]UIJLINGDJR,DESandeKE,GEVERST,etal.Selec-ofComputerVision"
+   "text": "[15]GIRSHICKR,DONAHUEJ,DARRELLT,etal.Richfeaturehierarchiesf"
   },
   {
    "unit": [
     "ref",
-    "r61"
+    "r22"
    ],
    "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
    ],
-   "text": "[62]LAWH,DENGJ.Cornernet:detectingobjectsaspairedkeypoints[A"
+   "text": "[22]LONGJ,SHELHAMERE,DARRELLT.Fullyconvolutionalnetworksfors"
+  },
+  {
+   "unit": [
+    "ref",
+    "r29"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[29]ZHUY,ZHAOC,WANGJ,etal.Couplenet:couplingglobalstructurew"
+  },
+  {
+   "unit": [
+    "ref",
+    "r38"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[38]HEYi-hui,ZHANGXiang-yu,MARIOSS,etal.Softer-NMS:Rethinkin"
+  },
+  {
+   "unit": [
+    "ref",
+    "r47"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[47]REDMONJ,FARHADIA.YOLOV3:Anincrementalimprovement[A].Comp"
+  },
+  {
+   "unit": [
+    "ref",
+    "r51"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[51]FUCheng-yang,LIUWei,RANGAA,etal.DSSD:DeconvolutionalSing"
+  },
+  {
+   "unit": [
+    "ref",
+    "r53"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[53]LIB,LIUY,WANGX.Gradientharmonizedsingle-stagedetector[A]"
+  },
+  {
+   "unit": [
+    "ref",
+    "r64"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[64]ZHOUXing-yi,ZHUOJia-cheng,KRAHENBUHLP.Bottom-upobjectdet"
+  },
+  {
+   "unit": [
+    "ref",
+    "r68"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[68]KUZNETSOVAA,ROMH,ALLDRINN,etal.TheOpenImagesDataset-v4:U"
   },
   {
    "unit": [
@@ -452,206 +371,39 @@
   },
   {
    "unit": [
-    "ref",
-    "r9"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[9]SHARMAKU,THAKURNV.AreviewandanapproachComputationalVision"
-  },
-  {
-   "unit": [
-    "span",
-    "p1",
-    0,
-    99
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "基于深度学习的目标检测研究综述罗会兰,陈鸿坤(江西理工大学信息工程学院,江西赣州341000)要:目标检测是计算机视觉领"
-  },
-  {
-   "unit": [
-    "span",
-    "p14",
-    0,
-    48
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "[13]从检法中不平衡问题的角度进行了综述,Zhao等人测框架和检测子任务两个角度进行了综述."
-  },
-  {
-   "unit": [
-    "span",
-    "p14",
-    90,
-    197
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在将其分为基于候选区域和基于回归两大类的前提下,对基于候选区域的目标检测算法,介绍基于区域的卷积神经网络(Re-gion"
-  },
-  {
-   "unit": [
-    "span",
-    "p16",
-    120,
-    178
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "而且候选区域输入CNN前,必须剪裁或缩放至固定大小,这会使候选区域发生形变且丢失较多的信息,导致网络检测精度下降."
-  },
-  {
-   "unit": [
-    "span",
-    "p2",
-    66,
-    252
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "4ASurveyofObjectDetectionBasedonDeepLearningLUOHui-lan,CHENH"
-  },
-  {
-   "unit": [
-    "span",
-    "p22",
-    159,
-    188
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "电子虽然FastR-CNN有效地加快了检测速率,但仍然"
-  },
-  {
-   "unit": [
-    "span",
-    "p25",
-    87,
-    133
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "RPN是一种全卷积神经网络(FullyConvolutionalNetwork,FCN"
-  },
-  {
-   "unit": [
-    "span",
-    "p3",
-    177,
-    264
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Theresearchbackground,significanceandchallengesofobjectdetec"
-  },
-  {
-   "unit": [
-    "span",
-    "p38",
-    14,
-    67
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "与此不同,2018年Chen等人RPN阶段引入上下文信息对候选区域进行微调,使得网络定位的更加准确."
-  },
-  {
-   "unit": [
-    "span",
-    "p39",
-    266,
-    384
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "对NMS的改进研究2.2.4NMS算法首先人工设定一个IOU阈值,将同一类的所有检测框按照分类置信度排序,选取分类置信度"
-  },
-  {
-   "unit": [
-    "span",
-    "p44",
-    7,
-    84
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "他们将预测的检测框与真值间的guidedNMSIOU值作为定位置信度,每一类根据定位置信度进行排序,从而改进了NMS过程"
-  },
-  {
-   "unit": [
     "span",
     "p48",
-    173,
-    288
+    86,
+    182
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "虽然YOLO算法完全舍弃了候选区学报域生成步骤,极大提高了检测速率,能满足实时目标检测的速度要求,但由于其网络设计比较粗"
+   "text": "如图5所示，YOLO算法将整张输入图像划分成S×S的网格图，每个网格只负责物体中心落在该网格的目标物体以及只预测B个边界"
   },
   {
    "unit": [
     "span",
-    "p54",
-    141,
-    372
+    "p51",
+    0,
+    129
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "同时借鉴FasterR-CNN算法的Anchor机制,对提取的特征图的每个位置上都预设固定数量的不同尺度和长宽比的先验框"
+   "text": "2018年Redmon等人[47]提出了YOLOv3算法，它借鉴残差网络中跳跃连接的思路，构建了名为DarNet-53的"
   },
   {
    "unit": [
     "span",
-    "p68",
-    21,
-    150
+    "p58",
+    557,
+    701
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "此外,Zhao等人字塔网络(Multi-LevelFeaturePyramidNetwork,MLF-PN),通过级联多"
-  },
-  {
-   "unit": [
-    "span",
-    "p71",
-    83,
-    83
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": ""
-  },
-  {
-   "unit": [
-    "span",
-    "p82",
-    8,
-    73
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "它们包含了20个常集和PASCALVOC2012见的类别,每张图片都有与之对应的XML文件标注了每个待检测目标的位置和类"
+   "text": "受FocalLoss的启发，Li等人[53]提出了梯度协调机制(GradientHarmonizingMechanism"
   }
  ]
 }
