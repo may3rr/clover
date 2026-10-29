@@ -17,7 +17,7 @@ async def build_library(
     links: list[LibraryLink] | None = None, venue: str | None = None,
     use_model: bool = True, cache=None, progress=None,
     pdfs: list[LocalPdf] | None = None,
-    exemplar_ids: list[str] | None = None, fallback_venue: str | None = None,
+    exemplar_ids: list[str] | None = None,
     manuscript_type: str = "research", guess_venues: bool | None = None,
     on_stage: Callable[[str, int, int], None] | None = None,
 ) -> tuple[Library, dict[str, LocalPdf], list[LocalPdf]]:
@@ -33,8 +33,7 @@ async def build_library(
         from ..config import venue_model_enabled
 
         guess_venues = venue_model_enabled()
-    opts = dict(exemplar_ids=exemplar_ids, fallback_venue=fallback_venue,
-                manuscript_type=manuscript_type)
+    opts = dict(exemplar_ids=exemplar_ids, manuscript_type=manuscript_type)
     if pdfs is None:
         def _pdf_progress(done: int, total: int) -> None:
             note("pdfs", done, total)

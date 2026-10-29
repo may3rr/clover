@@ -288,12 +288,18 @@ class VenueMetric(BaseModel):
 
 
 class ExemplarInfo(BaseModel):
-    """A PDF the baseline was built from (or offered for it)."""
+    """A paper of the target venue the baseline was built from (or found
+    for it): one of the manuscript's references, or an uncited PDF in
+    the reference folder."""
     doc_id: str
-    filename: str
+    filename: str = ""  # local PDF; "" when the text came from the web
     title: str | None = None
     year: int | None = None
     paper_type: Literal["research", "review"] = "research"
+    origin: Literal["cited", "folder"] = "folder"
+    ref_id: str | None = None  # cited: the manuscript's reference
+    label: str | None = None  # cited: its label in the manuscript, "12"
+    url: str | None = None  # cited without a local PDF: the open-access PDF
     used: bool = True
     note: str | None = None  # why it could not be used
     similar: bool = False  # among the closest to the manuscript's topic
@@ -309,8 +315,9 @@ class Distribution(BaseModel):
     sentence_refs: SentenceRefs | None = None
     functions: dict[str, int] | None = None
     marker_functions: dict[str, str] = Field(default_factory=dict)
-    # Chinese journal benchmarking: target journal and where its baseline
-    # came from (the reference folder's exemplars or the built-in one)
+    # venue benchmarking: the target the user typed and the papers of it
+    # the baseline was built from (cited references, folder PDFs);
+    # "builtin" appears only in reports stored before F34
     venue: str | None = None
     venue_source: Literal["exemplars", "builtin"] | None = None
     venue_stats: list[VenueStat] = Field(default_factory=list)
@@ -347,11 +354,14 @@ OverviewTier = Literal["below", "near", "at", "above", "na"]
 
 
 class ExemplarPaper(BaseModel):
-    """A recently published paper from the target venue, used as a yardstick."""
-    id: str  # ACL Anthology id, e.g. 2024.emnlp-main.123
+    """A paper of the target venue the critic compared against: one of
+    the manuscript's references or an uncited PDF in the folder."""
+    id: str
     title: str
     year: int | None = None
-    url: str
+    url: str | None = None
+    origin: Literal["cited", "folder"] = "folder"
+    label: str | None = None  # cited: its label in the manuscript, "12"
     # n_datasets / n_baselines / n_tables / n_figures / has_ablation /
     # has_human_eval / has_error_analysis / has_limitations (None = unknown)
     stats: dict[str, int | bool | None] = Field(default_factory=dict)

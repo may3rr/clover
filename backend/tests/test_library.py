@@ -110,7 +110,10 @@ def _docname(lib, rid):
 async def test_link_fixture_manuscript(library):
     ref, _, pdfs = library
     refs = parse_docx(DAKD).references
-    lib = await link_library(refs, pdfs, str(ref), use_model=False)
+    # blank target: no guessing from the folder, no exemplars
+    blank = await link_library(refs, pdfs, str(ref), use_model=False)
+    assert blank.venue is None and blank.exemplar_ids == [] and blank.venue_match_ids == []
+    lib = await link_library(refs, pdfs, str(ref), use_model=False, venue="数据分析与知识发现")
     assert _docname(lib, "r1").startswith("生成式AI")  # formal CNKI page
     assert _docname(lib, "r2").startswith("Ji et al.")  # not the Siren survey
     assert _docname(lib, "r3").endswith("曾子明.pdf")  # CNKI cover
@@ -120,7 +123,7 @@ async def test_link_fixture_manuscript(library):
     # the three uncited DAKD papers match the journal; the duplicate is
     # merged, the cited ones and the scan are not candidates. The review
     # (研究现状) is offered but not selected for a research manuscript
-    assert lib.venue == "数据分析与知识发现" and lib.venue_source == "folder"
+    assert lib.venue == "数据分析与知识发现" and lib.venue_source == "user"
     matched = sorted(d.filename for d in lib.docs if d.id in lib.venue_match_ids)
     assert matched == sorted([
         "基于多提示学习的方面级情感分析研究_钱玲飞.pdf",

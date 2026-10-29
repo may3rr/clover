@@ -402,13 +402,14 @@
       "type": "object"
     },
     "ExemplarInfo": {
-      "description": "A PDF the baseline was built from (or offered for it).",
+      "description": "A paper of the target venue the baseline was built from (or found\nfor it): one of the manuscript's references, or an uncited PDF in\nthe reference folder.",
       "properties": {
         "doc_id": {
           "title": "Doc Id",
           "type": "string"
         },
         "filename": {
+          "default": "",
           "title": "Filename",
           "type": "string"
         },
@@ -445,6 +446,51 @@
           "title": "Paper Type",
           "type": "string"
         },
+        "origin": {
+          "default": "folder",
+          "enum": [
+            "cited",
+            "folder"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "ref_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ref Id"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
         "used": {
           "default": true,
           "title": "Used",
@@ -469,14 +515,13 @@
         }
       },
       "required": [
-        "doc_id",
-        "filename"
+        "doc_id"
       ],
       "title": "ExemplarInfo",
       "type": "object"
     },
     "ExemplarPaper": {
-      "description": "A recently published paper from the target venue, used as a yardstick.",
+      "description": "A paper of the target venue the critic compared against: one of\nthe manuscript's references or an uncited PDF in the folder.",
       "properties": {
         "id": {
           "title": "Id",
@@ -499,8 +544,37 @@
           "title": "Year"
         },
         "url": {
-          "title": "Url",
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        },
+        "origin": {
+          "default": "folder",
+          "enum": [
+            "cited",
+            "folder"
+          ],
+          "title": "Origin",
           "type": "string"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Label"
         },
         "stats": {
           "additionalProperties": {
@@ -522,8 +596,7 @@
       },
       "required": [
         "id",
-        "title",
-        "url"
+        "title"
       ],
       "title": "ExemplarPaper",
       "type": "object"

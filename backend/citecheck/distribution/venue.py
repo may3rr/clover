@@ -1,23 +1,26 @@
-"""中文期刊对标：用文献文件夹里的同刊范文现场建基线。
+"""期刊对标：用目标期刊或会议的论文现场建基线。
 
-There is no arXiv for Chinese journals, and scraping CNKI is not an
-option. The author's own folder usually holds recent papers of the
-journal they are submitting to (the PDFs that are not cited). Their
-statistics, computed locally, become the benchmark:
+The exemplars are papers of the target venue whose text is at hand
+(pool.py gathers them): the manuscript's own references published there
+— the linked PDF in the reference folder, or the open-access PDF their
+verified record points at — and uncited PDFs of that venue in the
+folder. Their statistics, computed locally, become the benchmark:
 
 - the same section metrics as the arXiv benchmark (citation share and
   density per canonical section, citations per sentence), so the
   distribution layer compares them unchanged;
-- journal-level indicators Chinese editors look at: reference count,
-  share of references from the last three years, share of foreign
-  references, structured-abstract length, figures and tables.
+- journal-level indicators editors look at: reference count, share of
+  references from the last three years, share of foreign references,
+  structured-abstract length, figures and tables.
 
-A profile also keeps what each number is read from — the page of every
-section heading, the citing sentences, the reference list, the captions
-and the abstract — so the report can point at the exact place in each
-exemplar (venue_metrics.py), and the model reads (venue_model.py) work
-on the same text. Each exemplar's profile is cached by file hash. The
-benchmark dict has the arxiv_cs_cl.json shape plus ``venue_stats``.
+Numbered citations ([3], [4-6]) and author–year ones ((Devlin et al.,
+2019), Devlin et al. (2019)) are both counted. A profile also keeps what
+each number is read from — the page of every section heading, the
+citing sentences, the reference list, the captions and the abstract —
+so the report can point at the exact place in each exemplar
+(venue_metrics.py), and the model reads (venue_model.py) work on the
+same text. Each exemplar's profile is cached by its id. The benchmark
+dict has the arxiv_cs_cl.json shape plus ``venue_stats``.
 """
 
 from __future__ import annotations
@@ -25,7 +28,9 @@ from __future__ import annotations
 import logging
 import re
 import statistics
+from dataclasses import dataclass
 from datetime import date
+from typing import Literal
 
 from ..cache import Cache
 from ..library.scan import LocalPdf
@@ -38,8 +43,8 @@ from ..support.claims import split_sentences
 
 log = logging.getLogger(__name__)
 
-MIN_EXEMPLARS = 5
-_VERSION = "3"
+MIN_EXEMPLARS = 3
+_VERSION = "4"
 CANONICALS = ["intro", "related", "method", "experiment", "discussion",
               "conclusion", "other"]
 
@@ -52,6 +57,14 @@ _REF_HEAD_RE = re.compile(r"^(参考文献|References)\s*[:：]?$", re.I)
 _BACK_RE = re.compile(r"^(作者贡献声明|利益冲突声明|支撑数据|通讯作者|收稿日期)")
 _MARKER_RE = re.compile(r"\[(\d{1,3}(?:\s*[-–,，]\s*\d{1,3})*)\]")
 _ENTRY_RE = re.compile(r"\[(\d{1,3})\]\s*")
+# author–year: "(Peters et al., 2018a; Radford et al., 2018)" counts two,
+# "Devlin et al. (2019)" one
+_YEAR = r"(?:19|20)\d{2}[a-z]?"
+_AY_PAREN_RE = re.compile(r"\(([^()]{0,400}?[A-Z][^()]{0,400}?" + _YEAR + r"[^()]{0,200}?)\)")
+_AY_NARR_RE = re.compile(r"[A-Z][A-Za-z\-'’]+(?:\s+et\s+al\.|\s+and\s+[A-Z][A-Za-z\-'’]+)?\s*\("
+                         + _YEAR + r"\)")
+# reference list entries: "Name. 2018. Title" (ACL) or "Name (2018). Title" (APA)
+_AY_ENTRY_RE = re.compile(r"(?<=\.)\s+(" + _YEAR + r")\.\s|\((" + _YEAR + r")\)\.?\s")
 _CAPTION_RE = re.compile(r"^(图|表|Fig(?:ure)?\.?|Table)\s*(\d{1,2})(?![\d.．])\s*(.{0,60})", re.I)
 _CJK = re.compile(r"[一-鿿]")
 _LATIN = re.compile(r"[A-Za-zÀ-ɏ]+(?:['’-][A-Za-zÀ-ɏ]+)*")
@@ -113,15 +126,43 @@ def _items(raw: str) -> list[int]:
     return out
 
 
-def _lines(pdf: LocalPdf) -> list[tuple[str, int]]:
-    """(line, 1-based page in the PDF) for the paper without its cover."""
-    from pypdf import PdfReader
+@dataclass
+class ExemplarSource:
+    """A paper of the target venue the baseline may be built from."""
+    id: str  # LibraryDoc id, or "ref:" + a hash of the PDF url
+    title: str | None
+    year: int | None
+    origin: Literal["cited", "folder"]
+    filename: str = ""
+    url: str | None = None
+    ref_id: str | None = None  # cited: the manuscript's reference
+    label: str | None = None  # cited: its label in the manuscript, "12"
+    pdf: LocalPdf | None = None
+    raw_pages: list[str] | None = None  # online PDF: pypdf text per page
+    note: str | None = None  # why it is not read (no text, other paper type)
 
-    logging.getLogger("pypdf").setLevel(logging.ERROR)
-    reader = PdfReader(str(pdf.path))
+    def lines(self) -> list[tuple[str, int]]:
+        if self.pdf is not None:
+            return _lines(self.pdf)
+        return _page_lines(self.raw_pages or [], 0)
+
+    def text(self) -> str:
+        if self.pdf is not None:
+            return self.pdf.body()[0]
+        return "\n".join(clean_page(p) for p in self.raw_pages or [])
+
+
+def from_pdf(pdf: LocalPdf, **kw) -> ExemplarSource:
+    kw.setdefault("origin", "folder")
+    return ExemplarSource(id=pdf.doc.id, title=pdf.doc.title, year=pdf.doc.year,
+                          filename=pdf.doc.filename, pdf=pdf, **kw)
+
+
+def _page_lines(raw_pages: list[str], cover: int) -> list[tuple[str, int]]:
+    """(line, 1-based page) for pypdf page texts, skipping ``cover`` pages."""
     out: list[tuple[str, int]] = []
-    for i, page in enumerate(reader.pages[pdf.cover_pages:], pdf.cover_pages + 1):
-        for ln in (page.extract_text() or "").split("\n"):
+    for i, text in enumerate(raw_pages[cover:], cover + 1):
+        for ln in (text or "").split("\n"):
             # typeset pages space brackets out: "[ 1 ]", "[ J ]"
             ln = re.sub(r"\[\s*([\dA-Z/,，\-–\s]{1,20}?)\s*\]",
                         lambda m: "[" + re.sub(r"\s+", "", m.group(1)) + "]",
@@ -129,6 +170,47 @@ def _lines(pdf: LocalPdf) -> list[tuple[str, int]]:
             if ln:
                 out.append((ln, i))
     return out
+
+
+def _lines(pdf: LocalPdf) -> list[tuple[str, int]]:
+    """(line, 1-based page in the PDF) for the paper without its cover."""
+    from pypdf import PdfReader
+
+    logging.getLogger("pypdf").setLevel(logging.ERROR)
+    reader = PdfReader(str(pdf.path))
+    return _page_lines([p.extract_text() or "" for p in reader.pages], pdf.cover_pages)
+
+
+def _cites(text: str, author_year: bool) -> list[tuple[int, int]]:
+    """(offset, references cited) for every citation in ``text``."""
+    if not author_year:
+        return [(m.start(), len(_items(m.group(1)))) for m in _MARKER_RE.finditer(text)]
+    out = []
+    for m in _AY_PAREN_RE.finditer(text):
+        n = sum(len(re.findall(r"\b" + _YEAR + r"\b", part))
+                for part in m.group(1).split(";") if re.search(r"[A-Z][a-z]", part))
+        if n:
+            out.append((m.start(), n))
+    out += [(m.start(), 1) for m in _AY_NARR_RE.finditer(text)]
+    return sorted(out)
+
+
+def _entries(ref_text: str, author_year: bool) -> list[str]:
+    """Reference list entries; author–year lists have no numbers, so an
+    entry runs from one year to the next (enough for its type)."""
+    if not author_year:
+        return [e.strip() for e in _ENTRY_RE.split(ref_text)[2::2] if e.strip()]
+    flat = re.sub(r"\s+", " ", ref_text)
+    starts = [m.start() for m in _AY_ENTRY_RE.finditer(flat)]
+    return [flat[a:b].strip() for a, b in zip(starts, starts[1:] + [len(flat)])]
+
+
+def _entry_info(entry: str, author_year: bool) -> dict:
+    if not author_year:
+        return parse_reference(entry)
+    m = re.search(_YEAR, entry)
+    return {"year": int(m.group(0)[:4]) if m else None,
+            "lang": "zh" if _CJK.search(entry) else "en"}
 
 
 def _recent_share(years: list[int], pub_year: int) -> float | None:
@@ -159,9 +241,14 @@ def _join(lines: list[tuple[str, int]]) -> str:
 
 
 def profile_pdf(pdf: LocalPdf) -> dict | None:
+    return profile_source(from_pdf(pdf))
+
+
+def profile_source(src: ExemplarSource) -> dict | None:
     """One exemplar's statistics and their sources, or None when its
-    structure can't be read (no numbered headings or no reference list)."""
-    lines = _lines(pdf)
+    structure can't be read (no numbered headings, no reference list or
+    no citations)."""
+    lines = src.lines()
     ref_at = max((i for i, (ln, _) in enumerate(lines) if _REF_HEAD_RE.match(ln)), default=None)
     if ref_at is None:
         return None
@@ -170,6 +257,8 @@ def profile_pdf(pdf: LocalPdf) -> dict | None:
     ref_text = _join(tail[:end])
     sample = " ".join(ln for ln, _ in body[:300])
     zh = len(_CJK.findall(sample)) > len(_LATIN.findall(sample))
+    body_text = _join(body)
+    ay = len(_MARKER_RE.findall(body_text)) < 3 and len(_cites(body_text, True)) >= 3
 
     # sections: top-level numbered headings in sequence 1, 2, 3 …
     heads: list[dict] = []
@@ -201,13 +290,23 @@ def profile_pdf(pdf: LocalPdf) -> dict | None:
     sentences: list[dict] = []
     for h, sl in zip(heads, sec_lines):
         text = _join(sl)
-        h["cites"] = sum(len(_items(m.group(1))) for m in _MARKER_RE.finditer(text))
-        h["markers"] = len(_MARKER_RE.findall(text))
+        cites = _cites(text, ay)
+        h["cites"] = sum(n for _, n in cites)
+        h["markers"] = len(cites)
         h["words"] = _words(text)
         # page of each citing sentence: the page its first marker sits on
+        # (author–year citations wrap lines: the line the sentence starts on)
         marker_pages = [p for ln, p in sl for _ in _MARKER_RE.finditer(ln)]
         mk = 0
         for sent in split_sentences(text):
+            if ay:
+                n = sum(k for _, k in _cites(sent.text, True))
+                if n:
+                    head = sent.text.strip()[:12]
+                    page = next((p for ln, p in sl if head and head in ln), h["page"])
+                    sentences.append({"text": sent.text.strip()[:_SENT_MAX], "ids": n,
+                                      "page": page, "section": h["canonical"]})
+                continue
             ms = list(_MARKER_RE.finditer(sent.text))
             if not ms:
                 continue
@@ -220,18 +319,25 @@ def profile_pdf(pdf: LocalPdf) -> dict | None:
     if not total:
         return None
 
-    entries = [e.strip() for e in _ENTRY_RE.split(ref_text)[2::2] if e.strip()]
-    infos = [parse_reference(e) for e in entries]
-    pub_year = pdf.doc.year or date.today().year
+    entries = _entries(ref_text, ay)
+    infos = [_entry_info(e, ay) for e in entries]
+    pub_year = src.year or date.today().year
     years = [i["year"] for i in infos if i["year"] and i["year"] <= pub_year + 1]
 
     front = body[:body_start or 0] or lines[:80]
     head_text = _join(front)
-    abstract = re.search(r"摘\s*要\s*[:：](.+?)关键词", head_text)
+    if zh:
+        abstract = re.search(r"摘\s*要\s*[:：](.+?)关键词", head_text)
+        abstract_page = next((p for ln, p in front if "摘" in ln and "要" in ln), None)
+    else:
+        abstract = re.search(r"Abstract\s*[:.]?\s*(.+?)(?:\n\s*Keywords|\n\s*Index Terms|$)",
+                             head_text, re.S | re.I)
+        abstract_page = next((p for ln, p in front if ln.lower().startswith("abstract")), None)
     abstract_txt = abstract.group(1).strip() if abstract else None
-    abstract_page = next((p for ln, p in front if "摘" in ln and "要" in ln), None)
     # a structured abstract shorter than this was not read whole
-    if abstract_txt and len(_CJK.findall(abstract_txt)) < 120:
+    if abstract_txt and zh and len(_CJK.findall(abstract_txt)) < 120:
+        abstract_txt = None
+    if abstract_txt and not zh and len(abstract_txt.split()) < 40:
         abstract_txt = None
 
     captions: list[dict] = []
@@ -249,7 +355,6 @@ def profile_pdf(pdf: LocalPdf) -> dict | None:
             continue
         seen.add((kind, m.group(2)))
         captions.append({"kind": kind, "num": m.group(2), "text": ln[:80], "page": page})
-    body_text = _join(body)
     figs_mentioned = len(set(re.findall(r"图\s*(\d+)", body_text)))
     tabs_mentioned = len(set(re.findall(r"表\s*(\d+)", body_text)))
     n_fig = sum(1 for c in captions if c["kind"] == "fig") or figs_mentioned
@@ -265,9 +370,10 @@ def profile_pdf(pdf: LocalPdf) -> dict | None:
     types = [ref_type(e) for e in entries]
     return {
         "version": _VERSION,
-        "title": pdf.doc.title,
+        "title": src.title,
         "year": pub_year,
-        "paper_type": paper_type(pdf.doc.title),
+        "lang": "zh" if zh else "en",
+        "paper_type": paper_type(src.title),
         "headings": heads,
         "sections": sections,
         "total_cites": total,
@@ -284,7 +390,7 @@ def profile_pdf(pdf: LocalPdf) -> dict | None:
             "n_refs": len(entries),
             "recent_share": _recent_share(years, pub_year),
             "foreign_share": (sum(1 for i in infos if i["lang"] != "zh") / len(infos)) if infos else None,
-            "abstract_chars": len(_CJK.findall(abstract_txt)) if abstract_txt else None,
+            "abstract_chars": len(_CJK.findall(abstract_txt)) if abstract_txt and zh else None,
             "n_figures": n_fig,
             "n_tables": n_tab,
         },
@@ -299,22 +405,28 @@ def _q(vals: list[float]) -> dict | None:
     return {"median": med, "q1": q1, "q3": q3}
 
 
-def load_profiles(exemplars: list[LocalPdf], cache: Cache | None = None
-                  ) -> list[tuple[LocalPdf, dict | None]]:
-    """Every exemplar with its profile (None: structure not readable)."""
+def load_profiles(exemplars: list[ExemplarSource | LocalPdf], cache: Cache | None = None
+                  ) -> list[tuple[ExemplarSource, dict | None]]:
+    """Every exemplar with its profile (None: not read, or its structure
+    not readable)."""
     out = []
-    for pdf in exemplars:
-        key = f"venueprof|{_VERSION}|{pdf.doc.id}"
+    for src in exemplars:
+        if isinstance(src, LocalPdf):
+            src = from_pdf(src)
+        if src.note:  # no text, or another paper type: not read
+            out.append((src, None))
+            continue
+        key = f"venueprof|{_VERSION}|{src.id}"
         prof = cache.get(key) if cache else None
         if prof is None:
             try:
-                prof = profile_pdf(pdf) or {}
+                prof = profile_source(src) or {}
             except Exception as e:  # noqa: BLE001 — one bad PDF is skipped
-                log.warning("venue profile failed for %s: %s", pdf.doc.filename, e)
+                log.warning("venue profile failed for %s: %s", src.filename or src.url, e)
                 prof = {}
             if cache:
                 cache.set(key, prof)
-        out.append((pdf, prof or None))
+        out.append((src, prof or None))
     return out
 
 
@@ -336,7 +448,9 @@ def aggregate(profiles: list[dict], venue: str) -> dict:
     return {
         "id": f"venue:{venue}",
         "name": f"《{venue}》范文",
-        "language": "zh",
+        # zh unless most exemplars are written in another language
+        "language": "en" if sum(p.get("lang") == "en" for p in profiles) * 2 > len(profiles)
+        else "zh",
         "n_papers": len(profiles),
         "sections": sections,
         "sentence_refs": {f"share_ge{k}": _q([share_ge(p, k) for p in profiles])
@@ -346,7 +460,7 @@ def aggregate(profiles: list[dict], venue: str) -> dict:
     }
 
 
-def build_venue_benchmark(exemplars: list[LocalPdf], venue: str,
+def build_venue_benchmark(exemplars: list[ExemplarSource | LocalPdf], venue: str,
                           cache: Cache | None = None) -> dict | None:
     """Benchmark dict from the target journal's papers, or None with
     fewer than MIN_EXEMPLARS readable ones."""

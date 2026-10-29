@@ -27,7 +27,6 @@ const scan: LibraryScan = {
   paper: '/p/paper.docx',
   candidates: [],
   kind: 'docx',
-  baseline: { source: null, name: '数据分析与知识发现', n_papers: 3 },
   references: ['r1', 'r2', 'r3'].map((id) => ({
     id,
     label: id.slice(1),
@@ -73,14 +72,14 @@ describe('link confirmation', () => {
     expect(pickedExemplars(new Set(['b', 'c']), vs, { r1: 'a', r2: '', r3: 'c' })).toEqual(['b'])
   })
 
-  it('says which baseline the run will use', () => {
+  it('says what the run will compare against', () => {
     const vs = venueState(scan)
-    expect(baselineText(vs, 5)).toBe(
-      '用文件夹中 5 篇《数据分析与知识发现》论文作为对标范文，逐篇统计后和本文比较。'
+    expect(baselineText(vs, 2)).toBe(
+      '体检时会从参考文献中找出《数据分析与知识发现》的论文，连同这里勾选的 2 篇一起作为对标范文，合计不少于 3 篇才对标。'
     )
-    expect(baselineText({ ...vs, entry: { id: 'dakd', name: '数据分析与知识发现', n_papers: 36 } }, 2))
-      .toContain('内置基线')
-    expect(baselineText({ ...vs, venue: null }, 0)).toContain('填写目标期刊')
+    expect(baselineText({ ...vs, venue: null }, 0)).toBe(
+      '没有填写目标期刊，这次不对标。填写后，参考文献和文件夹里该刊的论文会作为对标范文。'
+    )
   })
 
   it('describes an exemplar without middle dots', () => {

@@ -14,7 +14,7 @@ import { ACCEPT_ERROR, isPaperPath } from '../lib/accept'
 interface Props {
   benchmark: string
   setBenchmark: (b: string) => void
-  /** target venue for the overview stage; '' = off */
+  /** target journal or conference as typed; '' = no benchmarking */
   venue: string
   setVenue: (v: string) => void
   onFile: (path: string) => void
@@ -38,14 +38,6 @@ interface Bench {
 
 /** Home: the three-pane shell with history in the sidebar and the drop
  *  zone as the reading area — the window never shows a bare whiteboard. */
-const VENUE_OPTIONS: [string, string][] = [
-  ['emnlp', 'EMNLP'],
-  ['acl', 'ACL'],
-  ['naacl', 'NAACL'],
-  ['findings-emnlp', 'Findings of EMNLP'],
-  ['', '不对标'],
-]
-
 const PREVIEW_LAYERS: [string, string][] = [
   ['authenticity', '文献真实性'],
   ['support', '论断支持度'],
@@ -72,9 +64,15 @@ export default function Empty({
   const [drag, setDrag] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [benches, setBenches] = useState<Bench[]>([])
+  // venues the registry knows, offered while typing (any name works)
+  const [known, setKnown] = useState<string[]>([])
   const { reports, remove } = useReports()
 
   useEffect(() => {
+    apiFetch('/venues')
+      .then((r) => r.json())
+      .then((v: { name: string }[]) => setKnown(v.map((x) => x.name)))
+      .catch(() => setKnown([]))
     apiFetch('/benchmarks')
       .then((r) => r.json())
       .then((b: Bench[]) => setBenches(b))
@@ -176,7 +174,7 @@ export default function Empty({
             <div className="t13 secondary" style={{ marginTop: 12 }}>
               已经下载了被引文献的话，把论文 .docx 放在一个文件夹的根目录，
               PDF 放进同级的 ref 文件夹，再拖入整个文件夹。本地原文会用来判断论断支持度，
-              文件夹里目标期刊的其他论文会作为对标范文。
+              填写目标期刊或会议后，参考文献和文件夹里该刊的论文会作为对标范文。
             </div>
             {(err || dropError) && (
               <div className="font-normal" style={{ marginTop: 12 }}>
@@ -227,29 +225,21 @@ export default function Empty({
                 </select>
                 <ChevronDownIcon size={13} color="var(--text-secondary)" />
               </label>
-              <label className="pill-quiet flex items-center gap-1">
-                <span className="secondary">目标会议</span>
-                <select
-                  className="font-normal"
-                  style={{
-                    appearance: 'none',
-                    background: 'transparent',
-                    border: 'none',
-                    padding: 0,
-                  }}
-                  value={venue}
-                  onChange={(e) => setVenue(e.target.value)}
-                  aria-label="目标会议"
-                >
-                  {VENUE_OPTIONS.map(([id, name]) => (
-                    <option key={id} value={id}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDownIcon size={13} color="var(--text-secondary)" />
-              </label>
             </div>
+            <input
+              className="venue-input"
+              style={{ marginTop: 12 }}
+              list="home-venues"
+              aria-label="目标期刊或会议"
+              placeholder="目标期刊或会议，如 计算机学报、EMNLP；留空不对标"
+              value={venue}
+              onChange={(e) => setVenue(e.target.value)}
+            />
+            <datalist id="home-venues">
+              {known.map((v) => (
+                <option key={v} value={v} />
+              ))}
+            </datalist>
           </div>
         </main>
       </div>

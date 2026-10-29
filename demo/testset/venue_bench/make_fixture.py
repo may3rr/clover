@@ -27,20 +27,24 @@ from citecheck.distribution.venue_metrics import prepare_venue  # noqa: E402
 from citecheck.library import build_library  # noqa: E402
 from citecheck.library.venue_match import paper_type  # noqa: E402
 from citecheck.parse import parse_document  # noqa: E402
-from citecheck.server import _venue_info  # noqa: E402
+from citecheck.distribution.venue import from_pdf  # noqa: E402
+from citecheck.server import _venue_entry  # noqa: E402
 
 OUT = ROOT / "app" / "fixtures" / "venue.sample.json"
 SAMPLE = ROOT / "app" / "fixtures" / "report.sample.json"
+
+
+VENUE = "数据分析与知识发现"
 
 
 async def main(paper: str, ref: str) -> None:
     cache = Cache(get_settings().cache_path)
     parsed = parse_document(paper)
     lib, _local, pdfs = await build_library(
-        parsed.references, ref, cache=cache, use_model=False, guess_venues=False,
+        parsed.references, ref, venue=VENUE, cache=cache, use_model=False, guess_venues=False,
         manuscript_type=paper_type(parsed.document.title))
     by = {p.doc.id: p for p in pdfs}
-    bench, ctx = await prepare_venue([by[i] for i in lib.exemplar_ids], lib.venue, parsed,
+    bench, ctx = await prepare_venue([from_pdf(by[i]) for i in lib.exemplar_ids], lib.venue, parsed,
                                      cache, use_model=True)
     dist, findings = await run_distribution(parsed, bench=bench, venue=lib.venue,
                                             venue_source="exemplars", venue_ctx=ctx)
@@ -55,10 +59,9 @@ async def main(paper: str, ref: str) -> None:
                       for i, f in enumerate(x for x in findings if x.metrics
                                                      and not x.metrics[0].startswith(("share:", "density:")))]
     scan = {
-        **_venue_info(lib),
+        "entry": _venue_entry(lib),
         "paper": "/Users/me/论文/manuscript.docx",
         "paper_type": "research",
-        "manuscript_venue": None,
         "candidates": [],
         "kind": "docx",
         "library": {**lib.model_dump(mode="json"), "folder": "/Users/me/论文/ref"},

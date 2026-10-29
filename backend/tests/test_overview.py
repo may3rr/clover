@@ -1,4 +1,4 @@
-"""Overview stage: venue exemplar scouting, shape profiles, critic."""
+"""Overview stage: shape profiles of the exemplar pool, critic."""
 
 from __future__ import annotations
 
@@ -7,41 +7,13 @@ from pathlib import Path
 import pytest
 
 import citecheck.overview.run as run_mod
-from citecheck.cache import Cache
 from citecheck.llm.client import LLMResult
 from citecheck.overview.profile import Shape, count_captions, manuscript_profile
 from citecheck.overview.run import DIMS, Prepared, critique, prepare
-from citecheck.overview.venues import Candidate, parse_volume, rank
 from citecheck.parse.parser import parse_docx
 from citecheck.schema import ExemplarPaper, Finding
 
 FIXTURES = Path("tests/fixtures")
-
-VOLUME_HTML = """
-<span class=d-block><strong><a class=align-middle href=/2024.emnlp-main.0/>Proceedings</a></strong></span>
-<span class=d-block><strong><a class=align-middle href=/2024.emnlp-main.1/><span class=acl-fixed-case>R</span>AG citation faithfulness</a></strong></span>
-<div class="card bg-light mb-2 mb-lg-3 collapse abstract-collapse" id=abstract-2024--emnlp-main--1><div class="card-body p-3 small">We study whether retrieval augmented generation cites sources faithfully.</div></div>
-<span class=d-block><strong><a class=align-middle href=/2024.emnlp-main.2/>Sentiment of tweets</a></strong></span>
-<div class="card bg-light mb-2 mb-lg-3 collapse abstract-collapse" id=abstract-2024--emnlp-main--2><div class="card-body p-3 small">Twitter sentiment classification &amp; emoji.</div></div>
-"""
-
-
-def test_parse_volume_skips_frontmatter_and_joins_abstracts():
-    papers = parse_volume(VOLUME_HTML, 2024)
-    assert [p.id for p in papers] == ["2024.emnlp-main.1", "2024.emnlp-main.2"]
-    assert papers[0].title == "RAG citation faithfulness"
-    assert "cites sources faithfully" in papers[0].abstract
-    assert papers[1].abstract.endswith("& emoji.")
-    assert papers[0].pdf == "https://aclanthology.org/2024.emnlp-main.1.pdf"
-
-
-def test_rank_prefers_topical_match_and_drops_zero_scores():
-    pool = parse_volume(VOLUME_HTML, 2024) + [
-        Candidate("2024.emnlp-main.3", "Speech translation", "audio", 2024)]
-    top = rank(pool, "citation faithfulness in retrieval augmented generation", k=3)
-    assert top[0].id == "2024.emnlp-main.1"
-    assert all(c.id != "2024.emnlp-main.3" for c in top)
-
 
 def test_count_captions_counts_distinct_numbers():
     lines = ["Table 1: Results.", "Table 1: (cont.)", "Figure 2. Overview",
@@ -75,10 +47,9 @@ def _patch_chat(monkeypatch, verdict: dict | None):
 
 
 def _prep() -> Prepared:
-    ex = ExemplarPaper(id="2024.emnlp-main.1", title="RAG", year=2024,
-                       url="https://aclanthology.org/2024.emnlp-main.1/",
+    ex = ExemplarPaper(id="ref:1", title="RAG", year=2024, origin="cited", label="3",
                        stats={"n_datasets": 4})
-    return Prepared("emnlp", {"n_tables": 2}, [ex])
+    return Prepared("emnlp", "EMNLP", {"n_tables": 2}, [ex])
 
 
 @pytest.mark.asyncio
@@ -111,36 +82,43 @@ async def test_critique_degrades_when_model_fails(monkeypatch):
 @pytest.mark.asyncio
 async def test_critique_without_exemplars_is_unavailable(monkeypatch):
     _patch_chat(monkeypatch, {"overall": "at"})
-    ov = await critique(Prepared("emnlp", {}, [], note="没能获取"), [])
+    ov = await critique(Prepared("emnlp", "EMNLP", {}, [], note="没能获取"), [])
     assert ov.status == "unavailable" and ov.note == "没能获取"
 
 
+def _ctx(n: int):
+    from citecheck.distribution.venue import ExemplarSource
+    from citecheck.distribution.venue_metrics import Exemplar, VenueContext
+
+    items = []
+    for i in range(n):
+        src = ExemplarSource(id=f"ref:{i}", title=f"Paper {i}", year=2018 + i,
+                             origin="cited", label=str(i + 1),
+                             raw_pages=["Table 1: main results. Table 2: ablation. Limitations."])
+        items.append(Exemplar(src, {"title": src.title}, similar=i == 0))
+    return VenueContext(venue="EMNLP", exemplars=items)
+
+
 @pytest.mark.asyncio
-async def test_prepare_reads_exemplars_in_parallel(monkeypatch, tmp_path):
+async def test_prepare_reads_the_closest_exemplars(monkeypatch):
     _patch_chat(monkeypatch, None)
-    cands = parse_volume(VOLUME_HTML, 2024)
-
-    async def fake_pick(venue, query, years, client, cache, k=3):
-        return cands[:1]
-
-    async def fake_pdf(url, client, cache):
-        return "Table 1: main results. Table 2: ablation. Limitations. ..."
-
-    monkeypatch.setattr(run_mod, "pick_exemplars", fake_pick)
-    monkeypatch.setattr(run_mod, "_fetch_pdf_text", fake_pdf)
     parsed = parse_docx(FIXTURES / "numeric_en.docx")
     steps: list[str] = []
-    prep = await prepare(parsed, "emnlp", None, Cache(tmp_path / "c.sqlite"),
-                         on_step=steps.append)
-    assert steps == ["正在获取近期论文", "正在读取 1 篇范文"]
-    assert len(prep.exemplars) == 1
-    ex = prep.exemplars[0].stats
-    assert ex["n_datasets"] == 3 and ex["n_tables"] == 2 and ex["has_limitations"]
+    prep = await prepare(parsed, "emnlp", "EMNLP", _ctx(6), on_step=steps.append)
+    assert steps == [f"正在读取 {run_mod.READ_MAX} 篇范文"]
+    # the topical match first, then the newest
+    assert [e.id for e in prep.exemplars] == ["ref:0", "ref:5", "ref:4", "ref:3"]
+    ex = prep.exemplars[0]
+    assert ex.origin == "cited" and ex.label == "1"
+    assert ex.stats["n_datasets"] == 3 and ex.stats["n_tables"] == 2
+    assert ex.stats["has_limitations"]
     assert prep.manuscript["n_baselines"] == 4  # manuscript read too
 
 
 @pytest.mark.asyncio
-async def test_prepare_unknown_venue():
+async def test_prepare_without_pool_carries_the_note():
     parsed = parse_docx(FIXTURES / "numeric_en.docx")
-    prep = await prepare(parsed, "nope", None, None)  # type: ignore[arg-type]
-    assert prep.exemplars == [] and prep.note
+    prep = await prepare(parsed, "计算机学报", "计算机学报", None, "找到 1 篇")
+    assert prep.exemplars == [] and prep.note == "找到 1 篇"
+    ov = await critique(prep, [])
+    assert ov.status == "unavailable" and ov.note == "找到 1 篇"

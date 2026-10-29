@@ -58,3 +58,22 @@ export function groupedMetrics(d: Distribution | null | undefined): [string, Ven
     .filter((g) => out.has(g))
     .map((g) => [g, out.get(g)!])
 }
+
+/** "[12] 标题" for a reference of the manuscript, the title otherwise. */
+export function exemplarName(e: {
+  title?: string | null
+  filename?: string
+  label?: string | null
+  origin?: string
+}): string {
+  const name = e.title || e.filename || ''
+  if (e.origin !== 'cited' || !e.label) return name
+  return `${/^\d+$/.test(e.label) ? `[${e.label}]` : e.label} ${name}`
+}
+
+/** "《数据分析与知识发现》的 6 篇论文，其中 2 篇是本文引用的" */
+export function poolSummary(d: Distribution): string {
+  const cited = (d.exemplars ?? []).filter((e) => e.used !== false && e.origin === 'cited').length
+  const base = `《${d.venue}》的 ${d.n_papers} 篇论文`
+  return cited ? `${base}，其中 ${cited} 篇是本文引用的` : base
+}

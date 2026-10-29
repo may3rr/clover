@@ -117,13 +117,17 @@ export type Filename1 = string;
 export type Title4 = string | null;
 export type Year1 = number | null;
 export type PaperType = "research" | "review";
+export type Origin1 = "cited" | "folder";
+export type RefId2 = string | null;
+export type Label3 = string | null;
+export type Url = string | null;
 export type Used = boolean;
 export type Note1 = string | null;
 export type Similar = boolean;
 export type Exemplars = ExemplarInfo[];
 export type Key2 = string;
 export type Group = "structure" | "distribution" | "references" | "functions" | "elements" | "length";
-export type Label3 = string;
+export type Label4 = string;
 export type Unit1 = string;
 export type Kind1 = "number" | "share" | "bool";
 export type Value1 = number | null;
@@ -164,14 +168,16 @@ export type VenueName = string;
 export type Overall = "below" | "near" | "at" | "above" | "na";
 export type Comment = string;
 export type Key3 = string;
-export type Label4 = string;
+export type Label5 = string;
 export type Tier = "below" | "near" | "at" | "above" | "na";
 export type Note2 = string;
 export type Dims = OverviewDim[];
 export type Id7 = string;
 export type Title6 = string;
 export type Year2 = number | null;
-export type Url = string;
+export type Url1 = string | null;
+export type Origin2 = "cited" | "folder";
+export type Label6 = string | null;
 export type Exemplars2 = ExemplarPaper[];
 export type Note3 = string | null;
 export type Folder = string;
@@ -190,7 +196,7 @@ export type ArxivId = string | null;
 export type VenueVia = ("cnki_cover" | "cnki_citation" | "doi_prefix" | "issn" | "header" | "model") | null;
 export type PaperType1 = "research" | "review";
 export type Docs = LibraryDoc[];
-export type RefId2 = string;
+export type RefId3 = string;
 export type DocId2 = string;
 export type Method = "doi" | "title" | "filename" | "llm" | "user";
 export type Score = number;
@@ -383,14 +389,20 @@ export interface VenueStat {
   flag?: Flag;
 }
 /**
- * A PDF the baseline was built from (or offered for it).
+ * A paper of the target venue the baseline was built from (or found
+ * for it): one of the manuscript's references, or an uncited PDF in
+ * the reference folder.
  */
 export interface ExemplarInfo {
   doc_id: DocId;
-  filename: Filename1;
+  filename?: Filename1;
   title?: Title4;
   year?: Year1;
   paper_type?: PaperType;
+  origin?: Origin1;
+  ref_id?: RefId2;
+  label?: Label3;
+  url?: Url;
   used?: Used;
   note?: Note1;
   similar?: Similar;
@@ -404,7 +416,7 @@ export interface ExemplarInfo {
 export interface VenueMetric {
   key: Key2;
   group: Group;
-  label: Label3;
+  label: Label4;
   unit?: Unit1;
   kind?: Kind1;
   value?: Value1;
@@ -471,18 +483,21 @@ export interface Overview {
 }
 export interface OverviewDim {
   key: Key3;
-  label: Label4;
+  label: Label5;
   tier?: Tier;
   note?: Note2;
 }
 /**
- * A recently published paper from the target venue, used as a yardstick.
+ * A paper of the target venue the critic compared against: one of
+ * the manuscript's references or an uncited PDF in the folder.
  */
 export interface ExemplarPaper {
   id: Id7;
   title: Title6;
   year?: Year2;
-  url: Url;
+  url?: Url1;
+  origin?: Origin2;
+  label?: Label6;
   stats?: Stats;
 }
 export interface Stats {
@@ -525,7 +540,7 @@ export interface LibraryDoc {
  * match (or the model) and wait for the user in the confirmation step.
  */
 export interface LibraryLink {
-  ref_id: RefId2;
+  ref_id: RefId3;
   doc_id: DocId2;
   method: Method;
   score: Score;

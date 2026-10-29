@@ -1,0 +1,5 @@
+# NAACL 主会。只用于从参考文献里认出同一会议的论文，没有投稿规则和内置基线。
+id = "naacl"
+name = "NAACL"
+aliases = ["North American Chapter of the Association for Computational Linguistics"]
+exclude = ["Findings", "Workshop", "System Demonstrations"]

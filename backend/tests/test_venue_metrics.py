@@ -157,7 +157,7 @@ async def test_compare_traceable(exemplar_dir, monkeypatch):
     pdfs = scan_folder(exemplar_dir, Cache(exemplar_dir / "c.sqlite"))
     bench, ctx = await prepare_venue(pdfs, VENUE, parsed, use_model=True)
     assert bench["n_papers"] == 7 and ctx.overrides.get("IG-RAG框架设计") == "method"
-    noisy = next(e for e in ctx.used if e.pdf.doc.filename == "noisy.pdf")
+    noisy = next(e for e in ctx.used if e.src.filename == "noisy.pdf")
     assert "method" in noisy.prof["sections"]  # the model typed the heading
 
     dist, findings = await run_distribution(parsed, bench=bench, venue=VENUE,
@@ -221,18 +221,25 @@ async def test_pipeline_uses_selected_exemplars(tmp_path, monkeypatch):
         try:
             return await run_pipeline(tmp_path / "p.docx", retrieval=retrieval,
                                       cache=Cache(tmp_path / "c.sqlite"), library_dir=ref,
-                                      library_exemplars=picked)
+                                      venue=VENUE, library_exemplars=picked)
         finally:
             await retrieval.close()
 
     report = await run(ids[:5])
     d = report.distribution
     assert d.venue == VENUE and d.venue_source == "exemplars" and d.n_papers == 5
-    assert sorted(e.doc_id for e in d.exemplars) == ids[:5]
+    assert sorted(e.doc_id for e in d.exemplars if e.origin == "folder") == ids[:5]
+    # the manuscript's own DAKD references [3] [5] are listed; no text, not counted
+    cited = [e for e in d.exemplars if e.origin == "cited"]
+    assert sorted(e.label for e in cited) == ["3", "5"]
+    assert all(not e.used and "原文" in e.note for e in cited)
     assert report.library.exemplar_ids == ids[:5] and d.venue_metrics
-    # four picked: too few, the built-in baseline takes over
-    d = (await run(ids[:4])).distribution
-    assert d.venue_source == "builtin" and not d.venue_metrics
+    # two picked: too few, no benchmark, and the report says why
+    report = await run(ids[:2])
+    d = report.distribution
+    assert d.venue is None and not d.venue_metrics and d.benchmark_id == "arxiv_cs_cl"
+    assert report.overview.status == "unavailable"
+    assert "找到 4 篇《数据分析与知识发现》论文，其中 2 篇能完成统计" in report.overview.note
 
 
 def test_library_venue_endpoint(exemplar_dir):
@@ -245,11 +252,11 @@ def test_library_venue_endpoint(exemplar_dir):
     r = c.post("/library/venue", headers=h, data={"library": str(exemplar_dir),
                                                   "venue": "Data Analysis and Knowledge Discovery"})
     body = r.json()
-    assert r.status_code == 200 and body["library"]["venue"] == "Data Analysis and Knowledge Discovery"
-    assert len(body["library"]["venue_match_ids"]) == 7
-    assert body["baseline"]["source"] == "exemplars" and body["entry"]["id"] == "dakd"
+    # an alias resolves to the registry name
+    assert r.status_code == 200 and body["library"]["venue"] == VENUE
+    assert len(body["library"]["venue_match_ids"]) == 7 and body["entry"]["id"] == "dakd"
     one = body["library"]["exemplar_ids"][0]
     r = c.post("/library/venue", headers=h, data={"library": str(exemplar_dir), "venue": "情报学报",
                                                   "linked": json.dumps([one])})
     body = r.json()
-    assert body["library"]["venue_match_ids"] == [] and body["baseline"]["source"] is None
+    assert body["library"]["venue_match_ids"] == [] and body["entry"] is None

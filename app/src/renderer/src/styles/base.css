@@ -282,6 +282,23 @@ select {
 .paper-search-input::placeholder {
   color: var(--text-secondary);
 }
+
+/* home: the target journal or conference, a capsule like the pills above */
+.venue-input {
+  display: block;
+  width: 100%;
+  height: 32px;
+  border-radius: 980px;
+  background: var(--fill);
+  padding: 0 16px;
+  font-size: 15px;
+  line-height: var(--lh-15);
+  color: var(--text);
+  text-align: center;
+}
+.venue-input::placeholder {
+  color: var(--text-secondary);
+}
 .icon-btn {
   width: 24px;
   height: 24px;

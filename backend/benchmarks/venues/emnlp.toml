@@ -1,0 +1,7 @@
+# EMNLP 主会。只用于从参考文献里认出同一会议的论文，没有投稿规则和内置基线。
+id = "emnlp"
+name = "EMNLP"
+aliases = ["Conference on Empirical Methods in Natural Language Processing",
+           "Empirical Methods in Natural Language Processing"]
+# 名称里带这些词的是分会、Findings 或 Workshop，不算主会
+exclude = ["Findings", "Workshop", "System Demonstrations"]

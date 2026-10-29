@@ -273,9 +273,9 @@ async def test_pipeline_report_opens_before_overview(tmp_path, monkeypatch):
     _patch_llm(monkeypatch)
     gate = asyncio.Event()
 
-    async def fake_prepare(parsed, venue_id, client, cache, on_step=None):
-        on_step("正在获取近期论文")
-        return Prepared(venue_id, {}, [], note="x")
+    async def fake_prepare(parsed, venue_id, venue_name, ctx, note=None, on_step=None):
+        on_step("正在读取 3 篇范文")
+        return Prepared(venue_id, venue_name, {}, [], note="x")
 
     async def fake_critique(prep, findings):
         await gate.wait()  # 慢的对标
@@ -291,7 +291,7 @@ async def test_pipeline_report_opens_before_overview(tmp_path, monkeypatch):
     task = asyncio.create_task(run_pipeline(
         FIXTURES / "numeric_unordered_en.docx", emit=events.append,
         retrieval=retrieval, cache=Cache(tmp_path / "c.sqlite"),
-        venue_id="emnlp", on_report=opened.append))
+        venue="emnlp", on_report=opened.append))
     for _ in range(400):
         if opened:
             break

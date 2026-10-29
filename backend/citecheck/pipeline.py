@@ -1,8 +1,9 @@
 """任务编排：解析 -> 四个图层并发 -> Report。
 
 并发结构：[norms（含 typos + reorder）]、[authenticity -> support]、
-[distribution]、[overview 准备：目标期刊参照论文 + 结构画像]；四层结束后
-overview 的评审者汇总给出整体定位（可选，venue_id 为 None 时关闭）。每个图层单独包裹：单层异常只把该层标为 failed，其余
+[distribution]、[对标：真实性核验结束后从参考文献和文献文件夹收集目标期刊的
+论文（范文池），distribution 用它建基线，overview 用它读结构画像]；四层结束后
+overview 的评审者汇总给出整体定位（venue 留空时整个对标关闭）。每个图层单独包裹：单层异常只把该层标为 failed，其余
 图层照常产出。authenticity 失败时 support 仍然运行（matched 为空，
 全部 undetermined / source_kind=none）。
 
@@ -29,8 +30,9 @@ from .distribution.layer import run_distribution
 from .lint.attribution import check_attribution
 from .lint.norms import check_norms
 from .lint.reorder import plan_reorder
-from .distribution.registry import builtin_baseline, detect_from_manuscript, find_venue
 from .config import venue_model_enabled
+from .distribution.pool import gather_pool, shortfall_note
+from .distribution.registry import resolve_target
 from .distribution.venue import MIN_EXEMPLARS
 from .distribution.venue_metrics import prepare_venue
 from .library.venue_match import paper_type
@@ -55,7 +57,6 @@ from .schema import (
     Revision,
 )
 from .overview.run import Prepared, critique, prepare, run_overview_safe
-from .overview.venues import VENUES
 from .support.layer import SupportRun
 
 log = logging.getLogger(__name__)
@@ -124,17 +125,20 @@ async def run_pipeline(
     *,
     retrieval: RetrievalClient | None = None,
     cache: Cache | None = None,
-    venue_id: str | None = None,
+    venue: str | None = None,
     library_dir: str | Path | None = None,
     library_links: list[LibraryLink] | None = None,
-    library_venue: str | None = None,
     library_exemplars: list[str] | None = None,
     on_report: Callable[[Report], None] | None = None,
 ) -> Report:
     """on_report 不为空时，期刊对标不再卡住报告：四层结束就组装报告
     （overview 为 pending）交给 on_report 并发出 done（带 overview=pending），
     之后在同一个任务里继续算对标，完成后原地更新同一个 Report 对象，
-    发 overview 与 overview_done 事件，再返回。"""
+    发 overview 与 overview_done 事件，再返回。
+
+    venue：用户填写的目标期刊或会议名称，留空不对标。"""
+    target = resolve_target(venue)
+    vname, ventry = target if target else (None, None)
     send = emit or (lambda _e: None)
     t0 = time.monotonic()
     meta = ReportMeta()
@@ -264,12 +268,10 @@ async def run_pipeline(
                         "authenticity", 0.15 * d / max(t, 1),
                         f"读取文献文件夹 {d}/{t} 篇"))
                 await structured
-                trace = detect_from_manuscript(parsed)
                 lib, local, pdfs = await build_library(
                     parsed.references, library_dir, links=library_links,
-                    venue=library_venue, cache=cache, pdfs=pdfs,
+                    venue=vname, cache=cache, pdfs=pdfs,
                     exemplar_ids=library_exemplars,
-                    fallback_venue=trace["name"] if trace else None,
                     manuscript_type=paper_type(parsed.document.title))
             except Exception as e:  # noqa: BLE001 — the run goes on without it
                 log.warning("reference library failed: %s", e)
@@ -280,32 +282,38 @@ async def run_pipeline(
 
         library_task = asyncio.create_task(_library())
 
+        # the verified records name each reference's journal: the pool
+        # waits for them (authenticity sets this, failed or not)
+        auth_done: asyncio.Future = asyncio.get_running_loop().create_future()
+
         async def _venue():
-            """(registry entry or None, name, benchmark dict or None,
-            source, VenueContext or None): the target journal and the
-            baseline to compare against — exemplars from the folder
-            first, the built-in baseline next, the default benchmark
-            otherwise (distribution falls back)."""
-            lib, _local, pdfs = await library_task
-            await structured
-            entry = (find_venue(library_venue) or find_venue(lib.venue if lib else None)
-                     or detect_from_manuscript(parsed))
-            name = library_venue or (lib.venue if lib else None) or (
-                entry["name"] if entry else None)
-            if lib and len(lib.exemplar_ids) >= MIN_EXEMPLARS:
+            """(benchmark or None, VenueContext or None, note or None):
+            the target venue's papers with text at hand — cited
+            references and the folder's uncited exemplars — and the
+            baseline built from them; ``note`` says why there is none."""
+            if target is None:
+                return None, None, None
+            try:
+                lib, local, pdfs = await library_task
+                checks = await auth_done
+                send({"type": "overview", "status": "running",
+                      "step": f"正在查找《{vname}》的论文"})
                 by_id = {p.doc.id: p for p in pdfs}
-                ex = [by_id[i] for i in lib.exemplar_ids if i in by_id]
-                try:
-                    bench, ctx = await prepare_venue(
-                        ex, name or "目标期刊", parsed, cache,
-                        use_model=venue_model_enabled())
-                except Exception as e:  # noqa: BLE001
-                    log.warning("venue benchmark failed: %s", e)
-                    bench, ctx = None, None
-                if bench is not None:
-                    return entry, name or "目标期刊", bench, "exemplars", ctx
-            bench = builtin_baseline(entry)
-            return entry, name, bench, "builtin" if bench else None, None
+                folder = [by_id[i] for i in lib.exemplar_ids if i in by_id] if lib else []
+                use_model = venue_model_enabled()
+                pool = await gather_pool(
+                    vname, ventry, refs=parsed.references, checks=checks,
+                    local=local, folder=folder,
+                    manuscript_type=paper_type(parsed.document.title),
+                    client=retrieval._client, cache=cache, use_model=use_model)
+                bench, ctx = await prepare_venue(
+                    pool.sources, vname, parsed, cache, use_model=use_model)
+            except Exception as e:  # noqa: BLE001
+                log.warning("venue benchmark failed: %s", e)
+                return None, None, f"《{vname}》对标暂时无法完成。请重新体检。"
+            note = None if bench else shortfall_note(
+                vname, len(pool.sources), len(ctx.used), MIN_EXEMPLARS)
+            return bench, ctx, note
 
         venue_task = asyncio.create_task(_venue())
         # let the structuring batches reach the cloud semaphore before the
@@ -356,6 +364,9 @@ async def run_pipeline(
                 else:
                     _layer("authenticity", "done", len(auth_findings),
                            anchors=_anchors(auth_findings))
+                finally:
+                    if not auth_done.done():
+                        auth_done.set_result(list(auth_checks))
                 try:
                     # support finishes even when authenticity failed
                     # (no checks -> every pair undetermined, none source)
@@ -371,12 +382,13 @@ async def run_pipeline(
                 nonlocal dist, dist_findings
                 _layer("distribution", "running")
                 await structured
-                _entry, vname, vbench, vsource, vctx = await venue_task
+                vbench, vctx, _note = await venue_task
                 try:
                     dist, dist_findings = await run_distribution(
                         parsed, bench_path=benchmark_path(benchmark_id),
-                        bench=vbench, venue=vname, venue_source=vsource,
-                        venue_ctx=vctx,
+                        bench=vbench, venue=vname if vbench else None,
+                        venue_source="exemplars" if vbench else None,
+                        venue_ctx=vctx if vbench else None,
                         progress=lambda d, t: _progress(
                             "distribution", d / max(t, 1),
                             f"分类引用功能 {d}/{t} 段"))
@@ -399,9 +411,8 @@ async def run_pipeline(
                     await structured
                     norm_findings = check_norms(parsed)
                     norm_findings += check_attribution(parsed)
-                    entry = (await venue_task)[0]
-                    if entry is not None:
-                        norm_findings += check_venue_rules(parsed, entry)
+                    if ventry is not None:
+                        norm_findings += check_venue_rules(parsed, ventry)
                     typo_findings, typo_revs = await typo_task
                     norm_findings += typo_findings
                     reorder_revs = await asyncio.to_thread(plan_reorder, parsed)
@@ -416,15 +427,16 @@ async def run_pipeline(
             # overview prep (venue exemplars + shape reading) needs no
             # findings — it overlaps the four layers
             async def _prep():
-                await structured
+                bench, ctx, note = await venue_task
                 return await prepare(
-                    parsed, venue_id, retrieval._client, cache,
+                    parsed, ventry["id"] if ventry else vname, vname,
+                    ctx if bench else None, note,
                     on_step=lambda step: send(
                         {"type": "overview", "status": "running",
                          "step": step}))
 
             prep_task = asyncio.create_task(run_overview_safe(_prep())) \
-                if venue_id else None
+                if target else None
 
             await asyncio.gather(
                 _auth_then_support(), _distribution(), _norms())
@@ -465,9 +477,8 @@ async def run_pipeline(
 
             if defer:
                 overview = Overview(
-                    status="pending", venue_id=venue_id,
-                    venue_name=VENUES[venue_id].name
-                    if venue_id in VENUES else venue_id)
+                    status="pending", venue_id=ventry["id"] if ventry else vname,
+                    venue_name=vname)
             elif prep_task is not None:
                 overview = await _finish_overview()
 

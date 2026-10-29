@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import Mascot, { type MascotStance } from './Mascot'
 import OrbitDots from './OrbitDots'
 import { AGENT_COLOR } from '../lib/mascot'
+import { exemplarName } from '../lib/venue'
 import type { Overview, Tier } from '../types/report'
 
 const TIER_LABEL: Record<Tier, string> = {
@@ -107,7 +108,7 @@ function PlaceholderLine({
   )
 }
 
-/** 与最终卡片同形：标题行、三行评语、五个维度、近期论文、说明 */
+/** 与最终卡片同形：标题行、三行评语、五个维度、对标论文、说明 */
 function PendingCard({
   venueName,
   style,
@@ -155,7 +156,7 @@ function PendingCard({
         ))}
       </div>
       <div style={{ marginTop: 16 }}>
-        <div className="t13 secondary">对标的近期论文</div>
+        <div className="t13 secondary">对标的论文</div>
         <div style={{ marginTop: 4 }}>
           <PlaceholderLine height={18} bar={10} width="80%" />
           <PlaceholderLine height={18} bar={10} width="72%" />
@@ -163,7 +164,7 @@ function PendingCard({
         </div>
       </div>
       <div className="t13 secondary" style={{ marginTop: 16 }}>
-        这是与近期已发表论文相比的粗略位置，不是修改建议。
+        这是与该刊已发表论文相比的粗略位置，不是修改建议。
       </div>
     </section>
   )
@@ -273,25 +274,32 @@ function ResultCard({
 
       {exemplars.length > 0 && (
         <div style={{ marginTop: 16 }}>
-          <div className="t13 secondary">对标的近期论文</div>
+          <div className="t13 secondary">对标的论文</div>
           <div className="flex flex-col" style={{ marginTop: 4, gap: 4 }}>
-            {exemplars.map((e) => (
-              <button
-                key={e.id}
-                className="link-accent t13"
-                style={{ textAlign: 'left' }}
-                onClick={() => window.citecheck.openExternal(e.url)}
-              >
-                {e.title}
-                {e.year ? ` ${e.year}` : ''}
-              </button>
-            ))}
+            {exemplars.map((e) => {
+              const text = `${exemplarName(e)}${e.year ? `，${e.year}` : ''}`
+              const url = e.url
+              return url ? (
+                <button
+                  key={e.id}
+                  className="link-accent t13"
+                  style={{ textAlign: 'left' }}
+                  onClick={() => window.citecheck.openExternal(url)}
+                >
+                  {text}
+                </button>
+              ) : (
+                <div key={e.id} className="t13">
+                  {text}
+                </div>
+              )
+            })}
           </div>
         </div>
       )}
 
       <div className="t13 secondary" style={{ marginTop: 16 }}>
-        这是与近期已发表论文相比的粗略位置，不是修改建议。
+        这是与该刊已发表论文相比的粗略位置，不是修改建议。
       </div>
     </section>
   )

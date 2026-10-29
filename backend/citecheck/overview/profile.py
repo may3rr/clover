@@ -32,7 +32,7 @@ class Shape(BaseModel):
     has_error_analysis: bool | None = None
 
 
-_SHAPE_PROMPT = """你在统计一篇 NLP 论文的实验规模。根据给出的文本，只回答能确定的事实，不能确定的填 null，不要猜。
+_SHAPE_PROMPT = """你在统计一篇论文的实验规模。根据给出的文本，只回答能确定的事实，不能确定的填 null，不要猜。
 - n_datasets：实验用到的不同数据集 / benchmark 个数
 - n_baselines：对比的基线方法个数（不含本文方法及其变体）
 - has_ablation：是否有消融实验
@@ -90,7 +90,7 @@ def manuscript_profile(parsed: ParsedDocument) -> tuple[dict, str]:
         "has_limitations": "limitation" in lower,
         "has_ethics": "ethic" in lower,
     }
-    abstract = _section_text(parsed, "abstract")[:2000]
+    abstract = _section_text(parsed, "abstract", "摘要")[:2000]
     excerpt = "\n".join([
         f"Title: {parsed.document.title or ''}",
         f"Abstract: {abstract}",

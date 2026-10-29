@@ -16,18 +16,8 @@ import { morph } from './lib/vt'
 import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
 import { ACCEPT_ERROR, isPaperPath, looksLikeFolder } from './lib/accept'
+import { readVenue, saveVenue } from './lib/targetVenue'
 
-const VENUE_KEY = 'clover.venue'
-const VENUES = ['emnlp', 'acl', 'naacl', 'findings-emnlp', '']
-function readVenue(): string {
-  try {
-    const v = localStorage.getItem(VENUE_KEY)
-    if (v !== null && VENUES.includes(v)) return v
-  } catch {
-    /* ignore */
-  }
-  return 'emnlp'
-}
 
 type Screen =
   | 'empty'
@@ -52,13 +42,11 @@ export default function App() {
   const [lateOverview, setLateOverview] = useState<Report['overview']>(undefined)
   const [benchmark, setBenchmark] = useState('arxiv_cs_cl')
   const [venue, setVenueState] = useState(readVenue)
+  // the target venue: typed on the home screen, edited on the
+  // confirmation page, sent with the scan and the run
   const setVenue = useCallback((v: string) => {
     setVenueState(v)
-    try {
-      localStorage.setItem(VENUE_KEY, v)
-    } catch {
-      /* private mode: the choice just lasts for this session */
-    }
+    saveVenue(v)
   }, [])
   // venue the running job was started with ('' = overview off)
   const [runVenue, setRunVenue] = useState('')
@@ -122,8 +110,9 @@ export default function App() {
         const fd = new FormData()
         fd.append('path', path)
         fd.append('benchmark', benchmark)
-        fd.append('venue', venue)
-        for (const [k, v] of Object.entries(extra)) fd.append(k, v)
+        const target = (extra.venue ?? venue).trim()
+        fd.append('venue', target)
+        for (const [k, v] of Object.entries(extra)) if (k !== 'venue') fd.append(k, v)
         const r = await apiFetch('/analyze', { method: 'POST', body: fd })
         if (!r.ok) {
           setJobError(ACCEPT_ERROR)
@@ -133,7 +122,7 @@ export default function App() {
         // the front sheet flies into the first skeleton page
         morph(() => {
           setJobId(job_id)
-          setRunVenue(venue)
+          setRunVenue(target)
           setScreen('running')
         })
       } catch {
@@ -162,6 +151,7 @@ export default function App() {
         const fd = new FormData()
         fd.append('path', path)
         fd.append('scan_id', id)
+        fd.append('venue', venue.trim())
         if (libraryDir) fd.append('library', libraryDir)
         const r = await apiFetch('/library/scan', { method: 'POST', body: fd })
         if (stale()) return // 用户已取消
@@ -191,7 +181,7 @@ export default function App() {
       await startJob(path)
       if (!stale()) setScreen((s) => (s === 'scanning' ? 'empty' : s))
     },
-    [libraryDir, startJob]
+    [libraryDir, startJob, venue]
   )
 
   const pickLibrary = useCallback(async () => {
@@ -446,13 +436,14 @@ export default function App() {
         scan={scan}
         libraryDir={scan.library.folder}
         onCancel={reset}
+        onVenueChange={setVenue}
         error={jobError}
         onStart={({ paper, links, venue: libVenue, exemplars }) =>
           startJob(paper, {
             library: scan.library.folder,
             links: JSON.stringify(links),
             exemplars: JSON.stringify(exemplars),
-            ...(libVenue ? { library_venue: libVenue } : {}),
+            venue: libVenue,
           })
         }
       />

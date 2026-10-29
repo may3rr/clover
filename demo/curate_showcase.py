@@ -2,7 +2,7 @@
 
 Inputs (raw pipeline output, committed as-is):
   demo/showcase_paper.docx      long_errors.docx + 3 typos (build_showcase.py)
-  demo/showcase_report.json     run_pipeline(..., venue_id="emnlp")
+  demo/showcase_report.json     run_pipeline(..., venue="EMNLP")
   demo/showcase_events.json     the SSE events of that run, with timestamps
   demo/demo_report_v2.json      demo_paper.docx, same pipeline version
 

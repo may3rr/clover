@@ -21,7 +21,6 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
-from collections import Counter
 from collections.abc import Callable
 
 from pydantic import BaseModel
@@ -31,7 +30,7 @@ from ..parse.links import latin_surname
 from ..schema import Library, LibraryLink, Reference
 from .scan import LocalPdf, filename_meta
 from .text import squash
-from .venue_match import annotate_venues, clean_venue, match_target
+from .venue_match import annotate_venues, match_target
 
 log = logging.getLogger(__name__)
 
@@ -117,30 +116,11 @@ async def _ask_model(ref: Reference, cands: list[LocalPdf]) -> LocalPdf | None:
     return cands[res.value.choice - 1]
 
 
-def _venue_key(name: str) -> str:
-    """Registry name for a known journal, else the cleaned name."""
-    from ..distribution.registry import find_venue
-
-    v = find_venue(clean_venue(name))
-    return v["name"] if v else clean_venue(name)
-
-
-def detect_venue(pdfs: list[LocalPdf], linked: set[str]) -> str | None:
-    """The journal most of the unlinked PDFs come from — the folder holds
-    the author's yardstick papers for it. Needs at least three."""
-    venues = Counter(_venue_key(p.doc.venue) for p in pdfs
-                     if p.doc.id not in linked and p.doc.venue and p.doc.readable)
-    if not venues:
-        return None
-    venue, n = venues.most_common(1)[0]
-    return venue if n >= 3 else None
-
-
 async def link_library(
     refs: list[Reference], pdfs: list[LocalPdf], folder: str,
     *, use_model: bool = True, venue: str | None = None,
     guess_venues: bool = False, exemplar_ids: list[str] | None = None,
-    fallback_venue: str | None = None, manuscript_type: str = "research",
+    manuscript_type: str = "research",
     on_stage: Callable[[str, int, int], None] | None = None,
 ) -> Library:
     """``guess_venues``: ask the model for the journal of uncited PDFs no
@@ -216,29 +196,23 @@ async def link_library(
     await annotate_venues(pdfs, {x.doc_id for x in final},
                           use_model=use_model and guess_venues)
     return assemble(final, pdfs, folder, venue, exemplar_ids=exemplar_ids,
-                    fallback_venue=fallback_venue, manuscript_type=manuscript_type)
+                    manuscript_type=manuscript_type)
 
 
 def assemble(links: list[LibraryLink], pdfs: list[LocalPdf], folder: str,
              venue: str | None = None, *, exemplar_ids: list[str] | None = None,
-             fallback_venue: str | None = None, manuscript_type: str = "research",
+             manuscript_type: str = "research",
              ) -> Library:
-    """Library record from final links. The target journal: ``venue``
-    (the user's), else the folder's majority journal, else
-    ``fallback_venue`` (traces in the manuscript). Its uncited PDFs are
-    the matches; the exemplars are ``exemplar_ids`` when the user picked
-    them, else the matches of the manuscript's paper type."""
-    from ..distribution.registry import find_venue
+    """Library record from final links. The target venue is the one the
+    user typed (none: no exemplars). Its uncited PDFs are the matches;
+    the exemplars are ``exemplar_ids`` when the user picked them, else
+    the matches of the manuscript's paper type."""
+    from ..distribution.registry import resolve_target
 
     used = {x.doc_id for x in links}
-    source = None
-    if venue:
-        venue, source = clean_venue(venue), "user"
-    elif (venue := detect_venue(pdfs, used)):
-        source = "folder"
-    elif fallback_venue:
-        venue, source = fallback_venue, "manuscript"
-    entry = find_venue(venue)
+    target = resolve_target(venue)
+    venue, entry = target if target else (None, None)
+    source = "user" if venue else None
     free = [p for p in pdfs if p.doc.id not in used and p.doc.readable]
     matches = []
     for p in free:

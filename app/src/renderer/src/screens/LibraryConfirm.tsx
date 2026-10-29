@@ -14,7 +14,6 @@ import {
   MIN_EXEMPLARS,
   pickedExemplars,
   rowState,
-  venueSourceText,
   venueState,
   type LibraryScan,
   type LinkChoice,
@@ -34,6 +33,8 @@ interface Props {
     exemplars: string[]
   }) => void
   onCancel: () => void
+  /** the target venue changed here: the home screen keeps the same one */
+  onVenueChange?: (venue: string) => void
   error?: string | null
   /** shots: open on the exemplar list */
   initialFilter?: 'exemplars'
@@ -63,6 +64,7 @@ export default function LibraryConfirm({
   libraryDir,
   onStart,
   onCancel,
+  onVenueChange,
   error,
   initialFilter,
 }: Props) {
@@ -114,7 +116,6 @@ export default function LibraryConfirm({
       fd.append('venue', name)
       fd.append('linked', JSON.stringify(Object.values(choice).filter(Boolean)))
       fd.append('paper_type', scan.paper_type ?? 'research')
-      if (scan.manuscript_venue) fd.append('manuscript_venue', scan.manuscript_venue)
       const res = await apiFetch('/library/venue', { method: 'POST', body: fd })
       if (!res.ok) throw new Error(String(res.status))
       const r = (await res.json()) as {
@@ -138,6 +139,7 @@ export default function LibraryConfirm({
       setVs(next)
       setPicked(new Set(next.defaultIds))
       setVenueInput(next.venue ?? '')
+      onVenueChange?.(next.venue ?? '')
     } catch {
       setVenueError('无法更新目标期刊。请确认文献文件夹还在原处，然后重新填写。')
     } finally {
@@ -167,7 +169,6 @@ export default function LibraryConfirm({
   const confirmAll = () => setTouched(new Set(scan.references.map((r) => r.id)))
 
   const baseline = baselineText(vs, exemplars.length)
-  const sourceText = venueSourceText(vs.source)
 
   return (
     <div className="relative h-full overflow-hidden">
@@ -334,13 +335,13 @@ export default function LibraryConfirm({
           </div>
           <div className="card flex flex-col" style={{ gap: 8 }}>
             <label className="t13 secondary" htmlFor="target-venue">
-              目标期刊
+              目标期刊或会议
             </label>
             <input
               id="target-venue"
               className="field-input"
               list="venue-options"
-              placeholder="填写要投稿的期刊"
+              placeholder="留空不对标"
               value={venueInput}
               disabled={venueBusy}
               onChange={(e) => setVenueInput(e.target.value)}
@@ -354,7 +355,6 @@ export default function LibraryConfirm({
                 <option key={v} value={v} />
               ))}
             </datalist>
-            {sourceText && vs.venue && <div className="t13 secondary">{sourceText}</div>}
             <div className="font-normal">{venueError ?? baseline}</div>
             {filter !== 'exemplars' && (
               <button
@@ -459,13 +459,13 @@ function ExemplarList({
         核对对标范文
       </div>
       <div className="secondary" style={{ marginTop: 8 }}>
-        勾选的论文作为{v}的范文，逐篇统计章节结构、引用分布、参考文献构成和研究要素，再与本文比较。
-        默认选中识别为该刊、且与本文类型相同的论文。
+        这里列出文件夹中没有被引用的论文。勾选的论文和参考文献里的{v}论文一起作为范文，
+        逐篇统计章节结构、引用分布、参考文献构成和研究要素，再与本文比较。默认选中识别为该刊、且与本文类型相同的论文。
       </div>
       <div className="callout" style={{ marginTop: 16 }}>
         <div className="font-normal flex-1">
-          已选 <span className="font-semibold">{nPicked}</span> 篇
-          {nPicked < MIN_EXEMPLARS ? `，不少于 ${MIN_EXEMPLARS} 篇才会用作对标基线。` : '。'}
+          已选 <span className="font-semibold">{nPicked}</span> 篇，连同参考文献里的该刊论文合计不少于{' '}
+          {MIN_EXEMPLARS} 篇才对标。
         </div>
         <button className="pill-quiet font-normal" onClick={onReset}>
           恢复默认选择

@@ -1,6 +1,6 @@
 """期刊对标的细化指标：稿件与每篇范文逐项比较，可追溯到页码与段落。
 
-``prepare_venue`` turns the selected exemplar PDFs into a benchmark
+``prepare_venue`` turns the exemplar pool (pool.py) into a benchmark
 (profiles, optional model reads, heading types fixed by the model) and a
 ``VenueContext``; the distribution layer then calls ``compare`` with the
 manuscript's own numbers. Every metric lists each exemplar's value with
@@ -21,15 +21,14 @@ import statistics
 from dataclasses import dataclass, field
 from datetime import date
 
-from ..library.scan import LocalPdf
 from ..library.venue_match import paper_type
 from ..parse.headings import is_back_matter, is_ref_heading
 from ..parse.parser import ParsedDocument
 from ..schema import (Anchor, ExemplarInfo, ExemplarValue, Finding, SectionDist, Stat,
                       VenueMetric)
 from ..support.evidence import locate_evidence
-from .venue import (MIN_EXEMPLARS, REF_TYPES, aggregate, load_profiles, manuscript_abstract,
-                    manuscript_stats, ref_type)
+from .venue import (MIN_EXEMPLARS, REF_TYPES, ExemplarSource, aggregate, load_profiles,
+                    manuscript_abstract, manuscript_stats, ref_type)
 
 log = logging.getLogger(__name__)
 
@@ -53,7 +52,7 @@ _CJK = re.compile(r"[一-鿿]")
 
 @dataclass
 class Exemplar:
-    pdf: LocalPdf
+    src: ExemplarSource
     prof: dict | None
     model: dict | None = None
     similar: bool = False
@@ -115,17 +114,18 @@ def apply_overrides(prof: dict, overrides: dict[str, str]) -> dict:
     return {**prof, "headings": heads, "sections": sections}
 
 
-async def prepare_venue(exemplars: list[LocalPdf], venue: str, parsed: ParsedDocument,
+async def prepare_venue(exemplars: list[ExemplarSource], venue: str, parsed: ParsedDocument,
                         cache=None, *, use_model: bool = False
-                        ) -> tuple[dict | None, VenueContext | None]:
-    """(benchmark, context) from the selected exemplars, (None, None)
-    with fewer than MIN_EXEMPLARS readable ones."""
+                        ) -> tuple[dict | None, VenueContext]:
+    """(benchmark, context) from the exemplar pool; the benchmark is None
+    with fewer than MIN_EXEMPLARS readable ones (the context still lists
+    every exemplar, for the report to say what was found)."""
     pairs = await asyncio.to_thread(load_profiles, exemplars, cache)
-    items = [Exemplar(pdf, prof) for pdf, prof in pairs]
+    items = [Exemplar(src, prof) for src, prof in pairs]
     used = [e for e in items if e.prof]
-    if len(used) < MIN_EXEMPLARS:
-        return None, None
     ctx = VenueContext(venue=venue, exemplars=items)
+    if len(used) < MIN_EXEMPLARS:
+        return None, ctx
     if use_model:
         from . import venue_model as vm
 
@@ -283,7 +283,7 @@ def compare(parsed: ParsedDocument, ctx: VenueContext, *, dist_sections: list[Se
 
     used = ctx.used
     n = len(used)
-    ex_vals = {e.pdf.doc.id: _ex_values(e) for e in used}
+    ex_vals = {e.src.id: _ex_values(e) for e in used}
     year = year or date.today().year
 
     # ---- the manuscript's values and the paragraphs behind them --------
@@ -380,7 +380,7 @@ def compare(parsed: ParsedDocument, ctx: VenueContext, *, dist_sections: list[Se
 
     metrics: list[VenueMetric] = []
     for sp in specs:
-        rows = [(e, ex_vals[e.pdf.doc.id].get(sp.key)) for e in used]
+        rows = [(e, ex_vals[e.src.id].get(sp.key)) for e in used]
         rows = [(e, v) for e, v in rows if v is not None]
         if not rows:
             continue  # nothing measured on the exemplars (model off)
@@ -388,7 +388,7 @@ def compare(parsed: ParsedDocument, ctx: VenueContext, *, dist_sections: list[Se
         value, anchors, quote = mine.get(sp.key, (None, [], None))
         m = VenueMetric(key=sp.key, group=sp.group, label=sp.label, unit=sp.unit,  # type: ignore[arg-type]
                         kind=sp.kind, value=value, anchors=anchors, quote=quote,  # type: ignore[arg-type]
-                        exemplars=[ExemplarValue(doc_id=e.pdf.doc.id, value=v[0], page=v[1],
+                        exemplars=[ExemplarValue(doc_id=e.src.id, value=v[0], page=v[1],
                                                  quote=v[2]) for e, v in rows])
         if sp.kind == "bool":
             known = [v for v in vals]
@@ -403,11 +403,13 @@ def compare(parsed: ParsedDocument, ctx: VenueContext, *, dist_sections: list[Se
         metrics.append(m)
 
     findings = _findings(metrics, ctx, n, ref_anchor=ra[0] if ra else None)
-    infos = [ExemplarInfo(doc_id=e.pdf.doc.id, filename=e.pdf.doc.filename,
-                          title=e.pdf.doc.title, year=e.pdf.doc.year,
-                          paper_type=paper_type(e.pdf.doc.title),  # type: ignore[arg-type]
-                          used=bool(e.prof), similar=e.similar,
-                          note=None if e.prof else "没有识别出章节结构或参考文献，未参与统计")
+    infos = [ExemplarInfo(doc_id=e.src.id, filename=e.src.filename,
+                          title=e.src.title, year=e.src.year,
+                          paper_type=paper_type(e.src.title),  # type: ignore[arg-type]
+                          origin=e.src.origin, ref_id=e.src.ref_id, label=e.src.label,
+                          url=e.src.url, used=bool(e.prof), similar=e.similar,
+                          note=None if e.prof else
+                          e.src.note or "没有识别出章节结构或参考文献，未参与统计")
              for e in ctx.exemplars]
     return metrics, findings, infos
 

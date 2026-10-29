@@ -24,6 +24,7 @@ import { mathPieces, type Piece } from '../lib/math'
 import { apiFetch, getInfo } from '../lib/api'
 import { assetUrl, layoutBlocks } from '../lib/layout'
 import { morph } from '../lib/vt'
+import { poolSummary } from '../lib/venue'
 import { useScrollFade } from '../lib/useScrollFade'
 import type { Prefs } from '../lib/prefs'
 import Detail from './Detail'
@@ -741,12 +742,12 @@ function SideRow({
   )
 }
 
-/** "《数据分析与知识发现》范文 32 篇" / built-in baseline / benchmark name */
+/** "《数据分析与知识发现》的 32 篇论文" / built-in baseline / benchmark name */
 export function benchLabel(report: Report): string {
   const d = report.distribution
   if (!d) return '—'
   if (d.venue && d.venue_source === 'exemplars')
-    return `《${d.venue}》，文献文件夹中的 ${d.n_papers} 篇论文`
+    return poolSummary(d)
   if (d.venue && d.venue_source === 'builtin')
     return `《${d.venue}》，内置基线 ${d.n_papers} 篇论文`
   return d.benchmark_name ?? '—'

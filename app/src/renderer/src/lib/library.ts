@@ -1,11 +1,5 @@
 import type { Library, LibraryDoc, LibraryLink } from '../types/report'
 
-export interface Baseline {
-  source: 'exemplars' | 'builtin' | null
-  name: string | null
-  n_papers: number
-}
-
 /** A journal the registry knows: rules, maybe a built-in baseline. */
 export interface VenueEntry {
   id: string
@@ -18,11 +12,8 @@ export interface LibraryScan {
   paper: string
   candidates: string[]
   kind: string
-  baseline: Baseline
   entry?: VenueEntry | null
   paper_type?: 'research' | 'review'
-  /** journal named by the manuscript's template traces */
-  manuscript_venue?: string | null
   library: Library
   references: ScanRef[]
 }
@@ -135,27 +126,16 @@ export function pickedExemplars(
     .filter((id) => picked.has(id))
 }
 
-export const MIN_EXEMPLARS = 5
+export const MIN_EXEMPLARS = 3
 
 /** What the run will compare against, in one sentence. */
 export function baselineText(vs: VenueState, nPicked: number): string {
-  const v = vs.venue ? `《${vs.venue}》` : '目标期刊'
-  if (nPicked >= MIN_EXEMPLARS)
-    return `用文件夹中 ${nPicked} 篇${v}论文作为对标范文，逐篇统计后和本文比较。`
-  if (vs.entry?.n_papers)
-    return `已选范文不足 ${MIN_EXEMPLARS} 篇，改用《${vs.entry.name}》的内置基线对标，只比较统计量。`
-  if (vs.entry)
-    return `已选范文不足 ${MIN_EXEMPLARS} 篇。按《${vs.entry.name}》的投稿要求检查，引用分布与英文语料对比，只比较占比。`
-  if (vs.venue)
-    return `已选范文不足 ${MIN_EXEMPLARS} 篇，引用分布与英文语料对比，只比较占比。可以在对标范文中勾选更多论文。`
-  return '没有识别出目标期刊。填写目标期刊后，文件夹里该刊的论文会列为对标范文。'
-}
-
-export function venueSourceText(source: VenueState['source']): string | null {
-  if (source === 'user') return '你填写的目标期刊'
-  if (source === 'folder') return '从文件夹中未被引用的论文识别'
-  if (source === 'manuscript') return '从稿件首页的期刊模板痕迹识别'
-  return null
+  if (!vs.venue)
+    return '没有填写目标期刊，这次不对标。填写后，参考文献和文件夹里该刊的论文会作为对标范文。'
+  return (
+    `体检时会从参考文献中找出《${vs.venue}》的论文，连同这里勾选的 ${nPicked} 篇一起作为对标范文，` +
+    `合计不少于 ${MIN_EXEMPLARS} 篇才对标。`
+  )
 }
 
 const VIA: Record<string, string> = {

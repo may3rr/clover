@@ -1,9 +1,12 @@
-"""Overview stage: a small multi-agent pass that places the manuscript
-against recent papers of the target venue.
+"""Overview stage: place the manuscript against papers of the target
+venue the user typed.
 
-  scout    (no model)   pick 3 similar papers from the venue — venues.py
-  readers  (fast model) one per exemplar + one for the manuscript, in
-                        parallel: extract each paper's "shape" — profile.py
+  pool     (no model)   the venue's papers with text at hand —
+                        distribution/pool.py, shared with the
+                        distribution layer's exemplar metrics
+  readers  (fast model) one per exemplar (the few closest in topic) + one
+                        for the manuscript, in parallel: extract each
+                        paper's "shape" — profile.py
   critic   (deep model) compare shapes + the four layers' findings and
                         give a tier per dimension and a 2–3 sentence
                         direction
@@ -12,30 +15,25 @@ The critic answers in tiers on purpose: users should read this as "where
 the draft roughly stands", not as revision instructions (AGENTS §2 —
 no rewriting, no suggested references).
 
-`prepare()` runs alongside the four layers (it needs no findings);
-`critique()` runs after them.
+`prepare()` runs once the pool is known (it needs no findings);
+`critique()` runs after the four layers.
 """
 
 from __future__ import annotations
 
 import asyncio
-import datetime as _dt
 import json
 import logging
 from dataclasses import dataclass, field
 from collections.abc import Callable
 from typing import Literal
 
-import httpx
 from pydantic import BaseModel, Field
 
-from ..cache import Cache
 from ..llm.client import chat_json
 from ..parse.parser import ParsedDocument
 from ..schema import ExemplarPaper, Finding, Overview, OverviewDim
-from ..support.sources import _fetch_pdf_text
 from .profile import exemplar_counts, manuscript_profile, read_shape
-from .venues import VENUES, pick_exemplars
 
 log = logging.getLogger(__name__)
 
@@ -57,49 +55,50 @@ COMMENT_MAX = 160
 NOTE_MAX = 40
 
 
+READ_MAX = 4  # exemplars the critic sees: the closest in topic, then the newest
+
+
 @dataclass
 class Prepared:
     venue_id: str
+    venue_name: str
     manuscript: dict
     exemplars: list[ExemplarPaper] = field(default_factory=list)
     note: str | None = None
 
 
-async def prepare(parsed: ParsedDocument, venue_id: str,
-                  client: httpx.AsyncClient, cache: Cache,
+async def prepare(parsed: ParsedDocument, venue_id: str, venue_name: str, ctx,
+                  note: str | None = None,
                   on_step: Callable[[str], None] | None = None) -> Prepared:
-    """on_step 收到真实阶段名，运行页的期刊评审行原样显示。"""
+    """``ctx``: the distribution layer's VenueContext (None or without a
+    benchmark: ``note`` says why). on_step 收到真实阶段名，运行页的期刊评审行原样显示。"""
     step = on_step or (lambda _s: None)
-    venue = VENUES.get(venue_id)
     stats, excerpt = manuscript_profile(parsed)
-    if venue is None:
-        return Prepared(venue_id, stats, note="不支持这个目标期刊")
+    used = list(ctx.used) if ctx is not None and not note else []
+    if not used:
+        return Prepared(venue_id, venue_name, stats,
+                        note=note or f"没有取得《{venue_name}》的论文原文，无法对标")
+    used.sort(key=lambda e: (not e.similar, -(e.src.year or 0)))
+    picked = used[:READ_MAX]
+    step(f"正在读取 {len(picked)} 篇范文")
 
-    title = parsed.document.title or ""
-    query = f"{title} {excerpt}"
-    this_year = _dt.date.today().year
-    step("正在获取近期论文")
-    picked = await pick_exemplars(
-        venue, query, [this_year - 1, this_year - 2], client, cache)
-    if picked:
-        step(f"正在读取 {len(picked)} 篇范文")
-
-    async def read_one(c) -> ExemplarPaper | None:
-        text = await _fetch_pdf_text(c.pdf, client, cache)
+    async def read_one(e) -> ExemplarPaper | None:
+        text = await asyncio.to_thread(e.src.text)
         if not text:
             return None
         shape = await read_shape(text)
         return ExemplarPaper(
-            id=c.id, title=c.title, year=c.year, url=c.url,
+            id=e.src.id, title=e.src.title or e.src.filename or "", year=e.src.year,
+            url=e.src.url, origin=e.src.origin, label=e.src.label,
             stats={**shape.model_dump(), **exemplar_counts(text)},
         )
 
     mine, *theirs = await asyncio.gather(
-        read_shape(excerpt), *(read_one(c) for c in picked))
+        read_shape(excerpt), *(read_one(e) for e in picked))
     stats.update(mine.model_dump())
     exemplars = [e for e in theirs if e is not None]
-    note = None if exemplars else f"没能获取 {venue.name} 近期论文作为参照"
-    return Prepared(venue_id, stats, exemplars, note)
+    return Prepared(venue_id, venue_name, stats, exemplars,
+                    None if exemplars else f"没能读取《{venue_name}》范文的原文")
 
 
 class _Dim(BaseModel):
@@ -116,7 +115,7 @@ class _Verdict(BaseModel):
 
 _CRITIC_PROMPT = """你是 {venue} 的资深审稿人，在投稿前给作者一个整体定位。你会看到：
 1. 待投稿论文的结构统计（manuscript）；
-2. {venue} 近两年与它主题最接近的几篇已发表论文的同类统计（exemplars）；
+2. {venue} 已发表的几篇论文的同类统计（exemplars），多数是这篇论文自己引用过的、主题最接近的论文；
 3. 自动引用检查的结果汇总（findings）。
 
 把待投稿论文和这些已发表论文比较，按以下维度各给一个档次：
@@ -124,7 +123,7 @@ _CRITIC_PROMPT = """你是 {venue} 的资深审稿人，在投稿前给作者一
 - analysis 分析深度：消融、人工评估、错误分析
 - literature 文献覆盖：参考文献数量与新近程度
 - citations 引用可靠性：根据 findings 中真实性与支持度问题的数量和严重程度
-- completeness 结构完整：Limitations、伦理声明等该会议要求的部分
+- completeness 结构完整：这些已发表论文普遍具备的部分，如 Limitations、伦理声明、作者贡献声明
 档次只能是 below（低于常见水平）、near（略低于）、at（达到）、above（高于）、na（信息不足）。每个维度的 note 用一句不超过 30 字的中文说明依据，引用具体数字。
 
 overall 是整体档次。comment 用两到三句中文，说清整体处在什么位置、最值得投入精力的方向。
@@ -146,8 +145,7 @@ def summarize_findings(findings: list[Finding]) -> dict:
 
 
 async def critique(prep: Prepared, findings: list[Finding]) -> Overview:
-    venue = VENUES.get(prep.venue_id)
-    name = venue.name if venue else prep.venue_id
+    name = prep.venue_name
     base = Overview(venue_id=prep.venue_id, venue_name=name,
                     exemplars=prep.exemplars, manuscript=prep.manuscript)
     if not prep.exemplars:

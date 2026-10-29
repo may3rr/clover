@@ -8,11 +8,13 @@ import { formatLoc } from '../lib/accept'
 import { HL_CLASS } from '../lib/highlight'
 import {
   boolSummary,
+  exemplarName,
   exemplarRows,
   fmtMetric,
   GROUP_LABEL,
   groupedMetrics,
   metricsFor,
+  poolSummary,
 } from '../lib/venue'
 import type { ExemplarInfo, VenueMetric } from '../types/report'
 
@@ -499,7 +501,7 @@ function DistributionDetail({
       <>
         <div className="t13 secondary">
           {d?.venue_source === 'exemplars'
-            ? `对标文献文件夹中《${d.venue}》的 ${d.n_papers} 篇论文，只在本机统计。`
+            ? `对标${poolSummary(d)}，只在本机统计。`
             : `对标内置的《${d?.venue}》基线，共 ${d?.n_papers ?? 0} 篇论文。`}
         </div>
         <div className="card flex flex-col" style={{ gap: 16 }}>
@@ -666,7 +668,7 @@ function VenueMetricsDetail({
   return (
     <>
       <div className="t13 secondary">
-        对标文献文件夹中《{d?.venue}》的 {d?.n_papers ?? 0} 篇论文，每项可以展开查看各篇范文的取值和出处。
+        {d ? `对标${poolSummary(d)}，` : ''}每项可以展开查看各篇范文的取值和出处。
         {near.length > 0 && `主题最接近本文的是${near.join('、')}。`}
       </div>
       <div className="card flex flex-col" style={{ gap: 16 }}>
@@ -779,7 +781,7 @@ function VenueMetricRow({
             <div key={value.doc_id} className="flex items-start gap-3">
               <div className="flex-1 min-w-0">
                 <div className="t13" style={{ wordBreak: 'break-word' }}>
-                  {info?.title || info?.filename || value.doc_id}
+                  {(info && exemplarName(info)) || value.doc_id}
                 </div>
                 <div className="t13 secondary" style={{ wordBreak: 'break-word' }}>
                   {[

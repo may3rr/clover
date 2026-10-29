@@ -177,26 +177,15 @@ async def venues() -> list[dict]:
     return out
 
 
-def _venue_info(lib, parsed=None) -> dict:
-    """Target journal of a library record: the registry entry it maps to
-    (rules, built-in baseline size) and the baseline the run will use."""
+def _venue_entry(lib) -> dict | None:
+    """The registry entry the target venue maps to (投稿规则), if any."""
     from .distribution.registry import builtin_baseline, find_venue
-    from .distribution.venue import MIN_EXEMPLARS
 
     entry = find_venue(lib.venue)
+    if entry is None:
+        return None
     b = builtin_baseline(entry)
-    n_ex = len(lib.exemplar_ids)
-    if n_ex >= MIN_EXEMPLARS:
-        baseline = {"source": "exemplars", "name": lib.venue, "n_papers": n_ex}
-    elif b is not None:
-        baseline = {"source": "builtin", "name": entry["name"], "n_papers": b["n_papers"]}
-    else:
-        baseline = {"source": None, "name": lib.venue, "n_papers": n_ex}
-    return {
-        "baseline": baseline,
-        "entry": {"id": entry["id"], "name": entry["name"],
-                  "n_papers": b["n_papers"] if b else 0} if entry else None,
-    }
+    return {"id": entry["id"], "name": entry["name"], "n_papers": b["n_papers"] if b else 0}
 
 
 # 扫描文献文件夹要读 PDF、匹配、可能还要问模型，可能持续几十秒：
@@ -218,10 +207,11 @@ async def library_scan(
 ):
     """Confirmation step before a folder run: which file is the paper,
     which folder holds the PDFs, the proposed reference ↔ PDF links and
-    the target journal's exemplars. Nothing is sent to the cloud except
-    the model's multiple-choice question for ambiguous links and, when
-    期刊对标细化 is on, the first page of PDFs whose journal is unknown."""
-    from .distribution.registry import detect_from_manuscript
+    the uncited PDFs of the target venue (``venue``: what the user typed
+    on the home screen; blank = no benchmarking). Nothing is sent to the
+    cloud except the model's multiple-choice question for ambiguous links
+    and, when 期刊对标细化 is on, the first page of PDFs whose journal is
+    unknown."""
     from .library import build_library
     from .library.folder import resolve_folder
     from .library.venue_match import paper_type
@@ -249,18 +239,15 @@ async def library_scan(
         log.exception("library scan: cannot parse %s", layout.paper)
         return JSONResponse({"detail": "无法读取论文文件。请确认它是 .docx 格式，然后重新拖入。"},
                             status_code=400)
-    trace = detect_from_manuscript(parsed)
     ptype = paper_type(parsed.document.title)
     lib, _local, _pdfs = await build_library(
-        parsed.references, lib_dir, venue=venue or None,
-        fallback_venue=trace["name"] if trace else None, manuscript_type=ptype,
+        parsed.references, lib_dir, venue=venue or None, manuscript_type=ptype,
         on_stage=stage)
     stage("done")
     return {
-        **_venue_info(lib),
+        "entry": _venue_entry(lib),
         "paper": str(layout.paper),
         "paper_type": ptype,
-        "manuscript_venue": trace["name"] if trace else None,
         "candidates": [str(p) for p in layout.candidates],
         "kind": layout.kind,
         "library": lib.model_dump(mode="json"),
@@ -278,9 +265,8 @@ async def library_venue(
     venue: str = Form(""),
     linked: str = Form("[]"),
     paper_type: str = Form("research"),
-    manuscript_venue: str | None = Form(None),
 ):
-    """The confirmation page changed the target journal: which uncited
+    """The confirmation page changed the target venue: which uncited
     PDFs are its papers now. ``linked``: doc ids the user's links use.
     Re-reads the folder from the scan cache; no model call beyond the
     (cached) journal guesses of the first scan."""
@@ -303,9 +289,8 @@ async def library_venue(
     links = [LibraryLink(ref_id=f"_{i}", doc_id=d, method="user", score=100)
              for i, d in enumerate(used)]
     lib = assemble(links, pdfs, str(lib_dir), venue.strip() or None,
-                   fallback_venue=manuscript_venue or None,
                    manuscript_type="review" if paper_type == "review" else "research")
-    return {**_venue_info(lib), "library": {
+    return {"entry": _venue_entry(lib), "library": {
         "venue": lib.venue, "venue_source": lib.venue_source,
         "venue_match_ids": lib.venue_match_ids, "exemplar_ids": lib.exemplar_ids,
         "docs": [d.model_dump(mode="json") for d in lib.docs]}}
@@ -317,13 +302,12 @@ async def analyze(
     file: UploadFile | None = File(None),
     path: str | None = Form(None),
     benchmark: str = Form("arxiv_cs_cl"),
-    # target venue for the overview stage; "" turns it off
-    venue: str = Form("emnlp"),
+    # target journal or conference as the user typed it; "" = no benchmarking
+    venue: str = Form(""),
     # reference folder (文献文件夹) and the user's confirmed links (JSON
     # list of LibraryLink); a dropped paper folder finds its ref/ itself
     library: str | None = Form(None),
     links: str | None = Form(None),
-    library_venue: str | None = Form(None),
     # the user's exemplar selection on the confirmation page (JSON list
     # of LibraryDoc ids); absent = the journal's matches by paper type
     exemplars: str | None = Form(None),
@@ -383,8 +367,8 @@ async def analyze(
         try:
             rep = await run_pipeline(
                 src, benchmark_id=benchmark, emit=emit,
-                venue_id=venue or None, library_dir=library,
-                library_links=confirmed, library_venue=library_venue or None,
+                venue=venue.strip() or None, library_dir=library,
+                library_links=confirmed,
                 library_exemplars=picked, on_report=on_report)
             job.report = rep
             if rep.overview is None or rep.overview.status != "pending":
