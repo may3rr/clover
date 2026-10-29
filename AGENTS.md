@@ -147,13 +147,16 @@ class Report:         document, sections, paragraphs, markers, references,
 - **只用系统字体：** `font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", system-ui, sans-serif;`
   英文自动使用 SF Pro，中文自动使用苹方。禁止引入任何网络字体或自带字体文件。
 - **层级只靠字重区分。** 可用字重：400、500、600、700。
-- **字号六档：**
-  - `13px`：次要文字——计数、说明、组标签、注释、属性行标签。
-  - `15px`：界面文字（标题、按钮、标签、列表行、属性值）。
-  - `17px`：阅读区论文正文（行高 `1.7`）与详情视图标题。
-  - `20px`：阅读区章节标题（600，上间距 32px）。
-  - `26px`：空状态 / 运行页大标题（600）。
-  - `32px`：阅读视图论文标题（700，Notion 页面标题）。
+- **字号六档，每档配固定行高**（`tokens.css` 的 `--lh-*`，`.t13` 等类同时设字号和行高，`body` 为 15/22）：
+  - `13px / 18px`：次要文字——计数、说明、组标签、注释、属性行标签。
+  - `15px / 22px`：界面文字（标题、按钮、标签、列表行、属性值）。
+  - `17px / 29px`（1.7）：阅读区论文正文；详情视图标题用 `17px / 26px`（`.t17`）。
+  - `20px / 28px`：阅读区章节标题（600，上间距 32px）。
+  - `26px / 34px`：空状态 / 运行页大标题（600）。
+  - `32px / 40px`：阅读视图论文标题（700，Notion 页面标题）。
+- 不写 `line-height: normal`，不写没有配行高的字号。中文行高与纯英文行高必须一致。图标与首行对齐时，外包一个与行高等高的盒子垂直居中，不用手调 `marginTop`。
+- `body` 开启 `text-autospace: normal`（中英、中文与数字之间自动留间距，手写空格处不重复加距）。`.t17`、`.t26`、`.t32` 开启 `text-wrap: balance`。
+- `text-box: trim-both cap alphabetic` 只用于纯英文或数字的小控件；中文按钮裁切后会上浮，不用。
 - 主文字颜色 `--text`；次要信息（计数、说明、caption、组标签）用 `--text-secondary`。语义色只用于状态。
 - 禁止全大写标签，禁止在标题里单独给某个词加粗或变色（语义计数除外），禁止用中点连接元信息（如 `A · B · C`），按钮文字后面不加箭头，中文标题旁不放英文小字标签。
 
@@ -186,7 +189,8 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
   /* 品牌色（设置页供应商图标，LobeHub lobe-icons 品牌色）：
      --brand-qwen / --brand-deepseek；品牌色块上的白色 glyph 用 --on-brand */
   --hairline / --shimmer                 /* SVG 页边 / 占位微光 */
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1) /* 唯一缓动 */
+  --ease / --ease-out / --ease-drawer / --ease-sine / --spring  /* 缓动，见 6.4 */
+  --glass-glow                           /* 落点高亮的柔光 */
 }
 /* dark：--bg #191919 等，同名定义在 tokens.css */
 ```
@@ -197,16 +201,32 @@ tokens.css 中允许十六进制和 rgba；组件里禁止任何颜色字面量�
 
 - **禁止分割线、边框、描边、下划线装饰。** 区块之间靠留白和底色区分。唯一的例外：侧栏 / 检查器与阅读区之间各一条 `1px var(--separator)` 发丝线（用 box-shadow 画，不用 border）。
 - 正文里的问题高亮用**柔和底色**（`--high-tint` 等，`padding: 0 2px; box-decoration-break: clone;`）。
-- 阴影只允许 `--glass-edge` / `--glass-shadow`，用在骨架页边和浮层菜单上；窗格和普通面板不加阴影。
+- 阴影只允许 `--glass-edge` / `--glass-shadow`，用在骨架页边和浮层菜单上；`--glass-glow` 只用于落点高亮的一次柔光。窗格和普通面板不加阴影。
 - 不要把内容切成一排排一模一样的圆角卡片。
 
 ### 6.4 间距、圆角、动效
 
 - 间距只用这组值：4 / 8 / 12 / 16 / 24 / 32 / 48 px。
 - 圆角：检查器内的详情卡 12px，callout 8px，列表行 8–10px，其余 tile 5px（20px 尺寸），高亮 4px，主按钮胶囊形（980px）。侧栏和检查器是通高直边窗格，没有圆角。
-- 动效曲线统一 `var(--ease)`；时长：hover/press 160ms、面板 240ms、跨屏 morph 320–400ms。只允许 transform / opacity（骨架条加 scaleX）。
+- **8px 及以上的面使用连续圆角** `-electron-corner-smoothing: system-ui`，`border-radius` 数值不变。统一列在 `base.css` 末尾「连续圆角」一节，组件里不内联 `borderRadius`。胶囊、圆点、5px tile、正文高亮不加。官网 `app/site/` 用 `corner-shape: squircle`，并以 `@supports` 回退普通圆角。
+- 嵌套圆角同心：外半径 = 内半径 + 间距。
+- **缓动**：曲线只在 `tokens.css` 定义，组件和 `base.css` 里禁止 `cubic-bezier(`、`linear(` 字面量和 `ease`、`ease-in`、`ease-out` 关键字（`lint:design` 检查）。
+
+  | 场合 | 曲线 | 时长 |
+  | --- | --- | --- |
+  | hover、颜色、按压（按压缩放 0.97） | `--ease-out` | 160ms |
+  | 进入：行、卡片、详情 | `--ease-out` | 240ms |
+  | 退出 | `--ease-out` | 进入的约 0.6 倍（240ms 进入配 140ms 退出） |
+  | 窗格折叠、屏内位移 | `--ease-drawer` | 240–320ms |
+  | 视图过渡 | 位移 `--ease-drawer`，淡入淡出 `--ease-out` | 360ms |
+  | 落定（勾选画完、卡片换入、浮层展开） | `--spring` | `--spring-dur` |
+  | 往复循环（呼吸、漂浮、微光） | `--ease-sine` | 不变 |
+  | 匀速旋转 | `linear` | 不变 |
+
+- 只允许 transform / opacity（骨架条加 scaleX）。一天几十次以上的操作（列表上下键、筛选切换）不做过渡或只做 opacity；键盘连续触发的操作不做 morph。
+- 时长不定、要等模型返回的场合用三点轨道 `components/OrbitDots.tsx`（期刊评审、支持度复核、范文细化），短等待用转圈。
 - 屏幕切换与列表→详情用 `document.startViewTransition`（`lib/vt.ts` 的 `morph()`，reduced-motion 时退化为直接切换）。
-- 尊重 `prefers-reduced-motion`：所有动画降为仅 opacity 或直接跳过。
+- 尊重 `prefers-reduced-motion`：去掉位移、缩放和循环，保留 opacity 与颜色过渡（`base.css` 末尾统一处理）。
 - 焦点环只在真实键盘焦点出现（`--accent` 2px，这是唯一允许的"线"）。不要在加载或鼠标点击后程序化 focus 元素。
 
 ### 6.5 窗口

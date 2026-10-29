@@ -146,7 +146,7 @@ export default function Empty({
           marginLeft: 240,
           marginRight: 380,
           background: active ? 'var(--bg-subtle)' : 'var(--bg)',
-          transition: 'background 200ms ease-out',
+          transition: 'background 160ms var(--ease)',
         }}
       >
         <div

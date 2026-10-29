@@ -21,8 +21,11 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
     'PingFang SC', system-ui, sans-serif;
   font-size: 15px;
+  line-height: var(--lh-15);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  /* 中英、中文与数字之间自动留间距；手写空格处不会重复加距 */
+  text-autospace: normal;
   /* counts, costs and progress don't jitter as they change */
   font-variant-numeric: tabular-nums;
   user-select: none;
@@ -71,15 +74,6 @@ select {
   color: inherit;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-}
 
 /* no orphan line ends in running text / callouts */
 .paper p,
@@ -157,15 +151,26 @@ select {
 /* type scale helpers */
 .t13 {
   font-size: 13px;
+  line-height: var(--lh-13);
+}
+.t17 {
+  font-size: 17px;
+  line-height: var(--lh-17-title);
+  text-wrap: balance;
 }
 .t20 {
   font-size: 20px;
+  line-height: var(--lh-20);
 }
 .t26 {
   font-size: 26px;
+  line-height: var(--lh-26);
+  text-wrap: balance;
 }
 .t32 {
   font-size: 32px;
+  line-height: var(--lh-32);
+  text-wrap: balance;
 }
 .secondary {
   color: var(--text-secondary);
@@ -224,6 +229,7 @@ select {
   padding: 0 14px;
   font-weight: 500;
   font-size: 15px;
+  line-height: var(--lh-15);
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -246,7 +252,7 @@ select {
 .pill-quiet:active:not(:disabled),
 .icon-btn:active:not(:disabled),
 .side-tab:active {
-  transform: scale(0.98);
+  transform: scale(0.97);
 }
 
 /* ⌘F search in the reading header */
@@ -270,6 +276,7 @@ select {
   height: 100%;
   background: transparent;
   font-size: 15px;
+  line-height: var(--lh-15);
   color: var(--text);
 }
 .paper-search-input::placeholder {
@@ -317,22 +324,23 @@ select {
   border-radius: 12px;
   background: var(--bg);
   box-shadow: var(--glass-edge), var(--glass-shadow);
-  animation: cc-pop 240ms var(--ease) both;
+  transform-origin: top right;
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 140ms var(--ease-out);
   -webkit-app-region: no-drag;
+}
+.export-pop.in {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 240ms var(--ease-out),
+    transform var(--spring-dur) var(--spring);
 }
 .export-pop-name {
   overflow-wrap: anywhere;
-}
-@keyframes cc-pop {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .export-pop {
-    animation-name: cc-fade;
-  }
 }
 /* small native-style indeterminate spinner — accent arc drawn as SVG */
 .spinner {
@@ -370,6 +378,7 @@ select {
 .hist-row-name {
   display: block;
   font-size: 15px;
+  line-height: var(--lh-15);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -597,6 +606,7 @@ select {
 /* group labels (13px secondary) */
 .group-label {
   font-size: 13px;
+  line-height: var(--lh-13);
   color: var(--text-secondary);
   padding: 8px 12px;
 }
@@ -610,6 +620,7 @@ select {
 }
 .side-tab {
   font-size: 13px;
+  line-height: var(--lh-13);
   font-weight: 600;
   color: var(--text-secondary);
   transition:
@@ -918,7 +929,7 @@ select {
     transparent
   );
   transform: translateX(-100%);
-  animation: cc-shimmer 1.6s linear infinite;
+  animation: cc-shimmer 1.6s var(--ease-sine) infinite;
 }
 @keyframes cc-shimmer {
   0% {
@@ -932,7 +943,7 @@ select {
 
 /* ======================================================= illustrations */
 .papers {
-  animation: cc-float 6s ease-in-out infinite;
+  animation: cc-float 6s var(--ease-sine) infinite;
 }
 @keyframes cc-float {
   0%,
@@ -962,21 +973,10 @@ select {
 }
 
 /* ============================================================ motion */
-/* buttons press at 0.97 */
-.pill-accent,
-.pill,
-.pill-quiet {
-  transition: transform 160ms var(--ease);
-}
-.pill-accent:active,
-.pill:active,
-.pill-quiet:active {
-  transform: scale(0.97);
-}
-/* row hover fades --fill in over 120ms */
+/* row hover fades --fill in over 160ms */
 .list-row,
 .side-row {
-  transition: background 120ms var(--ease);
+  transition: background 160ms var(--ease);
 }
 
 /* checkmark draw (stroke-dashoffset, 240ms) */
@@ -1046,10 +1046,12 @@ select {
   width: 96px;
   flex: none;
   font-size: 15px;
+  line-height: var(--lh-15);
   color: var(--text-secondary);
 }
 .prop-value {
   font-size: 15px;
+  line-height: var(--lh-15);
 }
 
 /* summary callout (Notion callout) */
@@ -1062,9 +1064,15 @@ select {
   align-items: flex-start;
 }
 
-/* view transitions: soft crossfade, 360ms */
+/* view transitions, 360ms: position and size ride the drawer curve,
+   the old/new snapshots crossfade on ease-out */
 ::view-transition-group(*) {
   animation-duration: 360ms;
+  animation-timing-function: var(--ease-drawer);
+}
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-timing-function: var(--ease-out);
 }
 .detail-title {
   view-transition-name: cc-detail-title;
@@ -1100,11 +1108,13 @@ select {
 .field-label {
   display: block;
   font-size: 13px;
+  line-height: var(--lh-13);
   color: var(--text-secondary);
   margin-bottom: 4px;
 }
 .field-hint {
   font-size: 13px;
+  line-height: var(--lh-13);
   color: var(--text-secondary);
   margin-top: 4px;
 }
@@ -1116,6 +1126,7 @@ select {
   background: var(--fill);
   padding: 0 12px;
   font-size: 15px;
+  line-height: var(--lh-15);
   color: var(--text);
 }
 
@@ -1143,7 +1154,7 @@ select {
   border-radius: 8px;
   width: 100%;
   text-align: left;
-  transition: background 120ms var(--ease);
+  transition: background 160ms var(--ease);
 }
 .account-chip:hover {
   background: var(--fill);
@@ -1183,6 +1194,7 @@ select {
   background: transparent;
   text-align: center;
   font-size: 17px;
+  line-height: var(--lh-17-title);
   font-weight: 600;
   color: var(--text);
   width: 320px;
@@ -1262,6 +1274,7 @@ select {
   background: var(--tile-blue);
   color: white;
   font-size: 13px;
+  line-height: var(--lh-13);
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -1270,6 +1283,7 @@ select {
 }
 .cmt-author {
   font-size: 15px;
+  line-height: var(--lh-15);
   font-weight: 600;
 }
 .cmt-time {
@@ -1277,6 +1291,7 @@ select {
 }
 .cmt-body {
   font-size: 15px;
+  line-height: var(--lh-15);
   margin-top: 4px;
 }
 
@@ -1298,8 +1313,9 @@ select {
   padding: 12px 8px;
   border-radius: 12px;
   font-size: 13px;
+  line-height: var(--lh-13);
   font-weight: 500;
-  transition: background 120ms var(--ease);
+  transition: background 160ms var(--ease);
 }
 .prov-card:hover {
   background: var(--fill);
@@ -1353,7 +1369,7 @@ select {
   justify-content: center;
   padding: 6px 0;
   border-radius: 8px;
-  transition: background 120ms var(--ease);
+  transition: background 160ms var(--ease);
 }
 .icopt:hover {
   background: var(--bg-subtle);
@@ -1370,6 +1386,7 @@ select {
   height: 26px;
   padding: 0 12px;
   font-size: 13px;
+  line-height: var(--lh-13);
 }
 
 /* usage hero + bars + daily chart */
@@ -1453,6 +1470,7 @@ select {
 }
 .usage-name {
   font-size: 15px;
+  line-height: var(--lh-15);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1494,18 +1512,18 @@ select {
   white-space: pre;
 }
 
-/* scroll-to pulse on the picked passage */
-@keyframes cc-flash {
-  0%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0.45; }
-}
-.hl-flash {
-  animation: cc-flash 800ms var(--ease);
-}
-@media (prefers-reduced-motion: reduce) {
-  .hl-flash {
-    animation: none;
+/* 落点高亮：只动底色和一圈柔光，一次落定；正文不变淡 */
+@keyframes cc-land {
+  from {
+    background-color: var(--search-current);
+    box-shadow: var(--glass-glow);
   }
+  to {
+    box-shadow: none;
+  }
+}
+.hl-land {
+  animation: cc-land 720ms var(--ease-out);
 }
 
 /* window in the background: selection goes neutral-quiet, hued glyphs desaturate */
@@ -1534,7 +1552,7 @@ select {
 .onboard-stage.leaving {
   opacity: 0;
   transform: scale(0.98);
-  transition: opacity 480ms var(--ease), transform 480ms var(--ease);
+  transition: opacity 280ms var(--ease), transform 280ms var(--ease);
 }
 @keyframes cc-stage-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -1789,15 +1807,37 @@ select {
 /* a running layer's fill breathes while its fraction stalls behind a long
    model call — the row stays alive without a second spinner */
 .run-fill:not(.ok):not(.failed) {
-  animation: cc-breathe 2.4s var(--ease) infinite;
+  animation: cc-breathe 2.4s var(--ease-sine) infinite;
 }
 @keyframes cc-breathe {
   0%, 100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.45;
+    opacity: 0.55;
   }
+}
+/* 进度没有分数可报时（期刊评审等模型返回）：小段微光从左扫到右，
+   代替固定的 3% 加呼吸 */
+.run-track.stalled::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  opacity: 0.55;
+  transform: translateX(-100%);
+  animation: cc-stall 1.8s var(--ease-sine) infinite;
+}
+@keyframes cc-stall {
+  to {
+    transform: translateX(310%);
+  }
+}
+.run-track.stalled .run-fill {
+  animation: none;
 }
 /* mascot | name | bar | status — columns line up across rows */
 .run-row {
@@ -1840,4 +1880,138 @@ select {
 }
 .switch.on .switch-knob {
   transform: translateX(16px);
+}
+
+/* ===================================================== 期刊对标占位 */
+/* 占位 200ms 后淡入；形状与最终卡片一致 */
+.ov-pending {
+  animation: cc-fade 240ms var(--ease-out) 200ms both;
+}
+.ov-ph {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--fill-strong);
+}
+.ov-ph::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--shimmer), transparent);
+  transform: translateX(-100%);
+  animation: cc-shimmer 1.6s var(--ease-sine) infinite;
+}
+/* 换入：档次从 4px 模糊、0.96 缩放、透明落到清晰；评语和各维度依次落定；
+   三点收拢后小球弹入 */
+@keyframes cc-ov-tier {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(4px);
+  }
+}
+@keyframes cc-ov-row {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes cc-ov-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+.ov-tier {
+  animation: cc-ov-tier 240ms var(--ease-out) both;
+}
+.ov-in {
+  animation: cc-ov-row var(--spring-dur) var(--spring) both;
+}
+.ov-pop {
+  animation: cc-ov-pop var(--spring-dur) var(--spring) both;
+}
+
+/* ===================================================== reduced motion */
+/* 减少动态效果：去掉位移、缩放和循环，保留 opacity 与颜色过渡。
+   放在文件末尾，才能覆盖前面同名的 keyframes */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-property: opacity, color, background-color, background !important;
+    animation-iteration-count: 1 !important;
+  }
+  .spinner,
+  .sk-shimmer::after,
+  .run-track.stalled::after,
+  .ov-ph::after,
+  .papers,
+  .run-fill:not(.ok):not(.failed) {
+    animation: none;
+  }
+  @keyframes cc-detail-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes cc-rise {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes cc-stage-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes cc-bar-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes cc-ov-tier {
+    from { opacity: 0; }
+  }
+  @keyframes cc-ov-row {
+    from { opacity: 0; }
+  }
+  @keyframes cc-ov-pop {
+    from { opacity: 0; }
+  }
+  @keyframes cc-sk-pop {
+    50% { transform: none; }
+  }
+  @keyframes cc-dot-pulse {
+    0% { transform: none; opacity: 0.55; }
+    100% { transform: none; opacity: 0; }
+  }
+}
+
+/* ===================================================== 连续圆角 */
+/* 8px 及以上的面使用 macOS 的连续圆角（superellipse）。border-radius
+   数值不变，边框、阴影、焦点环跟着变形。胶囊、圆点、5px tile、
+   正文高亮（4px，内联跨行）不加。统一列在这里，不散在组件里 */
+.paper-table-wrap,
+.paper-fig-row img,
+.paper-search,
+.export-pop,
+.hist-row,
+.card,
+.side-row,
+.list-row,
+.sk-page,
+.sk-shimmer,
+.callout,
+.field-input,
+.account-chip,
+.prov-card,
+.provider-badge,
+.prov-addform,
+.icopt,
+.onboard-privacy,
+.src-snippet,
+.run-panel,
+.overview-card {
+  -electron-corner-smoothing: system-ui;
+}
+.run-panel,
+.overview-card {
+  border-radius: 12px;
 }

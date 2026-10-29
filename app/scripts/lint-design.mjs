@@ -72,9 +72,16 @@ function scanFile(file) {
   for (const m of text.matchAll(/\bbox-?[Ss]hadow\s*:\s*([^;,}\n]+)/g)) {
     const v = m[1].trim()
     if (v === 'none') continue
-    if (!/var\(--glass-(edge|shadow)\)/.test(v) && !SEPARATOR.test(v)) {
+    if (!/var\(--glass-(edge|shadow|glow)\)/.test(v) && !SEPARATOR.test(v)) {
       failures.push(`${file}: box-shadow without --glass token '${v}'`)
     }
+  }
+  // easing curves live in tokens.css only (F25)
+  for (const m of text.matchAll(/\b(cubic-bezier|linear)\(/g)) {
+    failures.push(`${file}: easing literal '${m[0]}' (use a --ease-* token)`)
+  }
+  for (const m of text.matchAll(/(?:transition|animation)[^;{}\n]*?[\s'"](ease|ease-in|ease-out|ease-in-out)(?=[\s;,'"])/g)) {
+    failures.push(`${file}: easing keyword '${m[1]}' (use a --ease-* token)`)
   }
   // font-size values other than the 6-step scale
   for (const m of text.matchAll(/font-size:\s*([^;]+)/g)) {

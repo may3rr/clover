@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 /** Where the export went, and the two things people do next: open it, or
  *  find it. Stays until dismissed (click outside, Esc, or an action). */
@@ -13,16 +13,31 @@ export default function ExportDone({
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [err, setErr] = useState<string | null>(null)
+  // 进入走弹簧，退出 140ms；用 transition，快速连点时从当前状态折返
+  const [shown, setShown] = useState(false)
+  const leaveTimer = useRef<number>()
+  useEffect(() => {
+    const r = requestAnimationFrame(() => setShown(true))
+    return () => {
+      cancelAnimationFrame(r)
+      window.clearTimeout(leaveTimer.current)
+    }
+  }, [])
+  const dismiss = useCallback(() => {
+    setShown(false)
+    window.clearTimeout(leaveTimer.current)
+    leaveTimer.current = window.setTimeout(onClose, 140)
+  }, [onClose])
   const parts = path.split('/')
   const name = parts.pop() ?? path
   const folder = parts.pop() ?? ''
 
   useEffect(() => {
     const down = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+      if (ref.current && !ref.current.contains(e.target as Node)) dismiss()
     }
     const key = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') dismiss()
     }
     // next tick: the click that opened the popover must not close it
     const t = setTimeout(() => {
@@ -34,20 +49,24 @@ export default function ExportDone({
       window.removeEventListener('mousedown', down)
       window.removeEventListener('keydown', key)
     }
-  }, [onClose])
+  }, [dismiss])
 
   const open = async () => {
     const e = await window.citecheck.openPath(path)
     if (e) setErr(e)
-    else onClose()
+    else dismiss()
   }
   const reveal = () => {
     window.citecheck.revealInFinder(path)
-    onClose()
+    dismiss()
   }
 
   return (
-    <div ref={ref} className="export-pop" role="dialog" aria-label="导出完成">
+    <div
+      ref={ref}
+      className={`export-pop${shown ? ' in' : ''}`}
+      role="dialog"       aria-label="导出完成"
+    >
       <div className="font-semibold">已导出</div>
       <div className="export-pop-name">{name}</div>
       <div className="t13 secondary">

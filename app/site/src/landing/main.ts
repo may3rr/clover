@@ -51,6 +51,8 @@ onScroll()
 /** Each .window hosts the real app (app.html) at its native 1280 x 820,
  *  scaled to the box. Off-screen ones load when they get close. */
 const frames = new Map<Element, HTMLIFrameElement>()
+/** apps that have booted (a still also marks its window .ready) */
+const booted = new Set<Element>()
 const readyWaiters = new Map<HTMLIFrameElement, (() => void)[]>()
 
 function mount(box: HTMLElement) {
@@ -80,6 +82,7 @@ const lazy = new IntersectionObserver(
 )
 for (const box of document.querySelectorAll<HTMLElement>('.window')) {
   sizer.observe(box)
+  if (box.hasAttribute('data-manual')) continue
   if (box.hasAttribute('data-eager')) mount(box)
   else lazy.observe(box)
 }
@@ -89,6 +92,7 @@ addEventListener('message', (e) => {
   for (const [box, f] of frames)
     if (f.contentWindow === e.source) {
       box.classList.add('ready')
+      booted.add(box)
       readyWaiters.get(f)?.forEach((fn) => fn())
       readyWaiters.delete(f)
     }
@@ -98,7 +102,7 @@ addEventListener('message', (e) => {
 async function driver(box: HTMLElement) {
   mount(box)
   const f = frames.get(box)!
-  if (!box.classList.contains('ready'))
+  if (!booted.has(box))
     await new Promise<void>((r) => readyWaiters.set(f, [...(readyWaiters.get(f) ?? []), r]))
   return (f.contentWindow as CloverWin).clover!
 }
@@ -130,49 +134,59 @@ new IntersectionObserver(
   { threshold: 0.6 }
 ).observe(checkBox)
 
-// ----------------------------------------------- four layers, sticky stage
-const stage = document.querySelector<HTMLElement>('.stage')!
-const layersBox = document.getElementById('layers-window')!
-const steps = Array.from(document.querySelectorAll<HTMLElement>('.step'))
-let current = ''
-let pending: string | null = null
-/** step key = state, plus "@selector" when the reading area should scroll
- *  to that element (the venue review card sits below the title block) */
-async function show(key: string) {
-  pending = key
-  const c = await driver(layersBox)
-  // a fast scroll queues several states; only the last one matters
-  while (pending && pending !== current) {
-    const next: string = pending
-    current = next
-    const [state, sel] = next.split('@')
-    await c.go(state)
-    if (sel) await c.reveal(sel)
-  }
-}
-const stepObs = new IntersectionObserver(
-  (entries) => {
-    for (const e of entries) {
-      if (!e.isIntersecting) continue
-      steps.forEach((s) => s.classList.toggle('on', s === e.target))
-      const d = (e.target as HTMLElement).dataset
-      show(d.reveal ? `${d.state}@${d.reveal}` : d.state!)
-    }
-  },
-  { rootMargin: '-45% 0px -45% 0px' }
-)
-steps.forEach((s) => stepObs.observe(s))
-steps[0].classList.add('on')
+// ----------------------------------------------------- four layers
+// Each window is a still of the app (site/public/stills, made by
+// npm run site:stills from the replica itself). A click boots the live app
+// behind the still, drives it to the same state and lets it settle, then
+// fades the still out over identical pixels.
 
-function centerStage() {
-  if (matchMedia('(max-width: 960px)').matches) {
-    stage.style.top = ''
-    return
+/** wait until the app inside the frame has stopped animating */
+async function settle(f: HTMLIFrameElement) {
+  const w = f.contentWindow!
+  const frame = () => new Promise((r) => w.requestAnimationFrame(r))
+  for (let quiet = 0, i = 0; quiet < 3 && i < 120; i++) {
+    await frame()
+    quiet = w.document.getAnimations().length ? 0 : quiet + 1
   }
-  stage.style.top = `${Math.max(72, (innerHeight - stage.offsetHeight) / 2)}px`
 }
-new ResizeObserver(centerStage).observe(stage)
-addEventListener('resize', centerStage)
+
+for (const box of document.querySelectorAll<HTMLElement>('.window[data-still]')) {
+  const { still, state, reveal } = box.dataset
+  const pic = document.createElement('picture')
+  pic.className = 'still on'
+  pic.innerHTML =
+    `<source media="(prefers-color-scheme: dark)" srcset="./stills/${still}-dark.webp" />` +
+    `<img src="./stills/${still}-light.webp" alt="" decoding="async" loading="lazy" />`
+  box.appendChild(pic)
+  box.dataset.mode = 'still'
+  const img = pic.querySelector('img')!
+  const shown = () => box.classList.add('ready')
+  if (img.complete) shown()
+  else img.addEventListener('load', shown, { once: true })
+
+  box.dataset.src = `app.html?state=${encodeURIComponent(state!)}`
+  // boot once the pointer rests on it, so a click only has to settle it;
+  // windows that merely pass under the pointer while scrolling stay stills
+  let rest = 0
+  const cancel = () => clearTimeout(rest)
+  box.addEventListener('pointerenter', () => (cancel(), (rest = window.setTimeout(() => mount(box), 400))))
+  box.addEventListener('pointerleave', cancel)
+  addEventListener('scroll', cancel, { passive: true })
+  let going = false
+  box.addEventListener('click', async () => {
+    if (going || box.dataset.mode === 'live') return
+    going = true
+    try {
+      const c = await driver(box)
+      if (reveal) await c.reveal(reveal, 0)
+      await settle(frames.get(box)!)
+      box.dataset.mode = 'live'
+      pic.classList.remove('on')
+    } finally {
+      going = false
+    }
+  })
+}
 
 // --------------------------------------------------------------- reveal
 const revealObs = new IntersectionObserver(

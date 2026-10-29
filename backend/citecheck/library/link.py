@@ -18,9 +18,11 @@ model pick is marked ``review`` for the user's confirmation step.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import re
 from collections import Counter
+from collections.abc import Callable
 
 from pydantic import BaseModel
 from rapidfuzz import fuzz
@@ -36,6 +38,7 @@ log = logging.getLogger(__name__)
 AUTO = 90.0  # >= with author agreement: linked without asking
 FLOOR = 60.0  # below: not a candidate at all
 ASK = 70.0  # mid band [ASK, AUTO) without an author conflict -> the model
+_MAX_TITLE = 200  # squashed chars compared against first pages
 _MIN_TITLE = 6  # squashed chars; shorter titles ("Qwen Team") never match text
 _ZH_NAME = re.compile(r"[一-鿿]{2,4}")
 
@@ -49,7 +52,9 @@ def _first_author_key(authors: list[str]) -> str:
 
 
 def _title_score(ref: Reference, pdf: LocalPdf, head: str) -> tuple[float, str]:
-    t = squash(ref.title or "")
+    # a "title" that swallowed trailing text (author bios after the list) is
+    # hopeless to align and costs seconds: no real title is this long
+    t = squash(ref.title or "")[:_MAX_TITLE]
     if len(t) < _MIN_TITLE:
         return 0.0, "title"
     best, how = 0.0, "title"
@@ -59,7 +64,9 @@ def _title_score(ref: Reference, pdf: LocalPdf, head: str) -> tuple[float, str]:
         best = max(best, 96.0)
     elif head and len(t) >= 12:
         # tolerate a line-break artefact or a subtitle difference
-        best = max(best, fuzz.partial_ratio(t, head[:4000]) - 4)
+        # below FLOOR + 4 the pair is dropped anyway: the cutoff lets rapidfuzz
+        # stop early instead of aligning every title against every first page
+        best = max(best, fuzz.partial_ratio(t, head[:4000], score_cutoff=FLOOR + 4) - 4)
     fn_title, _ = filename_meta(pdf.doc.filename)
     fn = fuzz.ratio(t, squash(fn_title)) - 3  # file names are user-editable
     if fn > best:
@@ -134,16 +141,26 @@ async def link_library(
     *, use_model: bool = True, venue: str | None = None,
     guess_venues: bool = False, exemplar_ids: list[str] | None = None,
     fallback_venue: str | None = None, manuscript_type: str = "research",
+    on_stage: Callable[[str, int, int], None] | None = None,
 ) -> Library:
     """``guess_venues``: ask the model for the journal of uncited PDFs no
-    local rule could place (needs ``use_model``)."""
+    local rule could place (needs ``use_model``). ``on_stage(stage, done,
+    total)`` reports "link" (refs scored) and "ask" (model questions)."""
+    note = on_stage or (lambda _s, _d, _t: None)
     heads = {p.doc.id: squash(p.first_pages) for p in pdfs}
-    pairs: list[tuple[float, str, str, str, bool | None]] = []
-    for r in refs:
-        for p in pdfs:
-            s, how, author = score_pair(r, p, heads[p.doc.id])
-            if s >= FLOOR:
-                pairs.append((s, r.id, p.doc.id, how, author))
+
+    def _score_all() -> list[tuple[float, str, str, str, bool | None]]:
+        # refs x PDFs fuzzy matching is CPU-bound: keep it off the event loop
+        out = []
+        for i, r in enumerate(refs, 1):
+            for p in pdfs:
+                s, how, author = score_pair(r, p, heads[p.doc.id])
+                if s >= FLOOR:
+                    out.append((s, r.id, p.doc.id, how, author))
+            note("link", i, len(refs))
+        return out
+
+    pairs = await asyncio.to_thread(_score_all)
     pairs.sort(key=lambda x: -x[0])
 
     by_ref = {r.id: r for r in refs}
@@ -162,13 +179,31 @@ async def link_library(
         elif s >= ASK and author is not False:
             pending.setdefault(rid, []).append(did)
 
-    for rid, dids in pending.items():
-        if rid in links:
-            continue
-        cands = [by_doc[d] for d in dids if d not in used][:3]
-        if not cands:
-            continue
-        pick = await _ask_model(by_ref[rid], cands) if use_model else None
+    # the questions are independent: ask them side by side, then apply the
+    # answers in order so one PDF is still linked to one reference only
+    asks = [(rid, [by_doc[d] for d in dids if d not in used][:3])
+            for rid, dids in pending.items() if rid not in links]
+    asks = [(rid, c) for rid, c in asks if c]
+    answers: dict[str, LocalPdf | None] = {}
+    if use_model and asks:
+        gate = asyncio.Semaphore(4)
+        answered = 0
+
+        async def one(rid: str, cands: list[LocalPdf]) -> None:
+            nonlocal answered
+            async with gate:
+                try:
+                    answers[rid] = await _ask_model(by_ref[rid], cands)
+                except Exception:  # noqa: BLE001 — an unanswered question stays unlinked
+                    answers[rid] = None
+            answered += 1
+            note("ask", answered, len(asks))
+
+        note("ask", 0, len(asks))
+        await asyncio.gather(*(one(rid, c) for rid, c in asks))
+
+    for rid, _cands in asks:
+        pick = answers.get(rid)
         if pick is None or pick.doc.id in used:
             continue
         s = next(x[0] for x in pairs if x[1] == rid and x[2] == pick.doc.id)
@@ -177,6 +212,7 @@ async def link_library(
         used.add(pick.doc.id)
 
     final = [links[r.id] for r in refs if r.id in links]
+    note("venue", 0, 0)
     await annotate_venues(pdfs, {x.doc_id for x in final},
                           use_model=use_model and guess_venues)
     return assemble(final, pdfs, folder, venue, exemplar_ids=exemplar_ids,

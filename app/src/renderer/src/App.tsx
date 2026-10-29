@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { getInfo, apiFetch } from './lib/api'
+import { getInfo, apiFetch, eventsUrl } from './lib/api'
 import type { Report } from './types/report'
 import Empty from './screens/Empty'
 import Running, { type LayerUI } from './screens/Running'
 import ReportScreen from './screens/ReportScreen'
 import LibraryConfirm from './screens/LibraryConfirm'
+import Scanning from './screens/Scanning'
 import type { LibraryScan } from './lib/library'
 import ErrorScreen from './screens/Error'
 import Settings from './screens/Settings'
@@ -31,6 +32,7 @@ function readVenue(): string {
 type Screen =
   | 'empty'
   | 'library'
+  | 'scanning'
   | 'running'
   | 'report'
   | 'error'
@@ -39,11 +41,15 @@ type Screen =
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('empty')
+  const [scanId, setScanId] = useState('')
+  const scanToken = useRef('')
   const [info, setInfo] = useState<Awaited<
     ReturnType<typeof getInfo>
   > | null>(null)
   const [jobId, setJobId] = useState<string | null>(null)
   const [report, setReport] = useState<Report | null>(null)
+  // 期刊对标后到：报告先开，对标算完再补；undefined = 沿用 report.overview
+  const [lateOverview, setLateOverview] = useState<Report['overview']>(undefined)
   const [benchmark, setBenchmark] = useState('arxiv_cs_cl')
   const [venue, setVenueState] = useState(readVenue)
   const setVenue = useCallback((v: string) => {
@@ -145,13 +151,23 @@ export default function App() {
       setJobError(null)
       const folderLike = !isPaperPath(path)
       if (!folderLike && !libraryDir) return startJob(path)
+      // 扫描可能要几十秒：立刻切到扫描页，显示后端上报的真实阶段
+      const id = Math.random().toString(36).slice(2, 10)
+      scanToken.current = id
+      setScanId(id)
+      setFileName(path.split('/').pop() ?? path)
+      setScreen('scanning')
+      const stale = () => scanToken.current !== id
       try {
         const fd = new FormData()
         fd.append('path', path)
+        fd.append('scan_id', id)
         if (libraryDir) fd.append('library', libraryDir)
         const r = await apiFetch('/library/scan', { method: 'POST', body: fd })
+        if (stale()) return // 用户已取消
         if (r.ok) {
           const sc = (await r.json()) as LibraryScan
+          if (stale()) return
           setFileName(sc.paper.split('/').pop() ?? sc.paper)
           morph(() => {
             setScan(sc)
@@ -162,13 +178,18 @@ export default function App() {
         if (libraryDir) {
           const { detail } = (await r.json().catch(() => ({}))) as { detail?: string }
           setJobError(detail ?? ACCEPT_ERROR)
+          setScreen('empty')
           return
         }
       } catch {
+        if (stale()) return
         setJobError('无法连接本地服务。请重新打开应用。')
+        setScreen('empty')
         return
       }
-      startJob(path)
+      // 没有可用的文献文件夹（如没有 ref/ 的 LaTeX 项目）：按单文件体检
+      await startJob(path)
+      if (!stale()) setScreen((s) => (s === 'scanning' ? 'empty' : s))
     },
     [libraryDir, startJob]
   )
@@ -188,6 +209,7 @@ export default function App() {
     setScreen('empty')
     setJobId(null)
     setReport(null)
+    setLateOverview(undefined)
     setJobError(null)
   }, [])
 
@@ -203,6 +225,7 @@ export default function App() {
       const rep = (await r.json()) as Report
       morph(() => {
         setJobId(id)
+        setLateOverview(undefined)
         setReport(rep)
         setScreen('report')
       })
@@ -222,10 +245,41 @@ export default function App() {
     const rep = (await r.json()) as Report
     // skeleton page 1 morphs into the reading page, panel into inspector
     morph(() => {
+      setLateOverview(undefined)
       setReport(rep)
       setScreen('report')
     })
   }, [jobId])
+
+  // 报告打开时对标还没好：继续订阅这个任务的事件，等 overview_done 后只取回对标
+  useEffect(() => {
+    if (screen !== 'report' || !jobId || report?.overview?.status !== 'pending')
+      return
+    let es: EventSource | null = null
+    let cancelled = false
+    const settle = async (path: string) => {
+      es?.close()
+      try {
+        const r = await apiFetch(path)
+        if (cancelled) return
+        if (r.ok) setLateOverview(((await r.json()) as Report).overview ?? null)
+        else setLateOverview(null)
+      } catch {
+        if (!cancelled) setLateOverview(null)
+      }
+    }
+    eventsUrl(jobId).then((url) => {
+      if (cancelled) return
+      es = new EventSource(url)
+      es.addEventListener('overview_done', () => settle(`/jobs/${jobId}/report`))
+      // 任务已不在（服务重启）：读落库的报告，后端会把 pending 改成 unavailable
+      es.onerror = () => settle(`/reports/${jobId}`)
+    })
+    return () => {
+      cancelled = true
+      es?.close()
+    }
+  }, [screen, jobId, report])
 
   const onJobFailed = useCallback((error: string) => {
     setJobError(error)
@@ -371,6 +425,19 @@ export default function App() {
     )
   }
 
+  if (screen === 'scanning') {
+    return (
+      <Scanning
+        scanId={scanId}
+        name={fileName}
+        onCancel={() => {
+          scanToken.current = ''
+          setScreen('empty')
+        }}
+      />
+    )
+  }
+
   if (screen === 'library' && scan) {
     return (
       <LibraryConfirm
@@ -414,6 +481,7 @@ export default function App() {
       <ReportScreen
         key={jobId}
         report={report}
+        overview={lateOverview}
         jobId={jobId}
         externalSelection={extSel}
         externalFilter={extFilter}

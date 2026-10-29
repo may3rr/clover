@@ -128,6 +128,25 @@ def parse_authors(part: str, lang: str) -> list[str]:
     return [a for a in authors if a and a.lower() not in {"et", "al", "et al."}]
 
 
+# GB/T 7714 entries converted from a PDF often lose the space after each
+# separating full stop: "Lee S,Jha R.Zero-shot adaptive transfer for ….arXiv
+# preprint arXiv:1808.10059,2018". Put it back where the stop clearly ends the
+# author list ("R.Zero") or the title ("transfer.arXiv", "retrieval//Proc").
+_GBT_AUTHOR_END = re.compile(r"(?<=[\s,][A-Z])\.(?=[A-Za-z(\[])|(?<=\bet al)\.(?=\S)")
+_GBT_TITLE_END = re.compile(
+    r"(?<=[a-z0-9)\]])\.(?=(?:arXiv|In |Proceedings|Journal|Transactions|"
+    r"IEEE|ACM|Computational|Advances|Neural|Nature|Science)\b)"
+    r"|(?<=[a-z])\.(?=[A-Z][a-z]+[A-Z][a-z])"  # ".ComputationalLinguistics": venue words glued together
+    r"|//")
+
+
+def _space_gbt_separators(body: str) -> str:
+    if re.search(r"\.\s", re.sub(r"\bet al\.\s|\b[A-Z]\.\s", "", body)):
+        return body  # normally spaced entry: leave it alone
+    body = _GBT_AUTHOR_END.sub(". ", body, count=1)
+    return _GBT_TITLE_END.sub(lambda m: ". " if m.group(0) == "." else ". //", body, count=1)
+
+
 def parse_reference(raw: str) -> dict:
     """Best-effort field extraction. Returns a dict with keys:
     label, title, authors, year, venue, doi, lang."""
@@ -152,6 +171,9 @@ def parse_reference(raw: str) -> dict:
         if tr and not _CJK_RE.search(tr.group(1)):
             out["translation"] = tr.group(1).strip()
             body = body[: tr.start()].rstrip() + "."
+
+    if out["lang"] != "zh":
+        body = _space_gbt_separators(body)
 
     acl = _ACL_RE.match(body)
     if acl and out["lang"] != "zh" and _looks_like_author_list(
@@ -203,7 +225,7 @@ def parse_reference(raw: str) -> dict:
     # venue: the next chunk that isn't a bare year/pages/edition fragment
     for j in range(idx + 1, len(chunks)):
         venue = re.split(r"[,，]", chunks[j])[0]
-        venue = _TYPE_TAG_RE.sub("", venue).strip()
+        venue = _TYPE_TAG_RE.sub("", venue).lstrip("/ ").strip()
         if not venue or re.fullmatch(r"[\d\s:()\[\]\-–—,，./]+", venue):
             continue
         if re.fullmatch(r"\d+(版|st|nd|rd|th)\.?", venue):

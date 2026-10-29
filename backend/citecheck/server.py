@@ -199,11 +199,22 @@ def _venue_info(lib, parsed=None) -> dict:
     }
 
 
+# 扫描文献文件夹要读 PDF、匹配、可能还要问模型，可能持续几十秒：
+# 前端带一个 scan_id，轮询 GET /library/scan/{scan_id} 显示真实阶段
+SCANS: dict[str, dict] = {}
+
+
+@app.get("/library/scan/{scan_id}")
+async def library_scan_progress(scan_id: str):
+    return SCANS.get(scan_id) or {"stage": "reading", "done": 0, "total": 0}
+
+
 @app.post("/library/scan")
 async def library_scan(
     path: str = Form(...),
     library: str | None = Form(None),
     venue: str | None = Form(None),
+    scan_id: str | None = Form(None),
 ):
     """Confirmation step before a folder run: which file is the paper,
     which folder holds the PDFs, the proposed reference ↔ PDF links and
@@ -216,6 +227,13 @@ async def library_scan(
     from .library.venue_match import paper_type
     from .parse import parse_document
 
+    def stage(name: str, done: int = 0, total: int = 0) -> None:
+        if scan_id:
+            SCANS[scan_id] = {"stage": name, "done": done, "total": total}
+            if len(SCANS) > 32:  # 只留最近的几次
+                SCANS.pop(next(iter(SCANS)), None)
+
+    stage("reading")
     layout = resolve_folder(path)
     if layout.paper is None:
         return JSONResponse(
@@ -235,7 +253,9 @@ async def library_scan(
     ptype = paper_type(parsed.document.title)
     lib, _local, _pdfs = await build_library(
         parsed.references, lib_dir, venue=venue or None,
-        fallback_venue=trace["name"] if trace else None, manuscript_type=ptype)
+        fallback_venue=trace["name"] if trace else None, manuscript_type=ptype,
+        on_stage=stage)
+    stage("done")
     return {
         **_venue_info(lib),
         "paper": str(layout.paper),
@@ -354,14 +374,21 @@ async def analyze(
         job.events.append(ev)
         job.queue.put_nowait(ev)
 
+    def on_report(rep) -> None:
+        # 报告先开：四层结束即可读取、落库、导出；期刊对标稍后补上
+        job.report = rep
+        _save_report(job.id, src, benchmark, rep)
+
     async def _run() -> None:
         try:
-            job.report = await run_pipeline(
+            rep = await run_pipeline(
                 src, benchmark_id=benchmark, emit=emit,
                 venue_id=venue or None, library_dir=library,
                 library_links=confirmed, library_venue=library_venue or None,
-                library_exemplars=picked)
-            _save_report(job.id, src, benchmark, job.report)
+                library_exemplars=picked, on_report=on_report)
+            job.report = rep
+            if rep.overview is None or rep.overview.status != "pending":
+                _update_report(job.id, rep)
         except PipelineError as e:
             job.error = str(e)
         except Exception as e:  # noqa: BLE001
@@ -394,6 +421,31 @@ def _save_report(report_id: str, src: Path, benchmark: str, rep) -> None:
         log.exception("failed to persist report %s", report_id)
 
 
+def _update_report(report_id: str, rep) -> None:
+    """Write the late venue overview into the stored report."""
+    try:
+        Cache(get_settings().cache_path).update_report(
+            report_id,
+            json.dumps(rep.model_dump(mode="json"), ensure_ascii=False))
+    except Exception:  # noqa: BLE001
+        log.exception("failed to update report %s", report_id)
+
+
+def _settle_pending(report_id: str, data: dict) -> dict:
+    """A stored report still marked pending whose job is gone (the app quit
+    mid-overview) will never get its overview: say so instead of waiting."""
+    ov = data.get("overview")
+    if not ov or ov.get("status") != "pending":
+        return data
+    job = JOBS.get(report_id)
+    if job is not None and job.task is not None and not job.task.done():
+        return data
+    ov["status"] = "unavailable"
+    ov["note"] = (f"这次没有生成 {ov.get('venue_name', '')} 对标。"
+                  "请重新体检以生成对标。")
+    return data
+
+
 # ---------------------------------------------------------------- reports
 
 
@@ -414,7 +466,8 @@ async def get_stored_report(report_id: str):
     row = _stored_report(report_id)
     if isinstance(row, JSONResponse):
         return row
-    return JSONResponse(json.loads(row["report_json"]))
+    return JSONResponse(
+        _settle_pending(report_id, json.loads(row["report_json"])))
 
 
 @app.delete("/reports/{report_id}")
@@ -468,7 +521,9 @@ async def events(job_id: str):
                 idx += 1
                 yield {"event": ev["type"],
                        "data": json.dumps(ev, ensure_ascii=False)}
-                if ev["type"] in {"done", "failed"}:
+                # done 带 overview=pending 时，流保持到 overview_done
+                if ev["type"] in {"failed", "overview_done"} or (
+                        ev["type"] == "done" and ev.get("overview") != "pending"):
                     return
             await job.queue.get()
 

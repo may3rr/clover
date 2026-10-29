@@ -1012,7 +1012,8 @@
           "default": "ok",
           "enum": [
             "ok",
-            "unavailable"
+            "unavailable",
+            "pending"
           ],
           "title": "Status",
           "type": "string"

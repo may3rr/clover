@@ -51,7 +51,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse, on
       </div>
       <div className="flex-1 overflow-y-auto">
         <div style={{ padding: '0 16px 16px' }}>
-          <div className="font-semibold detail-title" style={{ fontSize: 17 }}>
+          <div className="t17 font-semibold detail-title">
             {item.title}
           </div>
           {formatLoc(item.anchors[0]?.loc) && (

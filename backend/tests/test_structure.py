@@ -55,3 +55,27 @@ def test_edition_chunk_not_venue():
     assert info["title"] == "统计自然语言处理"
     assert info["venue"] != "2版"
     assert info["year"] == 2013
+
+
+def test_gbt_entry_without_spaces_after_full_stops():
+    """PDF 转 docx 的 GB/T 条目常丢掉句点后的空格：作者、标题、刊名要能拆开，
+    否则标题变成整条文字，文献文件夹的连接大面积失败。"""
+    from citecheck.refs.structure import parse_reference
+
+    r = parse_reference(
+        "[100]Ross S,Bagnell J A.Reinforcement and imitation learningvia "
+        "interactive no-regret learning.arXiv preprint arXiv:1406.5979,2014")
+    assert r["authors"] == ["Ross S", "Bagnell J A"]
+    assert r["title"] == "Reinforcement and imitation learningvia interactive no-regret learning"
+    assert r["year"] == 2014
+
+    r = parse_reference(
+        "[10]Lewis D D.Naive(Bayes)at forty:The independenceassumption in "
+        "information retrieval//Proceedings of theEuropean Conference on "
+        "Machine Learning.Chemnitz,Germany,1998:4-15")
+    assert r["title"].endswith("information retrieval")
+    assert r["venue"].startswith("Proceedings")
+
+    # 正常带空格的条目不受影响
+    r = parse_reference("[3]Devlin J, Chang M W. BERT: Pre-training of deep bidirectional transformers. NAACL, 2019.")
+    assert r["title"] == "BERT: Pre-training of deep bidirectional transformers"

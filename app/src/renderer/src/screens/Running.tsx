@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { eventsUrl } from '../lib/api'
 import { CheckCircleFillIcon, ExclaimCircleFillIcon } from '../components/Icons'
 import Mascot, { type MascotState } from '../components/Mascot'
+import OrbitDots from '../components/OrbitDots'
 import { AGENT_COLOR } from '../lib/mascot'
 import SkeletonPaper from '../components/Skeleton'
 import type { Outline, SkAnchor } from '../lib/outline'
@@ -67,6 +68,8 @@ export default function Running({
     )
   )
   const [overview, setOverview] = useState<OverviewRun>('waiting')
+  // 后端上报的真实阶段：获取近期论文、读取范文、汇总评审意见
+  const [ovStep, setOvStep] = useState<string | null>(null)
   const [outline, setOutline] = useState<Outline | null>(null)
   const [anchors, setAnchors] = useState<Record<string, SkAnchor[]>>({})
   const [finished, setFinished] = useState(false)
@@ -121,6 +124,7 @@ export default function Running({
           d.status === 'unavailable'
         )
           setOverview(d.status)
+        if (typeof d.step === 'string') setOvStep(d.step)
       })
       es.addEventListener('done', () => {
         es?.close()
@@ -186,11 +190,15 @@ export default function Running({
     )
   )
   shownPct.current = pct
+  // 四层都结束后只剩期刊评审在等，这时写它的真实阶段
+  const layersDone = rows.every((r) => r.s.status === 'done')
   const stepText = finished
     ? '检查完成，正在打开报告'
     : !skOutline
       ? '正在解析论文'
-      : (step ?? '正在检查')
+      : layersDone && ovStatus === 'running' && ovStep
+        ? ovStep
+        : (step ?? '正在检查')
 
   return (
     <div
@@ -238,7 +246,6 @@ export default function Running({
           style={{
             marginTop: 16,
             background: 'var(--bg-subtle)',
-            borderRadius: 12,
             padding: '4px 16px',
             viewTransitionName: 'cc-panel',
           }}
@@ -296,14 +303,16 @@ function LayerRow({
     <div className="run-row">
       <RunMascot agent={agent} status={s.status} />
       <span style={{ fontWeight: 500 }}>{name}</span>
-      <div className="run-track thin">
+      <div
+        className={`run-track thin${agent === 'overview' && s.status === 'running' ? ' stalled' : ''}`}
+      >
         <div
           className={`run-fill${s.status === 'done' ? ' ok' : ''}${s.status === 'failed' ? ' failed' : ''}`}
           style={{ transform: `scaleX(${frac})` }}
         />
       </div>
       <span className="secondary flex items-center justify-end gap-2">
-        <StatusMark s={s} />
+        <StatusMark s={s} agent={agent} />
         {label ?? <StatusLabel s={s} />}
       </span>
     </div>
@@ -351,7 +360,11 @@ function RunMascot({
   )
 }
 
-function StatusMark({ s }: { s: LayerState }) {
+function StatusMark({ s, agent }: { s: LayerState; agent?: string }) {
+  // 期刊评审要等模型返回，时长不定：用三点轨道，不用转圈
+  if (s.status === 'running' && agent === 'overview') {
+    return <OrbitDots size={14} color={AGENT_COLOR.overview} />
+  }
   if (s.status === 'running') {
     return (
       <svg

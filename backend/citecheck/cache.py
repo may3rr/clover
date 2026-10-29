@@ -251,6 +251,16 @@ class Cache:
             )
             self._conn.commit()
 
+    def update_report(self, report_id: str, report_json: str) -> bool:
+        """Replace a stored report's body only (the late venue overview);
+        id, name and created_at stay as they were."""
+        with self._lock:
+            cur = self._conn.execute(
+                "UPDATE reports SET report_json = ? WHERE id = ?",
+                (report_json, report_id))
+            self._conn.commit()
+            return cur.rowcount > 0
+
     def list_reports(self) -> list[dict]:
         """Sidebar listing — metadata only, newest first."""
         with self._lock:

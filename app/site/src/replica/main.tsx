@@ -17,6 +17,29 @@ import './replica.css'
 // the window is always "key" here — the inactive look is for real focus loss
 document.hasFocus = () => true
 
+// Inside a landing page window, scrollIntoView would scroll the page around
+// the frame too; keep it to the nearest scroll container of the app.
+if (window.parent !== window) {
+  Element.prototype.scrollIntoView = function (arg?: boolean | ScrollIntoViewOptions) {
+    const opt: ScrollIntoViewOptions = typeof arg === 'object' ? arg : { block: arg === false ? 'end' : 'start' }
+    const block = opt.block ?? 'start'
+    for (let p = this.parentElement; p; p = p.parentElement) {
+      if (!/auto|scroll/.test(getComputedStyle(p).overflowY) || p.scrollHeight <= p.clientHeight) continue
+      const r = this.getBoundingClientRect()
+      const c = p.getBoundingClientRect()
+      const top = r.top - c.top
+      const bottom = top + r.height - c.height
+      const d =
+        block === 'center' ? top + r.height / 2 - c.height / 2
+        : block === 'end' ? bottom
+        : block === 'nearest' ? (top < 0 ? top : bottom > 0 ? Math.min(top, bottom) : 0)
+        : top
+      if (d) p.scrollBy({ top: d, behavior: opt.behavior })
+      return
+    }
+  }
+}
+
 const q = new URLSearchParams(location.search)
 const root = document.documentElement
 if (q.get('frame')) root.classList.add('framed')

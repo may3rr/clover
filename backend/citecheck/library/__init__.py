@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from pathlib import Path
 
 from ..schema import Library, LibraryLink, Reference
@@ -18,13 +19,16 @@ async def build_library(
     pdfs: list[LocalPdf] | None = None,
     exemplar_ids: list[str] | None = None, fallback_venue: str | None = None,
     manuscript_type: str = "research", guess_venues: bool | None = None,
+    on_stage: Callable[[str, int, int], None] | None = None,
 ) -> tuple[Library, dict[str, LocalPdf], list[LocalPdf]]:
     """Scan ``folder`` and link it to ``refs``. ``links`` given = the
     user's confirmed table from the confirmation step: kept as they are
     (dangling ids dropped, one PDF per entry), marked confirmed; likewise
     ``exemplar_ids``, the user's exemplar selection. Returns the report
     record, ref_id -> LocalPdf for the layers, and every scanned PDF
-    (exemplars are read from it)."""
+    (exemplars are read from it). ``on_stage(stage, done, total)`` reports
+    "pdfs", "link", "ask" and "venue" for the scan screen."""
+    note = on_stage or (lambda _s, _d, _t: None)
     if guess_venues is None:
         from ..config import venue_model_enabled
 
@@ -32,10 +36,15 @@ async def build_library(
     opts = dict(exemplar_ids=exemplar_ids, fallback_venue=fallback_venue,
                 manuscript_type=manuscript_type)
     if pdfs is None:
-        pdfs = await asyncio.to_thread(scan_folder, folder, cache, progress)
+        def _pdf_progress(done: int, total: int) -> None:
+            note("pdfs", done, total)
+            if progress is not None:
+                progress(done, total)
+
+        pdfs = await asyncio.to_thread(scan_folder, folder, cache, _pdf_progress)
     if links is None:
         lib = await link_library(refs, pdfs, str(folder), use_model=use_model, venue=venue,
-                                 guess_venues=guess_venues, **opts)
+                                 guess_venues=guess_venues, on_stage=on_stage, **opts)
     else:
         ref_ids = {r.id for r in refs}
         doc_ids = {p.doc.id for p in pdfs}

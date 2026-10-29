@@ -368,7 +368,8 @@ class Overview(BaseModel):
     """Venue-level read of the manuscript: where it sits against a few
     recent papers of the target venue. A coarse tier plus a direction —
     deliberately not edit-level advice (AGENTS §2)."""
-    status: Literal["ok", "unavailable"] = "ok"
+    # pending：报告已经打开，对标还在后台计算（见 pipeline 的 on_report）
+    status: Literal["ok", "unavailable", "pending"] = "ok"
     venue_id: str
     venue_name: str
     overall: OverviewTier = "na"

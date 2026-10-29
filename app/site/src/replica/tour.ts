@@ -279,14 +279,14 @@ async function moveTo(el: HTMLElement) {
   await sleep(ms + 60)
 }
 
-/** Scroll the reading area so `sel` sits near its top. */
+/** Scroll the reading area so `sel` sits near its top; `ms` 0 jumps there. */
 export async function reveal(sel: string, ms = 900): Promise<void> {
   const el = await find(sel)
   const pane = el.closest<HTMLElement>(reading)
   if (!pane) return
   const top =
     el.getBoundingClientRect().top - pane.getBoundingClientRect().top + pane.scrollTop - 72
-  pane.scrollTo({ top, behavior: 'smooth' })
+  pane.scrollTo({ top, behavior: ms ? 'smooth' : 'instant' })
   await sleep(ms)
 }
 

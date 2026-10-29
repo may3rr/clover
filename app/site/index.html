@@ -6,7 +6,7 @@
     <title>Clover</title>
     <meta
       name="description"
-      content="Clover 是一个 macOS 应用：拖入一篇 .docx 论文，核对参考文献的真实性、论断的支持度、引用分布与格式规范，再把问题写成 Word 批注和修订。"
+      content="Clover 是一个 macOS 应用：拖入一篇 Word 或 LaTeX 论文，核对参考文献的真实性、论断的支持度、引用分布与格式规范，再把问题写成 Word 批注和修订。"
     />
     <meta property="og:title" content="Clover: the last mile of the paper" />
     <meta property="og:description" content="投稿的最后一公里。引用体检，交回你熟悉的 Word 里改。" />
@@ -71,24 +71,17 @@
       <section class="about" id="about">
         <div class="about-head">
           <p class="eyebrow"><i class="dot" style="--c: var(--tile-indigo)"></i>关于</p>
-          <h2>想法到实验已经很快，论文的最后一公里还靠手工</h2>
+          <h2>想法到实验已经很快，投稿前的核对还靠手工</h2>
         </div>
         <div class="about-body">
+          <p>有了大模型和智能体，从想法走到实验结果快了很多，投稿量也跟着增长。</p>
           <p>
-            大语言模型和多智能体工具普及以后，研究者从一个想法走到一组实验结果的时间缩短了很多。写代码、跑实验、整理结果，智能体都能分担，投稿量也随之增长。
-          </p>
-          <p>
-            一篇论文投出之前，还有一段绕不开的路。为了满足学术诚信的要求，作者要逐条确认参考文献真实存在，作者、年份和 DOI 无误，确认每一处引用确实支持对应的论断，再检查格式和错别字。这些核对繁琐耗时，也最容易在截稿前被压缩。生成式工具写出的文字越多，编造的文献和张冠李戴的引用也越容易混进稿件。
+            投稿前的核对还得逐条手工完成：文献是否真实存在，引用是否支持论断，格式和错别字有没有问题。生成的文字越多，编造的文献和张冠李戴的引用越容易混进稿件。
           </p>
           <p>
-            Clover 想回答一个问题：这份核对能不能自动完成。它把核对拆成文献真实性、论断支持度、引用分布和格式规范四层，用 Qwen 系列模型配合公开学术数据库逐条检查，再把结果写回作者熟悉的 Word。核对交给机器，判断留给作者。
+            Clover 把这份核对拆成四层，用 Qwen 配合公开学术数据库逐条检查，再把结果写回 Word。核对交给机器，判断留给作者。
           </p>
-          <p class="about-note">
-            这是我们为天猫 AI 黑客松效率进化赛道、阿里云基于 Qwen 的科研提效赛题做的回答：让科研提效一直延伸到投稿前的最后一公里。
-          </p>
-          <p class="about-note">
-            需要说明一点：英文期刊和会议的元数据、摘要与开放全文更容易获取，所以 Clover 目前只支持英文论文。中文文献的核验与对标，会在之后补上。
-          </p>
+          <p class="about-note">支持 Word 和 LaTeX 稿件，中文和英文论文都能检查。</p>
         </div>
       </section>
 
@@ -98,56 +91,59 @@
           <p class="eyebrow"><i class="dot" style="--c: var(--ok)"></i>一次体检</p>
           <h2>拖进一篇论文，四层检查同时进行</h2>
           <p class="body">
-            Clover 在本机解析 docx，认出章节、段落、引用标记和参考文献表。四层检查并行推进，左边的论文骨架随结果逐段点亮。选定目标会议后，最后再和这个会议已发表的论文比一比。
+            解析在本机完成。四层检查并行推进，左边的论文骨架随结果逐段点亮。
           </p>
           <button class="ghost" id="replay" type="button">再看一次</button>
         </div>
         <div class="window" id="check-window" data-src="app.html?state=empty"></div>
       </section>
 
-      <!-- ============================================ four layers (sticky) -->
-      <section class="layers" id="layers">
-        <div class="steps">
-          <article class="step" data-state="item:f19">
+      <!-- ========================================================== layers -->
+      <!-- each window shows a still of the app; a click turns it live -->
+      <section class="features" id="layers">
+        <article class="band feature">
+          <div class="lead">
             <p class="eyebrow"><i class="dot" style="--c: var(--tile-indigo)"></i>文献真实性</p>
             <h3>编造的文献，查得出来</h3>
-            <p class="body">
-              每条参考文献都去 Crossref、OpenAlex、Semantic Scholar 和 arXiv 核对。作者、年份、DOI 与数据库记录对不上，Clover 指出差在哪里；几个库都真正应答且都没有记录，才判定为找不到。
-            </p>
-          </article>
-          <article class="step" data-state="item:f4">
+            <p class="body">每条文献都到 Crossref、OpenAlex、Semantic Scholar 和 arXiv 核对。作者、年份或 DOI 对不上，就指出差在哪里。</p>
+          </div>
+          <div class="shot">
+            <div class="window" data-still="f19" data-state="item:f19" data-manual></div>
+            <p class="shot-hint">点截图可以直接操作。</p>
+          </div>
+        </article>
+        <article class="band feature">
+          <div class="lead">
             <p class="eyebrow"><i class="dot" style="--c: var(--tile-blue)"></i>论断支持度</p>
             <h3>被引文献真的说过这句话吗</h3>
-            <p class="body">
-              Clover 抽出正文中每一组论断与引用，到被引文献的摘要和开放全文里找证据。每个判断都附原文片段，片段必须能在原文中逐字找到，找不到就降级为无法判断。
-            </p>
-          </article>
-          <article class="step" data-state="item:dist-group">
+            <p class="body">到被引文献的摘要和全文里找证据。每个判断都附一段能在原文里逐字找到的片段。</p>
+          </div>
+          <div class="window" data-still="f4" data-state="item:f4" data-manual></div>
+        </article>
+        <article class="band feature">
+          <div class="lead">
             <p class="eyebrow"><i class="dot" style="--c: var(--tile-teal)"></i>引用分布</p>
             <h3>把引用放回领域里看</h3>
-            <p class="body">
-              对照 150 篇 arXiv 计算语言学论文，逐章比较引用密度与引用功能。一句话里堆了七八篇文献，也会单独提出来。
-            </p>
-          </article>
-          <article class="step" data-state="item:v2">
+            <p class="body">对照同领域已发表的论文，逐章比较引用密度和引用功能。一句话堆了太多文献，也会单独提出来。</p>
+          </div>
+          <div class="window" data-still="dist" data-state="item:dist-group" data-manual></div>
+        </article>
+        <article class="band feature">
+          <div class="lead">
             <p class="eyebrow"><i class="dot" style="--c: var(--tile-purple)"></i>格式规范</p>
             <h3>机械性问题，直接给出修订</h3>
-            <p class="body">
-              错别字、文献重新排序和随之变化的引用编号，写成修订，由你逐条接受或拒绝。未被引用的文献、找不到条目的引用，写成批注。
-            </p>
-          </article>
-          <article class="step" data-state="report" data-reveal='section[aria-label$="对标"]'>
+            <p class="body">错别字和文献重排写成修订，由你逐条接受或拒绝。其余问题都写成批注。</p>
+          </div>
+          <div class="window" data-still="v2" data-state="item:v2" data-manual></div>
+        </article>
+        <article class="band feature">
+          <div class="lead">
             <p class="eyebrow"><i class="dot" style="--c: var(--tile-pink)"></i>期刊评审</p>
             <h3>投之前，先和目标会议比一比</h3>
-            <p class="body">
-              选定 EMNLP、ACL 或 NAACL，Clover 找出该会议已发表的相近论文，从实验规模、分析深度、文献覆盖、引用可靠性和结构完整五个方面给出定位。
-            </p>
-          </article>
-        </div>
-        <div class="stage">
-          <div class="window" id="layers-window" data-src="app.html?state=item:f19"></div>
-          <p class="stage-hint">右侧窗口跟着滚动切换，也可以自己点。</p>
-        </div>
+            <p class="body">选定目标会议或期刊，从实验规模、分析深度等五个方面，和已发表的相近论文比较。</p>
+          </div>
+          <div class="window" data-still="venue" data-state="report" data-reveal='section[aria-label$="对标"]' data-manual></div>
+        </article>
       </section>
 
       <!-- ========================================================= export -->
@@ -156,7 +152,7 @@
           <p class="eyebrow"><i class="dot" style="--c: var(--accent)"></i>导出到 Word</p>
           <h2>改稿，还在 Word 里</h2>
           <p class="body">
-            一键导出一份新的 docx。实质性问题挂成批注，附上依据和建议；错别字这类机械性问题写成修订。原文件不会被覆盖，每一处改动都可以撤销。
+            一键导出新的 docx。实质性问题写成批注，错别字写成修订。原文件不覆盖，每处改动都能撤销。
           </p>
           <a class="ghost" href="./samples/clover-sample.docx" download="vericite_emnlp（Clover）.docx">下载这份示例</a>
         </div>
@@ -169,19 +165,19 @@
         <div class="grid">
           <div>
             <h3>证据可追溯</h3>
-            <p>支持或不支持，都附被引文献的原文片段。片段在原文里逐字找不到，判断就不成立。</p>
+            <p>每个判断都附原文片段。片段逐字找不到，判断就不成立。</p>
           </div>
           <div>
             <h3>不确定就说不确定</h3>
-            <p>查不到的文献标为无法核验，不会说成不存在。证据不足的论断标为无法判断。</p>
+            <p>查不到的文献标为无法核验，不说成不存在。</p>
           </div>
           <div>
             <h3>只替你改机械性问题</h3>
-            <p>Clover 不改写、不续写正文，不删除或替换参考文献，也不推荐该引哪篇。删不删、换不换，由作者决定。</p>
+            <p>不改写正文，不删换文献，不推荐该引哪篇。</p>
           </div>
           <div>
             <h3>稿件留在本机</h3>
-            <p>全文在你的 Mac 上解析。云端只接收需要复核的论断和证据片段，不上传整篇稿件。</p>
+            <p>全文在本机解析，云端只收需要复核的论断和证据片段。</p>
           </div>
         </div>
       </section>
@@ -192,7 +188,7 @@
           <p class="eyebrow"><i class="dot" style="--c: var(--brand-qwen)"></i>模型</p>
           <h2>全程使用 Qwen</h2>
           <p class="body">
-            支持度判断用 qwen3.8-flash，存疑的结论交给 qwen3.8-max 复核，模型可以在设置里换。每次调用都有缓存和用量记录，实测一次完整检查约 0.19 元。
+            支持度判断用 qwen3.8-flash，存疑的结论交给 qwen3.8-max 复核。实测一次完整检查约 0.19 元。
           </p>
         </div>
         <div class="window" data-src="app.html?state=settings-model"></div>
@@ -206,7 +202,7 @@
           <a class="dl dl-mac" data-link="mac" href="#"><span>下载 macOS 版</span></a>
           <span class="dl dl-win" aria-disabled="true"><span>Windows</span><span class="dl-note">To be continued</span></span>
         </div>
-        <p class="hero-hint">应用尚未经过公证。第一次打开时如果被拦下，到系统设置的隐私与安全性里点仍要打开。</p>
+        <p class="hero-hint">应用尚未公证。第一次打开被拦下时，到系统设置的隐私与安全性里点仍要打开。</p>
       </section>
     </main>
 

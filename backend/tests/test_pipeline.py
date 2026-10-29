@@ -258,3 +258,85 @@ async def test_server_token(app_client, monkeypatch):
     )).status_code == 200
     assert (await client.get("/benchmarks?token=sekret")).status_code == 200
     await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_pipeline_report_opens_before_overview(tmp_path, monkeypatch):
+    """on_report 给出 overview=pending 的报告并先发 done；对标完成后原地更新，
+    再发 overview_done。"""
+    import asyncio
+
+    import citecheck.pipeline as pl
+    from citecheck.overview.run import Prepared
+    from citecheck.schema import Overview
+
+    _patch_llm(monkeypatch)
+    gate = asyncio.Event()
+
+    async def fake_prepare(parsed, venue_id, client, cache, on_step=None):
+        on_step("正在获取近期论文")
+        return Prepared(venue_id, {}, [], note="x")
+
+    async def fake_critique(prep, findings):
+        await gate.wait()  # 慢的对标
+        return Overview(status="ok", venue_id=prep.venue_id,
+                        venue_name="EMNLP", overall="at")
+
+    monkeypatch.setattr(pl, "prepare", fake_prepare)
+    monkeypatch.setattr(pl, "critique", fake_critique)
+
+    retrieval = _client(_empty_transport(), tmp_path)
+    events: list[dict] = []
+    opened: list = []
+    task = asyncio.create_task(run_pipeline(
+        FIXTURES / "numeric_unordered_en.docx", emit=events.append,
+        retrieval=retrieval, cache=Cache(tmp_path / "c.sqlite"),
+        venue_id="emnlp", on_report=opened.append))
+    for _ in range(400):
+        if opened:
+            break
+        await asyncio.sleep(0.05)
+    assert opened, "报告应在对标完成前交出"
+    assert opened[0].overview.status == "pending"
+    assert {"type": "done", "overview": "pending"} in events
+    assert "overview_done" not in [e["type"] for e in events]
+    assert not task.done()
+
+    gate.set()
+    report = await task
+    await retrieval.close()
+    assert report is opened[0]
+    assert report.overview.status == "ok"
+    assert [e["type"] for e in events][-2:] == ["overview", "overview_done"]
+    assert "overview" in report.meta.timings
+
+
+def test_pending_overview_without_live_job_settles_to_unavailable():
+    from citecheck.server import _settle_pending
+
+    data = {"overview": {"status": "pending", "venue_name": "EMNLP"}}
+    out = _settle_pending("no-such-job", data)
+    assert out["overview"]["status"] == "unavailable"
+    assert "重新体检" in out["overview"]["note"]
+    ok = {"overview": {"status": "ok"}}
+    assert _settle_pending("x", ok)["overview"]["status"] == "ok"
+
+
+@pytest.mark.asyncio
+async def test_library_scan_reports_stages(app_client, tmp_path):
+    """扫描文件夹时前端轮询真实阶段：最后一次应是 done，阶段中途出现 pdfs/link。"""
+    srv, client = app_client
+    r = await client.get("/library/scan/nobody")
+    assert r.json()["stage"] == "reading"
+
+    folder = tmp_path / "paper"
+    (folder / "ref").mkdir(parents=True)
+    (folder / "paper.docx").write_bytes(
+        (FIXTURES / "numeric_unordered_en.docx").read_bytes())
+    # 文件夹里至少要有一个 PDF 才算文献文件夹
+    pdf = Path("../demo/testset/zh_pdfs/aas_yinhongpeng_2016.pdf")
+    (folder / "ref" / "a.pdf").write_bytes(pdf.read_bytes())
+    r = await client.post("/library/scan",
+                          data={"path": str(folder), "scan_id": "s1"})
+    assert r.status_code == 200, r.text
+    assert (await client.get("/library/scan/s1")).json()["stage"] == "done"

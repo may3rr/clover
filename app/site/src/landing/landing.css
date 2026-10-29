@@ -290,6 +290,29 @@ p {
 .window.ready iframe {
   opacity: 1;
 }
+/* stills of the app (the four layers); a click swaps in the live app */
+.window .still {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 320ms var(--ease);
+  pointer-events: none;
+}
+.window .still.on {
+  opacity: 1;
+}
+.window[data-mode='still'] {
+  cursor: pointer;
+}
+.window[data-mode='still'] iframe {
+  pointer-events: none;
+}
+.window .still img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 /* placeholder shimmer until the replica reports ready */
 .window::after {
   content: '';
@@ -414,37 +437,14 @@ h3 {
   color: var(--text-secondary);
 }
 
-/* ---------------------------------------------------------- layers (sticky) */
-.layers {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 160px 24px 0;
-  display: grid;
-  grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
-  gap: 48px;
+/* --------------------------------------------------------------- layers */
+.feature {
+  padding-top: 96px;
 }
-.steps {
-  padding: 18vh 0 30vh;
+.features .feature:first-child {
+  padding-top: 160px;
 }
-.step {
-  min-height: 72vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  opacity: 0.28;
-  transition: opacity 400ms var(--ease);
-}
-.step.on {
-  opacity: 1;
-}
-.stage {
-  position: sticky;
-  top: 72px; /* centred in the viewport by main.ts */
-  align-self: start;
-  margin-top: 18vh;
-}
-.stage-hint {
+.shot-hint {
   margin-top: 16px;
   font-size: 13px;
   color: var(--text-secondary);
@@ -677,26 +677,13 @@ h3 {
   .about-body {
     font-size: 17px;
   }
-  .band,
-  .layers {
+  .band {
     grid-template-columns: minmax(0, 1fr);
     padding-top: 112px;
     gap: 32px;
   }
-  .layers .stage {
-    grid-row: 1;
-    top: 64px;
-    margin-top: 0;
-    z-index: 2;
-  }
-  .steps {
-    padding: 8vh 0 20vh;
-  }
-  .step {
-    min-height: 56vh;
-  }
-  .stage-hint {
-    display: none;
+  .feature {
+    padding-top: 64px;
   }
   .doc {
     grid-template-columns: minmax(0, 1fr);

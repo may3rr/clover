@@ -23,6 +23,7 @@ import datetime as _dt
 import json
 import logging
 from dataclasses import dataclass, field
+from collections.abc import Callable
 from typing import Literal
 
 import httpx
@@ -65,7 +66,10 @@ class Prepared:
 
 
 async def prepare(parsed: ParsedDocument, venue_id: str,
-                  client: httpx.AsyncClient, cache: Cache) -> Prepared:
+                  client: httpx.AsyncClient, cache: Cache,
+                  on_step: Callable[[str], None] | None = None) -> Prepared:
+    """on_step 收到真实阶段名，运行页的期刊评审行原样显示。"""
+    step = on_step or (lambda _s: None)
     venue = VENUES.get(venue_id)
     stats, excerpt = manuscript_profile(parsed)
     if venue is None:
@@ -74,8 +78,11 @@ async def prepare(parsed: ParsedDocument, venue_id: str,
     title = parsed.document.title or ""
     query = f"{title} {excerpt}"
     this_year = _dt.date.today().year
+    step("正在获取近期论文")
     picked = await pick_exemplars(
         venue, query, [this_year - 1, this_year - 2], client, cache)
+    if picked:
+        step(f"正在读取 {len(picked)} 篇范文")
 
     async def read_one(c) -> ExemplarPaper | None:
         text = await _fetch_pdf_text(c.pdf, client, cache)

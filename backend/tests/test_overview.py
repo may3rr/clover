@@ -129,7 +129,10 @@ async def test_prepare_reads_exemplars_in_parallel(monkeypatch, tmp_path):
     monkeypatch.setattr(run_mod, "pick_exemplars", fake_pick)
     monkeypatch.setattr(run_mod, "_fetch_pdf_text", fake_pdf)
     parsed = parse_docx(FIXTURES / "numeric_en.docx")
-    prep = await prepare(parsed, "emnlp", None, Cache(tmp_path / "c.sqlite"))
+    steps: list[str] = []
+    prep = await prepare(parsed, "emnlp", None, Cache(tmp_path / "c.sqlite"),
+                         on_step=steps.append)
+    assert steps == ["正在获取近期论文", "正在读取 1 篇范文"]
     assert len(prep.exemplars) == 1
     ex = prep.exemplars[0].stats
     assert ex["n_datasets"] == 3 and ex["n_tables"] == 2 and ex["has_limitations"]

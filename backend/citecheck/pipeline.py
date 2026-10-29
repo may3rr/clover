@@ -49,11 +49,13 @@ from .schema import (
     LayerStatus,
     LibraryLink,
     LLMCalls,
+    Overview,
     Report,
     ReportMeta,
     Revision,
 )
 from .overview.run import Prepared, critique, prepare, run_overview_safe
+from .overview.venues import VENUES
 from .support.layer import SupportRun
 
 log = logging.getLogger(__name__)
@@ -127,7 +129,12 @@ async def run_pipeline(
     library_links: list[LibraryLink] | None = None,
     library_venue: str | None = None,
     library_exemplars: list[str] | None = None,
+    on_report: Callable[[Report], None] | None = None,
 ) -> Report:
+    """on_report 不为空时，期刊对标不再卡住报告：四层结束就组装报告
+    （overview 为 pending）交给 on_report 并发出 done（带 overview=pending），
+    之后在同一个任务里继续算对标，完成后原地更新同一个 Report 对象，
+    发 overview 与 overview_done 事件，再返回。"""
     send = emit or (lambda _e: None)
     t0 = time.monotonic()
     meta = ReportMeta()
@@ -410,7 +417,11 @@ async def run_pipeline(
             # findings — it overlaps the four layers
             async def _prep():
                 await structured
-                return await prepare(parsed, venue_id, retrieval._client, cache)
+                return await prepare(
+                    parsed, venue_id, retrieval._client, cache,
+                    on_step=lambda step: send(
+                        {"type": "overview", "status": "running",
+                         "step": step}))
 
             prep_task = asyncio.create_task(run_overview_safe(_prep())) \
                 if venue_id else None
@@ -437,13 +448,28 @@ async def run_pipeline(
                 r.id = f"v{i}"
 
             overview = None
-            if prep_task is not None:
+            t_ov = time.monotonic()
+            defer = prep_task is not None and on_report is not None
+
+            async def _finish_overview() -> Overview | None:
                 send({"type": "overview", "status": "running"})
                 prep = await prep_task
+                ov = None
                 if isinstance(prep, Prepared):
-                    overview = await run_overview_safe(critique(prep, findings))
+                    send({"type": "overview", "status": "running",
+                          "step": "正在汇总评审意见"})
+                    ov = await run_overview_safe(critique(prep, findings))
                 send({"type": "overview",
-                      "status": overview.status if overview else "unavailable"})
+                      "status": ov.status if ov else "unavailable"})
+                return ov
+
+            if defer:
+                overview = Overview(
+                    status="pending", venue_id=venue_id,
+                    venue_name=VENUES[venue_id].name
+                    if venue_id in VENUES else venue_id)
+            elif prep_task is not None:
+                overview = await _finish_overview()
 
             meta.llm_calls = LLMCalls(local=stats.local, cloud=stats.cloud)
             meta.duration_s = round(time.monotonic() - t0, 1)
@@ -451,6 +477,8 @@ async def run_pipeline(
             meta.timings = {
                 "parse": round(t_parsed - t0, 1),
                 "layers": layer_times,
+                # 四层结束后等待期刊对标的时长（未开启对标时为 0）
+                "overview": round(time.monotonic() - t_ov, 1),
                 "sources": {
                     k: dict(v)
                     for k, v in getattr(retrieval, "stats", {}).items()
@@ -473,7 +501,22 @@ async def run_pipeline(
                 library=(await library_task)[0],
                 meta=meta,
             )
-            send({"type": "done"})
+            if not defer:
+                send({"type": "done"})
+                return report
+
+            # 报告先开：此刻对标还在算，前端凭 overview=pending 保持订阅
+            on_report(report)
+            send({"type": "done", "overview": "pending"})
+            try:
+                report.overview = await _finish_overview()
+            except Exception as e:  # noqa: BLE001
+                log.warning("deferred overview failed: %s", e)
+                send({"type": "overview", "status": "unavailable"})
+                report.overview = None
+            report.meta.timings["overview"] = round(time.monotonic() - t_ov, 1)
+            report.meta.duration_s = round(time.monotonic() - t0, 1)
+            send({"type": "overview_done"})
             return report
         finally:
             if own_retrieval:

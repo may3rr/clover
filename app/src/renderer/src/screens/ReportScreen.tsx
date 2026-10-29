@@ -55,6 +55,9 @@ const LAYER_ORDER = ['authenticity', 'support', 'distribution', 'norms']
 
 interface Props {
   report: Report
+  /** 期刊对标后到：覆盖 report.overview，report 对象本身保持不变，
+   *  这样条目、选中和高亮都不会因为对标到达而重建 */
+  overview?: Report['overview']
   jobId: string
   externalSelection?: { id: string | null; open: boolean } | null
   externalFilter?: { layer: string | null } | null
@@ -79,6 +82,7 @@ function duration(sec: number): string {
 
 export default function ReportScreen({
   report,
+  overview: lateOverview,
   jobId,
   externalSelection,
   externalFilter,
@@ -92,6 +96,7 @@ export default function ReportScreen({
 }: Props) {
   const { reports: history, remove: removeReport } = useReports()
   const items = useMemo(() => buildItems(report), [report])
+  const overview = lateOverview !== undefined ? lateOverview : report.overview
   const [filter, setFilter] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
@@ -292,28 +297,38 @@ export default function ReportScreen({
 
   // ------------------------------------------------------ selection nav
   const select = useCallback(
-    (id: string | null, openDetail: boolean) => {
-      // list → detail morphs via a View Transition (skipped when reduced)
-      if (openDetail) {
+    (id: string | null, openDetail: boolean, viaKey = false) => {
+      // list → detail morphs via a View Transition (skipped when reduced);
+      // arrowing through items with the detail open switches instantly
+      if (openDetail && !viaKey) {
         morph(() => {
           setSelectedId(id)
           setDetailId(id)
         })
       } else {
         setSelectedId(id)
-        setDetailId(null)
+        setDetailId(openDetail ? id : null)
       }
       if (id) {
         // after the commit: scroll the highlighted paper segment into view
         // and keep the selected list row visible
         setTimeout(() => {
           const segs = segRefs.current.get(id) ?? []
-          segs[0]?.scrollIntoView({ block: 'center' })
-          // a brief pulse so the eye lands on the passage
+          // within a screen: glide; further away: jump
+          const r = segs[0]?.getBoundingClientRect()
+          const near =
+            r != null &&
+            Math.abs(r.top + r.height / 2 - window.innerHeight / 2) <
+              window.innerHeight
+          segs[0]?.scrollIntoView({
+            block: 'center',
+            behavior: near ? 'smooth' : 'auto',
+          })
+          // the passage settles into its highlight once
           for (const el of segs) {
-            el.classList.remove('hl-flash')
+            el.classList.remove('hl-land')
             void el.offsetWidth // restart the animation on repeat picks
-            el.classList.add('hl-flash')
+            el.classList.add('hl-land')
           }
           document
             .querySelector('.list-row.sel')
@@ -387,7 +402,7 @@ export default function ReportScreen({
           detailId ?? selectedId,
           e.key === 'ArrowDown' ? 1 : -1
         )
-        if (next) select(next, detailId !== null)
+        if (next) select(next, detailId !== null, true)
       } else if (e.key === 'Enter') {
         if (selectedId) select(selectedId, true)
       } else if (e.key === 'Escape') {
@@ -654,6 +669,7 @@ export default function ReportScreen({
           <div style={{ maxWidth: 680, margin: '0 auto' }}>
             <PaperBody
               report={report}
+              overview={overview}
               items={items}
               filter={filter}
               selectedId={selectedId}
@@ -738,6 +754,7 @@ export function benchLabel(report: Report): string {
 
 function PaperBody({
   report,
+  overview,
   items,
   filter,
   selectedId,
@@ -745,6 +762,7 @@ function PaperBody({
   onPick,
 }: {
   report: Report
+  overview: Report['overview']
   items: ListItem[]
   filter: string | null
   selectedId: string | null
@@ -892,7 +910,7 @@ function PaperBody({
         </div>
         <div
           className="callout"
-          style={{ marginTop: 24, marginBottom: report.overview ? 16 : 40 }}
+          style={{ marginTop: 24, marginBottom: overview ? 16 : 40 }}
         >
           <DocMagnifyIcon size={20} color="var(--accent)" />
           <div className="font-normal">
@@ -920,7 +938,7 @@ function PaperBody({
             )}
           </div>
         </div>
-        <OverviewCard overview={report.overview} style={{ marginBottom: 40 }} />
+        <OverviewCard overview={overview} style={{ marginBottom: 40 }} />
       </div>
       {blocks.map((b) => {
         if (b.kind === 'table')
@@ -1052,6 +1070,12 @@ function InspectorList({
   const { ref: listScrollRef, fadeClass: listFade } =
     useScrollFade<HTMLDivElement>()
 
+  // 只在报告首次打开时 stagger；之后筛选切换出现的行直接显示
+  const [opening, setOpening] = useState(true)
+  useEffect(() => {
+    const t = setTimeout(() => setOpening(false), 12 * 20 + 160)
+    return () => clearTimeout(t)
+  }, [])
   let rowIdx = 0
   const row = (i: ListItem) => {
     // staggered entrance — max 12 rows animate, the rest are instant
@@ -1060,8 +1084,8 @@ function InspectorList({
     return (
       <button
         key={i.id}
-        className={`list-row row-in ${i.id === selectedId ? 'sel' : ''}`}
-        style={{ animationDelay: `${delay}ms` }}
+        className={`list-row${opening ? ' row-in' : ''} ${i.id === selectedId ? 'sel' : ''}`}
+        style={opening ? { animationDelay: `${delay}ms` } : undefined}
         onClick={() => onSelect(i.id)}
       >
         <div className="flex items-start gap-2">
@@ -1084,8 +1108,8 @@ function InspectorList({
   return (
     <>
       <div
-        className="font-semibold bar-solid-subtle drag-strip flex items-center justify-between"
-        style={{ fontSize: 17, padding: '0 16px', flex: 'none', height: 52 }}
+        className="t17 font-semibold bar-solid-subtle drag-strip flex items-center justify-between"
+        style={{ padding: '0 16px', flex: 'none', height: 52 }}
       >
         <span>{items.length} 个问题</span>
         <button
