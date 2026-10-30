@@ -200,7 +200,11 @@ async def _wait_done(client: httpx.AsyncClient, job_id: str) -> list[str]:
 
 
 @pytest.mark.asyncio
-async def test_server_flow(app_client, tmp_path):
+async def test_server_flow(app_client, tmp_path, monkeypatch):
+    from citecheck.config import get_settings
+
+    monkeypatch.setenv("CITECHECK_CACHE", str(tmp_path / "t.sqlite"))
+    get_settings.cache_clear()
     srv, client = app_client
     r = await client.get("/health")
     assert r.status_code == 200
@@ -234,7 +238,16 @@ async def test_server_flow(app_client, tmp_path):
     assert out != src and src.read_bytes() == (
         FIXTURES / "numeric_unordered_en.docx").read_bytes()
     out.unlink()  # keep ~/Downloads clean
+
+    # no target venue: the report is still stored, so the report screen's
+    # export (which goes through /reports) finds it
+    await srv.JOBS[job].task
+    assert (await client.get(f"/reports/{job}")).status_code == 200
+    r = await client.post(f"/reports/{job}/export")
+    assert r.status_code == 200, r.text
+    Path(r.json()["path"]).unlink()
     await client.aclose()
+    get_settings.cache_clear()
 
 
 @pytest.mark.asyncio

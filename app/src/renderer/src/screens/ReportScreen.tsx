@@ -1,10 +1,13 @@
 import {
+  memo,
   useCallback,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react'
+import { flushSync } from 'react-dom'
 import type { Paragraph, Report } from '../types/report'
 import {
   buildItems,
@@ -106,7 +109,10 @@ export default function ReportScreen({
   const [exported, setExported] = useState<string | null>(null)
   const [exportErr, setExportErr] = useState<string | null>(null)
   const isTex = report.document.source_format === 'tex'
-  const segRefs = useRef(new Map<string, HTMLElement[]>())
+  // set by select(); the layout effect below scrolls to it after commit
+  const pendingReveal = useRef<{ id: string; glide: boolean } | null>(null)
+  // bumps on every pick, so re-picking the selected item still reveals it
+  const [revealTick, setRevealTick] = useState(0)
   const paperRef = useRef<HTMLElement>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchTick, setSearchTick] = useState(0)
@@ -297,47 +303,82 @@ export default function ReportScreen({
   }, [])
 
   // ------------------------------------------------------ selection nav
+  const itemsRef = useRef(items)
+  itemsRef.current = items
+
+  /** Bring the selected item's passage into view: its highlight, else its
+   *  paragraph (anchor-less or not painted under the current filter). */
+  const reveal = useCallback((id: string, glide: boolean) => {
+    const root = paperRef.current
+    if (!root) return
+    const segs = Array.from(
+      root.querySelectorAll<HTMLElement>(`[data-iids~="${CSS.escape(id)}"]`)
+    )
+    const pid = itemsRef.current.find((i) => i.id === id)?.paragraphId
+    const target =
+      segs[0] ??
+      (pid
+        ? root.querySelector<HTMLElement>(`[data-pid="${CSS.escape(pid)}"]`)
+        : null)
+    if (target) {
+      // within a screen: glide; further away: jump
+      const r = target.getBoundingClientRect()
+      const near =
+        Math.abs(r.top + r.height / 2 - window.innerHeight / 2) <
+        window.innerHeight
+      target.scrollIntoView({
+        block: 'center',
+        behavior: glide && near ? 'smooth' : 'auto',
+      })
+    }
+    // the passage settles into its highlight once
+    for (const el of segs) {
+      el.classList.remove('hl-land')
+      void el.offsetWidth // restart the animation on repeat picks
+      el.classList.add('hl-land')
+    }
+    document.querySelector('.list-row.sel')?.scrollIntoView({ block: 'nearest' })
+  }, [])
+
+  useLayoutEffect(() => {
+    const p = pendingReveal.current
+    if (!p) return
+    pendingReveal.current = null
+    reveal(p.id, p.glide)
+  }, [selectedId, detailId, revealTick, reveal])
+
   const select = useCallback(
     (id: string | null, openDetail: boolean, viaKey = false) => {
       // list → detail morphs via a View Transition (skipped when reduced);
       // arrowing through items with the detail open switches instantly
       if (openDetail && !viaKey) {
         morph(() => {
-          setSelectedId(id)
-          setDetailId(id)
+          // commit inside the transition so its new snapshot already shows
+          // the paper scrolled to the passage: the jump reads as one
+          // cross-fade instead of a scroll that starts after the morph
+          if (id) pendingReveal.current = { id, glide: false }
+          flushSync(() => {
+            setSelectedId(id)
+            setDetailId(id)
+            setRevealTick((t) => t + 1)
+          })
         })
       } else {
+        if (id) pendingReveal.current = { id, glide: true }
         setSelectedId(id)
         setDetailId(openDetail ? id : null)
-      }
-      if (id) {
-        // after the commit: scroll the highlighted paper segment into view
-        // and keep the selected list row visible
-        setTimeout(() => {
-          const segs = segRefs.current.get(id) ?? []
-          // within a screen: glide; further away: jump
-          const r = segs[0]?.getBoundingClientRect()
-          const near =
-            r != null &&
-            Math.abs(r.top + r.height / 2 - window.innerHeight / 2) <
-              window.innerHeight
-          segs[0]?.scrollIntoView({
-            block: 'center',
-            behavior: near ? 'smooth' : 'auto',
-          })
-          // the passage settles into its highlight once
-          for (const el of segs) {
-            el.classList.remove('hl-land')
-            void el.offsetWidth // restart the animation on repeat picks
-            el.classList.add('hl-land')
-          }
-          document
-            .querySelector('.list-row.sel')
-            ?.scrollIntoView({ block: 'nearest' })
-        }, 0)
+        setRevealTick((t) => t + 1)
       }
     },
     []
+  )
+
+  const onPickSegment = useCallback(
+    (ids: string[]) => {
+      const it = pickItem(itemsRef.current.filter((i) => ids.includes(i.id)))
+      if (it) select(it.id, true)
+    },
+    [select]
   )
 
   const closeExported = useCallback(() => setExported(null), [])
@@ -674,12 +715,7 @@ export default function ReportScreen({
               items={items}
               filter={filter}
               selectedId={selectedId}
-              segRefs={segRefs}
-              onPick={(ids) => {
-                const covering = items.filter((i) => ids.includes(i.id))
-                const it = pickItem(covering)
-                if (it) select(it.id, true)
-              }}
+              onPick={onPickSegment}
             />
           </div>
         </main>
@@ -759,7 +795,6 @@ function PaperBody({
   items,
   filter,
   selectedId,
-  segRefs,
   onPick,
 }: {
   report: Report
@@ -767,7 +802,6 @@ function PaperBody({
   items: ListItem[]
   filter: string | null
   selectedId: string | null
-  segRefs: React.MutableRefObject<Map<string, HTMLElement[]>>
   onPick: (itemIds: string[]) => void
 }) {
   const exportWhere =
@@ -792,18 +826,39 @@ function PaperBody({
       ),
     [report.references]
   )
-  // visible highlights: only the active filter; low + renumber-group items
-  // only paint once selected
-  const visible = useMemo(
-    () =>
-      items.filter((i) => {
-        if (filter && i.layer !== filter) return false
-        if (i.id === selectedId) return true
-        if (i.kind === 'group' || i.severity === 'low') return false
-        return true
-      }),
-    [items, filter, selectedId]
+  // visible highlights per paragraph: only the active filter; low +
+  // renumber-group items only paint once selected. The lists stay the same
+  // objects across selections, so a pick re-renders only the paragraphs
+  // the old and new selection touch (ParaText is memoised).
+  const baseByPara = useMemo(() => {
+    const m = new Map<string, ListItem[]>()
+    for (const i of items) {
+      if (filter && i.layer !== filter) continue
+      if (i.kind === 'group' || i.severity === 'low') continue
+      for (const pid of new Set(i.anchors.map((a) => a.paragraph_id ?? ''))) {
+        const arr = m.get(pid)
+        if (arr) arr.push(i)
+        else m.set(pid, [i])
+      }
+    }
+    return m
+  }, [items, filter])
+  const selItem = useMemo(
+    () => items.find((i) => i.id === selectedId) ?? null,
+    [items, selectedId]
   )
+  const selParas = useMemo(
+    () =>
+      selItem && !(filter && selItem.layer !== filter)
+        ? new Set(selItem.anchors.map((a) => a.paragraph_id ?? ''))
+        : null,
+    [selItem, filter]
+  )
+  const listFor = (pid: string): ListItem[] => {
+    const base = baseByPara.get(pid) ?? NO_ITEMS
+    if (!selItem || !selParas?.has(pid) || base.includes(selItem)) return base
+    return [...base, selItem]
+  }
   const title = (report.document.title ?? '').trim()
   const nMarkers = (report.markers ?? []).length
   const nRefs = (report.references ?? []).length
@@ -835,37 +890,16 @@ function PaperBody({
 
   // paragraph text with highlight marks (prose, table cells and captions)
   const textOf = (p: Paragraph): React.ReactNode => {
-    const ptext = p.text ?? ''
-    const segs = segmentsForParagraph(ptext, p.id ?? '', visible, selectedId)
-    return segs.map((s, i) => {
-      const body = renderPieces(mathPieces(ptext, s.start, s.end, p.math))
-      if (s.severity === null) return <span key={i}>{body}</span>
-      const cls = s.selected
-        ? HL_SELECTED_CLASS[s.severity]
-        : HL_CLASS[s.severity]
-      // adjacent marks read as one run: no inner padding/radius
-      const jl = segs[i - 1]?.severity != null ? ' hl-jl' : ''
-      const jr = segs[i + 1]?.severity != null ? ' hl-jr' : ''
-      return (
-        <span
-          key={i}
-          className={`hl ${cls}${jl}${jr}`}
-          ref={(el) => {
-            if (!el) return
-            for (const id of s.itemIds) {
-              const arr = segRefs.current.get(id) ?? []
-              if (!arr.includes(el)) segRefs.current.set(id, [...arr, el])
-            }
-          }}
-          onClick={() => onPick(s.itemIds)}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
-        >
-          {body}
-        </span>
-      )
-    })
+    const pid = p.id ?? ''
+    const touched = selParas?.has(pid) ?? false
+    return (
+      <ParaText
+        p={p}
+        items={touched ? listFor(pid) : (baseByPara.get(pid) ?? NO_ITEMS)}
+        selectedId={touched ? selectedId : null}
+        onPick={onPick}
+      />
+    )
   }
 
   return (
@@ -1019,6 +1053,53 @@ function PaperBody({
     </>
   )
 }
+
+const NO_ITEMS: ListItem[] = []
+
+/** One paragraph's text with its highlight marks. Memoised: selecting an
+ *  item re-renders only the paragraphs whose marks change. Marks carry
+ *  their item ids in data-iids so the selection can find them in the DOM. */
+const ParaText = memo(function ParaText({
+  p,
+  items,
+  selectedId,
+  onPick,
+}: {
+  p: Paragraph
+  items: ListItem[]
+  selectedId: string | null
+  onPick: (itemIds: string[]) => void
+}) {
+  const ptext = p.text ?? ''
+  const segs = segmentsForParagraph(ptext, p.id ?? '', items, selectedId)
+  return (
+    <>
+      {segs.map((s, i) => {
+        const body = renderPieces(mathPieces(ptext, s.start, s.end, p.math))
+        if (s.severity === null) return <span key={i}>{body}</span>
+        const cls = s.selected
+          ? HL_SELECTED_CLASS[s.severity]
+          : HL_CLASS[s.severity]
+        // adjacent marks read as one run: no inner padding/radius
+        const jl = segs[i - 1]?.severity != null ? ' hl-jl' : ''
+        const jr = segs[i + 1]?.severity != null ? ' hl-jr' : ''
+        return (
+          <span
+            key={i}
+            className={`hl ${cls}${jl}${jr}`}
+            data-iids={s.itemIds.join(' ')}
+            onClick={() => onPick(s.itemIds)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
+          >
+            {body}
+          </span>
+        )
+      })}
+    </>
+  )
+})
 
 /** LaTeX inline math keeps its sub/superscripts in the reading view; the
  *  flattened text stays the anchor coordinate system. */

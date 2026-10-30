@@ -11,6 +11,7 @@ import {
   moveSelection,
   pickItem,
   reconcileFilter,
+  revisionTitle,
   type ListItem,
 } from './items'
 import { supportForFinding } from './claims'
@@ -148,6 +149,11 @@ describe('buildItems ordering', () => {
     const items = buildItems(report)
     expect(items.find((i) => i.id === 'v1')?.title).toBe('建议修订：x 改为 y')
     expect(items.find((i) => i.id === 'v1')?.layer).toBe('norms')
+  })
+
+  it('deletions and insertions are not titled 改为 nothing', () => {
+    expect(revisionTitle('图', '')).toBe('建议删除：图')
+    expect(revisionTitle('', '的')).toBe('建议插入：的')
   })
 })
 

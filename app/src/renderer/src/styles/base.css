@@ -672,6 +672,19 @@ select {
 .hl-rev {
   background: var(--ok-tint);
 }
+/* revision detail: the text taken out and the text put in */
+.rev-old,
+.rev-new {
+  border-radius: 4px;
+  padding: 2px 6px;
+  word-break: break-word;
+}
+.rev-old {
+  background: var(--high-tint);
+}
+.rev-new {
+  background: var(--ok-tint);
+}
 /* neighbouring segments join into one continuous mark */
 .hl-jl {
   padding-left: 0;

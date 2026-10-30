@@ -822,39 +822,31 @@ function NormsDetail({ item, report }: { item: ListItem; report: Report }) {
 function RevisionDetail({ item, tex }: { item: ListItem; tex: boolean }) {
   const r = item.revision
   if (!r) return null
+  // a typo fix may only delete ("网格图" -> "网格") or only insert text:
+  // say so instead of drawing an empty highlight
+  const deleted = !(r.new ?? '').trim()
+  const inserted = !deleted && !(r.old ?? '').trim()
   return (
     <>
       <div className="card">
         <div className="t13 secondary" style={{ marginBottom: 8 }}>
-          原文
+          {deleted ? '删去' : '原文'}
         </div>
-        <div
-          className="font-normal"
-          style={{
-            background: 'var(--high-tint)',
-            borderRadius: 4,
-            padding: '2px 6px',
-            wordBreak: 'break-word',
-          }}
-        >
-          {r.old}
-        </div>
+        {inserted ? (
+          <div className="secondary">原文这里没有文字</div>
+        ) : (
+          <div className="font-normal rev-old">{r.old}</div>
+        )}
       </div>
       <div className="card">
         <div className="t13 secondary" style={{ marginBottom: 8 }}>
-          修订为
+          {inserted ? '插入' : '修订为'}
         </div>
-        <div
-          className="font-normal"
-          style={{
-            background: 'var(--ok-tint)',
-            borderRadius: 4,
-            padding: '2px 6px',
-            wordBreak: 'break-word',
-          }}
-        >
-          {r.new}
-        </div>
+        {deleted ? (
+          <div className="secondary">删去后不留替换文字</div>
+        ) : (
+          <div className="font-normal rev-new">{r.new}</div>
+        )}
       </div>
       <div className="t13 secondary">
         {tex

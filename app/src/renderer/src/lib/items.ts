@@ -76,7 +76,7 @@ export function buildItems(report: Report): ListItem[] {
       kind: 'revision',
       layer: 'norms',
       severity: 'rev',
-      title: `建议修订：${clip(r.old)} 改为 ${clip(r.new)}`,
+      title: revisionTitle(r.old, r.new),
       detail: r.reason ?? '',
       anchors: r.anchor ? [r.anchor] : [],
       paragraphId: r.anchor?.paragraph_id ?? null,
@@ -147,6 +147,14 @@ export function buildItems(report: Report): ListItem[] {
     return d !== 0 ? d : a.start - b.start
   })
   return items
+}
+
+/** A typo fix may delete ("网格图" -> "网格") or insert text; neither
+ *  reads as "改为" an empty string. */
+export function revisionTitle(old: string | undefined, next: string | undefined): string {
+  if (!(next ?? '').trim()) return `建议删除：${clip(old)}`
+  if (!(old ?? '').trim()) return `建议插入：${clip(next)}`
+  return `建议修订：${clip(old)} 改为 ${clip(next)}`
 }
 
 function clip(s: string | undefined, n = 24): string {

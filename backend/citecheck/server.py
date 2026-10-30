@@ -358,10 +358,14 @@ async def analyze(
         job.events.append(ev)
         job.queue.put_nowait(ev)
 
+    saved = False
+
     def on_report(rep) -> None:
         # 报告先开：四层结束即可读取、落库、导出；期刊对标稍后补上
+        nonlocal saved
         job.report = rep
         _save_report(job.id, src, benchmark, rep)
+        saved = True
 
     async def _run() -> None:
         try:
@@ -371,7 +375,12 @@ async def analyze(
                 library_links=confirmed,
                 library_exemplars=picked, on_report=on_report)
             job.report = rep
-            if rep.overview is None or rep.overview.status != "pending":
+            # without a target venue (or overview) on_report is never called:
+            # the finished report is stored here, else the late overview is
+            # written into the row on_report stored
+            if not saved:
+                _save_report(job.id, src, benchmark, rep)
+            elif rep.overview is None or rep.overview.status != "pending":
                 _update_report(job.id, rep)
         except PipelineError as e:
             job.error = str(e)
