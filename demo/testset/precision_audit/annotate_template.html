@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>既有报警核对</title>
+<style>
+:root {
+  --bg: #ffffff; --bg-subtle: #f7f7f5;
+  --text: #37352f; --text-secondary: rgba(55,53,47,0.65);
+  --accent: #2383e2;
+  --fill: rgba(55,53,47,0.06); --fill-strong: rgba(55,53,47,0.09);
+  --separator: rgba(0,0,0,0.1);
+  --high: #FF5F57; --medium: #FEBC2E; --ok: #28C840;
+  --high-tint: rgba(255,95,87,0.2); --medium-tint: rgba(254,188,46,0.25); --ok-tint: rgba(40,200,64,0.2);
+  --high-text: #D70015; --medium-text: #A05A00; --ok-text: #1E7E34;
+  --accent-tint: rgba(35,131,226,0.14);
+  --purple: #AF52DE; --grey: #8E8E93;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #191919; --bg-subtle: #202020;
+    --text: rgba(255,255,255,0.86); --text-secondary: rgba(255,255,255,0.55);
+    --fill: rgba(255,255,255,0.06); --fill-strong: rgba(255,255,255,0.1);
+    --separator: rgba(255,255,255,0.1);
+    --high: #FF6961; --medium: #FFC53D; --ok: #32D74B;
+    --high-tint: rgba(255,105,97,0.28); --medium-tint: rgba(255,197,61,0.28); --ok-tint: rgba(50,215,75,0.28);
+    --high-text: #FF6961; --medium-text: #FFC53D; --ok-text: #32D74B;
+    --accent-tint: rgba(35,131,226,0.3);
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", system-ui, sans-serif;
+  font-size: 15px; color: var(--text); background: var(--bg);
+  display: grid; grid-template-columns: 300px 1fr; height: 100vh; overflow: hidden;
+}
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+button:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.secondary { color: var(--text-secondary); font-size: 13px; }
+
+/* sidebar */
+aside { background: var(--bg-subtle); box-shadow: 1px 0 0 var(--separator); display: flex; flex-direction: column; min-height: 0; }
+.side-head { padding: 16px 16px 8px; display: flex; flex-direction: column; gap: 12px; }
+.side-title { font-weight: 600; }
+.progress { height: 4px; border-radius: 2px; background: var(--fill-strong); overflow: hidden; }
+.progress > i { display: block; height: 100%; background: var(--ok); transform-origin: left; transition: transform 240ms var(--ease); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.seg { display: inline-flex; background: var(--fill); border-radius: 8px; padding: 2px; }
+.seg button { padding: 4px 8px; border-radius: 6px; font-size: 13px; color: var(--text-secondary); }
+.seg button[aria-pressed="true"] { background: var(--bg); color: var(--text); }
+.btn { padding: 4px 12px; border-radius: 980px; background: var(--fill); font-size: 13px; transition: background 160ms var(--ease); }
+.btn:hover { background: var(--fill-strong); }
+.btn.primary { background: var(--accent); color: #fff; }
+#list { overflow-y: auto; padding: 0 8px 16px; flex: 1; }
+.group { font-size: 13px; color: var(--text-secondary); padding: 16px 8px 4px; }
+.item { display: grid; grid-template-columns: 16px 1fr; gap: 8px; width: 100%; text-align: left; padding: 6px 8px; border-radius: 8px; transition: background 160ms var(--ease); }
+.item:hover { background: var(--fill); }
+.item[aria-current="true"] { background: var(--fill-strong); }
+.item .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
+.dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; background: var(--fill-strong); }
+.dot.l-true { background: var(--ok); } .dot.l-fp { background: var(--high); }
+.dot.l-conv { background: var(--purple); } .dot.l-unk { background: var(--grey); }
+
+/* main */
+main { display: flex; flex-direction: column; min-height: 0; }
+#detail { overflow-y: auto; flex: 1; padding: 32px 48px 48px; }
+.wrap { max-width: 860px; margin: 0 auto; }
+h1 { font-size: 20px; font-weight: 600; margin: 4px 0 8px; }
+h2 { font-size: 15px; font-weight: 600; margin: 32px 0 8px; }
+.meta { display: flex; gap: 16px; flex-wrap: wrap; }
+.alarm { display: grid; grid-template-columns: 20px 1fr; gap: 8px; padding: 8px 0; }
+.alarm .title { font-weight: 500; }
+.alarm .d { white-space: pre-wrap; color: var(--text-secondary); font-size: 13px; margin-top: 4px; }
+.reading { font-size: 17px; line-height: 1.7; }
+.box { background: var(--bg-subtle); border-radius: 8px; padding: 12px 16px; }
+.box + .box { margin-top: 8px; }
+mark { background: var(--medium-tint); color: inherit; border-radius: 4px; padding: 0 2px; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+mark.ev { background: var(--ok-tint); }
+mark.caret { background: var(--high-tint); color: var(--high-text); padding: 0 1px; }
+.pre { white-space: pre-wrap; word-break: break-word; }
+.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; }
+.kv { display: grid; grid-template-columns: 96px 1fr; gap: 4px 12px; font-size: 13px; margin-top: 8px; }
+.kv > :nth-child(odd) { color: var(--text-secondary); }
+.ref { padding: 16px 0; }
+.ref + .ref { margin-top: 8px; }
+.ref-raw { font-size: 15px; line-height: 1.6; }
+.links { display: flex; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-top: 8px; }
+.verdict { font-weight: 600; }
+.v-supported { color: var(--ok-text); } .v-partial { color: var(--medium-text); }
+.v-unsupported { color: var(--high-text); } .v-undetermined { color: var(--text-secondary); }
+.st-verified { color: var(--ok-text); } .st-mismatch { color: var(--medium-text); }
+.st-not_found { color: var(--high-text); } .st-unverifiable { color: var(--text-secondary); }
+.sc { margin-top: 12px; padding: 12px 16px; background: var(--bg-subtle); border-radius: 8px; }
+details > summary { cursor: pointer; color: var(--text-secondary); font-size: 13px; margin-top: 8px; list-style: none; }
+details > summary::before { content: "▸ "; }
+details[open] > summary::before { content: "▾ "; }
+.cmp { display: grid; grid-template-columns: 120px 1fr; gap: 8px 12px; align-items: baseline; }
+.cmp .lab { font-size: 13px; color: var(--text-secondary); }
+.nl { color: var(--text-secondary); }
+
+/* label bar */
+.bar { background: var(--bg); box-shadow: 0 -1px 0 var(--separator); padding: 12px 48px; }
+.bar .wrap { display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center; }
+.labels { display: flex; gap: 8px; }
+.lb { padding: 6px 12px; border-radius: 980px; background: var(--fill); transition: background 160ms var(--ease), transform 160ms var(--ease); white-space: nowrap; }
+.lb:hover { background: var(--fill-strong); }
+.lb:active { transform: scale(0.97); }
+.lb kbd { font: inherit; font-size: 13px; color: var(--text-secondary); margin-right: 4px; }
+.lb[aria-pressed="true"].l-true { background: var(--ok-tint); color: var(--ok-text); }
+.lb[aria-pressed="true"].l-fp { background: var(--high-tint); color: var(--high-text); }
+.lb[aria-pressed="true"].l-conv { background: rgba(175,82,222,0.2); color: var(--purple); }
+.lb[aria-pressed="true"].l-unk { background: var(--fill-strong); }
+.lb[aria-pressed="true"] kbd { color: inherit; }
+textarea { font: inherit; font-size: 13px; color: var(--text); background: var(--fill); border: 0; border-radius: 8px; padding: 8px 12px; resize: vertical; min-height: 36px; height: 36px; width: 100%; }
+.nav { display: flex; gap: 8px; }
+.guide { font-size: 13px; line-height: 1.6; color: var(--text-secondary); }
+.guide b { color: var(--text); font-weight: 500; }
+.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); padding: 8px 16px; border-radius: 980px; font-size: 13px; opacity: 0; transition: opacity 240ms var(--ease); pointer-events: none; }
+.toast.show { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<aside>
+  <div class="side-head">
+    <div class="side-title">既有报警核对</div>
+    <div class="secondary" id="count"></div>
+    <div class="progress"><i id="bar" style="transform: scaleX(0)"></i></div>
+    <div class="row">
+      <div class="seg" id="langSeg">
+        <button data-v="all" aria-pressed="true">全部</button>
+        <button data-v="zh" aria-pressed="false">中文</button>
+        <button data-v="en" aria-pressed="false">英文</button>
+      </div>
+      <div class="seg" id="todoSeg">
+        <button data-v="0" aria-pressed="true">全部</button>
+        <button data-v="1" aria-pressed="false">未标</button>
+      </div>
+    </div>
+    <div class="row">
+      <button class="btn primary" id="exportBtn">导出 labels.csv</button>
+      <button class="btn" id="importBtn">导入</button>
+      <input type="file" id="importFile" accept=".csv,text/csv" hidden>
+    </div>
+    <details>
+      <summary>标注说明</summary>
+      <div class="guide">
+        <p>每条是一个评测单元：一条引用句、一条参考文献或一个无引用的句子。单元上可能挂着多条报警，<b>只要其中一条报警指出的问题在原稿里成立</b>，就标真问题。</p>
+        <p><b>真问题</b>：原稿确实有这个问题，作者看到批注或修订会改。<br>
+        <b>误报</b>：报警不成立，比如证据其实支持论断、文献真实存在且信息一致、所谓错别字本来正确。<br>
+        <b>转换痕迹</b>：只用于 PDF 转 Word 产生的乱码、串栏或单词粘连，原 PDF 排版里并没有这个错。<br>
+        <b>无法判断</b>：手头材料不足以下结论。</p>
+        <p>快捷键：1 到 4 选标签，J 或 → 下一条，K 或 ← 上一条。标注自动保存在本浏览器，换浏览器前请先导出。</p>
+      </div>
+    </details>
+  </div>
+  <nav id="list"></nav>
+</aside>
+<main>
+  <div id="detail"><div class="wrap" id="content"></div></div>
+  <div class="bar"><div class="wrap">
+    <div class="labels" id="labels"></div>
+    <textarea id="note" placeholder="备注" rows="1"></textarea>
+    <div class="nav">
+      <button class="btn" id="prevBtn">上一条</button>
+      <button class="btn" id="nextBtn">下一条</button>
+    </div>
+  </div></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script id="data" type="application/json">/*__DATA__*/null</script>
+<script>
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const ITEMS = DATA.items;
+const BY_ID = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+const LABELS = [
+  { v: "真问题", cls: "l-true" }, { v: "误报", cls: "l-fp" },
+  { v: "转换痕迹", cls: "l-conv" }, { v: "无法判断", cls: "l-unk" },
+];
+const CLS = Object.fromEntries(LABELS.map(l => [l.v, l.cls]));
+const LAYER = { authenticity: "文献真实性", support: "论断支持度", distribution: "引用分布",
+  norms: "格式规范", revision: "错别字修订", status: "核验状态", label: "支持度判定" };
+const STORE = "clover-precision-audit-" + DATA.audit_id;
+
+let state = {};
+try { state = JSON.parse(localStorage.getItem(STORE) || "{}"); } catch (e) { state = {}; }
+let filter = { lang: "all", todo: false };
+let cur = ITEMS.length ? ITEMS[0].id : null;
+
+function save() { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} }
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+function showNL(s) { return esc(s).replace(/\n/g, '<span class="nl">⏎</span>\n'); }
+function hl(text, span, cls, nl, caret) {
+  const f = nl ? showNL : esc;
+  if (caret && span && span[0] === span[1]) return f(text.slice(0, span[0])) + '<mark class="caret">‸</mark>' + f(text.slice(span[0]));
+  if (!span || span[0] >= span[1]) return f(text);
+  const [a, b] = span;
+  return f(text.slice(0, a)) + `<mark class="${cls || ""}">` + f(text.slice(a, b)) + "</mark>" + f(text.slice(b));
+}
+function stratumName(h) {
+  const i = h.indexOf(":");
+  return i < 0 ? h : `${LAYER[h.slice(0, i)] || h.slice(0, i)}：${h.slice(i + 1)}`;
+}
+function glyph(sev) {
+  const col = { high: "var(--high)", medium: "var(--medium)", low: "var(--text-secondary)", revision: "var(--ok)" }[sev] || "var(--text-secondary)";
+  if (sev === "high") return `<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="${col}"/><rect x="9" y="5" width="2" height="6.5" rx="1" fill="var(--bg)"/><circle cx="10" cy="14.2" r="1.2" fill="var(--bg)"/></svg>`;
+  if (sev === "medium") return `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2.5 18.5 17h-17z" fill="${col}"/><rect x="9" y="7" width="2" height="5" rx="1" fill="var(--bg)"/><circle cx="10" cy="14.4" r="1.1" fill="var(--bg)"/></svg>`;
+  if (sev === "revision") return `<svg width="20" height="20" viewBox="0 0 20 20"><path d="M3 14.5 13 4.5l2.5 2.5-10 10H3z" fill="${col}"/></svg>`;
+  return `<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="${col}"/><rect x="9" y="8.5" width="2" height="6" rx="1" fill="var(--bg)"/><circle cx="10" cy="6" r="1.2" fill="var(--bg)"/></svg>`;
+}
+function visible() {
+  return ITEMS.filter(i => (filter.lang === "all" || i.lang === filter.lang)
+    && (!filter.todo || !(state[i.id] && state[i.id].label) || i.id === cur));
+}
+function shortText(i) {
+  const y = i.typos[0];
+  const t = !y ? i.sentence.text : !y.old ? `插入「${y.new}」` : !y.new ? `删除「${y.old}」` : `${y.old} → ${y.new}`;
+  return t.replace(/\s+/g, " ").slice(0, 60);
+}
+
+function renderList() {
+  const vis = visible();
+  let html = "", last = null;
+  vis.forEach(i => {
+    const g = (i.lang === "zh" ? "中文　" : "英文　") + stratumName(i.stratum);
+    if (g !== last) {
+      const s = DATA.strata[i.lang][i.stratum];
+      html += `<div class="group">${esc(g)}　${s.n}/${s.N}</div>`;
+      last = g;
+    }
+    const lab = state[i.id] && state[i.id].label;
+    html += `<button class="item" data-id="${i.id}" aria-current="${i.id === cur}">
+      <span class="dot ${lab ? CLS[lab] : ""}"></span>
+      <span><span class="t">${esc(shortText(i))}</span><br><span class="secondary">${esc(i.paper)}</span></span></button>`;
+  });
+  const list = document.getElementById("list");
+  list.innerHTML = html || '<div class="group">没有符合条件的条目</div>';
+  const done = ITEMS.filter(i => state[i.id] && state[i.id].label).length;
+  document.getElementById("count").textContent = `已标 ${done} / ${ITEMS.length}　中文 ${ITEMS.filter(i => i.lang === "zh").length}　英文 ${ITEMS.filter(i => i.lang === "en").length}`;
+  document.getElementById("bar").style.transform = `scaleX(${ITEMS.length ? done / ITEMS.length : 0})`;
+  const el = list.querySelector('[aria-current="true"]');
+  if (el) el.scrollIntoView({ block: "nearest" });
+}
+
+function renderCheck(c) {
+  if (!c) return '<div class="kv"><span>核验</span><span>未记录</span></div>';
+  const rows = [["核验", `<span class="verdict st-${c.status}">${esc(c.status)}</span>${c.source ? "，来源 " + esc(c.source) : ""}`]];
+  if (c.issues && c.issues.length) rows.push(["问题", esc(c.issues.join("；"))]);
+  if (c.title) rows.push(["匹配标题", esc(c.title)]);
+  if (c.authors && c.authors.length) rows.push(["匹配作者", esc(c.authors.slice(0, 8).join(", ") + (c.authors.length > 8 ? " 等" : ""))]);
+  if (c.year || c.venue) rows.push(["年份与出处", esc([c.year, c.venue].filter(Boolean).join("，"))]);
+  if (c.doi) rows.push(["DOI", esc(c.doi)]);
+  return `<div class="kv">${rows.map(r => `<span>${r[0]}</span><span>${r[1]}</span>`).join("")}</div>`
+    + (c.abstract ? `<details><summary>数据库摘要</summary><div class="box pre" style="margin-top:8px">${esc(c.abstract)}</div></details>` : "");
+}
+function evidenceSpan(sc) {
+  if (!sc.excerpt || !sc.evidence) return null;
+  if (sc.evidence_span) {
+    const [a, b] = sc.evidence_span;
+    if (sc.excerpt.slice(a, b).replace(/\s+/g, "") === sc.evidence.replace(/\s+/g, "")) return [a, b];
+  }
+  const k = sc.excerpt.indexOf(sc.evidence);
+  return k >= 0 ? [k, k + sc.evidence.length] : null;
+}
+function renderRef(r) {
+  const p = r.parsed;
+  const parsed = [["解析标题", p.title], ["解析作者", (p.authors || []).join(", ")], ["解析年份", p.year], ["解析出处", p.venue], ["解析 DOI", p.doi]]
+    .filter(x => x[1]).map(x => `<span>${x[0]}</span><span>${esc(x[1])}</span>`).join("");
+  const sc = r.support.map(s => {
+    const span = evidenceSpan(s);
+    return `<div class="sc">
+      <div><span class="verdict v-${s.label}">${esc(s.label)}</span>${s.off_topic ? "，判为内容无关" : ""}<span class="secondary">　来源 ${esc(s.source_kind)}${s.source_title ? "，" + esc(s.source_title) : ""}</span></div>
+      ${s.evidence ? `<div class="reading" style="margin-top:8px"><mark class="ev">${esc(s.evidence)}</mark></div>` : '<div class="secondary" style="margin-top:8px">没有证据片段</div>'}
+      ${s.rationale ? `<div style="margin-top:8px">${esc(s.rationale)}</div>` : ""}
+      ${s.source_link ? `<div class="links"><a href="${esc(s.source_link.url)}" target="_blank">${esc(s.source_link.label)}</a></div>` : ""}
+      ${s.excerpt ? `<details><summary>被引文献原文摘录${span ? "，证据已标绿" : ""}</summary><div class="box pre" style="margin-top:8px">${hl(s.excerpt, span, "ev")}</div></details>` : ""}
+    </div>`;
+  }).join("");
+  return `<div class="ref">
+    <div class="ref-raw">${r.raw.trim().startsWith("[") ? "" : `<span class="secondary">[${esc(r.label || r.id)}]</span> `}${esc(r.raw)}</div>
+    <details><summary>解析结果</summary><div class="kv">${parsed}</div></details>
+    ${renderCheck(r.check)}
+    <div class="links">${r.links.map(l => `<a href="${esc(l.url)}" target="_blank">${esc(l.label)}</a>`).join("")}</div>
+    ${sc}
+  </div>`;
+}
+
+function renderDetail() {
+  const i = BY_ID[cur];
+  const c = document.getElementById("content");
+  if (!i) { c.innerHTML = '<p class="secondary">没有条目。</p>'; return; }
+  const idx = ITEMS.indexOf(i) + 1;
+  const s = DATA.strata[i.lang][i.stratum];
+  let h = `<div class="secondary">第 ${idx} / ${ITEMS.length} 条　${i.lang === "zh" ? "中文" : "英文"}　${esc(i.paper)}　本层抽 ${s.n} / ${s.N}</div>
+    <h1>${esc(stratumName(i.stratum))}</h1>`;
+  h += `<h2>报警</h2>` + i.alarms.map(a => `<div class="alarm">${glyph(a.severity)}<div>
+      <div class="title">${esc(a.title)}<span class="secondary">　${esc(a.label)}</span></div>
+      ${a.detail ? `<div class="d">${esc(a.detail)}</div>` : ""}</div></div>`).join("");
+  const isRef = i.loc.unit[0] === "ref";
+  h += `<h2>${isRef ? "参考文献条目" : "所在句子"}</h2><div class="box reading">${hl(i.sentence.text, i.sentence.hl)}</div>`;
+  if (i.context && !isRef) {
+    h += `<details><summary>段落上下文</summary><div class="box reading" style="margin-top:8px">${i.context.cut_left ? "…" : ""}${hl(i.context.text, i.context.hl)}${i.context.cut_right ? "…" : ""}</div></details>`;
+  }
+  if (i.typos.length) {
+    h += `<h2>错别字对照</h2>` + i.typos.map(t => `<div class="box">
+      <div style="margin-bottom:8px">「<b>${esc(t.old)}</b>」改为「<b>${esc(t.new)}</b>」<span class="secondary">　${esc(t.reason)}</span></div>
+      <div class="cmp">
+        <span class="lab">${i.lang === "zh" ? "docx 文本" : "解析文本"}</span><span class="reading pre">${hl(t.docx.text, t.docx.hl, "", false, true)}</span>
+        <span class="lab">${t.source ? esc(t.source.where) : "原文"}</span><span class="reading pre ${i.lang === "en" ? "mono" : ""}">${t.source ? hl(t.source.text, t.source.hl, "", i.lang === "zh", true) : `<span class="secondary">${esc(t.source_missing || "没有可对照的原文")}</span>`}</span>
+      </div></div>`).join("");
+  }
+  if (i.refs.length) h += `<h2>涉及的参考文献</h2>` + i.refs.map(renderRef).join("");
+  const L = i.loc;
+  h += `<h2>定位</h2><div class="kv">
+    <span>单元</span><span class="mono">${esc(L.unit.join(" "))}</span>
+    <span>段落</span><span class="mono">${esc(L.paragraph_id || "")}${L.start != null ? ` ${L.start}-${L.end}` : ""}</span>
+    ${L.section ? `<span>章节</span><span>${esc(L.section.slice(0, 60))}</span>` : ""}
+    ${L.tex && L.tex.length ? `<span>源码</span><span class="mono">${esc(L.tex.join("  "))}</span>` : ""}
+    <span>条目 ID</span><span class="mono">${esc(i.id)}</span></div>`;
+  c.innerHTML = h;
+  document.getElementById("detail").scrollTop = 0;
+  const st = state[i.id] || {};
+  document.querySelectorAll(".lb").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === st.label)));
+  document.getElementById("note").value = st.note || "";
+}
+
+function render() { renderList(); renderDetail(); }
+function go(delta) {
+  const vis = visible();
+  const k = vis.findIndex(i => i.id === cur);
+  const n = vis[Math.min(vis.length - 1, Math.max(0, k + delta))];
+  if (n) { cur = n.id; render(); }
+}
+function setLabel(v) {
+  const st = state[cur] || (state[cur] = {});
+  st.label = st.label === v ? "" : v;
+  st.at = new Date().toISOString();
+  save(); renderList();
+  document.querySelectorAll(".lb").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === st.label)));
+}
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+// CSV
+const COLS = ["id", "lang", "paper", "stratum", "label", "note", "labeled_at"];
+function csvCell(v) { v = String(v ?? ""); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+function toCSV() {
+  const rows = [COLS.join(",")];
+  ITEMS.forEach(i => {
+    const st = state[i.id] || {};
+    rows.push([i.id, i.lang, i.paper, i.stratum, st.label || "", st.note || "", st.at || ""].map(csvCell).join(","));
+  });
+  return "﻿" + rows.join("\r\n") + "\r\n";
+}
+function parseCSV(text) {
+  text = text.replace(/^﻿/, "");
+  const rows = []; let row = [], cell = "", q = false;
+  for (let k = 0; k < text.length; k++) {
+    const ch = text[k];
+    if (q) {
+      if (ch === '"') { if (text[k + 1] === '"') { cell += '"'; k++; } else q = false; }
+      else cell += ch;
+    } else if (ch === '"') q = true;
+    else if (ch === ",") { row.push(cell); cell = ""; }
+    else if (ch === "\n" || ch === "\r") {
+      if (ch === "\r" && text[k + 1] === "\n") k++;
+      row.push(cell); rows.push(row); row = []; cell = "";
+    } else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const head = rows.shift() || [];
+  return rows.filter(r => r.some(x => x)).map(r => Object.fromEntries(head.map((h, j) => [h, r[j] ?? ""])));
+}
+function importCSV(text) {
+  let n = 0, unknown = 0, bad = 0;
+  parseCSV(text).forEach(r => {
+    if (!BY_ID[r.id]) { unknown++; return; }
+    if (r.label && !CLS[r.label]) { bad++; return; }
+    if (!r.label && !r.note) return;
+    state[r.id] = { label: r.label || "", note: r.note || "", at: r.labeled_at || "" };
+    n++;
+  });
+  save(); render();
+  return { n, unknown, bad };
+}
+function exportCSV() {
+  const blob = new Blob([toCSV()], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "labels.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast("已导出 labels.csv，请放到 precision_audit/ 目录下");
+}
+
+// wiring
+document.getElementById("labels").innerHTML = LABELS.map((l, k) =>
+  `<button class="lb ${l.cls}" data-v="${l.v}" aria-pressed="false"><kbd>${k + 1}</kbd>${l.v}</button>`).join("");
+document.getElementById("labels").addEventListener("click", e => { const b = e.target.closest(".lb"); if (b) setLabel(b.dataset.v); });
+document.getElementById("list").addEventListener("click", e => { const b = e.target.closest(".item"); if (b) { cur = b.dataset.id; render(); } });
+document.getElementById("note").addEventListener("input", e => {
+  const st = state[cur] || (state[cur] = {});
+  st.note = e.target.value; st.at = st.at || new Date().toISOString(); save();
+});
+document.getElementById("prevBtn").onclick = () => go(-1);
+document.getElementById("nextBtn").onclick = () => go(1);
+document.getElementById("exportBtn").onclick = exportCSV;
+document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+document.getElementById("importFile").addEventListener("change", async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const r = importCSV(await f.text());
+  toast(`已导入 ${r.n} 条${r.unknown ? `，${r.unknown} 条不属于本次抽样` : ""}${r.bad ? `，${r.bad} 条标签无法识别` : ""}`);
+  e.target.value = "";
+});
+for (const [id, key] of [["langSeg", "lang"], ["todoSeg", "todo"]]) {
+  document.getElementById(id).addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    filter[key] = key === "todo" ? b.dataset.v === "1" : b.dataset.v;
+    document.querySelectorAll(`#${id} button`).forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+    const vis = visible();
+    if (!vis.some(i => i.id === cur) && vis.length) cur = vis[0].id;
+    render();
+  });
+}
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "TEXTAREA" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const k = e.key;
+  if ("1234".includes(k) && k.length === 1) { setLabel(LABELS[+k - 1].v); e.preventDefault(); }
+  else if (k === "j" || k === "ArrowRight") { go(1); e.preventDefault(); }
+  else if (k === "k" || k === "ArrowLeft") { go(-1); e.preventDefault(); }
+});
+render();
+</script>
+</body>
+</html>

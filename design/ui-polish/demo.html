@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Clover 界面细节探索：组件演示</title>
+<style>
+/* ---------------------------------------------------------------
+   现有 token：从 app/src/renderer/src/styles/tokens.css 摘出本页用到的部分
+   --------------------------------------------------------------- */
+:root {
+  --bg: #ffffff; --bg-subtle: #f7f7f5;
+  --text: #37352f; --text-secondary: rgba(55,53,47,0.65);
+  --accent: #2383e2;
+  --fill: rgba(55,53,47,0.06); --fill-strong: rgba(55,53,47,0.09);
+  --separator: rgba(0,0,0,0.1);
+  --glass-edge: 0 0 0 0.5px rgba(55,53,47,0.09);
+  --glass-shadow: 0 8px 24px rgba(55,53,47,0.10);
+  --high: #ff5f57; --medium: #febc2e; --ok: #28c840;
+  --high-text: #d70015; --medium-text: #a05a00; --ok-text: #1e7e34;
+  --tile-indigo: #5856d6; --tile-blue: #007aff; --tile-teal: #30b0c7;
+  --tile-purple: #af52de; --tile-pink: #d6409f; --on-tile: #fff;
+  --shimmer: rgba(255,255,255,0.6);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* -------- 本轮提议新增的 token（见 plan.md 第 3 节） -------- */
+  --ease-out: var(--ease);                         /* 进入、响应：保留现值 */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);   /* 窗格、抽屉、屏内位移 */
+  --ease-sine: cubic-bezier(0.37, 0, 0.63, 1);     /* 往复循环：呼吸、漂浮 */
+  /* 弹簧：阻尼比 0.8，响应 0.4s，过冲 1.5%，约 520ms 静止 */
+  --spring: linear(0, 0.019, 0.068, 0.136, 0.216, 0.302, 0.389, 0.473, 0.553,
+    0.626, 0.693, 0.751, 0.802, 0.846, 0.883, 0.914, 0.94, 0.96, 0.976, 0.989,
+    0.998, 1.005, 1.009, 1.013, 1.014, 1.015, 1.015, 1.015, 1.014, 1.012, 1.011,
+    1.01, 1.009, 1.007, 1.006, 1.005, 1.004, 1.003, 1.003, 1.002, 1);
+  --spring-dur: 520ms;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #191919; --bg-subtle: #202020;
+    --text: rgba(255,255,255,0.87); --text-secondary: rgba(255,255,255,0.48);
+    --accent: #529cca;
+    --fill: rgba(255,255,255,0.055); --fill-strong: rgba(255,255,255,0.09);
+    --separator: rgba(255,255,255,0.1);
+    --glass-edge: 0 0 0 0.5px rgba(255,255,255,0.10);
+    --glass-shadow: 0 8px 24px rgba(0,0,0,0.45);
+    --high: #ff6961; --medium: #ffc53d; --ok: #32d74b;
+    --high-text: #ff6961; --medium-text: #ffc53d; --ok-text: #32d74b;
+    --tile-indigo: #5e5ce6; --tile-blue: #0a84ff; --tile-teal: #40cbe0;
+    --tile-purple: #bf5af2; --tile-pink: #e55aaa;
+    --shimmer: rgba(255,255,255,0.12);
+  }
+}
+
+/* ------------------------------ 演示页骨架 ------------------------------ */
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", system-ui, sans-serif;
+  font-size: 15px; line-height: 22px; color: var(--text); background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: default; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.shell { display: grid; grid-template-columns: 240px 1fr; height: 100%; }
+.nav { background: var(--bg-subtle); box-shadow: 1px 0 0 var(--separator); padding: 24px 12px; overflow: auto; }
+.nav-h { font-size: 13px; color: var(--text-secondary); padding: 0 10px 8px; }
+.nav button {
+  display: flex; align-items: center; gap: 8px; width: 100%; height: 32px; padding: 0 10px;
+  border-radius: 8px; text-align: left; transition: background-color 160ms var(--ease);
+}
+.nav button:hover { background: var(--fill); }
+.nav button.on { background: var(--fill-strong); font-weight: 500; }
+.nav .n { width: 20px; color: var(--text-secondary); font-size: 13px; font-variant-numeric: tabular-nums; }
+.stage { overflow: auto; }
+.page { max-width: 880px; padding: 48px 48px 96px; }
+.page[hidden] { display: none; }
+h1 { font-size: 26px; line-height: 34px; font-weight: 600; margin: 0 0 8px; text-wrap: balance; }
+h2 { font-size: 17px; line-height: 26px; font-weight: 600; margin: 48px 0 8px; }
+p.lead, p.note { color: var(--text-secondary); margin: 0 0 16px; max-width: 680px; text-wrap: pretty; }
+p.note { font-size: 13px; line-height: 20px; }
+.t13 { font-size: 13px; line-height: 18px; }
+.sec { color: var(--text-secondary); }
+.row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-start; }
+.col { display: flex; flex-direction: column; gap: 8px; }
+.cap { font-size: 13px; line-height: 18px; color: var(--text-secondary); }
+.board { background: var(--bg-subtle); border-radius: 12px; padding: 24px; }
+.paperbg { background: var(--bg); border-radius: 12px; padding: 24px; box-shadow: var(--glass-edge); }
+.pill {
+  display: inline-flex; align-items: center; height: 30px; padding: 0 14px; border-radius: 980px;
+  background: var(--fill); font-weight: 500; transition: transform 160ms var(--ease-out), background-color 160ms var(--ease);
+}
+.pill:hover { background: var(--fill-strong); }
+.pill:active { transform: scale(0.97); }
+.pill.accent { background: var(--accent); color: #fff; }
+.ctl { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin: 16px 0; font-size: 13px; color: var(--text-secondary); }
+.ctl label { display: inline-flex; gap: 8px; align-items: center; }
+.ctl input[type=range] { width: 120px; accent-color: var(--accent); }
+.ctl select { font: inherit; color: var(--text); background: var(--fill); border: 0; border-radius: 8px; height: 26px; padding: 0 8px; }
+.tag { display: inline-block; font-size: 13px; line-height: 18px; padding: 0 8px; border-radius: 980px; background: var(--fill); color: var(--text-secondary); }
+.tag.new { background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 13px; background: var(--fill); border-radius: 4px; padding: 0 4px; }
+
+/* -------------------------------- 共用小件 -------------------------------- */
+.shim { position: relative; overflow: hidden; background: var(--fill-strong); border-radius: 4px; }
+.shim::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, var(--shimmer), transparent);
+  animation: shim 1.6s var(--ease-sine) infinite;
+}
+@keyframes shim { 0% { transform: translateX(-100%); } 70%, 100% { transform: translateX(100%); } }
+.mascot { flex: none; }
+
+/* ============================ 1. 期刊对标占位卡 ============================ */
+.ov {
+  background: var(--bg-subtle); border-radius: 12px; padding: 16px; width: 560px; max-width: 100%;
+  -electron-corner-smoothing: system-ui;
+}
+.ov-head { display: flex; align-items: center; gap: 12px; height: 28px; }
+.ov-slot { position: relative; width: 28px; height: 28px; flex: none; }
+.ov-slot > * { position: absolute; inset: 0; }
+.ov-title { flex: 1; min-width: 0; font-weight: 600; }
+.ov-tier { font-weight: 600; position: relative; min-width: 112px; height: 22px; text-align: right; }
+.ov-tier > span { position: absolute; right: 0; top: 0; white-space: nowrap; }
+.swap-out { opacity: 0; filter: blur(4px); transform: scale(0.96); }
+.swap { transition: opacity 240ms var(--ease-out), filter 240ms var(--ease-out), transform 240ms var(--ease-out); }
+.ov-body { margin-top: 12px; position: relative; min-height: 48px; }
+.ov-lines { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+.ov-lines .shim { height: 12px; }
+.ov-dims { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.ov-dim { display: flex; justify-content: space-between; align-items: center; gap: 12px; height: 24px; }
+.ov-dim .v { position: relative; width: 120px; height: 18px; }
+.ov-dim .v .shim { position: absolute; right: 0; top: 4px; width: 72px; height: 10px; }
+.ov-dim .v span { position: absolute; right: 0; top: 0; font-size: 13px; line-height: 18px; white-space: nowrap; }
+.ov-ex { margin-top: 16px; }
+.ov-ex-list { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; min-height: 66px; }
+.ov-ex-item { font-size: 13px; line-height: 18px; color: var(--accent); opacity: 0; transform: translateY(4px);
+  transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out); }
+.ov-ex-item.in { opacity: 1; transform: none; }
+.ov-step { font-size: 13px; line-height: 18px; color: var(--text-secondary); margin-top: 16px; height: 18px; position: relative; }
+.ov-step span { position: absolute; left: 0; top: 0; transition: opacity 240ms var(--ease-out), transform 240ms var(--ease-out); }
+.ov-step span.leave { opacity: 0; transform: translateY(-6px); }
+.ov-step span.enter { opacity: 0; transform: translateY(6px); }
+.sem-ok { color: var(--ok-text); } .sem-medium { color: var(--medium-text); }
+
+/* 运行页行 */
+.run-panel { background: var(--bg-subtle); border-radius: 12px; padding: 4px 16px; width: 560px; max-width: 100%; }
+.run-row { display: grid; grid-template-columns: 24px 88px 1fr 104px; align-items: center; column-gap: 12px; height: 44px; }
+.run-track { position: relative; height: 3px; border-radius: 1.5px; background: var(--fill-strong); overflow: hidden; }
+.run-fill { position: absolute; inset: 0; background: var(--accent); transform-origin: left; }
+.run-fill.ok { background: var(--ok); }
+.run-fill.stuck { transform: scaleX(0.03); animation: breathe-now 2.4s var(--ease) infinite; }
+.sheen { position: absolute; top: 0; bottom: 0; width: 40%; left: 0;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 70%, transparent), transparent);
+  animation: sheen 1.8s var(--ease-sine) infinite; }
+@keyframes sheen { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.run-status { display: flex; align-items: center; justify-content: flex-end; gap: 8px; color: var(--text-secondary); }
+
+/* ============================ 3. 缓动曲线 ============================ */
+.ez { display: grid; grid-template-columns: 96px 1fr 200px; gap: 16px; align-items: center; padding: 8px 0; }
+.ez svg { width: 96px; height: 96px; background: var(--bg); border-radius: 8px; overflow: visible; }
+.ez .track { position: relative; height: 28px; background: var(--bg); border-radius: 980px; }
+.ez .ball { position: absolute; left: 4px; top: 4px; width: 20px; height: 20px; border-radius: 50%; background: var(--accent); }
+.ez .meta { font-size: 13px; line-height: 18px; color: var(--text-secondary); }
+.ez .meta b { color: var(--text); font-weight: 600; display: block; font-size: 15px; line-height: 22px; }
+
+/* ============================ 4. 循环动效 ============================ */
+.loop-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+.loop-cell { background: var(--bg); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.bar4 { position: relative; height: 4px; border-radius: 2px; background: var(--fill-strong); overflow: hidden; }
+.bar4 i { position: absolute; inset: 0; background: var(--accent); transform-origin: left; transform: scaleX(0.42); }
+.breathe-now { animation: breathe-now 2.4s var(--ease) infinite; }
+.breathe-sine { animation: breathe-sine 2.4s var(--ease-sine) infinite; }
+@keyframes breathe-now { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes breathe-sine { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.bar4 .sheen { width: 30%; }
+.graph { height: 64px; width: 100%; }
+
+/* ============================ 5. 超椭圆 ============================ */
+.sq-cmp { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.sq-cell { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.sq-big { width: 200px; height: 200px; background: var(--tile-blue); border-radius: 48px; }
+.sq-overlay { position: relative; width: 280px; height: 280px; overflow: hidden; border-radius: 8px; background: var(--bg); }
+.sq-overlay > div { position: absolute; left: 24px; top: 24px; width: 900px; height: 900px; border-radius: 180px; }
+.sq-a { background: color-mix(in srgb, var(--tile-blue) 55%, transparent); }
+.sq-b { background: color-mix(in srgb, var(--high) 55%, transparent); }
+.smooth { -electron-corner-smoothing: system-ui; }
+.sq-real { display: grid; grid-template-columns: 140px 1fr 1fr; gap: 16px 24px; align-items: center; }
+.sq-real .h { font-size: 13px; color: var(--text-secondary); }
+.tile { width: 20px; height: 20px; border-radius: 5px; display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+.lrow { width: 240px; height: 32px; border-radius: 8px; background: var(--fill-strong); display: flex; align-items: center; gap: 8px; padding: 0 10px; }
+.card12 { width: 260px; background: var(--bg); border-radius: 12px; padding: 16px; box-shadow: var(--glass-edge); }
+.pop12 { width: 260px; background: var(--bg); border-radius: 12px; padding: 4px; box-shadow: var(--glass-edge), var(--glass-shadow); }
+.pop12 .mi { height: 32px; display: flex; align-items: center; padding: 0 12px; }
+.pop12 .mi.sel { background: var(--fill-strong); }
+.conc-bad .mi { border-radius: 12px; }
+.conc-good .mi { border-radius: 8px; }
+
+/* ============================ 6. 落点高亮 ============================ */
+.para { font-size: 17px; line-height: 1.7; max-width: 560px; }
+.hl { border-radius: 4px; padding: 0 2px; box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  background: color-mix(in srgb, var(--high) 38%, transparent); }
+@keyframes flash-now { 0%, 100% { opacity: 1; } 25%, 75% { opacity: 0.45; } }
+.flash-now { animation: flash-now 800ms var(--ease); }
+@keyframes swell {
+  from { background-color: color-mix(in srgb, var(--high) 70%, transparent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--high) 22%, transparent); }
+}
+.flash-new { animation: swell 700ms var(--ease-out); }
+
+/* ============================ 7. 浮层出场 ============================ */
+.pop-stage { position: relative; height: 220px; background: var(--bg); border-radius: 12px; box-shadow: var(--glass-edge); }
+.pop-stage .trigger { position: absolute; top: 16px; right: 16px; }
+.pop { position: absolute; top: 56px; right: 16px; width: 260px; padding: 16px; border-radius: 12px; background: var(--bg);
+  box-shadow: var(--glass-edge), var(--glass-shadow); -electron-corner-smoothing: system-ui; }
+.pop-now { display: none; }
+.pop-now.open { display: block; animation: pop-now 240ms var(--ease) both; }
+@keyframes pop-now { from { opacity: 0; transform: translateY(-4px); } }
+.pop-new { transform-origin: top right; opacity: 0; transform: scale(0.96); pointer-events: none;
+  transition: opacity 140ms var(--ease-out), transform 140ms var(--ease-out); }
+.pop-new.open { opacity: 1; transform: none; pointer-events: auto;
+  transition: opacity 200ms var(--ease-out), transform var(--spring-dur) var(--spring); }
+
+/* ============================ 8. 字排 ============================ */
+.lh-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.lh-col { background: var(--bg-subtle); border-radius: 12px; padding: 8px; }
+.lh-row { display: flex; gap: 8px; padding: 10px 12px; border-radius: 10px; align-items: flex-start; }
+.lh-row + .lh-row { margin-top: 0; }
+.lh-row:nth-child(odd) { background: var(--fill); }
+.lh-row .g { flex: none; width: 16px; height: 16px; border-radius: 50%; background: var(--high); margin-top: 1px; }
+.lh-normal .lh-row { line-height: normal; }
+.lh-fixed .lh-row { line-height: 22px; }
+.lh-fixed .lh-row .g { margin-top: 3px; }
+.lh-fixed .lh-row .t13 { line-height: 18px; }
+.lh-normal .lh-row .t13 { line-height: normal; }
+.hgt { font-size: 13px; color: var(--text-secondary); font-variant-numeric: tabular-nums; margin-left: auto; flex: none; }
+.trim-demo { display: flex; gap: 24px; align-items: center; }
+.guide { position: relative; }
+.guide::before { content: ""; position: absolute; left: -8px; right: -8px; top: 50%; height: 1px; background: var(--high); opacity: 0.6; pointer-events: none; }
+.trim { text-box: trim-both cap alphabetic; }
+.auto-on { text-autospace: normal; }
+.auto-off { text-autospace: no-autospace; }
+.wrapbox { width: 300px; font-size: 20px; line-height: 28px; font-weight: 600; background: var(--bg); border-radius: 8px; padding: 12px; }
+.bal { text-wrap: balance; }
+
+@media (prefers-reduced-motion: reduce) {
+  .shim::after, .sheen, .breathe-now, .breathe-sine, .run-fill.stuck { animation: none; }
+  .swap, .ov-ex-item, .ov-step span { transition: opacity 160ms linear; transform: none !important; filter: none !important; }
+  .pop-new, .pop-new.open { transition: opacity 160ms linear; transform: none; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <nav class="nav" aria-label="组件">
+    <div class="nav-h">界面细节探索</div>
+    <button data-p="p1"><span class="n">1</span>期刊对标占位</button>
+    <button data-p="p2"><span class="n">2</span>三点轨道</button>
+    <button data-p="p3"><span class="n">3</span>缓动曲线</button>
+    <button data-p="p4"><span class="n">4</span>循环与等待</button>
+    <button data-p="p5"><span class="n">5</span>超椭圆圆角</button>
+    <button data-p="p6"><span class="n">6</span>落点高亮</button>
+    <button data-p="p7"><span class="n">7</span>浮层出场</button>
+    <button data-p="p8"><span class="n">8</span>字排细节</button>
+    <div class="nav-h" style="margin-top:24px">本页按 tokens.css 配色，跟随系统深浅色。</div>
+  </nav>
+
+  <main class="stage">
+  <!-- ======================================================== 1 -->
+  <section class="page" id="p1">
+    <h1>期刊对标占位</h1>
+    <p class="lead">报告先打开，期刊评审在后台继续。卡片位置先放占位：已经拿到的范文标题如实列出，还没出来的结论和五个维度用三点轨道和微光等待。结果返回时，三点收拢成评审者小球，档次文字从模糊到清晰换入，各维度依次落定。占位与最终卡片同高，换入时阅读区不跳动。</p>
+    <div class="ctl">
+      <button class="pill" id="ov-replay">重新播放</button>
+      <button class="pill" id="ov-resolve">模拟结果返回</button>
+      <label><input type="checkbox" id="ov-auto" checked /> 8 秒后自动返回</label>
+    </div>
+    <div class="paperbg">
+      <div class="ov" id="ov">
+        <div class="ov-head">
+          <div class="ov-slot">
+            <div id="ov-orbit" class="swap"></div>
+            <svg id="ov-mascot" class="swap swap-out" viewBox="0 0 28 28" aria-hidden="true">
+              <circle cx="14" cy="15" r="12" fill="var(--tile-pink)"/>
+              <ellipse cx="10.5" cy="13.5" rx="1.8" ry="2.4" fill="var(--on-tile)"/>
+              <ellipse cx="17.5" cy="13.5" rx="1.8" ry="2.4" fill="var(--on-tile)"/>
+            </svg>
+          </div>
+          <div class="ov-title">《情报学报》对标</div>
+          <div class="ov-tier">
+            <span id="ov-tier-wait" class="swap sec" style="font-weight:400">正在评审</span>
+            <span id="ov-tier-done" class="swap swap-out sem-ok">达到常见水平</span>
+          </div>
+        </div>
+        <div class="ov-body">
+          <div class="ov-lines swap" id="ov-lines">
+            <div class="shim" style="width:100%"></div>
+            <div class="shim" style="width:92%"></div>
+            <div class="shim" style="width:58%"></div>
+          </div>
+          <div class="swap swap-out" id="ov-comment" style="position:absolute;inset:0">稿件的文献覆盖和结构与近期论文相当，实验规模略小。最值得投入的方向是补充一组对比实验，并说明样本选择的依据。</div>
+        </div>
+        <div class="ov-dims" id="ov-dims"></div>
+        <div class="ov-ex">
+          <div class="t13 sec">对标的近期论文</div>
+          <div class="ov-ex-list" id="ov-ex"></div>
+        </div>
+        <div class="ov-step" id="ov-step"><span>正在获取近期论文</span></div>
+      </div>
+    </div>
+    <p class="note">步骤文字只写后端真实上报的阶段（获取论文、读取范文、汇总意见），不做假进度。占位出现前有约 200ms 的延迟，结果很快返回时不闪一下占位；占位一旦出现至少停留约 400ms。这两个数取自 Vercel Web Interface Guidelines 的加载态建议。</p>
+
+    <h2>运行页的期刊评审行</h2>
+    <p class="lead">现在这一行在评审进行时进度条停在 3% 并呼吸，状态是转圈加“进行中”，等得久时像卡住了。建议换成不定进度的微光，状态位放小号三点轨道，文字写当前阶段。</p>
+    <div class="row">
+      <div class="col">
+        <div class="cap">现状</div>
+        <div class="run-panel">
+          <div class="run-row">
+            <svg width="24" height="24" viewBox="0 0 28 28"><circle cx="14" cy="15" r="12" fill="var(--tile-pink)"/><ellipse cx="10.5" cy="13.5" rx="1.8" ry="2.4" fill="#fff"/><ellipse cx="17.5" cy="13.5" rx="1.8" ry="2.4" fill="#fff"/></svg>
+            <span style="font-weight:500">期刊评审</span>
+            <div class="run-track"><div class="run-fill stuck"></div></div>
+            <span class="run-status">
+              <svg class="spin" width="14" height="14" viewBox="0 0 14 14"><circle cx="7" cy="7" r="5.5" fill="none" stroke="var(--fill-strong)" stroke-width="2"/><path d="M 7 1.5 A 5.5 5.5 0 0 1 12.5 7" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>进行中
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="cap">建议</div>
+        <div class="run-panel">
+          <div class="run-row">
+            <svg width="24" height="24" viewBox="0 0 28 28"><circle cx="14" cy="15" r="12" fill="var(--tile-pink)"/><ellipse cx="10.5" cy="13.5" rx="1.8" ry="2.4" fill="#fff"/><ellipse cx="17.5" cy="13.5" rx="1.8" ry="2.4" fill="#fff"/></svg>
+            <span style="font-weight:500">期刊评审</span>
+            <div class="run-track"><div class="sheen"></div></div>
+            <span class="run-status"><span id="run-orbit"></span>汇总意见</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================== 2 -->
+  <section class="page" id="p2" hidden>
+    <h1>三点轨道</h1>
+    <p class="lead">三个点在一个倾斜的圆盘上绕行。透视投影让近处的点更大、更实，远处的点更小、更淡，前后遮挡按深度排序。它替代“等模型”这类时长不定的转圈：期刊评审、支持度复核、范文细化。普通的短等待仍用现有的系统风格转圈。</p>
+    <div class="ctl">
+      <label>倾角 <input type="range" id="o-tilt" min="5" max="80" value="24" /><span id="o-tilt-v">24°</span></label>
+      <label>转速 <input type="range" id="o-speed" min="10" max="120" value="45" /><span id="o-speed-v">0.45 圈/秒</span></label>
+      <label>透视 <input type="range" id="o-persp" min="15" max="80" value="30" /><span id="o-persp-v">3.0</span></label>
+      <label>配色 <select id="o-color"><option value="pink">评审者粉</option><option value="layers">图层三色</option><option value="ink">正文墨色</option><option value="accent">强调蓝</option></select></label>
+      <label><input type="checkbox" id="o-wobble" checked /> 圆盘轻微摆动</label>
+    </div>
+    <div class="board">
+      <div class="row" style="align-items:center;gap:48px">
+        <div class="col" style="align-items:center"><div id="o-96"></div><span class="cap">96px 观察用</span></div>
+        <div class="col" style="align-items:center"><div id="o-28"></div><span class="cap">28px 卡片头像位</span></div>
+        <div class="col" style="align-items:center"><div id="o-14"></div><span class="cap">14px 状态位</span></div>
+      </div>
+    </div>
+    <p class="note">实现要点：一个 rAF 驱动的小组件，每帧只写 transform、opacity、z-index；离开视口或窗口隐藏时停帧；减少动态效果时三点静止排成一行，只做依次明暗。小尺寸下摆动关掉，倾角放大到 30° 左右，否则 14px 里看不出前后。</p>
+  </section>
+
+  <!-- ======================================================== 3 -->
+  <section class="page" id="p3" hidden>
+    <h1>缓动曲线</h1>
+    <p class="lead">现在全站只有一条 <code>--ease</code>，进入、退出、窗格平移、无限循环都用它。它作为进入和响应曲线很好，问题出在别的场合。视图过渡只设置了时长，曲线走的是浏览器默认的 <code>ease</code>，与站内其他动效不是一套。建议保留 <code>--ease</code>，按用途再加三条。</p>
+    <div class="ctl"><button class="pill" id="ez-play">全部播放</button><span>点击单行也可单独播放。小球走同样的距离，时长按各自建议值。</span></div>
+    <div class="board" id="ez-list"></div>
+    <p class="note">弹簧用 CSS <code>linear()</code> 写成静态曲线，不引入动画库；数值由阻尼比 0.8、响应 0.4s 的弹簧采样得到，过冲 1.5%，眼睛感到的落定约在 300ms，完全静止 520ms。只用于“落定”类时刻：勾选画完、卡片换入、浮层展开。</p>
+  </section>
+
+  <!-- ======================================================== 4 -->
+  <section class="page" id="p4" hidden>
+    <h1>循环与等待</h1>
+    <p class="lead">无限往复的动画，每一段关键帧都会套一次缓动。用进入曲线做呼吸，亮到暗很快、随后长时间停在暗处，再猛地亮回来，循环接缝处会顿一下。下面三条进度条同时运行，左边是现状。</p>
+    <div class="loop-grid">
+      <div class="loop-cell">
+        <div class="cap">现状：呼吸用 --ease</div>
+        <div class="bar4"><i class="breathe-now"></i></div>
+        <svg class="graph" id="g-now" viewBox="0 0 200 64" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="loop-cell">
+        <div class="cap">建议：呼吸用 --ease-sine，幅度收到 0.55</div>
+        <div class="bar4"><i class="breathe-sine"></i></div>
+        <svg class="graph" id="g-sine" viewBox="0 0 200 64" preserveAspectRatio="none"></svg>
+      </div>
+      <div class="loop-cell">
+        <div class="cap">建议：进度停滞时叠一道微光</div>
+        <div class="bar4"><i></i><div class="sheen"></div></div>
+        <div class="cap">已完成的部分保持实色，微光表示仍在工作。适合等模型返回、比例长时间不动的层。</div>
+      </div>
+    </div>
+    <p class="note">曲线图画的是一个周期里的不透明度。同样的问题也出现在空状态纸张的漂浮（已用 ease-in-out，可以保留）和骨架微光（现为 linear，建议改成 --ease-sine，扫过时有加减速，更像光而不像传送带）。</p>
+  </section>
+
+  <!-- ======================================================== 5 -->
+  <section class="page" id="p5" hidden>
+    <h1>超椭圆圆角</h1>
+    <p class="lead">普通圆角是直线接四分之一圆，曲率在接缝处突变，眼睛会看到一个“折点”。Apple 的连续圆角让曲率从直边逐渐增加，转角更柔和、看起来也略大。我们是 Electron 应用，它自带 <code>-electron-corner-smoothing</code>，取值 <code>system-ui</code> 时与 macOS 一致，并且边框、描边、阴影、焦点环都跟着变形，<code>border-radius</code> 的数值不用改。标准属性 <code>corner-shape</code> 也已在这个版本的 Chromium 里可用，适合官网。</p>
+    <p class="note" id="sq-support"></p>
+
+    <h2>放大看形状</h2>
+    <div class="ctl">
+      <label>corner-shape 指数 <input type="range" id="sq-k" min="100" max="300" value="160" /><span id="sq-k-v">superellipse(1.6)</span></label>
+      <label>圆角倍数 <input type="range" id="sq-m" min="100" max="180" value="130" /><span id="sq-m-v">1.30×</span></label>
+    </div>
+    <div class="board">
+      <div class="sq-cmp">
+        <div class="sq-cell"><div class="sq-big"></div><span class="cap">普通圆角 48px</span></div>
+        <div class="sq-cell"><div class="sq-big smooth"></div><span class="cap">Electron 平滑 system-ui</span></div>
+        <div class="sq-cell"><div class="sq-big" id="sq-cs"></div><span class="cap" id="sq-cs-cap">corner-shape</span></div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:24px">
+        <div class="sq-cell">
+          <div class="sq-overlay"><div class="sq-a"></div><div class="sq-b smooth"></div></div>
+          <span class="cap">左上角放大：蓝为普通圆角，红为平滑圆角，两者重叠处为深色</span>
+        </div>
+      </div>
+    </div>
+
+    <h2>放回实际尺寸</h2>
+    <p class="lead">小半径上差别很小。5px 的图层 tile 基本看不出，8px 的列表选中行能隐约感到，12px 的卡片和浮层最明显。胶囊按钮、圆形头像、正文高亮保持原样。</p>
+    <div class="board sq-real">
+      <span></span><span class="h">普通圆角</span><span class="h">平滑圆角</span>
+      <span class="cap">图层 tile 5px</span>
+      <span><span class="tile" style="background:var(--tile-indigo)">●</span> <span class="tile" style="background:var(--tile-teal)">●</span></span>
+      <span><span class="tile smooth" style="background:var(--tile-indigo)">●</span> <span class="tile smooth" style="background:var(--tile-teal)">●</span></span>
+      <span class="cap">选中行 8px</span>
+      <div class="lrow">[1] Vaswani 等，2017</div>
+      <div class="lrow smooth">[1] Vaswani 等，2017</div>
+      <span class="cap">详情卡 12px</span>
+      <div class="card12">编造或信息不符的文献只写批注，删不删由作者决定。</div>
+      <div class="card12 smooth">编造或信息不符的文献只写批注，删不删由作者决定。</div>
+    </div>
+
+    <h2>同心圆角</h2>
+    <p class="lead">嵌套的圆角要同心：内半径等于外半径减去间距。外层 12px、内边距 4px 的菜单，里面的选中行应当是 8px。用 12px 时，选中行的转角会顶到外框的转角上，中间那条缝一头宽一头窄。</p>
+    <div class="board row">
+      <div class="col"><span class="cap">内外都 12px</span>
+        <div class="pop12 conc-bad smooth"><div class="mi sel">导出带批注的 docx</div><div class="mi">导出为 LaTeX 项目</div></div></div>
+      <div class="col"><span class="cap">外 12px，内 8px</span>
+        <div class="pop12 conc-good smooth"><div class="mi sel smooth">导出带批注的 docx</div><div class="mi">导出为 LaTeX 项目</div></div></div>
+    </div>
+  </section>
+
+  <!-- ======================================================== 6 -->
+  <section class="page" id="p6" hidden>
+    <h1>落点高亮</h1>
+    <p class="lead">点开一个问题时，阅读区滚到对应段落并闪两下。现在闪的是整个高亮的不透明度，连同正文一起变淡，读起来像告警。建议只动底色：从更浓的底色加一圈柔光开始，一次落回选中态，正文始终清楚。</p>
+    <div class="row">
+      <div class="col" style="flex:1;min-width:300px">
+        <div class="cap">现状：不透明度闪两下</div>
+        <div class="paperbg para">已有研究表明，<span class="hl" id="hl-now">大规模预训练语言模型在引文推荐任务上已经超过人工专家</span>，但这一结论依赖于特定的评测集。</div>
+        <div><button class="pill" id="hl-now-b">跳到这里</button></div>
+      </div>
+      <div class="col" style="flex:1;min-width:300px">
+        <div class="cap">建议：底色一次落定</div>
+        <div class="paperbg para">已有研究表明，<span class="hl" id="hl-new">大规模预训练语言模型在引文推荐任务上已经超过人工专家</span>，但这一结论依赖于特定的评测集。</div>
+        <div><button class="pill" id="hl-new-b">跳到这里</button></div>
+      </div>
+    </div>
+    <p class="note">柔光用 box-shadow 画在高亮自身上，它跟随高亮的圆角和换行，结束时完全消失，不留线。滚动本身也建议改为 smooth，距离超过一屏时直接跳，避免长距离滚动带来的眩晕。</p>
+  </section>
+
+  <!-- ======================================================== 7 -->
+  <section class="page" id="p7" hidden>
+    <h1>浮层出场</h1>
+    <p class="lead">导出结果浮层现在从上方 4px 处淡入，退出时直接消失。浮层是从按钮里长出来的，建议从按钮所在的角缩放展开，用弹簧落定；退出更快更轻。快速连点时，过渡会从当前状态折返，关键帧动画会从头重播。</p>
+    <div class="row">
+      <div class="col" style="flex:1;min-width:300px">
+        <div class="cap">现状</div>
+        <div class="pop-stage">
+          <button class="pill accent trigger" id="pop-now-b">导出</button>
+          <div class="pop pop-now" id="pop-now"><b style="font-weight:600">已导出</b><div class="t13 sec" style="margin-top:4px">论文_批注版.docx 已保存到下载文件夹。</div></div>
+        </div>
+      </div>
+      <div class="col" style="flex:1;min-width:300px">
+        <div class="cap">建议</div>
+        <div class="pop-stage">
+          <button class="pill accent trigger" id="pop-new-b">导出</button>
+          <div class="pop pop-new" id="pop-new"><b style="font-weight:600">已导出</b><div class="t13 sec" style="margin-top:4px">论文_批注版.docx 已保存到下载文件夹。</div></div>
+        </div>
+      </div>
+    </div>
+    <p class="note">进入：transform-origin 设在右上角，scale 0.96 到 1 走 --spring，不透明度 200ms。退出：140ms，只缩到 0.96。起始比例不低于 0.95，从 0 开始的缩放像凭空冒出来。</p>
+  </section>
+
+  <!-- ======================================================== 8 -->
+  <section class="page" id="p8" hidden>
+    <h1>字排细节</h1>
+    <h2 style="margin-top:16px">中英混排的行高</h2>
+    <p class="lead">界面文字大多没有写行高，用的是字体自带的 normal。SF Pro 与苹方的上下伸部不同，含中文的行会比纯英文的行高出一截，检查器列表里两行同样结构的条目高度不一样，图标对齐靠 <code>marginTop: 1</code> 这样的手调。建议给每档字号固定行高。右侧数字为实测行高。</p>
+    <div class="lh-demo">
+      <div class="col"><span class="cap">现状：line-height normal</span><div class="lh-col lh-normal" id="lh-a"></div></div>
+      <div class="col"><span class="cap">建议：15/22，13/18</span><div class="lh-col lh-fixed" id="lh-b"></div></div>
+    </div>
+
+    <h2>中英文之间的间距</h2>
+    <p class="lead">现在靠手写空格隔开中文和数字，有的地方写了，有的地方没写。<code>text-autospace</code> 会在汉字与拉丁字母、数字之间自动加约 1/8 字宽的间距，比空格窄，和苹方的字面更协调；已有空格的地方不会重复加。</p>
+    <div class="board col" style="gap:12px">
+      <div><span class="cap">关闭</span><div class="auto-off" style="font-size:17px">用Qwen核验了12条参考文献，DOI前缀10.1007与Springer一致。</div></div>
+      <div><span class="cap">开启</span><div class="auto-on" style="font-size:17px">用Qwen核验了12条参考文献，DOI前缀10.1007与Springer一致。</div></div>
+      <p class="note" id="auto-support" style="margin:0"></p>
+    </div>
+
+    <h2>标题断行</h2>
+    <p class="lead">论文标题和详情标题可以设 <code>text-wrap: balance</code>，避免第二行只剩两三个字。正文已经用了 pretty，标题还没有。</p>
+    <div class="board row">
+      <div class="col"><span class="cap">现状</span><div class="wrapbox">基于大语言模型的学术论文引用真实性与支持度自动核验方法</div></div>
+      <div class="col"><span class="cap">balance</span><div class="wrapbox bal">基于大语言模型的学术论文引用真实性与支持度自动核验方法</div></div>
+    </div>
+
+    <h2>按钮文字的光学居中</h2>
+    <p class="lead"><code>text-box: trim-both cap alphabetic</code> 按大写字母高度裁掉行框上下的空白，英文按钮文字真正居中。中文没有大写高度，裁切会让汉字略微上浮，所以只给纯英文或数字的控件用，中文按钮维持现状。红线是按钮的几何中线。</p>
+    <div class="board trim-demo">
+      <div class="col"><span class="cap">默认</span><span class="guide"><span class="pill accent">Export</span></span></div>
+      <div class="col"><span class="cap">trim cap</span><span class="guide"><span class="pill accent"><span class="trim">Export</span></span></span></div>
+      <div class="col"><span class="cap">中文默认</span><span class="guide"><span class="pill accent">开始体检</span></span></div>
+      <div class="col"><span class="cap">中文 trim cap</span><span class="guide"><span class="pill accent"><span class="trim">开始体检</span></span></span></div>
+    </div>
+  </section>
+  </main>
+</div>
+
+<script>
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
+const $ = (s) => document.querySelector(s)
+
+/* -------------------------------------------------------------- nav */
+const pages = [...document.querySelectorAll('.page')]
+const navBtns = [...document.querySelectorAll('.nav button[data-p]')]
+function show(id) {
+  pages.forEach((p) => (p.hidden = p.id !== id))
+  navBtns.forEach((b) => b.classList.toggle('on', b.dataset.p === id))
+  history.replaceState(null, '', '#' + id)
+  if (id === 'p1') ovReplay()
+  if (id === 'p8') measureLH()
+}
+navBtns.forEach((b) => b.addEventListener('click', () => show(b.dataset.p)))
+
+/* ------------------------------------------------------ orbit dots */
+const PALETTE = {
+  pink: ['var(--tile-pink)', 'var(--tile-pink)', 'var(--tile-pink)'],
+  layers: ['var(--tile-indigo)', 'var(--tile-blue)', 'var(--tile-teal)'],
+  ink: ['var(--text)', 'var(--text)', 'var(--text)'],
+  accent: ['var(--accent)', 'var(--accent)', 'var(--accent)'],
+}
+const orbits = []
+function makeOrbit(host, size, opts = {}) {
+  const o = { tilt: 24, speed: 0.45, persp: 3, color: 'pink', wobble: true, ...opts }
+  host.style.cssText += `position:relative;width:${size}px;height:${size}px;flex:none;display:inline-block`
+  const d = size * 0.24
+  const dots = [0, 1, 2].map(() => {
+    const el = document.createElement('i')
+    el.style.cssText = `position:absolute;left:${(size - d) / 2}px;top:${(size - d) / 2}px;width:${d}px;height:${d}px;border-radius:50%;will-change:transform,opacity`
+    host.appendChild(el)
+    return el
+  })
+  const R = size * 0.3
+  const state = { o, dots, R, host, size, visible: true, gather: 0 }
+  const paint = () => dots.forEach((el, i) => (el.style.background = PALETTE[o.color][i]))
+  paint()
+  state.paint = paint
+  new IntersectionObserver(([e]) => (state.visible = e.isIntersecting)).observe(host)
+  orbits.push(state)
+  if (reduced) dots.forEach((el, i) => {
+    el.style.transform = `translateX(${(i - 1) * d * 1.3}px)`
+    el.animate([{ opacity: 0.35 }, { opacity: 1 }, { opacity: 0.35 }], { duration: 1200, delay: i * 200, iterations: Infinity })
+  })
+  return state
+}
+let t0 = performance.now()
+function frame(now) {
+  const t = (now - t0) / 1000
+  if (!reduced && !document.hidden) for (const s of orbits) {
+    if (!s.visible) continue
+    const { o, R } = s
+    const e = (o.tilt * Math.PI) / 180
+    const roll = o.wobble && s.size > 20 ? Math.sin(t * 0.8) * 0.16 : 0
+    const f = R * o.persp
+    const r = R * (1 - s.gather)          // 收拢：半径缩到 0
+    s.dots.forEach((el, i) => {
+      const th = t * o.speed * 2 * Math.PI + (i * 2 * Math.PI) / 3
+      const x = r * Math.cos(th), yp = r * Math.sin(th)
+      const sy = yp * Math.sin(e), z = yp * Math.cos(e)
+      const X = x * Math.cos(roll) - sy * Math.sin(roll)
+      const Y = x * Math.sin(roll) + sy * Math.cos(roll)
+      const k = f / (f - z)
+      const depth = r ? (z / r + 1) / 2 : 1
+      el.style.transform = `translate(${X * k}px, ${Y * k}px) scale(${k})`
+      el.style.opacity = 0.3 + 0.7 * depth
+      el.style.zIndex = Math.round(depth * 10)
+    })
+  }
+  requestAnimationFrame(frame)
+}
+requestAnimationFrame(frame)
+
+const big = makeOrbit($('#o-96'), 96)
+const mid = makeOrbit($('#o-28'), 28)
+const small = makeOrbit($('#o-14'), 14, { tilt: 32 })
+const lab = [big, mid, small]
+const bindRange = (id, fmt, apply) => {
+  const el = $(id), out = $(id + '-v')
+  const run = () => { out.textContent = fmt(+el.value); apply(+el.value) }
+  el.addEventListener('input', run)
+}
+bindRange('#o-tilt', (v) => v + '°', (v) => lab.forEach((s) => (s.o.tilt = s === small ? Math.max(v, 30) : v)))
+bindRange('#o-speed', (v) => (v / 100).toFixed(2) + ' 圈/秒', (v) => lab.forEach((s) => (s.o.speed = v / 100)))
+bindRange('#o-persp', (v) => (v / 10).toFixed(1), (v) => lab.forEach((s) => (s.o.persp = v / 10)))
+$('#o-color').addEventListener('change', (e) => lab.forEach((s) => { s.o.color = e.target.value; s.paint() }))
+$('#o-wobble').addEventListener('change', (e) => lab.forEach((s) => (s.o.wobble = e.target.checked)))
+
+/* -------------------------------------------- 1. overview placeholder */
+const ovOrbit = makeOrbit($('#ov-orbit'), 28)
+makeOrbit($('#run-orbit'), 14, { tilt: 32 })
+const DIMS = [
+  ['实验规模', '略低于常见水平', 'sem-medium'],
+  ['分析深度', '达到常见水平', 'sem-ok'],
+  ['文献覆盖', '达到常见水平', 'sem-ok'],
+  ['引用可靠性', '高于常见水平', 'sem-ok'],
+  ['结构完整', '达到常见水平', 'sem-ok'],
+]
+const EX = [
+  '面向科技文献的细粒度引文意图识别 2025',
+  '学术论文引用内容的自动抽取与评价 2024',
+  '基于大模型的参考文献核验方法 2024',
+]
+$('#ov-dims').innerHTML = DIMS.map(([l, v, c], i) =>
+  `<div class="ov-dim"><span>${l}</span><span class="v"><i class="shim swap" style="animation-delay:${i * 80}ms"></i><span class="swap swap-out ${c}">${v}</span></span></div>`
+).join('')
+$('#ov-ex').innerHTML = EX.map((t) => `<div class="ov-ex-item">${t}</div>`).join('')
+let ovTimers = []
+const later = (ms, fn) => ovTimers.push(setTimeout(fn, ms))
+function setStep(text) {
+  const box = $('#ov-step'), old = box.querySelector('span:not(.leave)')
+  if (old && old.textContent === text) return
+  if (old) { old.classList.add('leave'); setTimeout(() => old.remove(), 260) }
+  const n = document.createElement('span')
+  n.textContent = text; n.className = 'enter'; box.appendChild(n)
+  requestAnimationFrame(() => requestAnimationFrame(() => n.classList.remove('enter')))
+}
+function ovReplay() {
+  ovTimers.forEach(clearTimeout); ovTimers = []
+  ovOrbit.gather = 0
+  $('#ov-orbit').classList.remove('swap-out'); $('#ov-mascot').classList.add('swap-out')
+  $('#ov-tier-wait').classList.remove('swap-out'); $('#ov-tier-done').classList.add('swap-out')
+  $('#ov-lines').classList.remove('swap-out'); $('#ov-comment').classList.add('swap-out')
+  document.querySelectorAll('#ov-dims .v').forEach((v) => { v.children[0].classList.remove('swap-out'); v.children[1].classList.add('swap-out') })
+  document.querySelectorAll('.ov-ex-item').forEach((e) => e.classList.remove('in'))
+  $('#ov-step').innerHTML = '<span>正在获取近期论文</span>'; $('#ov-step').style.opacity = 1
+  later(1800, () => setStep('正在读取 3 篇范文'))
+  document.querySelectorAll('.ov-ex-item').forEach((e, i) => later(2200 + i * 600, () => e.classList.add('in')))
+  later(4400, () => setStep('正在汇总评审意见'))
+  if ($('#ov-auto').checked) later(8000, ovResolve)
+}
+function ovResolve() {
+  ovTimers.forEach(clearTimeout); ovTimers = []
+  document.querySelectorAll('.ov-ex-item').forEach((e) => e.classList.add('in'))
+  // 三点收拢，小球换入
+  const g0 = performance.now()
+  const gather = (now) => {
+    const p = Math.min(1, (now - g0) / 240)
+    ovOrbit.gather = 1 - Math.pow(1 - p, 3)
+    if (p < 1) requestAnimationFrame(gather)
+  }
+  requestAnimationFrame(gather)
+  later(160, () => { $('#ov-orbit').classList.add('swap-out'); $('#ov-mascot').classList.remove('swap-out') })
+  later(200, () => { $('#ov-tier-wait').classList.add('swap-out'); $('#ov-tier-done').classList.remove('swap-out') })
+  later(260, () => { $('#ov-lines').classList.add('swap-out'); $('#ov-comment').classList.remove('swap-out') })
+  document.querySelectorAll('#ov-dims .v').forEach((v, i) => later(320 + i * 40, () => {
+    v.children[0].classList.add('swap-out'); v.children[1].classList.remove('swap-out')
+  }))
+  later(320, () => { $('#ov-step').style.transition = 'opacity 240ms var(--ease-out)'; $('#ov-step').style.opacity = 0 })
+}
+$('#ov-replay').addEventListener('click', ovReplay)
+$('#ov-resolve').addEventListener('click', ovResolve)
+
+/* ------------------------------------------------------- 3. easing */
+const CURVES = [
+  { name: '--ease（现有）', use: '进入、响应、hover', css: 'var(--ease)', cb: [0.2, 0.8, 0.2, 1], dur: 240 },
+  { name: 'ease（浏览器默认）', use: '视图过渡现在实际用的', css: 'ease', cb: [0.25, 0.1, 0.25, 1], dur: 360 },
+  { name: '--ease-drawer', use: '窗格折叠、抽屉、屏内位移', css: 'var(--ease-drawer)', cb: [0.32, 0.72, 0, 1], dur: 320 },
+  { name: '--ease-sine', use: '往复循环', css: 'var(--ease-sine)', cb: [0.37, 0, 0.63, 1], dur: 600 },
+  { name: '--spring', use: '落定：勾选、换入、浮层', css: 'var(--spring)', pts: true, dur: 520 },
+]
+const SPRING = getComputedStyle(document.documentElement).getPropertyValue('--spring').match(/[\d.]+/g).map(Number)
+$('#ez-list').innerHTML = CURVES.map((c, i) => {
+  let path
+  if (c.pts) path = `<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" points="${SPRING.map((v, j) => `${(j / (SPRING.length - 1)) * 96},${96 - v * 80 - 8}`).join(' ')}"/>`
+  else { const [a, b, cc, d] = c.cb; path = `<path fill="none" stroke="var(--accent)" stroke-width="2.5" d="M0,88 C${a * 96},${88 - b * 80} ${cc * 96},${88 - d * 80} 96,8"/>` }
+  return `<div class="ez" data-i="${i}">
+    <svg viewBox="0 0 96 96"><line x1="0" y1="8" x2="96" y2="8" stroke="var(--fill-strong)"/>${path}</svg>
+    <div class="track"><div class="ball"></div></div>
+    <div class="meta"><b>${c.name}</b>${c.use}，${c.dur}ms</div></div>`
+}).join('')
+const balls = [...document.querySelectorAll('.ez')].map((row, i) => {
+  const ball = row.querySelector('.ball'), c = CURVES[i]
+  ball.style.transition = `transform ${c.dur}ms ${c.css}`
+  let on = false
+  const play = () => {
+    on = !on
+    const w = row.querySelector('.track').clientWidth - 28
+    ball.style.transform = on ? `translateX(${w}px)` : 'none'
+  }
+  row.addEventListener('click', play)
+  return play
+})
+$('#ez-play').addEventListener('click', () => balls.forEach((p) => p()))
+
+/* ------------------------------------------------------- 4. loops */
+function bez(p1, p2) { // 返回 y(x) 的近似
+  return (x) => { let lo = 0, hi = 1
+    for (let k = 0; k < 30; k++) { const t = (lo + hi) / 2, bx = 3 * (1 - t) ** 2 * t * p1[0] + 3 * (1 - t) * t * t * p2[0] + t ** 3; bx < x ? (lo = t) : (hi = t) }
+    const t = (lo + hi) / 2; return 3 * (1 - t) ** 2 * t * p1[1] + 3 * (1 - t) * t * t * p2[1] + t ** 3 }
+}
+function drawLoop(id, ez, low) {
+  const pts = []
+  for (let i = 0; i <= 200; i++) {
+    const x = i / 200, half = x < 0.5, p = half ? x * 2 : (x - 0.5) * 2
+    const y = half ? 1 - (1 - low) * ez(p) : low + (1 - low) * ez(p)
+    pts.push(`${i},${64 - y * 56 - 4}`)
+  }
+  $(id).innerHTML = `<polyline fill="none" stroke="var(--accent)" stroke-width="2" vector-effect="non-scaling-stroke" points="${pts.join(' ')}"/>`
+}
+drawLoop('#g-now', bez([0.2, 0.8], [0.2, 1]), 0.45)
+drawLoop('#g-sine', bez([0.37, 0], [0.63, 1]), 0.55)
+
+/* ----------------------------------------------------- 5. squircle */
+const smoothOK = CSS.supports('-electron-corner-smoothing', 'system-ui')
+const shapeOK = CSS.supports('corner-shape', 'squircle')
+$('#sq-support').textContent =
+  `当前浏览器：-electron-corner-smoothing ${smoothOK ? '可用' : '不可用，第二列显示为普通圆角，请在 Clover 的开发窗口里打开本页对比'}；corner-shape ${shapeOK ? '可用' : '不可用'}。`
+const cs = $('#sq-cs')
+const applyCS = () => {
+  const k = $('#sq-k').value / 100, m = $('#sq-m').value / 100
+  $('#sq-k-v').textContent = `superellipse(${k.toFixed(1)})`
+  $('#sq-m-v').textContent = m.toFixed(2) + '×'
+  cs.style.cornerShape = `superellipse(${k})`
+  cs.style.borderRadius = 48 * m + 'px'
+  $('#sq-cs-cap').textContent = `corner-shape ${k.toFixed(1)}，半径 ${Math.round(48 * m)}px`
+}
+$('#sq-k').addEventListener('input', applyCS); $('#sq-m').addEventListener('input', applyCS); applyCS()
+
+/* ---------------------------------------------------- 6. highlight */
+function retrigger(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls) }
+$('#hl-now-b').addEventListener('click', () => retrigger($('#hl-now'), 'flash-now'))
+$('#hl-new-b').addEventListener('click', () => retrigger($('#hl-new'), 'flash-new'))
+
+/* ----------------------------------------------------- 7. popover */
+$('#pop-now-b').addEventListener('click', () => $('#pop-now').classList.toggle('open'))
+$('#pop-new-b').addEventListener('click', () => $('#pop-new').classList.toggle('open'))
+
+/* -------------------------------------------------- 8. typography */
+const LH_ROWS = [
+  ['[1] Vaswani et al., 2017', 'Attention is all you need'],
+  ['[2] 王晓明 等，2021', '面向学术文本的引文功能分类'],
+  ['[3] Devlin et al., 2019', 'BERT: pre-training of deep bidirectional transformers'],
+  ['[4] 李华，2023', '中文期刊参考文献著录的常见错误'],
+]
+const rowsHTML = LH_ROWS.map(([a, b]) => `<div class="lh-row"><span class="g"></span><div style="min-width:0"><div style="font-weight:600">${a}</div><div class="t13 sec">${b}</div></div><span class="hgt"></span></div>`).join('')
+$('#lh-a').innerHTML = rowsHTML; $('#lh-b').innerHTML = rowsHTML
+function measureLH() {
+  document.querySelectorAll('.lh-row').forEach((r) => (r.querySelector('.hgt').textContent = r.getBoundingClientRect().height.toFixed(1)))
+}
+$('#auto-support').textContent = CSS.supports('text-autospace', 'normal')
+  ? '当前浏览器支持 text-autospace。' : '当前浏览器不支持 text-autospace，两行看起来相同；Clover 自带的 Chromium 152 支持。'
+
+/* spinner 仅用于现状对照 */
+document.querySelectorAll('.spin').forEach((s) => s.animate([{ transform: 'rotate(0)' }, { transform: 'rotate(360deg)' }], { duration: 800, iterations: Infinity }))
+
+show(location.hash.slice(1) && document.getElementById(location.hash.slice(1)) ? location.hash.slice(1) : 'p1')
+</script>
+</body>
+</html>
