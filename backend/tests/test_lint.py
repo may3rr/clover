@@ -476,3 +476,29 @@ async def test_typos_consistent_term_kept():
         {"original": "模型的的置信度", "correction": "模型的置信度", "reason": "叠字"},
     ]})
     assert [(r.old, r.new) for r in revs] == [("的", "")]
+
+
+def test_reorder_table_citations_follow_the_table_mention():
+    """A table cited in the text before [3] holds [2]; the docx keeps the
+    table after the paragraph citing [3]. The list is in first-citation
+    order for the typeset page and must not be reordered."""
+    from citecheck.schema import TableCell
+    p = mk_parsed(
+        ["见文献[1]，相关工作如表1所示，另见文献[3].",
+         "表1 相关工作", "[2]"],
+        ["[1] A.", "[2] B.", "[3] C."],
+        [(0, "[1]", "numeric", [1]), (0, "[3]", "numeric", [3]),
+         (2, "[2]", "numeric", [2])])
+    p.paragraphs[1].caption = True
+    p.paragraphs[2].cell = TableCell(table="t0", row=0, col=0)
+    assert plan_reorder(p) == []
+    # a table nobody mentions stays where the docx holds it
+    p.paragraphs[0].text = "见文献[1]，另见文献[3]."
+    p.markers[1].start = p.paragraphs[0].text.index("[3]")
+    assert plan_reorder(p)
+
+
+def test_numeric_items_minus_sign_range():
+    # Chinese journals typeset ranges with U+2212: 文献[10−12]
+    assert _numeric_items("[10−12]") == [10, 11, 12]
+

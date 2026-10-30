@@ -1,4 +1,5 @@
 import {
+  Fragment,
   memo,
   useCallback,
   useEffect,
@@ -19,6 +20,8 @@ import {
   type ListItem,
 } from '../lib/items'
 import {
+  editFor,
+  inlineEdits,
   segmentsForParagraph,
   HL_CLASS,
   HL_SELECTED_CLASS,
@@ -1071,30 +1074,51 @@ const ParaText = memo(function ParaText({
   onPick: (itemIds: string[]) => void
 }) {
   const ptext = p.text ?? ''
-  const segs = segmentsForParagraph(ptext, p.id ?? '', items, selectedId)
+  const pid = p.id ?? ''
+  const segs = segmentsForParagraph(ptext, pid, items, selectedId)
+  const edits = inlineEdits(pid, items)
   return (
     <>
       {segs.map((s, i) => {
         const body = renderPieces(mathPieces(ptext, s.start, s.end, p.math))
         if (s.severity === null) return <span key={i}>{body}</span>
-        const cls = s.selected
-          ? HL_SELECTED_CLASS[s.severity]
-          : HL_CLASS[s.severity]
+        // a mechanical edit reads like a diff: old text in red,
+        // the replacement green right after it
+        const edit = editFor(s, edits)
+        const cls = edit
+          ? s.selected
+            ? 'hl-sel-del'
+            : 'hl-del'
+          : s.selected
+            ? HL_SELECTED_CLASS[s.severity]
+            : HL_CLASS[s.severity]
         // adjacent marks read as one run: no inner padding/radius
+        const ins = edit && edit.end === s.end && edit.next ? edit.next : null
         const jl = segs[i - 1]?.severity != null ? ' hl-jl' : ''
-        const jr = segs[i + 1]?.severity != null ? ' hl-jr' : ''
+        const jr = segs[i + 1]?.severity != null && !ins ? ' hl-jr' : ''
+        const pick = () => onPick(s.itemIds)
         return (
-          <span
-            key={i}
-            className={`hl ${cls}${jl}${jr}`}
-            data-iids={s.itemIds.join(' ')}
-            onClick={() => onPick(s.itemIds)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' && onPick(s.itemIds)}
-          >
-            {body}
-          </span>
+          <Fragment key={i}>
+            <span
+              className={`hl ${cls}${jl}${jr}`}
+              data-iids={s.itemIds.join(' ')}
+              onClick={pick}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => e.key === 'Enter' && pick()}
+            >
+              {body}
+            </span>
+            {ins && (
+              <span
+                className={`hl ${s.selected ? 'hl-sel-ins' : 'hl-ins'}`}
+                data-iids={s.itemIds.join(' ')}
+                onClick={pick}
+              >
+                {ins}
+              </span>
+            )}
+          </Fragment>
         )
       })}
     </>

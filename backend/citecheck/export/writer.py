@@ -57,7 +57,7 @@ W_CRS, W_CRE, W_CREF = (
     dx.qn("commentRangeStart"), dx.qn("commentRangeEnd"),
     dx.qn("commentReference"))
 W_SECTPR = dx.qn("sectPr")
-_W_DASH = re.compile(r"\s*[-–—~～]\s*")
+_W_DASH = re.compile(r"\s*[-–‒‑−—~～]\s*")
 
 
 # ---------------------------------------------------------------- output

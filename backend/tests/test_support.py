@@ -924,3 +924,28 @@ async def test_dual_excerpt_skipped_when_unflagged_or_same(monkeypatch):
     check = await evaluate_with_excerpt(
         claim, "r1", "real source text", "T", "fulltext", alternate=alternate)
     assert check.label == "unsupported" and calls == [1]
+
+
+def test_no_source_notes_group_by_citing_paragraph():
+    """A sentence citing five unreachable papers gets one note listing
+    them, anchored on the claims, not five notes on the bibliography."""
+    from citecheck.parse.parser import ParsedDocument
+    from citecheck.schema import Document, Reference, SupportCheck
+    from citecheck.support.layer import _support_findings
+
+    refs = [Reference(id=f"r{i}", raw="x", label=str(i), paragraph_id="pr")
+            for i in range(1, 4)]
+    parsed = ParsedDocument(document=Document(), references=refs)
+    c1 = Claim(id="c1", paragraph_id="p1", start=0, end=10, text="a")
+    c2 = Claim(id="c2", paragraph_id="p1", start=12, end=30, text="b")
+    c3 = Claim(id="c3", paragraph_id="p2", start=0, end=5, text="c")
+    jobs = [(c1, "r2"), (c1, "r1"), (c2, "r3"), (c3, "r1")]
+    checks = [SupportCheck(claim_id=c.id, ref_id=r, label="undetermined",
+                           source_kind="none", rationale="")
+              for c, r in jobs]
+    found = _support_findings(parsed, jobs, checks)
+    assert len(found) == 2
+    p1 = next(f for f in found if f.anchor.paragraph_id == "p1")
+    assert p1.refs == ["r1", "r2", "r3"]
+    assert (p1.anchor.start, p1.anchor.end) == (0, 30)
+    assert "[1]、[2]、[3]" in p1.detail and "3 篇" in p1.title

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Report, RefCheck, SectionDist } from '../types/report'
-import type { ListItem } from '../lib/items'
+import { refIdent, type ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
 import { ChevronDownIcon, ChevronLeftIcon, SidebarTrailingIcon } from '../components/Icons'
@@ -155,9 +155,26 @@ function FindingDetail({
 
 function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
   const s = supportForFinding(report, item)
+  const ids = item.finding?.refs ?? []
+  const many = ids.length > 1
+  const refs = (report.references ?? []).filter((r) => ids.includes(r.id ?? ''))
   return (
     <>
-      {s.sentence && (
+      {many && (
+        <div className="card">
+          <div className="t13 secondary" style={{ marginBottom: 8 }}>
+            无法判断的文献
+          </div>
+          <div className="flex flex-col gap-2">
+            {refs.map((r) => (
+              <div key={r.id} className="font-normal">
+                {refIdent(r)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {!many && s.sentence && (
         <div className="card">
           <div className="t13 secondary" style={{ marginBottom: 8 }}>
             你的论文写道

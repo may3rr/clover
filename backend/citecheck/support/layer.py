@@ -233,10 +233,12 @@ def _support_findings(
     jobs: list[tuple[Claim, str]],
     checks: list[SupportCheck],
 ) -> list[Finding]:
-    ref_para = {r.id: r.paragraph_id for r in parsed.references}
-    para_len = {p.id: len(p.text) for p in parsed.paragraphs}
+    ref_order = {r.id: i for i, r in enumerate(parsed.references)}
+    ref_label = {r.id: f"[{r.label}]" if r.label else r.id
+                 for r in parsed.references}
     findings: list[Finding] = []
-    no_source_refs: set[str] = set()
+    # citing paragraph -> claims whose cited text could not be fetched
+    no_source: dict[str, list[tuple[Claim, str]]] = {}
     for (claim, rid), check in zip(jobs, checks):
         if check.label == "unsupported":
             findings.append(
@@ -277,18 +279,26 @@ def _support_findings(
                 )
             )
         if check.source_kind == "none":
-            no_source_refs.add(rid)
-    for rid in sorted(no_source_refs):
-        pid = ref_para.get(rid) or ""
+            no_source.setdefault(claim.paragraph_id, []).append((claim, rid))
+    # one note per citing paragraph: a sentence citing [3-7] reads as one
+    # question, not five, and the note sits where the claim is
+    for pid, pairs in no_source.items():
+        rids = sorted({rid for _, rid in pairs},
+                      key=lambda r: ref_order.get(r, 0))
+        labels = "、".join(ref_label.get(r, r) for r in rids)
+        n = len(rids)
         findings.append(
             Finding(
                 id="", layer="support", severity="low",
-                anchor=Anchor(paragraph_id=pid, start=0, end=para_len.get(pid, 0)),
-                title="未能获取这篇文献的原文，相关论断无法判断",
-                detail="依据：未找到可用的摘要或开放全文。\n"
-                       "建议：把这篇文献的 PDF 放进文献文件夹后重新体检，"
-                       "或人工核对引用该文献的论断。",
-                refs=[rid],
+                anchor=Anchor(paragraph_id=pid,
+                              start=min(c.start for c, _ in pairs),
+                              end=max(c.end for c, _ in pairs)),
+                title=("未能获取被引文献的原文，这里的论断无法判断" if n == 1
+                       else f"未能获取 {n} 篇被引文献的原文，这里的论断无法判断"),
+                detail=f"依据：以下文献未找到可用的摘要或开放全文：{labels}。\n"
+                       "建议：把这些文献的 PDF 放进文献文件夹后重新体检，"
+                       "或人工核对这里的论断。",
+                refs=rids,
             )
         )
     for i, f in enumerate(findings):

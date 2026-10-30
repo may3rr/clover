@@ -22,7 +22,7 @@ from rapidfuzz import fuzz
 from ..schema import Reference
 from .markers import DetectedMarker
 
-_NUM_TOKEN = re.compile(r"\d+\s*[-–—~～]\s*\d+|\d+")
+_NUM_TOKEN = re.compile(r"\d+\s*[-–‒‑−—~～]\s*\d+|\d+")
 _ZH_NAME = re.compile(r"[一-鿿]{2,4}")
 _YEAR = re.compile(r"((?:19|20)\d{2})([a-z])?")
 
@@ -35,7 +35,7 @@ def _numeric_items(raw: str) -> list[int]:
     """'[1,3]' -> [1, 3]; '[2-5]' / '2–5' -> [2, 3, 4, 5]."""
     nums: list[int] = []
     for tok in _NUM_TOKEN.findall(raw):
-        m = re.match(r"(\d+)\s*[-–—~～]\s*(\d+)", tok)
+        m = re.match(r"(\d+)\s*[-–‒‑−—~～]\s*(\d+)", tok)
         if m:
             a, b = int(m.group(1)), int(m.group(2))
             nums.extend(range(a, b + 1) if a <= b else range(b, a + 1))

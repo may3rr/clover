@@ -896,3 +896,23 @@ def test_bracketed_label_without_space_resolves_by_label():
                      rid=f"r{k}") for k, n in enumerate([14, 15, 17, 18])]
     resolve = _number_resolver(refs)
     assert resolve(17) == "r2" and resolve(15) == "r1"
+
+
+def test_partial_record_is_not_an_author_mismatch():
+    """OpenAlex keeps only one author of many Chinese journal papers:
+    'Zhang Juan, Mao Xiao-Bo, Chen Tie-Jun' -> record 'Tiejun Chen'."""
+    ref = make_ref(
+        "[21] Zhang Juan, Mao Xiao-Bo, Chen Tie-Jun. Survey of moving "
+        "object tracking algorithm. Application Research of Computers, "
+        "2009, 26(12): 4407-4410")
+    hit = _hit(title="Survey of moving object tracking algorithm",
+               authors=("Tiejun Chen",), doi=None, source="openalex",
+               year=2009)
+    issues, author_diff, _ = _evaluate(ref, hit)
+    assert not issues and author_diff is False
+    # a full-length record led by someone else is still a mismatch
+    hit = _hit(title="Survey of moving object tracking algorithm",
+               authors=("Wei Li", "Xiaobo Mao", "Tiejun Chen"), doi=None,
+               source="openalex", year=2009)
+    issues, author_diff, _ = _evaluate(ref, hit)
+    assert author_diff is True

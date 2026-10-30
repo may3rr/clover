@@ -113,13 +113,41 @@ def _latin_names_agree(ref_name: str, hit_name: str) -> bool:
     return bool(_name_tokens(ref_name) & _name_tokens(hit_name))
 
 
+def _same_person(ref_name: str, hit_name: str) -> bool | None:
+    """Whether two author names agree; None when they are in different
+    scripts (pinyin order varies, so a CJK name is never compared with a
+    latin one)."""
+    a, b = _surname(ref_name), _surname(hit_name)
+    if not (a and b) or bool(_CJK.search(a)) != bool(_CJK.search(b)):
+        return None
+    if _CJK.search(a):
+        return b.startswith(a) or a.startswith(b)
+    # particles are written inconsistently ("van den Oord" / "Oord")
+    return _latin_names_agree(ref_name, hit_name)
+
+
+def _partial_record(ref: Reference, hit_authors: list[str]) -> bool:
+    """A record that lists fewer authors than the manuscript, all of them
+    manuscript authors in the manuscript's order. OpenAlex often keeps
+    only one author of a Chinese journal paper (Zhang Juan, Mao Xiao-Bo,
+    Chen Tie-Jun -> 'Tiejun Chen'); a record that drops the lead author
+    that way is a gap in the record, not a wrong first author. Authors
+    listed out of order still count as a mismatch."""
+    if (not hit_authors or len(hit_authors) >= len(ref.authors)
+            or _same_person(ref.authors[0], hit_authors[0])):
+        return False
+    i = 1
+    for name in hit_authors:
+        while i < len(ref.authors) and not _same_person(ref.authors[i], name):
+            i += 1
+        if i == len(ref.authors):
+            return False
+        i += 1
+    return True
+
+
 def _ref_surname(ref: Reference) -> str:
     return _surname(ref.authors[0]) if ref.authors else ""
-
-
-def _hit_surname(hit: dict) -> str:
-    authors = hit.get("authors") or []
-    return _surname(authors[0]) if authors else ""
 
 
 async def _gather_hits(
@@ -251,46 +279,28 @@ def _evaluate(
     issues: list[str] = []
     author_diff = False
     year_diff = False
-    ref_surname = _ref_surname(ref)
-    hit_surname = _hit_surname(hit)
-    # CJK vs latin surname comparison is unreliable (pinyin order varies);
-    # only flag when both sides are the same script
-    if ref_surname and hit_surname and bool(_CJK.search(ref_surname)) == bool(
-        _CJK.search(hit_surname)
-    ):
-        if _CJK.search(ref_surname):
-            ok = hit_surname.startswith(ref_surname) or ref_surname.startswith(hit_surname)
-        else:
-            # particles are written inconsistently ("van den Oord" / "Oord")
-            ok = _latin_names_agree(ref.authors[0], hit["authors"][0])
-        if not ok:
-            author_diff = True
-            issues.append(
-                f"首作者不一致：文中写 {ref.authors[0]}，数据库记录为 {hit['authors'][0]}"
-            )
+    hit_authors = hit.get("authors") or []
+    partial = _partial_record(ref, hit_authors)
+    first_ok = (_same_person(ref.authors[0], hit_authors[0])
+                if ref.authors and hit_authors else None)
+    if first_ok is False and not partial:
+        author_diff = True
+        issues.append(
+            f"首作者不一致：文中写 {ref.authors[0]}，数据库记录为 {hit_authors[0]}"
+        )
     # with >=2 authors on both sides, a wrong second author (swapped order,
     # miscredited co-author) is a strong signal the first-author check
     # alone can't see. arXiv preprint records are exempt: their author
     # lists drift between versions (e.g. the word2vec preprint omits a
     # co-author the proceedings version has), while venue records are
     # authoritative
-    hit_authors = hit.get("authors") or []
-    if (hit.get("source") != "arxiv"
+    if (hit.get("source") != "arxiv" and not partial
             and len(ref.authors) >= 2 and len(hit_authors) >= 2):
-        ref_s2 = _surname(ref.authors[1])
-        hit_s2 = _surname(hit_authors[1])
-        if ref_s2 and hit_s2 and bool(_CJK.search(ref_s2)) == bool(
-            _CJK.search(hit_s2)
-        ):
-            if _CJK.search(ref_s2):
-                ok2 = hit_s2.startswith(ref_s2) or ref_s2.startswith(hit_s2)
-            else:
-                ok2 = _latin_names_agree(ref.authors[1], hit_authors[1])
-            if not ok2:
-                issues.append(
-                    f"第二作者不一致：文中写 {ref.authors[1]}，"
-                    f"数据库记录为 {hit_authors[1]}"
-                )
+        if _same_person(ref.authors[1], hit_authors[1]) is False:
+            issues.append(
+                f"第二作者不一致：文中写 {ref.authors[1]}，"
+                f"数据库记录为 {hit_authors[1]}"
+            )
     if ref.year and hit.get("year"):
         # a reprint's record year can postdate the work; the arXiv version's
         # year (alt_year) is an acceptable match too. An arXiv preprint may

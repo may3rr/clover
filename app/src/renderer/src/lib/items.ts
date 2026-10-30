@@ -1,4 +1,4 @@
-import type { Anchor, Finding, Report, Revision } from '../types/report'
+import type { Anchor, Finding, Reference, Report, Revision } from '../types/report'
 
 export type Severity = 'high' | 'medium' | 'low' | 'rev'
 
@@ -171,10 +171,22 @@ export function firstLine(detail: string): string {
  * itself lives in the detail view. */
 export function refLine(item: ListItem, report: Report): string | null {
   if (item.layer !== 'authenticity' && item.layer !== 'support') return null
-  const refId = item.finding?.refs?.[0]
-  if (!refId) return null
-  const r = (report.references ?? []).find((x) => x.id === refId)
-  if (!r) return null
+  const ids = item.finding?.refs ?? []
+  if (!ids.length) return null
+  const refs = report.references ?? []
+  // a note covering several references (unreachable sources cited in one
+  // paragraph) lists their numbers
+  if (ids.length > 1)
+    return ids
+      .map((id) => refs.find((x) => x.id === id))
+      .map((r) => (r?.label ? `[${r.label}]` : ''))
+      .filter(Boolean)
+      .join('、')
+  const r = refs.find((x) => x.id === ids[0])
+  return r ? refIdent(r) : null
+}
+
+export function refIdent(r: Reference): string {
   const num = r.label ? `[${r.label}] ` : ''
   const first = (r.authors?.[0] ?? '').split(/[\s,]+/)[0] ?? ''
   const who = first ? `${first}${(r.authors?.length ?? 0) > 1 ? ' 等' : ''}` : ''

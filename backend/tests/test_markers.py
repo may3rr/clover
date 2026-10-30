@@ -163,3 +163,8 @@ def test_field_result_not_double_detected():
 def test_no_markers():
     _, ms, managed = detect(run("<w:t>plain prose without citations.</w:t>"))
     assert ms == [] and managed is None
+
+
+def test_minus_sign_range_marker():
+    _, ms, _ = detect(run("<w:t>如文献[10−12]讨论了</w:t>"))
+    assert [m.raw for m in ms] == ["[10−12]"]

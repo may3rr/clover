@@ -39,7 +39,7 @@ from ..parse.parser import ParsedDocument
 from ..schema import Anchor, Reference, Revision
 
 _SEP_RE = re.compile(r"[,，、;；]\s*|、")
-_DASH_RE = re.compile(r"\d(\s*[-–—~～]\s*)\d")
+_DASH_RE = re.compile(r"\d(\s*[-–‒‑−—~～]\s*)\d")
 _OPENERS = "([（【［"
 _CLOSERS = ")])】］"
 _LABEL_HEAD = re.compile(r"^\s*[\[\(（【［]?\d{1,3}[\]\)）】］]?\s*[\.、]?")
@@ -186,6 +186,105 @@ def _author_year_order(refs: list[Reference]) -> list[str] | None:
     return [r.id for r, _ in mixed]
 
 
+_FLOAT_LABEL = re.compile(
+    r"^\s*(表|图|Table|Tab\.|Figure|Fig\.)\s*(\d+)", re.I)
+
+
+def _float_key(text: str) -> tuple[str, str] | None:
+    """('table'|'figure', number) from a caption's leading label."""
+    m = _FLOAT_LABEL.match(text or "")
+    if not m:
+        return None
+    kind = "table" if m.group(1).lower().startswith(("表", "tab")) else "figure"
+    return kind, m.group(2)
+
+
+def _mention_re(kind: str, num: str) -> re.Pattern[str]:
+    words = r"表|Table|Tab\." if kind == "table" else r"图|Figure|Fig\."
+    return re.compile(rf"(?:{words})\s*{num}(?!\d)", re.I)
+
+
+# (paragraph index, char offset, item index inside the marker)
+Pos = tuple[int, int, int]
+
+
+def _cite_windows(parsed: ParsedDocument) -> dict[str, tuple[Pos, Pos]]:
+    """Earliest first-citation window per reference id.
+
+    A body citation sits at one position. A citation inside a table cell
+    or a caption belongs to a float: the typeset page puts the float
+    somewhere between its first mention in the text ("如表 2 所示") and
+    where the docx happens to hold it, and authors number its citations
+    anywhere in that span. Such a citation counts as the window between
+    those two positions."""
+    paras = parsed.paragraphs
+    order = {p.id: i for i, p in enumerate(paras)}
+    body = [p for p in paras if not p.cell and not p.caption]
+
+    def mention(key: tuple[str, str] | None) -> Pos | None:
+        if key is None:
+            return None
+        pat = _mention_re(*key)
+        for p in body:
+            m = pat.search(p.text)
+            if m:
+                return order[p.id], m.start(), 0
+        return None
+
+    # table id -> its caption key: the caption paragraphs right before
+    # the first cell (or right after the last one)
+    table_key: dict[str, tuple[str, str] | None] = {}
+    for i, p in enumerate(paras):
+        if not p.cell or p.cell.table in table_key:
+            continue
+        tid = p.cell.table
+        near = [paras[j] for j in range(max(0, i - 3), i) if paras[j].caption]
+        last = max(j for j, q in enumerate(paras)
+                   if q.cell and q.cell.table == tid)
+        near += [paras[j] for j in range(last + 1, min(len(paras), last + 4))
+                 if paras[j].caption]
+        keys = [k for k in (_float_key(q.text) for q in near)
+                if k and k[0] == "table"]
+        table_key[tid] = keys[0] if keys else None
+
+    mention_at: dict[str, Pos | None] = {}
+    windows: dict[str, tuple[Pos, Pos]] = {}
+    for m in parsed.markers:
+        p = paras[order[m.paragraph_id]] if m.paragraph_id in order else None
+        if p is None:
+            continue
+        at: Pos | None = None
+        if p.cell or p.caption:
+            if p.id not in mention_at:
+                key = (table_key.get(p.cell.table) if p.cell
+                       else _float_key(p.text))
+                mention_at[p.id] = mention(key)
+            at = mention_at[p.id]
+        for k, rid in enumerate(m.ref_ids):
+            here: Pos = (order[p.id], m.start, k)
+            lo, hi = (here, here) if at is None else (min(at, here), max(at, here))
+            old = windows.get(rid)
+            windows[rid] = (lo, hi) if old is None else (
+                min(old[0], lo), min(old[1], hi))
+    return windows
+
+
+def _order_fits(refs: list[Reference],
+                windows: dict[str, tuple[Pos, Pos]]) -> bool:
+    """Whether the current list order is a first-citation order for some
+    placement of each float's citations inside their window. Uncited
+    entries are left out: norms reports them, moving them is not ours."""
+    cur: Pos = (-1, -1, -1)
+    for r in refs:
+        w = windows.get(r.id)
+        if w is None:
+            continue
+        cur = max(cur, w[0])
+        if cur > w[1]:
+            return False
+    return True
+
+
 def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
     """Revisions to bring the reference list and markers into order."""
     # only bibliography-block entries participate; footnote-promoted
@@ -212,12 +311,15 @@ def plan_reorder(parsed: ParsedDocument) -> list[Revision]:
         return []
 
     # ---- numeric ------------------------------------------------------
-    target: list[str] = []
-    for m in parsed.markers:
-        for rid in m.ref_ids:
-            if rid in list_ids and rid not in target:
-                target.append(rid)
-    target += [r.id for r in refs if r.id not in target]
+    windows = {rid: w for rid, w in _cite_windows(parsed).items()
+               if rid in list_ids}
+    if _order_fits(refs, windows):
+        return []
+    # target: each entry at its earliest window start, i.e. a float's
+    # citations where the text first mentions the float
+    first_seen = {r.id: i for i, r in enumerate(refs)}
+    target = sorted(windows, key=lambda rid: (windows[rid][0], first_seen[rid]))
+    target += [r.id for r in refs if r.id not in windows]
     if [r.id for r in refs] == target:
         return []
 

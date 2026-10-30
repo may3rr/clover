@@ -5,7 +5,7 @@ import {
   displayName,
   DEFAULT_PREFS,
 } from './prefs'
-import { segmentsForParagraph } from './highlight'
+import { editFor, inlineEdits, segmentsForParagraph } from './highlight'
 import {
   buildItems,
   moveSelection,
@@ -487,5 +487,50 @@ describe('layoutSkeleton ragged line ends', () => {
     const refs = lines.filter((l) => l.kind === 'ref').map((l) => l.w)
     expect(new Set(refs.map((w) => w!.toFixed(3))).size).toBe(4)
     expect(refs.every((w) => w! >= 0.58 && w! <= 0.95)).toBe(true)
+  })
+})
+
+describe('inline diff edits', () => {
+  const typo: ListItem = {
+    id: 'rev-1',
+    kind: 'revision',
+    layer: 'norms',
+    severity: 'rev',
+    title: '',
+    detail: '',
+    anchors: [{ paragraph_id: 'p1', start: 3, end: 5 }],
+    paragraphId: 'p1',
+    start: 3,
+    revision: {
+      id: 'rev-1',
+      kind: 'typo',
+      anchor: { paragraph_id: 'p1', start: 3, end: 5 },
+      old: '背境',
+      new: '背景',
+      reason: '',
+    } as Revision,
+  }
+  it('pairs a revision segment with its replacement', () => {
+    const edits = inlineEdits('p1', [typo])
+    expect(edits).toEqual([{ itemId: 'rev-1', start: 3, end: 5, next: '背景' }])
+    const segs = segmentsForParagraph('复杂的背境建模', 'p1', [typo])
+    const seg = segs.find((s) => s.severity === 'rev')!
+    expect(seg.text).toBe('背境')
+    expect(editFor(seg, edits)?.next).toBe('背景')
+  })
+  it('leaves whole-entry moves as a plain tint', () => {
+    const move = {
+      ...typo,
+      revision: { ...typo.revision!, kind: 'ref_reorder', move_after: 'p9' } as Revision,
+    }
+    expect(inlineEdits('p1', [move])).toEqual([])
+  })
+  it('lets a finding of higher severity win the segment', () => {
+    const high: ListItem = { ...typo, id: 'f1', kind: 'finding', severity: 'high', revision: undefined }
+    const edits = inlineEdits('p1', [typo, high])
+    const seg = segmentsForParagraph('复杂的背境建模', 'p1', [typo, high]).find(
+      (s) => s.severity !== null
+    )!
+    expect(editFor(seg, edits)).toBeNull()
   })
 })

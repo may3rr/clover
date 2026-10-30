@@ -83,3 +83,43 @@ export const HL_SELECTED_CLASS: Record<Severity, string> = {
   low: 'hl-sel-low',
   rev: 'hl-sel-rev',
 }
+
+/** A mechanical edit shown inline in the reading view, git-diff style:
+ *  the text it replaces in red, the replacement right after in green. */
+export interface InlineEdit {
+  itemId: string
+  start: number
+  end: number
+  next: string
+}
+
+/** Inline edits on one paragraph: typo fixes, renumbered markers and
+ *  in-place label changes. Whole-entry moves of the reorder are left as a
+ *  plain tint — the entry's new place is elsewhere in the list. */
+export function inlineEdits(paragraphId: string, items: ListItem[]): InlineEdit[] {
+  const out: InlineEdit[] = []
+  for (const i of items) {
+    const revs = i.revision ? [i.revision] : (i.revisions ?? [])
+    for (const r of revs) {
+      const a = r.anchor
+      if (!a || a.paragraph_id !== paragraphId) continue
+      if (r.move_after != null) continue
+      const start = a.start ?? 0
+      const end = a.end ?? 0
+      if (end <= start) continue
+      out.push({ itemId: i.id, start, end, next: r.new ?? '' })
+    }
+  }
+  return out
+}
+
+/** The edit a highlighted segment belongs to, when the segment is shown as
+ *  a revision (no finding of higher severity covers it). */
+export function editFor(seg: Segment, edits: InlineEdit[]): InlineEdit | null {
+  if (seg.severity !== 'rev') return null
+  return (
+    edits.find(
+      (e) => seg.itemIds.includes(e.itemId) && e.start <= seg.start && seg.end <= e.end
+    ) ?? null
+  )
+}

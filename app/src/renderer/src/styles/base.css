@@ -685,6 +685,14 @@ select {
 .rev-new {
   background: var(--ok-tint);
 }
+/* inline diff in the reading view: the text a revision takes out
+   in red, and the text it puts in, in green right after */
+.hl-del {
+  background: var(--high-tint);
+}
+.hl-ins {
+  background: var(--ok-tint);
+}
 /* neighbouring segments join into one continuous mark */
 .hl-jl {
   padding-left: 0;
@@ -712,6 +720,12 @@ select {
 .has-sel .hl-rev {
   background: color-mix(in srgb, var(--ok) 8%, transparent);
 }
+.has-sel .hl-del {
+  background: color-mix(in srgb, var(--high) 9%, transparent);
+}
+.has-sel .hl-ins {
+  background: color-mix(in srgb, var(--ok) 8%, transparent);
+}
 /* selected segment: stronger version of the same semantic color */
 .hl-sel-high {
   background: color-mix(in srgb, var(--high) 38%, transparent);
@@ -723,6 +737,12 @@ select {
   background: color-mix(in srgb, var(--text-secondary) 30%, transparent);
 }
 .hl-sel-rev {
+  background: color-mix(in srgb, var(--ok) 36%, transparent);
+}
+.hl-sel-del {
+  background: color-mix(in srgb, var(--high) 38%, transparent);
+}
+.hl-sel-ins {
   background: color-mix(in srgb, var(--ok) 36%, transparent);
 }
 /* text scrolling under the toolbar fades out instead of being cut —

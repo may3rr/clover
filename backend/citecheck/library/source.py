@@ -9,6 +9,7 @@ open-access PDF, and its metadata confirms or contradicts the entry.
 from __future__ import annotations
 
 import re
+import unicodedata
 
 from rapidfuzz import fuzz
 
@@ -21,7 +22,7 @@ from ..support.sources import (
     _drop_reference_tail,
 )
 from .link import _first_author_key
-from .scan import LocalPdf
+from .scan import LocalPdf, filename_meta
 from .text import squash
 
 
@@ -99,6 +100,20 @@ def _legible(text: str) -> bool:
     return bool(t) and len(squash(t)) / len(t) >= 0.6
 
 
+_SPACING_ACCENT = re.compile(r"(?<=\w)[´¨ˆ˜`˝˚ˇ](?=\w)")
+
+
+def _fold(names: list[str]) -> list[str]:
+    """Drop diacritics so 'Gonz´alez' (a PDF-extracted spacing accent)
+    and 'González' compare equal."""
+    out = []
+    for n in names:
+        n = _SPACING_ACCENT.sub("", n or "")
+        n = unicodedata.normalize("NFKD", n)
+        out.append("".join(c for c in n if not unicodedata.combining(c)))
+    return out
+
+
 def local_issues(ref: Reference, pdf: LocalPdf) -> list[str]:
     doc = pdf.doc
     if doc.source not in _TRUSTED:
@@ -111,9 +126,15 @@ def local_issues(ref: Reference, pdf: LocalPdf) -> list[str]:
             and _is_cjk(ref.title) == _is_cjk(doc.title)
             and fuzz.ratio(squash(ref.title), squash(doc.title)) < 85):
         issues.append(f"本地原文标题为《{doc.title[:60]}》")
-    want, have = _first_author_key(ref.authors), _first_author_key(doc.authors)
-    if (want and have and _is_cjk(want) == _is_cjk(have) and want != have
-            and want not in squash(" ".join(doc.authors))):
+    # a file name suffix ("_González.pdf", "_anon.pdf") fills in the
+    # authors when the page gave none; it proves nothing about the paper
+    _, fn_author = filename_meta(doc.filename)
+    from_name = bool(fn_author) and doc.authors == [fn_author]
+    want = _first_author_key(_fold(ref.authors))
+    have = _first_author_key(_fold(doc.authors))
+    if (want and have and not from_name and _is_cjk(want) == _is_cjk(have)
+            and want != have
+            and want not in squash(" ".join(_fold(doc.authors)))):
         issues.append(f"本地原文首作者为 {doc.authors[0]}，文中写 {ref.authors[0]}")
     if ref.year and doc.year and abs(ref.year - doc.year) > 1:
         issues.append(f"本地原文年份为 {doc.year}，文中写 {ref.year}")

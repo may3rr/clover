@@ -68,7 +68,7 @@ FAKES = {
          "dynamic belief graphs[J]. Chinese Journal of Computers, 2020, "
          "43(9): 1712-1727."),
     ],
-    "yinhongpeng_odt": [  # 自动化学报(英文著录): Author. Title[J]. Journal, 年, 卷(期): 页
+    "yinhongpeng_odt": [  # 自动化学报(英文著录): Author. Title. Journal, 年, 卷(期): 页
         ("Gao X, Wen L. Scale-adaptive anchor-free detector for tiny "
          "vehicle detection. Acta Automatica Sinica, 2020, 46(7): 1-14"),
         ("Chen B, Yin H. Attention-guided feature fusion for video object "
@@ -111,6 +111,17 @@ STACK_SENT = ("此外,上述工作在数据集构建、模型结构、训练策�
 # non-prose — the parser does not treat those [n] as citations
 _AFFIL = re.compile(r"\[\d{1,3}\]\s*,\s*\[\d{1,3}\]")
 _FRONT = re.compile(r"关键词|Key\s*words|Keywords", re.IGNORECASE)
+# GB/T 7714 document-type tags: [J] [M] [C] [A] [D] [R] [EB/OL] ...
+_TYPE_TAG = re.compile(r"[\[［]\s*[A-Z](?:/OL)?\s*[\]］]|[\[［]\s*EB/OL\s*[\]］]")
+
+
+def in_list_style(entry: str, ref_texts: list[str]) -> str:
+    """Write an injected entry the way the manuscript's own list does: a
+    list that never tags document types gets untagged entries, so the
+    injection adds its intended defect and no formatting inconsistency."""
+    if any(_TYPE_TAG.search(t) for t in ref_texts):
+        return entry
+    return re.sub(r"\s{2,}", " ", _TYPE_TAG.sub("", entry)).strip()
 
 
 def squash(s: str) -> str:
@@ -227,7 +238,9 @@ def inject_paper(directory: str, seed: int = 42):
     hosts = [i for i in body_idx
              if not _AFFIL.search(doc.paragraphs[i].text)
              and not _FRONT.search(doc.paragraphs[i].text)]
+    tagged_list = list(ref_texts)
     for k, fake in enumerate(FAKES[directory][:2]):
+        fake = in_list_style(fake, tagged_list)
         doc.add_paragraph(f"[{label}] {fake}")
         ref_texts.append(f"[{label}] {fake}")
         host_i = rng.choice([i for i in hosts if i not in modified])
@@ -243,7 +256,7 @@ def inject_paper(directory: str, seed: int = 42):
         label += 1
 
     # ---- 2. uncited x1 ----------------------------------------------------
-    unc = UNCITED[directory]
+    unc = in_list_style(UNCITED[directory], tagged_list)
     # whitespace-insensitive: the paper's own copy may format authors
     # differently ("Vaswani A,Shazeer N" vs "Vaswani A, Shazeer N")
     already = any(squash(unc)[:16] in squash(t) for t in ref_texts)

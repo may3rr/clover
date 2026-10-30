@@ -26,7 +26,7 @@ from ..schema import Anchor, Finding, Reference
 # "[J]" exactly: online-first [J/OL] entries have no volume/pages yet
 _JOURNAL_TAG_RE = re.compile(r"[\[［]\s*J\s*[\]］]")
 _VOLUME_RE = re.compile(r"(?:19|20)\d{2}\s*[,，]\s*(?:\d+|[(（]\s*\d+)|\d+\s*[(（]\s*[\dS]")
-_PAGES_RE = re.compile(r"[:：]\s*[A-Za-z]?\d+(?:\s*[-–—~,，]\s*[A-Za-z]?\d+)*\s*[.．]?\s*(?:$|DOI|doi|https?://|\()", re.M)
+_PAGES_RE = re.compile(r"[:：]\s*[A-Za-z]?\d+(?:\s*[-–‒‑−—~,，]\s*[A-Za-z]?\d+)*\s*[.．]?\s*(?:$|DOI|doi|https?://|\()", re.M)
 
 
 def _strip_label(raw: str) -> str:
