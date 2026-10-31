@@ -40,6 +40,7 @@ import ExportDone from '../components/ExportDone'
 import PaperSearch from '../components/PaperSearch'
 import { MagnifierIcon } from '../components/Icons'
 import OverviewCard from '../components/OverviewCard'
+import OrbitDots from '../components/OrbitDots'
 import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
 import {
@@ -76,6 +77,25 @@ interface Props {
   onOpenReport: (id: string) => void
   prefs: Prefs
   onOpenSettings: () => void
+  /** benchmarking a finished report against a venue typed afterwards */
+  rebench?: RebenchState | null
+  onBenchmark?: (venue: string) => void
+}
+
+/** the re-run behind a venue typed on a finished report */
+export interface RebenchState {
+  venue: string
+  /** latest progress label of the run */
+  step?: string
+  /** the manuscript changed on disk since this report was made */
+  edited?: boolean
+  error?: string
+}
+
+/** what identifies a finding across two runs of the same manuscript */
+function itemSig(i: ListItem): string {
+  const a = i.anchors[0]
+  return `${i.layer}|${i.kind}|${i.title}|${a?.paragraph_id ?? ''}|${a?.start ?? ''}`
 }
 
 /** 303 → "5 分 3 秒", 20 → "20 秒" */
@@ -100,6 +120,8 @@ export default function ReportScreen({
   onOpenReport,
   prefs,
   onOpenSettings,
+  rebench,
+  onBenchmark,
 }: Props) {
   const { reports: history, remove: removeReport } = useReports()
   const items = useMemo(() => buildItems(report), [report])
@@ -107,6 +129,25 @@ export default function ReportScreen({
   const [filter, setFilter] = useState<string | null>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
+  // a report swapped in after benchmarking renumbers its findings: carry the
+  // selection over to the same finding by what it says and where it sits
+  const selSig = useRef<string | null>(null)
+  const prevItems = useRef(items)
+  useEffect(() => {
+    const swapped = prevItems.current !== items
+    prevItems.current = items
+    if (swapped && selSig.current) {
+      const same = items.find((i) => itemSig(i) === selSig.current)
+      if (same?.id !== selectedId) {
+        setSelectedId(same?.id ?? null)
+        setDetailId((d) => (d === selectedId ? (same?.id ?? null) : d))
+      }
+      if (!same) selSig.current = null
+      return
+    }
+    const cur = items.find((i) => i.id === selectedId)
+    selSig.current = cur ? itemSig(cur) : null
+  }, [items, selectedId])
   const [exporting, setExporting] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [exported, setExported] = useState<string | null>(null)
@@ -276,7 +317,10 @@ export default function ReportScreen({
       const r = await apiFetch(`/reports/${jobId}/export`, { method: 'POST' })
       if (!r.ok) {
         const d = await r.json().catch(() => ({}))
-        setExportErr(d.detail ?? '导出失败。请重试。')
+        setExportErr(
+          d.detail ??
+            '无法写出新文件。请确认原稿没有在 Word 中打开，然后重新导出。'
+        )
         setExporting(false)
         return
       }
@@ -284,7 +328,7 @@ export default function ReportScreen({
       setExported(path)
       onExported(path)
     } catch {
-      setExportErr('导出失败。请确认本地服务仍在运行。')
+      setExportErr('无法连接本地服务。请退出 Clover 后重新打开，再导出一次。')
     }
     setExporting(false)
   }, [exporting, jobId, onExported])
@@ -352,6 +396,18 @@ export default function ReportScreen({
 
   const select = useCallback(
     (id: string | null, openDetail: boolean, viaKey = false) => {
+      // a detail opened from the paper while the inspector is collapsed
+      // would land in a pane nobody can see: bring the pane back first
+      if (openDetail && id)
+        setRightCollapsed((v) => {
+          if (v)
+            try {
+              localStorage.setItem('cc-pane-right', '0')
+            } catch {
+              // per-viewer convenience only
+            }
+          return false
+        })
       // list → detail morphs via a View Transition (skipped when reduced);
       // arrowing through items with the detail open switches instantly
       if (openDetail && !viaKey) {
@@ -385,6 +441,10 @@ export default function ReportScreen({
   )
 
   const closeExported = useCallback(() => setExported(null), [])
+  // the list unmounts while a detail is open: keep where it was scrolled
+  // and whether its entrance already played, so going back returns to the
+  // same place instead of a list that looks reloaded
+  const listMemo = useRef({ scrollTop: 0, opened: false })
 
   const closeDetail = useCallback(() => {
     morph(() => setDetailId(null))
@@ -554,6 +614,7 @@ export default function ReportScreen({
           <div
             ref={sideScrollRef}
             className={`side-scroll fade-scroll flex-1 overflow-y-auto flex flex-col gap-1${sideFade ? ` ${sideFade}` : ''}`}
+            style={{ padding: '0 8px 8px' }}
           >
             {sideTab === 'toc' ? (
               outline.length ? (
@@ -571,7 +632,7 @@ export default function ReportScreen({
                   </button>
                 ))
               ) : (
-                <div className="t13 secondary" style={{ padding: '4px 12px' }}>
+                <div className="t13 secondary" style={{ padding: '4px 8px' }}>
                   这篇论文没有识别出章节标题。
                 </div>
               )
@@ -593,7 +654,7 @@ export default function ReportScreen({
               </>
             )}
           </div>
-          <div style={{ padding: '0 12px 12px' }}>
+          <div style={{ padding: '0 8px 12px' }}>
             <AccountChip prefs={prefs} onOpen={onOpenSettings} />
           </div>
         </div>
@@ -656,6 +717,8 @@ export default function ReportScreen({
               <ExportDone
                 path={exported}
                 tex={isTex}
+                comments={(report.findings ?? []).length}
+                revisions={(report.revisions ?? []).length}
                 onClose={closeExported}
               />
             )}
@@ -719,6 +782,8 @@ export default function ReportScreen({
               filter={filter}
               selectedId={selectedId}
               onPick={onPickSegment}
+              rebench={rebench}
+              onBenchmark={onBenchmark}
             />
           </div>
         </main>
@@ -747,6 +812,7 @@ export default function ReportScreen({
               selectedId={selectedId}
               onSelect={(id) => select(id, true)}
               onCollapse={toggleRightPane}
+              memo={listMemo}
             />
           )}
         </div>
@@ -792,6 +858,79 @@ export function benchLabel(report: Report): string {
   return d.benchmark_name ?? '—'
 }
 
+/** No target venue was given before the check: one can be typed here.
+ *  The manuscript is checked again with it (the caches make that a replay)
+ *  and the report updates in place when the run is done. */
+function VenuePrompt({
+  state,
+  onStart,
+}: {
+  state: RebenchState | null
+  onStart: (venue: string) => void
+}) {
+  const [name, setName] = useState('')
+  const [known, setKnown] = useState<string[]>([])
+  useEffect(() => {
+    apiFetch('/venues')
+      .then((r) => r.json())
+      .then((v: { name: string }[]) => setKnown(v.map((x) => x.name)))
+      .catch(() => setKnown([]))
+  }, [])
+  const busy = !!state && !state.error
+  const start = () => {
+    const v = name.trim()
+    if (v && !busy) onStart(v)
+  }
+  return (
+    <div className="flex flex-col" style={{ gap: 8, marginBottom: 40 }}>
+      <div className="t13 secondary">
+        {busy
+          ? `正在按《${state.venue}》重新检查${state.step ? `：${state.step}` : ''}。完成后这份报告会被新报告替换。` +
+            (state.edited ? '原稿在上次检查后改动过，新报告按改动后的原稿生成。' : '')
+          : '没有填写目标期刊。填写后会重新检查一遍原稿，按该刊的范文比较引用分布、检查该刊的投稿要求，并用新报告替换这份报告。'}
+      </div>
+      {busy ? (
+        <div className="flex items-center" style={{ gap: 8, height: 32 }}>
+          <OrbitDots size={20} />
+          <span className="secondary">正在对标</span>
+        </div>
+      ) : (
+        <form
+          className="flex items-center"
+          style={{ gap: 8 }}
+          onSubmit={(e) => {
+            e.preventDefault()
+            start()
+          }}
+        >
+          <input
+            className="venue-input venue-input-left"
+            list="report-venues"
+            aria-label="目标期刊或会议"
+            placeholder="填写目标期刊或会议，例如计算机学报、EMNLP"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <datalist id="report-venues">
+            {known.map((v) => (
+              <option key={v} value={v} />
+            ))}
+          </datalist>
+          <button
+            type="submit"
+            className="pill-quiet"
+            style={{ flex: 'none' }}
+            disabled={!name.trim()}
+          >
+            开始对标
+          </button>
+        </form>
+      )}
+      {state?.error && <div className="t13 sem-high">{state.error}</div>}
+    </div>
+  )
+}
+
 function PaperBody({
   report,
   overview,
@@ -799,6 +938,8 @@ function PaperBody({
   filter,
   selectedId,
   onPick,
+  rebench,
+  onBenchmark,
 }: {
   report: Report
   overview: Report['overview']
@@ -806,7 +947,11 @@ function PaperBody({
   filter: string | null
   selectedId: string | null
   onPick: (itemIds: string[]) => void
+  rebench?: RebenchState | null
+  onBenchmark?: (venue: string) => void
 }) {
+  // no target venue was given: offer one, the report updates after
+  const showPrompt = !overview && !report.distribution?.venue && !!onBenchmark
   const exportWhere =
     report.document.source_format === 'tex'
       ? '导出后会以注释写进 LaTeX 源码，修订另附补丁文件'
@@ -866,8 +1011,15 @@ function PaperBody({
   const nMarkers = (report.markers ?? []).length
   const nRefs = (report.references ?? []).length
   const nHigh = items.filter((i) => i.severity === 'high').length
-  const nMedium = items.filter(
-    (i) => i.severity === 'medium' || i.severity === 'low'
+  const nMedium = items.filter((i) => i.severity === 'medium').length
+  const nLow = items.filter((i) => i.severity === 'low').length
+  // the work done that found nothing: entries that checked out, and
+  // claim-reference pairs whose evidence was located word for word
+  const refChecks = report.ref_checks ?? []
+  const nVerified = refChecks.filter((c) => c.status === 'verified').length
+  const supportChecks = report.support_checks ?? []
+  const nEvidence = supportChecks.filter(
+    (c) => c.label !== 'undetermined' && !!c.evidence
   ).length
   const blocks = useMemo(
     () => layoutBlocks(report.paragraphs ?? []),
@@ -922,8 +1074,24 @@ function PaperBody({
               ['文件', report.document.filename ?? '—'],
               ['引用标记', `${nMarkers} 处`],
               ['参考文献', `${nRefs} 条`],
+              ...(refChecks.length
+                ? ([
+                    [
+                      '文献核验',
+                      `${refChecks.length} 条中 ${nVerified} 条与数据库或本地原文一致`,
+                    ],
+                  ] as [string, string][])
+                : []),
+              ...(supportChecks.length
+                ? ([
+                    [
+                      '原文比对',
+                      `${supportChecks.length} 组论断与文献中，${nEvidence} 组在被引原文里逐字找到证据`,
+                    ],
+                  ] as [string, string][])
+                : []),
               [
-                '对标领域',
+                report.distribution?.venue ? '对标期刊' : '对标领域',
                 benchLabel(report),
               ],
               ...(report.library
@@ -948,7 +1116,10 @@ function PaperBody({
         </div>
         <div
           className="callout"
-          style={{ marginTop: 24, marginBottom: overview ? 16 : 40 }}
+          style={{
+            marginTop: 24,
+            marginBottom: overview || showPrompt ? 16 : 40,
+          }}
         >
           <DocMagnifyIcon size={20} color="var(--accent)" />
           <div className="font-normal">
@@ -961,22 +1132,25 @@ function PaperBody({
                   <>
                     {' '}
                     <span className="font-semibold sem-high">{nHigh}</span>{' '}
-                    条严重问题{nMedium > 0 ? '，' : ''}
+                    条严重问题
                   </>
                 )}
                 {nMedium > 0 && (
                   <>
-                    {' '}
+                    {nHigh > 0 ? '、' : ' '}
                     <span className="font-semibold sem-medium">{nMedium}</span>{' '}
                     条需要注意
                   </>
                 )}
-                ，{exportWhere}。
+                {nLow > 0 && `、${nLow} 条提示`}，{exportWhere}。
               </>
             )}
           </div>
         </div>
         <OverviewCard overview={overview} style={{ marginBottom: 40 }} />
+        {showPrompt && onBenchmark && (
+          <VenuePrompt state={rebench ?? null} onStart={onBenchmark} />
+        )}
       </div>
       {blocks.map((b) => {
         if (b.kind === 'table')
@@ -1155,6 +1329,7 @@ function InspectorList({
   selectedId,
   onSelect,
   onCollapse,
+  memo,
 }: {
   items: ListItem[]
   report: Report
@@ -1162,6 +1337,7 @@ function InspectorList({
   selectedId: string | null
   onSelect: (id: string) => void
   onCollapse: () => void
+  memo: React.MutableRefObject<{ scrollTop: number; opened: boolean }>
 }) {
   const groups = useMemo(() => {
     if (!grouped) return null
@@ -1176,12 +1352,27 @@ function InspectorList({
   const { ref: listScrollRef, fadeClass: listFade } =
     useScrollFade<HTMLDivElement>()
 
-  // 只在报告首次打开时 stagger；之后筛选切换出现的行直接显示
-  const [opening, setOpening] = useState(true)
+  // 只在报告首次打开时 stagger；之后筛选切换、从详情返回时行直接显示
+  const [opening, setOpening] = useState(!memo.current.opened)
   useEffect(() => {
+    memo.current.opened = true
     const t = setTimeout(() => setOpening(false), 12 * 20 + 160)
     return () => clearTimeout(t)
-  }, [])
+  }, [memo])
+  // back from a detail: the list where it was, the item just read in view
+  useLayoutEffect(() => {
+    const el = listScrollRef.current
+    if (!el) return
+    el.scrollTop = memo.current.scrollTop
+    el.querySelector<HTMLElement>('.list-row.sel')?.scrollIntoView({
+      block: 'nearest',
+    })
+    const keep = () => {
+      memo.current.scrollTop = el.scrollTop
+    }
+    el.addEventListener('scroll', keep, { passive: true })
+    return () => el.removeEventListener('scroll', keep)
+  }, [listScrollRef, memo])
   let rowIdx = 0
   const row = (i: ListItem) => {
     // staggered entrance — max 12 rows animate, the rest are instant
@@ -1195,12 +1386,13 @@ function InspectorList({
         onClick={() => onSelect(i.id)}
       >
         <div className="flex items-start gap-2">
-          <span style={{ marginTop: 1, flex: 'none' }}>
+          {/* a box as tall as the title's first line centres the glyph */}
+          <span className="flex items-center" style={{ height: 22, flex: 'none' }}>
             <SevGlyph severity={i.severity} />
           </span>
           <div className="min-w-0">
             <div
-              className={`font-semibold${i.id === selectedId ? ' row-title-sel' : ''}`}
+              className={`list-row-title font-semibold${i.id === selectedId ? ' row-title-sel' : ''}`}
             >
               {i.title}
             </div>
@@ -1217,7 +1409,11 @@ function InspectorList({
         className="t17 font-semibold bar-solid-subtle drag-strip flex items-center justify-between"
         style={{ padding: '0 16px', flex: 'none', height: 52 }}
       >
-        <span>{items.length} 个问题</span>
+        <span>
+          {items.filter((i) => i.severity !== 'rev').length} 个问题
+          {items.some((i) => i.severity === 'rev') &&
+            `，${items.filter((i) => i.severity === 'rev').length} 项修订`}
+        </span>
         <button
           className="icon-btn"
           aria-label="收起检查器"

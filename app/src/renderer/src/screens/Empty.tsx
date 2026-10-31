@@ -119,7 +119,7 @@ export default function Empty({
           style={{ padding: '0 8px 8px' }}
         >
           {reports.length === 0 && (
-            <div className="t13 secondary" style={{ padding: '4px 12px' }}>
+            <div className="t13 secondary" style={{ padding: '4px 8px' }}>
               检查过的论文会出现在这里
             </div>
           )}
@@ -132,7 +132,7 @@ export default function Empty({
             />
           ))}
         </nav>
-        <div style={{ padding: '0 12px 12px' }}>
+        <div style={{ padding: '0 8px 12px' }}>
           <AccountChip prefs={prefs} onOpen={onOpenSettings} />
         </div>
       </aside>
@@ -172,9 +172,9 @@ export default function Empty({
               压缩包、文件夹。全文在本机解析，不会上传。
             </div>
             <div className="t13 secondary" style={{ marginTop: 12 }}>
-              已经下载了被引文献的话，把论文 .docx 放在一个文件夹的根目录，
-              PDF 放进同级的 ref 文件夹，再拖入整个文件夹。本地原文会用来判断论断支持度，
-              填写目标期刊或会议后，参考文献和文件夹里该刊的论文会作为对标范文。
+              {'已经下载了被引文献的话，把论文 .docx 放在一个文件夹的根目录，' +
+                'PDF 放进同级的 ref 文件夹，再拖入整个文件夹。本地原文会用来判断论断支持度，' +
+                '填写目标期刊或会议后，参考文献和文件夹里该刊的论文会作为对标范文。'}
             </div>
             {(err || dropError) && (
               <div className="font-normal" style={{ marginTop: 12 }}>

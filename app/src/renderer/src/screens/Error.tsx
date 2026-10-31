@@ -6,7 +6,7 @@ export default function ErrorScreen() {
     >
       <div className="font-semibold">无法启动本地服务。</div>
       <div className="font-normal">
-        请确认 Python 环境可用，然后重新打开应用。
+        请退出 Clover 后重新打开。如果仍然出现，请把日志发给开发者。
       </div>
     </div>
   )

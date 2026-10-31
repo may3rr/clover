@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { apiFetch, apiJson } from '../lib/api'
 import { CheckSquareIcon, ChevronDownIcon, SevGlyph } from '../components/Icons'
 import { SideIcon, type SideIconName } from '../components/SideIcons'
@@ -85,6 +85,12 @@ export default function LibraryConfirm({
   const [venueInput, setVenueInput] = useState(vs.venue ?? '')
   const [venueBusy, setVenueBusy] = useState(false)
   const [venueError, setVenueError] = useState<string | null>(null)
+  // the venue update in flight: "开始体检" waits for it, so a name typed
+  // and then the button clicked (the blur starts the update) is the name
+  // the run uses
+  const venueJob = useRef<Promise<VenueState | null> | null>(null)
+  const vsRef = useRef(vs)
+  vsRef.current = vs
 
   useEffect(() => {
     apiJson<VenueEntry[]>('/venues')
@@ -105,9 +111,15 @@ export default function LibraryConfirm({
     [venues, docs]
   )
 
-  const applyVenue = async (raw: string) => {
+  const applyVenue = (raw: string): Promise<VenueState | null> => {
     const name = raw.trim()
-    if (name === (vs.venue ?? '')) return
+    if (name === (vsRef.current.venue ?? '')) return Promise.resolve(vsRef.current)
+    const job = updateVenue(name)
+    venueJob.current = job
+    return job
+  }
+
+  const updateVenue = async (name: string): Promise<VenueState | null> => {
     setVenueBusy(true)
     setVenueError(null)
     try {
@@ -137,14 +149,37 @@ export default function LibraryConfirm({
         entry: r.entry,
       }
       setVs(next)
+      vsRef.current = next
       setPicked(new Set(next.defaultIds))
       setVenueInput(next.venue ?? '')
       onVenueChange?.(next.venue ?? '')
+      return next
     } catch {
       setVenueError('无法更新目标期刊。请确认文献文件夹还在原处，然后重新填写。')
+      return null
     } finally {
       setVenueBusy(false)
     }
+  }
+
+  const starting = useRef(false)
+  const start = async () => {
+    if (starting.current) return
+    starting.current = true
+    let st: VenueState | null = vsRef.current
+    if (venueJob.current) st = await venueJob.current
+    if (st && venueInput.trim() !== (st.venue ?? '')) st = await applyVenue(venueInput)
+    if (!st) {
+      starting.current = false // the error is shown under the field
+      return
+    }
+    onStart({
+      paper: scan.paper,
+      links: finalLinks(scan, choice),
+      venue: st.venue ?? '',
+      // a venue changed just now resets the selection to its defaults
+      exemplars: st === vs ? exemplars : pickedExemplars(new Set(st.defaultIds), st, choice),
+    })
   }
 
   const togglePick = (id: string) =>
@@ -244,15 +279,15 @@ export default function LibraryConfirm({
               核对文献连接
             </div>
             <div className="secondary" style={{ marginTop: 8 }}>
-              {scan.references.length} 条参考文献中，{c.linked + c.review} 条在文献文件夹里找到了原文。
-              连上的文献用本地原文判断论断支持度、核对题录，其余照常联网核验。
+              {`${scan.references.length} 条参考文献中，${c.linked + c.review} 条在文献文件夹里找到了原文。` +
+                '连上的文献用本地原文判断论断支持度、核对题录，其余照常联网核验。'}
             </div>
             {c.review > 0 && (
               <div className="callout" style={{ marginTop: 16 }}>
                 <SevGlyph severity="medium" size={20} />
                 <div className="font-normal flex-1">
                   有 <span className="font-semibold sem-medium">{c.review}</span>{' '}
-                  条连接由模型从相近的候选中选出，请逐条确认。
+                  条连接由模型从相近的候选中选出。可以逐条核对，开始体检时没有改动的连接按模型的选择使用。
                 </div>
                 <button className="pill-quiet font-normal" onClick={confirmAll}>
                   全部确认
@@ -281,6 +316,18 @@ export default function LibraryConfirm({
                         </span>
                       </div>
                     </div>
+                    {/* the model's pick, accepted as is: the dropdown alone can't
+                        say "this one is right" (choosing the same item fires
+                        no change) */}
+                    {st === 'review' && (
+                      <button
+                        className="pill-quiet t13 row-action keep"
+                        style={{ flex: 'none' }}
+                        onClick={() => setTouched((t) => new Set(t).add(r.id))}
+                      >
+                        确认
+                      </button>
+                    )}
                     <label
                       className={`pill-quiet row-action flex items-center gap-1${st === 'review' ? ' keep' : ''}`}
                       style={{ flex: 'none', maxWidth: 160 }}
@@ -391,16 +438,11 @@ export default function LibraryConfirm({
           <button
             className="pill-accent"
             style={{ width: '100%', justifyContent: 'center' }}
-            onClick={() =>
-              onStart({
-                paper: scan.paper,
-                links: finalLinks(scan, choice),
-                venue: vs.venue ?? '',
-                exemplars,
-              })
-            }
+            // not disabled while the venue updates: the field's blur fires on
+            // mousedown, and a button disabled before mouseup drops the click
+            onClick={start}
           >
-            开始体检
+            {venueBusy ? '正在更新目标期刊' : '开始体检'}
           </button>
         </div>
       </aside>

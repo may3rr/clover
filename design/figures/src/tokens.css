@@ -1,0 +1,66 @@
+/* 设计 token：取自 Clover（tmall/app）的 tokens.css，图中所有颜色只引用这里的变量 */
+:root {
+  --bg: #ffffff;
+  --bg-subtle: #f7f7f5;
+  --text: #37352f;
+  --text-secondary: rgba(55, 53, 47, 0.65);
+  --accent: #2383e2;
+
+  --fill: rgba(55, 53, 47, 0.06);
+  --fill-strong: rgba(55, 53, 47, 0.09);
+  --glass-edge: 0 0 0 0.5px rgba(55, 53, 47, 0.09);
+  --glass-shadow: 0 8px 24px rgba(55, 53, 47, 0.10);
+  --separator: rgba(0, 0, 0, 0.1);
+
+  --high: #ff5f57;
+  --high-tint: rgba(255, 95, 87, 0.2);
+  --medium: #febc2e;
+  --medium-tint: rgba(254, 188, 46, 0.22);
+  --ok: #28c840;
+  --ok-tint: rgba(40, 200, 64, 0.18);
+  --low: var(--text-secondary);
+  --low-tint: var(--fill-strong);
+  --high-text: #d70015;
+  --medium-text: #a05a00;
+  --ok-text: #1e7e34;
+
+  --tile-indigo: #5856d6;
+  --tile-blue: #007aff;
+  --tile-teal: #30b0c7;
+  --tile-purple: #af52de;
+  --tile-grey: #8e8e93;
+  --tile-pink: #d6409f;
+  --on-tile: #ffffff;
+
+  --brand-qwen: #082dff;
+  /* Intel 品牌蓝：只用于标示在 Intel 本机运行的部分 */
+  --brand-intel: #0068b5;
+  --on-brand: #ffffff;
+
+  --hairline: var(--separator);
+
+  /* 色相浅底：实体高亮与色块底，同色约 0.14 alpha */
+  --tile-indigo-tint: rgba(88, 86, 214, 0.14);
+  --tile-blue-tint: rgba(0, 122, 255, 0.12);
+  --tile-teal-tint: rgba(48, 176, 199, 0.17);
+  --tile-pink-tint: rgba(214, 64, 159, 0.13);
+  --tile-purple-tint: rgba(175, 82, 222, 0.14);
+  --brand-qwen-tint: rgba(8, 45, 255, 0.09);
+  --brand-intel-tint: rgba(0, 104, 181, 0.08);
+  --accent-tint: rgba(35, 131, 226, 0.14);
+
+  /* 领域与角色的色相映射 */
+  --hue-time: var(--tile-indigo);
+  --hue-space: var(--tile-blue);
+  --hue-social: var(--tile-pink);
+  --hue-nature: var(--tile-teal);
+  --hue-model: var(--brand-qwen);
+  --hue-program: var(--text);
+  --tint-time: var(--tile-indigo-tint);
+  --tint-space: var(--tile-blue-tint);
+  --tint-social: var(--tile-pink-tint);
+  --tint-nature: var(--tile-teal-tint);
+  --tint-model: var(--brand-qwen-tint);
+
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

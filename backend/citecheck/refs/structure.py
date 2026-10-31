@@ -33,6 +33,18 @@ _ACL_RE = re.compile(r"^(?P<authors>.+?)\.\s+(?P<year>(?:19|20)\d{2})[a-z]?\.\s+
 _EVENT_YEAR_RE = re.compile(
     r"\s+(Conference|Annual|Meeting|Workshop|International|Joint|Findings|Edition)\b")
 
+# "Proceedings of the 1993 Advances in …", "Proc. of the 2014 Conf.": the
+# year after these heads names the event; the work's own year comes later
+_EVENT_HEAD_RE = re.compile(r"(?:Proceedings|Proc\.?)\s+of\s+(?:the\s+)?$", re.I)
+# a line-break hyphen carried over from a PDF ("descrip- tion", "surveil-
+# lance"); a suspended compound ("pre- and post-training") is kept
+_BREAK_HYPHEN_RE = re.compile(r"(?<=[a-z])[-‐‑]\s+(?!(?:and|or|to|vs)\b)(?=[a-z])")
+
+
+def dehyphenate(title: str | None) -> str | None:
+    return _BREAK_HYPHEN_RE.sub("", title) if title else title
+
+
 _EN_NAME = re.compile(r"^[^\W\d_][^\W\d_'’\-]*(?:\s+[^\W\d_]\.?)*$")
 _EN_INITIAL = re.compile(r"^[^\W\d_](?:\.-?\s?[^\W\d_]\.?)*\.?$")
 _ZH_NAME = re.compile(r"^[一-鿿]{2,4}$")
@@ -150,6 +162,12 @@ def _space_gbt_separators(body: str) -> str:
 def parse_reference(raw: str) -> dict:
     """Best-effort field extraction. Returns a dict with keys:
     label, title, authors, year, venue, doi, lang."""
+    out = _parse_reference(raw)
+    out["title"] = dehyphenate(out.get("title"))
+    return out
+
+
+def _parse_reference(raw: str) -> dict:
     out: dict = {"label": None, "title": None, "authors": [], "year": None,
                  "venue": None, "doi": None, "lang": "other", "translation": None}
     body = raw.strip()
@@ -196,7 +214,9 @@ def parse_reference(raw: str) -> dict:
                    lambda m: " " * len(m.group(0)), body)
     year_m = apa or next(
         (m for m in _YEAR_RE.finditer(dated)
-         if not _EVENT_YEAR_RE.match(dated, m.end())), None)
+         if not _EVENT_YEAR_RE.match(dated, m.end())
+         and not _EVENT_HEAD_RE.search(dated[max(0, m.start() - 40):m.start()])),
+        None)
     if year_m:
         out["year"] = int(year_m.group(1))
 
@@ -286,7 +306,8 @@ _BATCH_PROMPT = (
     "字段：i（条目编号）、title（论文或书的标题，不含作者、年份、会议名，去掉[J][M]等类型标识）、"
     "authors（作者列表，按原文顺序，英文保留原写法如 \"Patrick Lewis\" 或 \"Lewis, P.\"，"
     "中文每人一个字符串，不要包含 et al. 或“等”）、year（发表年份，整数；"
-    "只取表示这篇文献发表时间的年份，会议名里的年份如“2022 Conference”不算，"
+    "只取表示这篇文献发表时间的年份，会议名里的年份如“2022 Conference”"
+    "“Proceedings of the 1993 Advances in …”不算，"
     "DOI 和网址里的年份也不算；没有就填 null）、venue（期刊或会议名）、doi。\n"
     "原文没有的信息一律填 null，不要补全、不要猜。\n"
     "只输出 JSON：{{\"items\": [{{\"i\": 1, \"title\": ..., \"authors\": [...], "
@@ -366,7 +387,7 @@ async def structure_references(refs: list, progress=None) -> int:
             for field in ("title", "venue", "doi", "authors", "year"):
                 val = getattr(it, field)
                 if _grounded(field, val, r.raw):
-                    setattr(r, field, val)
+                    setattr(r, field, dehyphenate(val) if field == "title" else val)
             if (tuple(r.authors), r.year) != before:
                 changed += 1
         return changed

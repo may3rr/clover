@@ -56,9 +56,16 @@ def _attributed_name(window: str) -> tuple[str, int] | None:
     m = _ATTR_RE.search(window)
     if m:
         name = m.group("name").strip(" .,-")
-        # "Bordes和Weston等人" — the captured name is the second author of
-        # the group; the first author may well be the ref's
-        if m.start("name") > 0 and window[m.start("name") - 1] in "和与及、,，":
+        # "Bordes和Weston等人" / "Bordes, Weston等人" — the captured name is
+        # the second author of the group; the first author may well be the
+        # ref's. A comma after a year or a clause ("2015 年，He 等人") is not
+        # a list of names.
+        before = window[:m.start("name")].rstrip()
+        if before[-1:] and before[-1] in "和与及":
+            return None
+        if before[-1:] and before[-1] in "、,，" and re.search(
+                r"[A-Za-zÀ-ž一-鿿]\s*$", before[:-1]) and not re.search(
+                r"[年月日]\s*$", before[:-1]):
             return None
         if len(name) >= 2:
             return name, m.start("name")

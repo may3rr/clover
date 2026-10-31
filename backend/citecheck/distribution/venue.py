@@ -232,10 +232,6 @@ def _heading_ok(title: str, zh: bool) -> bool:
     return title[0].isupper() and 2 <= len(words) <= 10 and not title.endswith(".")
 
 
-def _pages_of(lines: list[tuple[str, int]]) -> list[int]:
-    return [p for _, p in lines]
-
-
 def _join(lines: list[tuple[str, int]]) -> str:
     return clean_page("\n".join(ln for ln, _ in lines))
 

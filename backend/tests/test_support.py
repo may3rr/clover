@@ -926,9 +926,9 @@ async def test_dual_excerpt_skipped_when_unflagged_or_same(monkeypatch):
     assert check.label == "unsupported" and calls == [1]
 
 
-def test_no_source_notes_group_by_citing_paragraph():
-    """A sentence citing five unreachable papers gets one note listing
-    them, anchored on the claims, not five notes on the bibliography."""
+def test_no_source_notes_merge_into_one():
+    """Every unreachable source raises the same question, so the whole
+    document gets one note listing them, not one per citing paragraph."""
     from citecheck.parse.parser import ParsedDocument
     from citecheck.schema import Document, Reference, SupportCheck
     from citecheck.support.layer import _support_findings
@@ -944,8 +944,8 @@ def test_no_source_notes_group_by_citing_paragraph():
                            source_kind="none", rationale="")
               for c, r in jobs]
     found = _support_findings(parsed, jobs, checks)
-    assert len(found) == 2
-    p1 = next(f for f in found if f.anchor.paragraph_id == "p1")
-    assert p1.refs == ["r1", "r2", "r3"]
-    assert (p1.anchor.start, p1.anchor.end) == (0, 30)
-    assert "[1]、[2]、[3]" in p1.detail and "3 篇" in p1.title
+    assert len(found) == 1
+    note = found[0]
+    assert note.anchor is None and note.refs == ["r1", "r2", "r3"]
+    assert "[1]、[2]、[3]" in note.detail
+    assert "3 篇" in note.title and "3 条论断" in note.title

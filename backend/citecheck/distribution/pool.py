@@ -50,10 +50,6 @@ class Pool:
     name: str
     sources: list[ExemplarSource] = field(default_factory=list)
 
-    @property
-    def n_cited(self) -> int:
-        return sum(1 for s in self.sources if s.origin == "cited")
-
 
 # ------------------------------------------------------- cited references
 

@@ -94,8 +94,12 @@ def _field_markers(
             continue
         kind: MarkerKind | None = None
         items: list = []
-        if "ZOTERO_ITEM" in f.instr:
-            kind, managed = "zotero", "zotero"
+        # Mendeley writes the same CSL-JSON payload as Zotero under its own
+        # field name; NoteExpress (common in Chinese labs) carries no
+        # readable payload, so its visible text is linked like EndNote's
+        if "ZOTERO_ITEM" in f.instr or "ADDIN CSL_CITATION" in f.instr:
+            kind = "zotero"
+            managed = "zotero" if "ZOTERO_ITEM" in f.instr else "mendeley"
             data = _extract_json(f.instr)
             if data:
                 for it in data.get("citationItems", []):
@@ -103,6 +107,8 @@ def _field_markers(
                         items.append(it["itemData"])
         elif "EN.CITE" in f.instr or "ADDIN EN." in f.instr:
             kind, managed = "endnote", "endnote"
+        elif "ADDIN NE.Ref" in f.instr:
+            kind, managed = "endnote", "noteexpress"
         if kind is not None:
             out.append(
                 DetectedMarker(start=f.span[0], end=f.span[1], raw="", kind=kind, items=items)

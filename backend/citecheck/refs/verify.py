@@ -31,18 +31,24 @@ import logging
 import re
 import unicodedata
 from collections.abc import Callable
+from contextvars import ContextVar
 from dataclasses import dataclass, field
 
 from rapidfuzz import fuzz
 
 from ..parse.links import latin_surname
 from ..schema import Anchor, Finding, Paragraph, RefCheck, Reference
-from .sources import RetrievalClient, SourceResult
+from .sources import RetrievalClient
 from .structure import complete_reference_fields
 
 log = logging.getLogger(__name__)
 
 _TITLE_MIN = 92.0
+# latest plausible publication year among the manuscript's own entries; a
+# record dated after it is a later re-deposit of the cited work (a 2009 tech
+# report registered in 2024, a 1977 thesis digitised in 2022), since a
+# manuscript cannot cite a work published after everything else it cites
+_HORIZON: ContextVar[int | None] = ContextVar("_HORIZON", default=None)
 _SURNAME_MIN = 85.0
 _SOURCES = ("crossref", "openalex", "s2", "arxiv")
 # not_found (English refs) requires these to have really answered; s2 is
@@ -64,8 +70,17 @@ _ARXIV_BATCH = 5
 _CJK = re.compile(r"[一-鿿]")
 
 
+def _fold(s: str) -> str:
+    """NFKC, then drop diacritics: 'Jégou' / 'Kočiský' / 'PAŞCA' read as
+    'Jegou' / 'Kocisky' / 'PASCA' — manuscripts often type names without
+    the accents the database keeps."""
+    s = unicodedata.normalize("NFKD", unicodedata.normalize("NFKC", s or ""))
+    return unicodedata.normalize(
+        "NFC", "".join(c for c in s if not unicodedata.combining(c)))
+
+
 def _norm(s: str) -> str:
-    s = unicodedata.normalize("NFKC", s or "").lower()
+    s = _fold(s).lower()
     return re.sub(r"[^a-z0-9一-鿿]+", " ", s).strip()
 
 
@@ -73,8 +88,14 @@ def _title_ratio(want: str, hit: dict) -> float:
     """Similarity of a normalised ref title to the record's title, or to
     its main title when the source files a subtitle apart (Crossref): an
     entry may cite either."""
-    return max(fuzz.token_sort_ratio(want, _norm(t))
-               for t in (hit.get("title"), hit.get("main_title")) if t)
+    def one(t: str) -> float:
+        have = _norm(t)
+        # word splits differ ("random-forest" / "randomForest", "Dataset-v4"
+        # / "Dataset V4"): the same letters in the same order are one title
+        joined = fuzz.ratio(want.replace(" ", ""), have.replace(" ", ""))
+        return max(fuzz.token_sort_ratio(want, have), joined if joined >= 97 else 0)
+
+    return max(one(t) for t in (hit.get("title"), hit.get("main_title")) if t)
 
 
 def _surname(name: str) -> str:
@@ -96,7 +117,7 @@ def _surname(name: str) -> str:
 def _name_tokens(name: str) -> set[str]:
     """Full-name tokens of a latin name, initials dropped, hyphens joined:
     'Yi-Feng Lin' -> {yifeng, lin}; 'Weld D.S.' -> {weld}."""
-    n = unicodedata.normalize("NFKC", name or "").lower()
+    n = _fold(name).lower()
     n = re.sub(r"[\-‐‑–]", "", n)
     return {t for t in re.split(r"[^a-z]+", n) if len(t) >= 2}
 
@@ -311,6 +332,10 @@ def _evaluate(
             ok = any(ref.year - 2 <= int(y) <= ref.year + 1 for y in years)
         else:
             ok = any(abs(int(y) - ref.year) <= 1 for y in years)
+        horizon = _HORIZON.get()
+        if (not ok and horizon and ref.year < horizon
+                and all(int(y) > horizon + 1 for y in years)):
+            ok = True
         if not ok:
             year_diff = True
             issues.append(
@@ -370,8 +395,15 @@ _GREY_RE = re.compile(
     r"technical report|tech\.?\s*rep\b|white\s*paper|\bblog\b|\bopenai\b|"
     r"github|kaggle|huggingface\.co|https?://|www\.|\bdataset\b|"
     r"accessed|retrieved from|unpublished|in preparation|"
-    r"personal communication|\bmanuscript\b",
+    r"personal communication|\bmanuscript\b|keynote|invited talk|"
+    r"\btutorial\b|leaderboard|\bslides\b|\bsoftware\b|\btoolkit\b",
     re.I)
+# "December 2019", "May 2020" with no volume or pages: how web pages,
+# leaderboard entries and blog posts are dated, not journal articles
+_MONTH_DATED_RE = re.compile(
+    r"\b(?:January|February|March|April|May|June|July|August|September|"
+    r"October|November|December)\s+(?:19|20)\d{2}\b")
+_PAGED_RE = re.compile(r"\d+\s*\(\d+\)|\bpp?\.|\bpages\b|\b\d+\s*[-–]\s*\d+\b|\bvol", re.I)
 
 
 def _grey(ref: Reference) -> bool:
@@ -380,6 +412,8 @@ def _grey(ref: Reference) -> bool:
     entry carrying no publication venue and no DOI at all."""
     text = f"{ref.raw} {ref.venue or ''}"
     if _GREY_RE.search(text):
+        return True
+    if _MONTH_DATED_RE.search(ref.raw) and not _PAGED_RE.search(ref.raw):
         return True
     return not (ref.venue or "").strip() and not ref.doi
 
@@ -616,6 +650,17 @@ async def _finalize(
             if retried and len(retried[0][2]) < len(title_matches[0][2]):
                 title_matches = retried
 
+    # a hyphenated compound the index stores joined ("random-forest" for
+    # "randomForest"): search engines tokenise the two apart and miss it
+    joined = _JOINED_RE.sub("", ref.title or "")
+    if not title_matches and doi_hit is None and joined != (ref.title or ""):
+        extra = await asyncio.gather(client.openalex_search(joined),
+                                     client.crossref_search(joined))
+        for r in extra:
+            if r.ok:
+                st.hits += r.data or []
+        title_matches, doi_hit = _select(ref, st.hits)
+
     # gray zone: nothing cleared the title bar, but some record comes close
     # (abbreviated title, dropped subtitle, renamed preprint). The model may
     # rescue a match — it can never turn an entry into "not found".
@@ -631,6 +676,7 @@ async def _finalize(
 
 
 _GRAY_MIN = 70.0
+_JOINED_RE = re.compile(r"(?<=[A-Za-z])-(?=[A-Za-z])")
 
 _ADJ_PROMPT = (
     "判断论文参考文献中的一条条目，和文献数据库里的几条候选记录，是否指同一篇文献。\n"
@@ -737,6 +783,18 @@ async def _stage1(
     return _State(hits=hits, responded=responded, doi_other=doi_other)
 
 
+def _year_horizon(references: list[Reference]) -> int | None:
+    """Second-latest entry year: one mistyped future year ("2091") or a
+    single fabricated recent entry must not stretch the horizon."""
+    import datetime
+
+    now = datetime.date.today().year
+    years = sorted(r.year for r in references if r.year and r.year <= now)
+    if len(years) < 5:
+        return None
+    return years[-2]
+
+
 async def verify_references(
     references: list[Reference],
     paragraphs: list[Paragraph],
@@ -749,6 +807,7 @@ async def verify_references(
     waiting for arXiv batches for the stragglers. ``local`` maps ref ids
     to PDFs linked from the user's reference folder (library.source)."""
     para_len = {p.id: len(p.text) for p in paragraphs}
+    horizon_token = _HORIZON.set(_year_horizon(references))
     own = client is None
     if own:
         client = RetrievalClient()
@@ -826,6 +885,7 @@ async def verify_references(
 
         await asyncio.gather(*(_fin(ref) for ref in pending))
     finally:
+        _HORIZON.reset(horizon_token)
         if own:
             await client.close()
 

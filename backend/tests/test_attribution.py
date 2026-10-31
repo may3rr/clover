@@ -95,3 +95,14 @@ def test_multi_marker_sentence_skipped():
 def test_collective_noun_skipped():
     p = _parsed("该方法借鉴了已有方法等人[5]的思路。", ["王大明"])
     assert check_attribution(p) == []
+
+
+def test_comma_after_year_fires():
+    # "2015 年，He 等人" — the comma closes a clause, it is not an author list
+    p = _parsed("2015 年，He 等人[5]提出了Fast R-CNN 算法。", ["GIRSHICK R."])
+    assert len(check_attribution(p)) == 1
+
+
+def test_comma_author_list_skipped():
+    p = _parsed("Bordes, Weston等人[5]提出了模型。", ["Bordes A"])
+    assert check_attribution(p) == []

@@ -108,27 +108,6 @@ export function TextFormatFillIcon(p: IconProps) {
   )
 }
 
-export function DocTextFillIcon(p: IconProps) {
-  return (
-    <Fill {...p}>
-      <path
-        fillRule="evenodd"
-        d="M6.5 2.5h6.6l5.4 5.4V19a2.5 2.5 0 0 1-2.5 2.5H6.5A2.5 2.5 0 0 1 4 19V5a2.5 2.5 0 0 1 2.5-2.5zM12.6 3.9v4h4z"
-      />
-      <rect x="8" y="12" width="8" height="1.5" rx="0.75" fill="var(--tile-bg, white)" />
-      <rect x="8" y="15.2" width="5.5" height="1.5" rx="0.75" fill="var(--tile-bg, white)" />
-    </Fill>
-  )
-}
-
-export function PlusFillIcon(p: IconProps) {
-  return (
-    <Fill {...p}>
-      <path d="M11 4.5h2V11h6.5v2H13v6.5h-2V13H4.5v-2H11z" />
-    </Fill>
-  )
-}
-
 export function TrashFillIcon(p: IconProps) {
   return (
     <Fill {...p}>
@@ -287,15 +266,6 @@ export function CheckSquareIcon({ size = 18, on = false }: { size?: number; on?:
 
 // chevrons stay stroke-only per the spec
 
-export function PersonFillIcon(p: IconProps) {
-  return (
-    <Fill {...p}>
-      <circle cx="12" cy="7.8" r="4.3" />
-      <path d="M12 13.6c-4.5 0-7.7 2.8-7.7 6.1 0 .9.7 1.8 1.6 1.8h12.2c.9 0 1.6-.9 1.6-1.8 0-3.3-3.2-6.1-7.7-6.1z" />
-    </Fill>
-  )
-}
-
 /** gearshape.fill — 8-lobe rosette with a punched centre hole */
 export function GearshapeFillIcon(p: IconProps) {
   return (
@@ -323,29 +293,6 @@ export function ChevronLeftIcon({ size = 18, color = 'currentColor' }: IconProps
       style={{ flex: 'none', display: 'block' }}
     >
       <path d="M14.5 5.5 8.5 12l6 6.5" />
-    </svg>
-  )
-}
-
-/** chevron-right — mirror of ChevronLeftIcon */
-export function ChevronRightIcon({
-  size = 18,
-  color = 'currentColor',
-}: IconProps) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth={1.6}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      style={{ flex: 'none', display: 'block' }}
-    >
-      <path d="M9.5 5.5 15.5 12l-6 6.5" />
     </svg>
   )
 }

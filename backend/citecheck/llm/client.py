@@ -12,7 +12,7 @@ import heapq
 import json
 import logging
 from contextvars import ContextVar
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any, Literal, TypeVar
 from urllib.parse import urlparse
 
@@ -142,10 +142,6 @@ class stats_scope:
 
     def __exit__(self, *exc: object) -> None:
         _current_stats.reset(self._token)
-
-
-def current_stats() -> LLMStats | None:
-    return _current_stats.get()
 
 
 def _count(route: str) -> None:

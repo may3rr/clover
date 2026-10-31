@@ -17,10 +17,14 @@ import re
 
 from rapidfuzz import fuzz
 
-from ..parse.links import author_year_items, _numeric_items, unresolved_numeric
+from ..parse.links import author_year_items, unresolved_numeric
 from ..parse.parser import ParsedDocument
 from ..refs.structure import _TYPE_TAG_RE
 from ..schema import Anchor, Finding, Reference
+
+_BARE_OL_RE = re.compile(r"\[\s*OL\s*\]")
+_MANAGER_NAME = {"zotero": "Zotero", "endnote": "EndNote", "mendeley": "Mendeley",
+                 "noteexpress": "NoteExpress"}
 
 
 # "[J]" exactly: online-first [J/OL] entries have no volume/pages yet
@@ -189,7 +193,29 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
         ))
 
     # ---- GB/T type-tag mixing -----------------------------------------
-    tagged = [bool(_TYPE_TAG_RE.search(r.raw)) for r in refs]
+    # "[OL]" alone carries the medium but not the type: a tag, but not a
+    # complete one, so it is reported as such rather than as missing
+    bare_ol = [bool(_BARE_OL_RE.search(r.raw)) and not _TYPE_TAG_RE.search(r.raw)
+               for r in refs]
+    tagged = [bool(_TYPE_TAG_RE.search(r.raw)) or ol for r, ol in zip(refs, bare_ol)]
+    # one finding for the whole list: the same slip repeated on ten
+    # entries is one thing for the author to fix, not ten
+    ol_refs = [r for r, ol in zip(refs, bare_ol) if ol]
+    if ol_refs:
+        labels = "、".join(f"[{r.label}]" if r.label else (r.title or "")[:20]
+                          for r in ol_refs)
+        which = (f"第 {labels} 条" if len(ol_refs) == 1
+                 else f"{labels} 共 {len(ol_refs)} 条")
+        findings.append(Finding(
+            id="", layer="norms", severity="low",
+            anchor=_ref_anchor(ol_refs[0], para_len),
+            title="文献类型标识只写了载体 [OL]",
+            detail=f"依据：{which}标为 [OL]。GB/T 7714 中 OL 是电子资源的载体"
+                   "标识，要和文献类型连写，例如网络预印本写作 [EB/OL]，网络期刊"
+                   "论文写作 [J/OL]。\n"
+                   "建议：按每条文献的类型补全标识。",
+            refs=[r.id for r in ol_refs],
+        ))
     if any(tagged) and not all(tagged):
         for r, ok in zip(refs, tagged):
             if not ok:
@@ -225,7 +251,7 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
             ))
 
     # ---- managed list out of first-appearance order -------------------
-    if parsed.document.managed_by in {"zotero", "endnote"} and refs:
+    if parsed.document.managed_by and refs:
         first_seen: list[str] = []
         for m in parsed.markers:
             for rid in m.ref_ids:
@@ -233,7 +259,7 @@ def check_norms(parsed: ParsedDocument) -> list[Finding]:
                     first_seen.append(rid)
         order = [r.id for r in refs if r.id in first_seen]
         if order != first_seen:
-            tool = "Zotero" if parsed.document.managed_by == "zotero" else "EndNote"
+            tool = _MANAGER_NAME.get(parsed.document.managed_by, "文献管理软件")
             first = refs[0]
             findings.append(Finding(
                 id="", layer="norms", severity="medium",

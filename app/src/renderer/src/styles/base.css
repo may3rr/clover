@@ -296,6 +296,12 @@ select {
   color: var(--text);
   text-align: center;
 }
+/* the report page's variant sits in a row with its button */
+.venue-input-left {
+  text-align: left;
+  flex: 1;
+  min-width: 0;
+}
 .venue-input::placeholder {
   color: var(--text-secondary);
 }
@@ -581,7 +587,7 @@ select {
 .side-row {
   height: 32px;
   border-radius: 8px;
-  padding: 0 10px;
+  padding: 0 8px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -608,6 +614,14 @@ select {
 .list-row.sel {
   background: var(--fill-strong);
 }
+/* pane text line: rows inset 8 from the pane edge, content 8 inside the
+   row, so glyphs, labels and headers all start 16 from the edge */
+.inspector .list-row {
+  padding: 12px 8px;
+}
+.inspector .list-row-title {
+  text-wrap: pretty;
+}
 
 /* a row's secondary control: shown on hover / keyboard focus only */
 .list-row .row-action {
@@ -627,12 +641,19 @@ select {
   color: var(--text-secondary);
   padding: 8px 12px;
 }
+.glass-sidebar .group-label {
+  padding: 8px 16px;
+}
+/* inspector labels sit in the list's 8px inset */
+.inspector .group-label {
+  padding: 8px;
+}
 
 /* sidebar lower section: 目录 / 最近检查 as two quiet text tabs */
 .side-tabs {
   display: flex;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 8px 16px;
   margin-top: 16px;
 }
 .side-tab {
@@ -1540,6 +1561,28 @@ select {
   margin: 12px 0 0;
   color: var(--text-secondary);
 }
+.qwen-models {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.qwen-model {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.qwen-spin {
+  flex: none;
+  padding: 0;
+  border-radius: 8px;
+  transition: transform 160ms var(--ease-out);
+}
+.qwen-spin:active {
+  transform: scale(0.97);
+}
+.qwen-spin .provider-badge {
+  transition: transform var(--spring-bouncy-dur) var(--spring-bouncy);
+}
 
 /* the paper keeps proportional figures — it is prose, not UI */
 .paper {
@@ -1798,6 +1841,8 @@ select {
   61%, 100% { opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
+  .qwen-spin .provider-badge { transition: none; }
+  .qwen-spin:active { transform: none; }
   .egg-btn, .egg-blink { animation: none; }
 }
 

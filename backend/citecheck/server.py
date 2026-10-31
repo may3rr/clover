@@ -351,6 +351,16 @@ async def analyze(
         except (ValueError, TypeError):
             return JSONResponse({"detail": "范文列表格式不正确"}, status_code=400)
 
+    return {"job_id": _launch(src, benchmark, venue.strip() or None, library,
+                              confirmed, picked)}
+
+
+def _launch(src: Path, benchmark: str, venue: str | None, library: str | None,
+            confirmed, picked, replaces: str | None = None) -> str:
+    """Start a pipeline job; returns its id. ``replaces``: a stored report
+    this run supersedes (the same manuscript benchmarked after the fact) —
+    its row is removed once the new report is stored, so the history keeps
+    one entry per check."""
     job = Job(id=secrets.token_hex(8), src_path=src)
     JOBS[job.id] = job
 
@@ -366,12 +376,17 @@ async def analyze(
         job.report = rep
         _save_report(job.id, src, benchmark, rep)
         saved = True
+        _drop_replaced()
+
+    def _drop_replaced() -> None:
+        if replaces:
+            Cache(get_settings().cache_path).delete_report(replaces)
 
     async def _run() -> None:
         try:
             rep = await run_pipeline(
                 src, benchmark_id=benchmark, emit=emit,
-                venue=venue.strip() or None, library_dir=library,
+                venue=venue, library_dir=library,
                 library_links=confirmed,
                 library_exemplars=picked, on_report=on_report)
             job.report = rep
@@ -380,6 +395,7 @@ async def analyze(
             # written into the row on_report stored
             if not saved:
                 _save_report(job.id, src, benchmark, rep)
+                _drop_replaced()
             elif rep.overview is None or rep.overview.status != "pending":
                 _update_report(job.id, rep)
         except PipelineError as e:
@@ -390,7 +406,7 @@ async def analyze(
             emit({"type": "failed", "error": "体检过程中出现内部错误。"})
 
     job.task = asyncio.create_task(_run())
-    return {"job_id": job.id}
+    return job.id
 
 
 def _save_report(report_id: str, src: Path, benchmark: str, rep) -> None:
@@ -468,6 +484,44 @@ async def delete_stored_report(report_id: str):
     if not Cache(get_settings().cache_path).delete_report(report_id):
         return JSONResponse({"detail": "report not found"}, status_code=404)
     return {"ok": True}
+
+
+@app.post("/reports/{report_id}/venue")
+async def benchmark_stored_report(report_id: str, venue: str = Form("")):
+    """Benchmark a finished report against a target venue typed after the
+    fact: the same manuscript runs again with the venue set, keeping the
+    reference folder and the links the user confirmed. The model and
+    retrieval caches make the four layers a replay; the new report
+    replaces this one once it is stored."""
+    name = venue.strip()
+    if not name:
+        return JSONResponse({"detail": "请填写目标期刊或会议名称。"}, status_code=400)
+    row = _stored_report(report_id)
+    if isinstance(row, JSONResponse):
+        return row
+    src = Path(row["src_path"])
+    if not src.exists():
+        return JSONResponse(
+            {"detail": "原稿已移动或删除，无法对标。请重新拖入论文，并在首页填写目标期刊。"},
+            status_code=400)
+    from .schema import Report
+
+    old = Report.model_validate(json.loads(row["report_json"]))
+    lib = old.library
+    library = lib.folder if lib and Path(lib.folder).is_dir() else None
+    links = lib.links if library and lib.links else None
+    # the run reads the manuscript as it is now: say so when it was edited
+    # after this report was made
+    from datetime import datetime
+
+    try:
+        made = datetime.fromisoformat(row["created_at"]).timestamp()
+        edited = src.stat().st_mtime > made + 1
+    except (ValueError, OSError):
+        edited = False
+    return {"job_id": _launch(src, row["benchmark"], name, library, links, None,
+                              replaces=report_id),
+            "edited": edited}
 
 
 @app.post("/reports/{report_id}/export")

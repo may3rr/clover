@@ -237,8 +237,8 @@ def _support_findings(
     ref_label = {r.id: f"[{r.label}]" if r.label else r.id
                  for r in parsed.references}
     findings: list[Finding] = []
-    # citing paragraph -> claims whose cited text could not be fetched
-    no_source: dict[str, list[tuple[Claim, str]]] = {}
+    # claims whose cited text could not be fetched, by reference
+    no_source: dict[str, set[str]] = {}
     for (claim, rid), check in zip(jobs, checks):
         if check.label == "unsupported":
             findings.append(
@@ -279,25 +279,22 @@ def _support_findings(
                 )
             )
         if check.source_kind == "none":
-            no_source.setdefault(claim.paragraph_id, []).append((claim, rid))
-    # one note per citing paragraph: a sentence citing [3-7] reads as one
-    # question, not five, and the note sits where the claim is
-    for pid, pairs in no_source.items():
-        rids = sorted({rid for _, rid in pairs},
-                      key=lambda r: ref_order.get(r, 0))
+            no_source.setdefault(rid, set()).add(claim.id)
+    # one note for the whole document: every unreachable source raises the
+    # same question with the same next step, so the list reads as one item
+    # instead of repeating per paragraph
+    if no_source:
+        rids = sorted(no_source, key=lambda r: ref_order.get(r, 0))
         labels = "、".join(ref_label.get(r, r) for r in rids)
-        n = len(rids)
+        n_claims = len(set().union(*no_source.values()))
         findings.append(
             Finding(
-                id="", layer="support", severity="low",
-                anchor=Anchor(paragraph_id=pid,
-                              start=min(c.start for c, _ in pairs),
-                              end=max(c.end for c, _ in pairs)),
-                title=("未能获取被引文献的原文，这里的论断无法判断" if n == 1
-                       else f"未能获取 {n} 篇被引文献的原文，这里的论断无法判断"),
+                id="", layer="support", severity="low", anchor=None,
+                title=f"未能获取 {len(rids)} 篇被引文献的原文，"
+                      f"{n_claims} 条论断无法判断",
                 detail=f"依据：以下文献未找到可用的摘要或开放全文：{labels}。\n"
                        "建议：把这些文献的 PDF 放进文献文件夹后重新体检，"
-                       "或人工核对这里的论断。",
+                       "或人工核对引用它们的论断。",
                 refs=rids,
             )
         )
@@ -476,13 +473,6 @@ async def _cascade(
         rationale=rationale, source_title=title,
         source_excerpt=used, evidence_span=span, off_topic=off_topic,
     )
-
-
-async def _judge_pair(
-    claim: Claim, ref_id: str, matched: dict | None, cache: Cache, http
-) -> SupportCheck:
-    source = await build_source(matched, claim.text, cache=cache, client=http)
-    return await _judge_with_source(claim, ref_id, matched, source)
 
 
 async def _judge_with_source(

@@ -320,15 +320,48 @@ def _diff_span(old: str, new: str) -> tuple[int, int, str]:
 # ------------------------------------------------------------- comments
 
 
+_EVIDENCE_MAX = 200
+
+
+def _evidence_line(f, report: Report) -> str | None:
+    """The cited text behind a support comment, so the author can weigh
+    the judgement in Word without switching back to Clover: the evidence
+    of the check whose claim sits under the comment, with where it came
+    from. Verbatim (it was located in the source), cut to a few lines."""
+    if f.layer != "support" or f.anchor is None or not f.refs:
+        return None
+    claims = {c.id: c for c in report.claims}
+    label = {r.id: r.label for r in report.references}
+    for chk in report.support_checks:
+        c = claims.get(chk.claim_id)
+        if (chk.ref_id not in f.refs or not chk.evidence or c is None
+                or c.paragraph_id != f.anchor.paragraph_id
+                or c.end <= f.anchor.start or c.start >= f.anchor.end):
+            continue
+        where = (f"本地原文第 {chk.source_page} 页" if chk.source_file and chk.source_page
+                 else "本地原文" if chk.source_file
+                 else "开放全文" if chk.source_kind == "fulltext" else "摘要")
+        ev = " ".join(chk.evidence.split())
+        if len(ev) > _EVIDENCE_MAX:
+            ev = ev[:_EVIDENCE_MAX] + "……"
+        tag = f"[{label[chk.ref_id]}]，" if label.get(chk.ref_id) else ""
+        return f"被引原文（{tag}{where}）：{ev}"
+    return None
+
+
 def _comment_el(cid: int, title: str, detail: str, date: str) -> etree._Element:
     c = etree.Element(dx.qn("comment"))
     c.set(W_ID, str(cid))
     c.set(W_AUTHOR, _author)
     c.set(W_INITIALS, _initials)
     c.set(W_DATE, date)
-    for line in [title] + [ln for ln in detail.splitlines() if ln.strip()]:
+    lines = [title] + [ln for ln in detail.splitlines() if ln.strip()]
+    for i, line in enumerate(lines):
         p = etree.SubElement(c, W_P)
         r = etree.SubElement(p, W_R)
+        if i == 0:  # the title reads as the comment's heading
+            rpr = etree.SubElement(r, dx.qn("rPr"))
+            etree.SubElement(rpr, dx.qn("b"))
         t = etree.SubElement(r, W_T)
         t.text = line
         t.set(XML_SPACE, "preserve")
@@ -603,8 +636,9 @@ def export_report(
             continue
         _place_comment(target_p, target_runs, cid, ids, date,
                        comment_ref_style)
+        ev = _evidence_line(f, report)
         new_comments_root.append(
-            _comment_el(cid, f.title, f.detail, date))
+            _comment_el(cid, f.title, f.detail + ("\n" + ev if ev else ""), date))
 
     # ---- write the new zip --------------------------------------------------
     blobs["word/document.xml"] = etree.tostring(
@@ -661,7 +695,7 @@ def _strip_label(raw: str) -> str:
 def _self_check(src: Path, out_root: etree._Element, out: Path,
                 report: Report) -> None:
     # (a) the exported file still parses
-    acc_parsed = parse_docx(out)
+    parse_docx(out)
 
     src_root = etree.fromstring(zipfile.ZipFile(src).read("word/document.xml"))
 

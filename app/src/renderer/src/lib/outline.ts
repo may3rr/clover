@@ -37,12 +37,10 @@ export interface SkAnchor {
 
 export const CHARS_PER_LINE = 90
 export const LINE_H = 7 // 3px bar + 4px gap
-export const HEAD_H = 15 // title text + gap
 export const PAGE_PAD = 10
 export const PAGE_W = 124
 export const PAGE_H = 170
 export const MAX_PAGES = 4
-export const MIN_PAGES = 2
 export const MAX_REF_BARS = 10
 
 export interface SkLine {

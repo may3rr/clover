@@ -21,7 +21,6 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
-import httpx
 
 from .cache import Cache
 from .config import get_settings
@@ -218,7 +217,8 @@ async def run_pipeline(
 
     para_by_id = {p.id: p for p in parsed.paragraphs}
     t_parsed = time.monotonic()
-    send({"type": "parsed", "outline": _outline(parsed)})
+    send({"type": "parsed", "outline": _outline(parsed),
+          "n_refs": len(parsed.references), "n_markers": len(parsed.markers)})
 
     # uploaded files are stored as "<hex>_<name>.docx" — strip the prefix
     # so usage rows show the document's real name

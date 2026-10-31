@@ -29,6 +29,11 @@ interface Props {
 }
 
 export default function Detail({ item, report, backLabel, onBack, onCollapse, onJump }: Props) {
+  const evidenceFirst =
+    item.kind === 'finding' &&
+    item.layer === 'support' &&
+    (item.finding?.refs ?? []).length === 1 &&
+    !!supportForFinding(report, item).excerpt
   return (
     <div className="detail-in flex flex-col flex-1 min-h-0" key={item.id}>
       <div
@@ -65,8 +70,10 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse, on
             className="flex flex-col"
             style={{ gap: 12, marginTop: 16 }}
           >
-            {/* the why comes first; the evidence below backs it up */}
-            <DetailLines detail={item.detail} />
+            {/* the why comes first and the evidence backs it up — except
+                for a support verdict, where the side-by-side texts are
+                the argument and must sit above the fold of a 380px pane */}
+            {!evidenceFirst && <DetailLines detail={item.detail} />}
             <SourceSnippet item={item} />
             {item.kind === 'group' && item.layer === 'distribution' ? (
               <DistributionDetail item={item} report={report} onJump={onJump} />
@@ -80,6 +87,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse, on
             ) : (
               <FindingDetail item={item} report={report} onJump={onJump} />
             )}
+            {evidenceFirst && <DetailLines detail={item.detail} />}
           </div>
         </div>
       </div>
@@ -111,16 +119,23 @@ function SourceSnippet({ item }: { item: ListItem }) {
   )
 }
 
+// "依据：…" / "建议：…" lines get the small label the cards use
+const LINE_LABEL = /^(依据|建议)：/
+
 function DetailLines({ detail }: { detail: string }) {
   const lines = detail.split('\n').filter(Boolean)
   if (!lines.length) return null
   return (
     <div className="flex flex-col gap-2">
-      {lines.map((l, i) => (
-        <div key={i} className="font-normal">
-          {l}
-        </div>
-      ))}
+      {lines.map((l, i) => {
+        const m = LINE_LABEL.exec(l)
+        return (
+          <div key={i} className="font-normal">
+            {m && <div className="t13 secondary">{m[1]}</div>}
+            {m ? l.slice(m[0].length) : l}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -186,26 +201,45 @@ function SupportDetail({ item, report }: { item: ListItem; report: Report }) {
       )}
       {s.excerpt && (
         <div className="card">
-          <div className="t13 secondary" style={{ marginBottom: 8 }}>
-            被引文献原文
+          <div
+            className="t13 flex items-center justify-between"
+            style={{ marginBottom: 8 }}
+          >
+            <span className="secondary">被引文献原文</span>
+            {s.label && VERDICT[s.label] && (
+              <span className={`font-semibold ${VERDICT[s.label][1]}`}>
+                {VERDICT[s.label][0]}
+              </span>
+            )}
           </div>
           {s.sourceTitle && (
             <div className="font-semibold" style={{ marginBottom: 4 }}>
               {s.sourceTitle}
             </div>
           )}
+          {/* the trust mechanism, said out loud: the quoted evidence was
+              found word for word in the source, or it was not */}
+          <div className="t13 secondary" style={{ marginBottom: 8 }}>
+            {s.evidenceSpan
+              ? `证据已在原文中逐字定位，${sourceLine(s.sourceKind, s.sourceFile, s.sourcePage)}`
+              : sourceLine(s.sourceKind, s.sourceFile, s.sourcePage)}
+          </div>
           <Excerpt
             text={s.excerpt}
             span={s.evidenceSpan}
             label={s.label}
           />
-          <div className="t13 secondary" style={{ marginTop: 8 }}>
-            {sourceLine(s.sourceKind, s.sourceFile, s.sourcePage)}
-          </div>
         </div>
       )}
     </>
   )
+}
+
+// verdict word and its semantic text colour (6.1: verdicts may be coloured)
+const VERDICT: Record<string, [string, string]> = {
+  unsupported: ['不支持', 'sem-high'],
+  partial: ['部分支持', 'sem-medium'],
+  supported: ['支持', 'sem-ok'],
 }
 
 /** where the excerpt came from: the user's own PDF (with the page the

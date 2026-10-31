@@ -34,12 +34,3 @@ export function BrandIcon({
 export function QwenIcon(p: BrandIconProps) {
   return <BrandIcon name="qwen" {...p} />
 }
-export function OpenAIIcon(p: BrandIconProps) {
-  return <BrandIcon name="openai" {...p} />
-}
-export function DeepSeekIcon(p: BrandIconProps) {
-  return <BrandIcon name="deepseek" {...p} />
-}
-export function OllamaIcon(p: BrandIconProps) {
-  return <BrandIcon name="ollama" {...p} />
-}

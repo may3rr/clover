@@ -141,7 +141,7 @@ export default function Onboarding({
           <div className="onboard-panel" style={{ width: 560 }}>
             <h1 className="t26 onboard-h">连接模型服务</h1>
             <p className="secondary onboard-sub">
-              {APP_NAME} 用大模型判断引用是否支持论断。默认使用阿里云百炼的通义千问，也可以填入你自己维护的 OpenAI 兼容端点。
+              {APP_NAME} 用通义千问判断引用是否支持论断。填入阿里云百炼的 API Key 即可开始。
             </p>
             <div className="onboard-model">
               <ModelSection

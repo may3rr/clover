@@ -266,3 +266,33 @@ def test_export_pure_insertion_typo(tmp_path):
     el = dict(docx_xml.iter_paragraphs(doc_root(out)))[para.id]
     inserted = ["".join(t.text or "" for t in ins.iter(w("t"))) for ins in el.iter(w("ins"))]
     assert "（KRL）" in inserted
+
+
+def test_support_comment_quotes_cited_text(tmp_path):
+    """A support comment carries the located evidence, so the author can
+    weigh it in Word; the title run is bold."""
+    from citecheck.schema import Claim, SupportCheck
+
+    src = FIXTURES / "numeric_en.docx"
+    base = build_report(src, with_distribution=False)
+    m = base.markers[0]
+    para = next(p for p in base.paragraphs if p.id == m.paragraph_id)
+    rid = m.ref_ids[0]
+    claim = Claim(id="c1", paragraph_id=para.id, start=0, end=m.end,
+                  text=para.text[:m.end], marker_ids=[m.id])
+    check = SupportCheck(claim_id="c1", ref_id=rid, label="unsupported",
+                         evidence="We report results on a different task.",
+                         source_kind="fulltext", rationale="")
+    f = Finding(id="", layer="support", severity="high",
+                anchor=Anchor(paragraph_id=para.id, start=0, end=m.end),
+                title="被引文献不支持这条论断", detail="依据：x。", refs=[rid])
+    report = build_report(src, extra_findings=[f], with_distribution=False)
+    report.claims, report.support_checks = [claim], [check]
+    out = export_report(src, report, tmp_path / "out.docx")
+    root = etree.fromstring(read_part(out, "word/comments.xml"))
+    texts = ["".join(c.itertext()) for c in root.findall(w("comment"))]
+    hit = [t for t in texts if t.startswith("被引文献不支持这条论断")]
+    assert hit and "被引原文（" in hit[0] and "开放全文" in hit[0]
+    assert "different task" in hit[0]
+    first_run = root.find(f".//{w('comment')}/{w('p')}/{w('r')}")
+    assert first_run.find(f"{w('rPr')}/{w('b')}") is not None

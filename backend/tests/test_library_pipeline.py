@@ -160,3 +160,64 @@ def test_library_scan_endpoint(paper_folder, tmp_path, monkeypatch):
         assert r.status_code == 400 and "ref 文件夹" in r.json()["detail"]
     finally:
         get_settings.cache_clear()
+
+
+def test_local_title_from_figure_label_ignored():
+    # the largest text on page 1 is a figure label; the entry's title is
+    # printed on the page, so the PDF is the same work
+    from pathlib import Path
+
+    from citecheck.library.scan import LocalPdf
+    from citecheck.library.source import local_issues
+    from citecheck.schema import LibraryDoc, Reference
+
+    doc = LibraryDoc(id="x", filename="YOLOv3_Redmon.pdf", title="inference time (ms)",
+                     source="layout")
+    page = ("YOLOv3: An Incremental Improvement Joseph Redmon Ali Farhadi "
+            "University of Washington Abstract We present some updates to YOLO")
+    pdf = LocalPdf(doc, Path("YOLOv3_Redmon.pdf"), [page])
+    ref = Reference(id="r1", raw="[1] x", title="YOLOV3: An incremental improvement",
+                    authors=["REDMON J"])
+    assert local_issues(ref, pdf) == []
+    # a different paper's title on the page still disagrees
+    other = Reference(id="r2", raw="[2] x", title="Focal loss for dense object detection",
+                      authors=["LIN T-Y"])
+    assert local_issues(other, pdf)
+
+
+def test_local_title_short_form_ignored():
+    from pathlib import Path
+
+    from citecheck.library.scan import LocalPdf
+    from citecheck.library.source import local_issues
+    from citecheck.schema import LibraryDoc, Reference
+
+    doc = LibraryDoc(id="y", filename="oi.pdf", title="The Open Images Dataset V4",
+                     source="layout")
+    pdf = LocalPdf(doc, Path("oi.pdf"), ["The Open Images Dataset V4 Kuznetsova"])
+    ref = Reference(id="r1", raw="[1] x",
+                    title="The Open Images Dataset-v4: Unified Image Classification, "
+                          "Object Detection, and Visual Relationship Detection at Scale",
+                    authors=["KUZNETSOVA A"])
+    assert local_issues(ref, pdf) == []
+
+
+def test_local_author_order_and_placeholder():
+    from pathlib import Path
+
+    from citecheck.library.scan import LocalPdf
+    from citecheck.library.source import local_issues
+    from citecheck.schema import LibraryDoc, Reference
+
+    title = "A survey of shape feature extraction techniques"
+
+    def issues(ref_authors, doc_authors):
+        doc = LibraryDoc(id="z", filename="s.pdf", title=title, authors=doc_authors,
+                         source="layout")
+        ref = Reference(id="r", raw="x", title=title, authors=ref_authors)
+        return local_issues(ref, LocalPdf(doc, Path("s.pdf"), [title]))
+
+    assert issues(["Yang M Q"], ["Mingqiang Yang", "Kidiyo Kpalma"]) == []
+    assert issues(["Ling Xiao"], ["Xiao Ling", "Daniel S. Weld"]) == []
+    assert issues(["Smeulders A W M"], ["anon"]) == []
+    assert issues(["Smith J"], ["Jones K"])
