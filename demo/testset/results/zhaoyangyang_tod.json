@@ -68,12 +68,12 @@
   "tp": 9,
   "fn": 0,
   "fp_new": 0,
-  "pre_existing": 122,
-  "tn": 358,
+  "pre_existing": 105,
+  "tn": 359,
   "excluded": 4,
   "claims": 198,
   "refs": 242,
-  "support_definitive": 162
+  "support_definitive": 164
  },
  "lenient": [
   1.0,
@@ -81,22 +81,12 @@
   1.0
  ],
  "strict": [
-  0.06870229007633588,
+  0.07894736842105263,
   1.0,
-  0.7505112474437627
+  0.7780126849894292
  ],
  "fp_units": [],
  "pre_existing_units": [
-  {
-   "unit": [
-    "claim",
-    "c10"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "KNN算法具有较强的一致性结果，其性能在很大程度上取决用于识别最近邻的距离度量，并且不擅长处理高维度数据"
-  },
   {
    "unit": [
     "claim",
@@ -183,7 +173,6 @@
    ],
    "alarms": [
     "label:unsupported",
-    "revision:typo",
     "support:被引文献不支持这条论断"
    ],
    "text": "目前工业界的对话系统的常规的方法仍然依赖于全面使用手工制作调整规则模板"
@@ -228,7 +217,6 @@
    ],
    "alarms": [
     "label:unsupported",
-    "revision:typo",
     "support:被引文献不支持这条论断"
    ],
    "text": "先前的在进行对话时，要对对话状态进行表方法"
@@ -258,16 +246,6 @@
   {
    "unit": [
     "claim",
-    "c168"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Zhao等人首先提出一种端到端的强深度化学习框架，基于长短记忆网络的深度Q网络的变体，即深度循环Q网络（DeepRecu"
-  },
-  {
-   "unit": [
-    "claim",
     "c17"
    ],
    "alarms": [
@@ -285,16 +263,6 @@
     "revision:typo"
    ],
    "text": "William等人提出混合编码网络（HybridCodeNetworks，HCN），通过使用LSTM来避免状态跟踪的繁琐"
-  },
-  {
-   "unit": [
-    "claim",
-    "c178"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "非任务型对话系统已有利用外部存储，模块来帮助系统更接近地模仿人类对话的模型"
   },
   {
    "unit": [
@@ -320,6 +288,17 @@
     "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "目前任务型对话系统常用的评估方法包括基于语料库的方题的对话（例如，购买正确的电影票、找到合适的餐馆等）"
+  },
+  {
+   "unit": [
+    "claim",
+    "c182"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "和对话产生的成本，即对话的轮次"
   },
   {
    "unit": [
@@ -383,7 +362,6 @@
    ],
    "alarms": [
     "label:unsupported",
-    "revision:typo",
     "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "迁移学习通过利用源领域中的可复用的知识，并将其移植到目标领域作为目标领域训练数据的一部分来帮助学习和训练目标领域．"
@@ -664,43 +642,10 @@
     "r107"
    ],
    "alarms": [
-    "authenticity:文献信息与本地原文不一致",
+    "authenticity:文献信息与数据库记录不一致",
     "status:mismatch"
    ],
    "text": "[107]LakshminarayananAS,SharmaS,RavindranB.Dynamicframeskipd"
-  },
-  {
-   "unit": [
-    "ref",
-    "r111"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[111]SuttonRS,BartoAG.ReinforcementLearning:AnIntroduction.C"
-  },
-  {
-   "unit": [
-    "ref",
-    "r122"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[122]Gaic'M,KimD,TsiakoulisP,etal.Distributeddialoguepolici"
-  },
-  {
-   "unit": [
-    "ref",
-    "r124"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[124]Gaic'M,Mrki'cN,SuP,etal.Policycommitteeforadaptationi"
   },
   {
    "unit": [
@@ -716,13 +661,24 @@
   {
    "unit": [
     "ref",
-    "r17"
+    "r156"
    ],
    "alarms": [
     "authenticity:文献信息与数据库记录不一致",
     "status:mismatch"
    ],
-   "text": "[17]BapnaA,TurG,Hakkani-TurD,HeckLP.Towardszeroshotframesema"
+   "text": "[156]MairesseF,Gaic'M,JurˇcekF,etal.Phrase-basedstatistical"
+  },
+  {
+   "unit": [
+    "ref",
+    "r176"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[176]RusV,CaiZ,GraesserAC.Evaluationinnaturallanguagegenerat"
   },
   {
    "unit": [
@@ -760,24 +716,13 @@
   {
    "unit": [
     "ref",
-    "r218"
+    "r224"
    ],
    "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
    ],
-   "text": "[218]WalkerMA,LitmanDJ,KammCA,etal.PARADISE:Aframeworkforeva"
-  },
-  {
-   "unit": [
-    "ref",
-    "r229"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[229]Gaic'M,LefevreF,JurˇcekF,etal.Back-offactionselectioni"
+   "text": "[224]WatanabeT,ArakiM,DoshitaS.Evaluatingdialoguestrategiesu"
   },
   {
    "unit": [
@@ -804,13 +749,57 @@
   {
    "unit": [
     "ref",
-    "r31"
+    "r239"
    ],
    "alarms": [
-    "authenticity:文献信息与本地原文不一致",
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[239]RoemmeleM,BejanCA,GordonAS.Choiceofplausiblealternative"
+  },
+  {
+   "unit": [
+    "ref",
+    "r25"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[25]LaffertyJD,MccallumA,PereiraFCN.Conditionalrandomfields:"
+  },
+  {
+   "unit": [
+    "ref",
+    "r72"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[72]WangZ,LemonO.Asimpleandgenericbelieftrackingmechanismfor"
+  },
+  {
+   "unit": [
+    "ref",
+    "r77"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
     "status:mismatch"
    ],
-   "text": "[31]YuW,YilinS,HongxiaJ,etal.Abi-modelbasedRNNsemanticframep"
+   "text": "[77]YoungS,Gaic'M,KeizerS,etal.Thehiddeninformationstatemod"
+  },
+  {
+   "unit": [
+    "ref",
+    "r80"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[80]HendersonM.Machinelearningfordialogstatetracking:Areview"
   },
   {
    "unit": [
@@ -826,13 +815,13 @@
   {
    "unit": [
     "ref",
-    "r94"
+    "r86"
    ],
    "alarms": [
     "authenticity:未能在数据库中找到这篇文献",
     "status:not_found"
    ],
-   "text": "[94]LemonO,RieserrV.Reinforcementlearningforadaptivedialogue"
+   "text": "[86]LeeS,EskenaziM.Recipeforbuildingrobustspokendialogstatet"
   },
   {
    "unit": [
@@ -855,18 +844,6 @@
     "status:mismatch"
    ],
    "text": "[96]RossS,GordonGJ,BagnellJA.No-regretreductionsforimitation"
-  },
-  {
-   "unit": [
-    "span",
-    "p105",
-    39,
-    61
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "有效利地利用过去和未来的信息）领域拓展性强；"
   },
   {
    "unit": [
@@ -895,18 +872,6 @@
   {
    "unit": [
     "span",
-    "p133",
-    0,
-    64
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "②在实际应用中，尽管使用深度学习模型表现优于传统方法，但深度学习模型的训练需要的大量的标注语料，成为了NLU领域的一个重"
-  },
-  {
-   "unit": [
-    "span",
     "p134",
     132,
     183
@@ -915,18 +880,6 @@
     "revision:typo"
    ],
    "text": "为此，一些基于常识知识图谱的对话模型被陆续提出[48-50]来帮助机器理解比字面上含义更深层次的理解．"
-  },
-  {
-   "unit": [
-    "span",
-    "p138",
-    89,
-    120
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "将特定领域完整常识知识编码为键值对（keyvalue）并整合．"
   },
   {
    "unit": [
@@ -951,30 +904,6 @@
     "revision:typo"
    ],
    "text": "DST以当前的动作un、前n-1轮的对话状态和相应的系统动作作为输入，输出其对当前对话状态St的估计．"
-  },
-  {
-   "unit": [
-    "span",
-    "p145",
-    0,
-    36
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "DST主要分为三类方法：基于人工规则、基于生成式模型和基于判别模式模型．"
-  },
-  {
-   "unit": [
-    "span",
-    "p15",
-    82,
-    145
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在任务型对话系统领域，苹果Siri、亚马逊Echo、微软敦煌小冰等开始步入应用阶段，帮助用户便捷处理复杂任务，减轻了人工"
   },
   {
    "unit": [
@@ -1039,18 +968,6 @@
   {
    "unit": [
     "span",
-    "p292",
-    0,
-    105
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "其效果超过DDQ（在预订电影票的任务中，epoch=300，任务成功率0．7400，平均对话轮数13．81，人工评价任务"
-  },
-  {
-   "unit": [
-    "span",
     "p320",
     345,
     377
@@ -1071,18 +988,6 @@
     "revision:typo"
    ],
    "text": "RL=（Si，Ai）in=1分别对应一个专家示例集合!E"
-  },
-  {
-   "unit": [
-    "span",
-    "p333",
-    198,
-    213
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "其中Q-学习算法分成如下两步："
   },
   {
    "unit": [
@@ -1195,30 +1100,6 @@
   {
    "unit": [
     "span",
-    "p421",
-    0,
-    47
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "NLG的方法可以话分为：基于规则模板/句子规划的方法、基于语言模型的方法和基于深度学习的方法．"
-  },
-  {
-   "unit": [
-    "span",
-    "p423",
-    0,
-    83
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "[主演人1]、[主演人2]、[…]主演的[电影名称]电影将于[放映日期]的[放映时间]点在[影院名称]进行放映该模板中，"
-  },
-  {
-   "unit": [
-    "span",
     "p425",
     121,
     153
@@ -1279,18 +1160,6 @@
   {
    "unit": [
     "span",
-    "p512",
-    158,
-    184
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "因此目前的NLG的评估并不成熟，制约着NLG的发展．"
-  },
-  {
-   "unit": [
-    "span",
     "p518",
     169,
     210
@@ -1311,18 +1180,6 @@
     "revision:typo"
    ],
    "text": "难以集合知识库；"
-  },
-  {
-   "unit": [
-    "span",
-    "p563",
-    42,
-    78
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "数据库很大时，需要很大的计算量，不易扩展很多模块需要较多的人为干预，例如"
   },
   {
    "unit": [
@@ -1351,42 +1208,6 @@
   {
    "unit": [
     "span",
-    "p602",
-    207,
-    277
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "大量实践表，训练语料的质量和对话系统生成内容的明[221-223]质量紧密相关，但是高质量的对训练语料的专业的、完整的标"
-  },
-  {
-   "unit": [
-    "span",
-    "p659",
-    0,
-    18
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "：Paperhttp：//www．"
-  },
-  {
-   "unit": [
-    "span",
-    "p7",
-    1105,
-    1229
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Thenon-taskorienteddialoguesystems，alsocalledknownaschatrobo"
-  },
-  {
-   "unit": [
-    "span",
     "p7",
     1229,
     1400
@@ -1395,18 +1216,6 @@
     "revision:typo"
    ],
    "text": "Thereareusedintheopenfieldscenariosandcanhandleawidevarietyo"
-  },
-  {
-   "unit": [
-    "span",
-    "p774",
-    0,
-    18
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "：Paperhttp：//www．"
   },
   {
    "unit": [
@@ -1455,18 +1264,6 @@
     "revision:typo"
    ],
    "text": "高效地融合领域知识不但要克服上述的挑战，而且还要一整套知识工程的方法，因此如何引入领域知识和构建高质量的知识图谱是未来对"
-  },
-  {
-   "unit": [
-    "span",
-    "p984",
-    152,
-    211
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "手机助手、问答系统、智能聊天机器人等对话系统如雨后春笋般地涌现，人机对话系统业的蓬勃发展展现了人机对话广泛的应用价值．"
   }
  ]
 }

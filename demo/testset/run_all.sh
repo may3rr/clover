@@ -1,6 +1,8 @@
 #!/bin/bash
 source /opt/anaconda3/etc/profile.d/conda.sh && conda activate claude
-export DASHSCOPE_API_KEY=$(python3 "$(dirname "$0")/get_key.py")
+# 百炼密钥由 backend/.env 读取；向量与重排的硅基流动密钥取自 ~/.zshrc
+# （F36 前这里把 DeepSeek 密钥塞进 DASHSCOPE_API_KEY，英文 F8 结果因此是 deepseek-flash 跑的）
+[ -n "$SILICONFLOW_API_KEY" ] || export SILICONFLOW_API_KEY=$(zsh -ic 'printf %s "$SILICONFLOW_API_KEY"' 2>/dev/null)
 cd /Users/jackielyu/Coding/tmall
 variants=${1:-"clean injected"}
 for d in liuqiao_kg luohuilan_odt zhaoyangyang_tod yinhongpeng_odt guyingjie_mrc; do

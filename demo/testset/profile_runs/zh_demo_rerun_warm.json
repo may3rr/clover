@@ -1,0 +1,106 @@
+{
+ "tag": "zh_demo_rerun",
+ "phase": "warm",
+ "input": "demo/final/演示稿/基于深度学习的目标检测研究综述.docx",
+ "library": "demo/final/演示稿/ref",
+ "wall_s": 5.4,
+ "duration_s": 5.4,
+ "timings": {
+  "parse": 0.0,
+  "layers": {
+   "distribution": 0.0,
+   "norms": 0.0,
+   "authenticity": 5.1,
+   "support": 5.4
+  },
+  "overview": 0.0,
+  "sources": {
+   "crossref": {
+    "calls": 115,
+    "seconds": 0.0,
+    "cached": 115
+   },
+   "openalex": {
+    "calls": 90,
+    "seconds": 0.0,
+    "cached": 90
+   },
+   "s2": {
+    "calls": 11,
+    "seconds": 39.89,
+    "cached": 0
+   },
+   "arxiv": {
+    "calls": 6,
+    "seconds": 0.0,
+    "cached": 6
+   }
+  }
+ },
+ "size": {
+  "paragraphs": 149,
+  "references": 73,
+  "markers": 96,
+  "claims": 79,
+  "support_checks": 109,
+  "linked_pdfs": 52
+ },
+ "tasks": {
+  "structure": {
+   "calls": 16,
+   "cached": 16,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "function": {
+   "calls": 40,
+   "cached": 40,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "extract": {
+   "calls": 65,
+   "cached": 65,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "typo": {
+   "calls": 65,
+   "cached": 65,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "judge": {
+   "calls": 302,
+   "cached": 301,
+   "prompt": 862,
+   "completion": 3,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "review": {
+   "calls": 21,
+   "cached": 21,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  }
+ },
+ "findings": 33,
+ "revisions": 14
+}

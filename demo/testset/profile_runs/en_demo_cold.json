@@ -1,0 +1,133 @@
+{
+ "tag": "en_demo",
+ "phase": "cold",
+ "input": "demo/final/英文演示稿/deep_residual_learning.zip",
+ "library": "demo/final/英文演示稿/ref",
+ "wall_s": 472.9,
+ "duration_s": 472.9,
+ "timings": {
+  "parse": 0.8,
+  "layers": {
+   "distribution": 20.2,
+   "authenticity": 36.3,
+   "norms": 143.2,
+   "support": 471.8
+  },
+  "overview": 0.0,
+  "sources": {
+   "arxiv": {
+    "calls": 7,
+    "seconds": 48.539,
+    "cached": 0
+   },
+   "crossref": {
+    "calls": 76,
+    "seconds": 406.855,
+    "cached": 0
+   },
+   "openalex": {
+    "calls": 58,
+    "seconds": 345.045,
+    "cached": 0
+   },
+   "s2": {
+    "calls": 12,
+    "seconds": 5.688,
+    "cached": 0
+   }
+  }
+ },
+ "size": {
+  "paragraphs": 678,
+  "references": 54,
+  "markers": 142,
+  "claims": 112,
+  "support_checks": 156,
+  "linked_pdfs": 29
+ },
+ "tasks": {
+  "extract": {
+   "calls": 95,
+   "cached": 0,
+   "prompt": 13744,
+   "completion": 5139,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "typo": {
+   "calls": 120,
+   "cached": 0,
+   "prompt": 31338,
+   "completion": 2580,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "structure": {
+   "calls": 11,
+   "cached": 0,
+   "prompt": 5282,
+   "completion": 5307,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "function": {
+   "calls": 71,
+   "cached": 0,
+   "prompt": 14214,
+   "completion": 3814,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "judge": {
+   "calls": 406,
+   "cached": 29,
+   "prompt": 317608,
+   "completion": 34735,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "embed": {
+   "calls": 1006,
+   "cached": 0,
+   "prompt": 2590934,
+   "completion": 0,
+   "models": [
+    "Qwen/Qwen3-Embedding-0.6B"
+   ]
+  },
+  "review": {
+   "calls": 25,
+   "cached": 6,
+   "prompt": 42577,
+   "completion": 3310,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "rerank": {
+   "calls": 130,
+   "cached": 0,
+   "prompt": 1177441,
+   "completion": 0,
+   "models": [
+    "Qwen/Qwen3-Reranker-0.6B"
+   ]
+  },
+  "review_fallback": {
+   "calls": 2,
+   "cached": 0,
+   "prompt": 7183,
+   "completion": 2028,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  }
+ },
+ "findings": 42,
+ "revisions": 10
+}

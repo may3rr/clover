@@ -25,7 +25,7 @@
    "id": "wrongyear",
    "kind": "wrong_year",
    "detected": true,
-   "detail": "status=mismatch issues=['年份不一致：文中写 2013，数据库记录为 2016', '本地原文年份为 2016，文中写 2013']",
+   "detail": "status=mismatch issues=['年份不一致：文中写 2013，数据库记录为 2017', '本地原文年份为 2016，文中写 2013']",
    "located": true
   },
   {
@@ -39,7 +39,7 @@
    "id": "misattr2",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "detail": "labels=['unsupported'] offtopic=1 findings=2",
    "located": true
   },
   {
@@ -61,22 +61,22 @@
   "tp": 7,
   "fn": 1,
   "fp_new": 0,
-  "pre_existing": 30,
-  "tn": 107,
+  "pre_existing": 18,
+  "tn": 117,
   "excluded": 4,
   "claims": 75,
   "refs": 72,
-  "support_definitive": 63
+  "support_definitive": 65
  },
  "lenient": [
   1.0,
   0.875,
-  0.991304347826087
+  0.992
  ],
  "strict": [
-  0.1891891891891892,
+  0.28,
   0.875,
-  0.7862068965517242
+  0.8671328671328671
  ],
  "fp_units": [],
  "pre_existing_units": [
@@ -188,16 +188,6 @@
   {
    "unit": [
     "claim",
-    "c51"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "在此基础上，Lin等人提出了RetinaNet算法，针对SSD算法因密集采样导致的难易样本严重失衡问题，提出了Focal"
-  },
-  {
-   "unit": [
-    "claim",
     "c56"
    ],
    "alarms": [
@@ -243,54 +233,9 @@
     "c66"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "revision:typo"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "当前通用目标检测任务中流行的数据集有:PAS-CALVOC2007、PASCALVOC2012、MSCOCO、Image"
-  },
-  {
-   "unit": [
-    "ref",
-    "r12"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[12]OKSUZKemal,CAMBarisCan,KALKANS,etal.ImbalanceProblemsinO"
-  },
-  {
-   "unit": [
-    "ref",
-    "r15"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[15]GIRSHICKR,DONAHUEJ,DARRELLT,etal.Richfeaturehierarchiesf"
-  },
-  {
-   "unit": [
-    "ref",
-    "r22"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[22]LONGJ,SHELHAMERE,DARRELLT.Fullyconvolutionalnetworksfors"
-  },
-  {
-   "unit": [
-    "ref",
-    "r29"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[29]ZHUY,ZHAOC,WANGJ,etal.Couplenet:couplingglobalstructurew"
   },
   {
    "unit": [
@@ -306,80 +251,13 @@
   {
    "unit": [
     "ref",
-    "r47"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[47]REDMONJ,FARHADIA.YOLOV3:Anincrementalimprovement[A].Comp"
-  },
-  {
-   "unit": [
-    "ref",
-    "r51"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[51]FUCheng-yang,LIUWei,RANGAA,etal.DSSD:DeconvolutionalSing"
-  },
-  {
-   "unit": [
-    "ref",
-    "r53"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[53]LIB,LIUY,WANGX.Gradientharmonizedsingle-stagedetector[A]"
-  },
-  {
-   "unit": [
-    "ref",
-    "r64"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[64]ZHOUXing-yi,ZHUOJia-cheng,KRAHENBUHLP.Bottom-upobjectdet"
-  },
-  {
-   "unit": [
-    "ref",
-    "r68"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[68]KUZNETSOVAA,ROMH,ALLDRINN,etal.TheOpenImagesDataset-v4:U"
-  },
-  {
-   "unit": [
-    "ref",
     "r7"
    ],
    "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
    ],
    "text": "[7]LIAWA,WIENERM.Classificationandregressionbyrandom-forest["
-  },
-  {
-   "unit": [
-    "span",
-    "p48",
-    86,
-    182
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "如图5所示，YOLO算法将整张输入图像划分成S×S的网格图，每个网格只负责物体中心落在该网格的目标物体以及只预测B个边界"
   },
   {
    "unit": [
@@ -392,18 +270,6 @@
     "revision:typo"
    ],
    "text": "2018年Redmon等人[47]提出了YOLOv3算法，它借鉴残差网络中跳跃连接的思路，构建了名为DarNet-53的"
-  },
-  {
-   "unit": [
-    "span",
-    "p58",
-    557,
-    701
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "受FocalLoss的启发，Li等人[53]提出了梯度协调机制(GradientHarmonizingMechanism"
   }
  ]
 }

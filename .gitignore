@@ -89,3 +89,6 @@ demo/final/**/*.pdf
 demo/final/runs/*.log
 # 运行报告含被引文献原文片段，只留在本地
 demo/final/runs/*.json
+
+# 基线定格前的旧评测结果，只留在本机
+demo/testset/results_f33/

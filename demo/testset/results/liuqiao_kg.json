@@ -67,34 +67,46 @@
  "counts": {
   "tp": 9,
   "fn": 0,
-  "fp_new": 1,
-  "pre_existing": 31,
-  "tn": 143,
+  "fp_new": 2,
+  "pre_existing": 22,
+  "tn": 146,
   "excluded": 4,
   "claims": 91,
   "refs": 85,
-  "support_definitive": 51
+  "support_definitive": 55
  },
  "lenient": [
-  0.9,
+  0.8181818181818182,
   1.0,
-  0.9934640522875817
+  0.9872611464968153
  ],
  "strict": [
-  0.21951219512195122,
+  0.2727272727272727,
   1.0,
-  0.8260869565217391
+  0.8659217877094972
  ],
  "fp_units": [
   {
    "unit": [
-    "claim",
-    "c1"
+    "ref",
+    "r10"
    ],
    "alarms": [
-    "revision:typo"
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
    ],
-   "text": "me④、复旦大学GDM实验室⑤推出的中文知识图谱项目等"
+   "text": "[10]LingXiao,WeldD.S.Fine-grainedentityrecognition[C]??Proco"
+  },
+  {
+   "unit": [
+    "ref",
+    "r68"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[68]LaoNi,MitchellT,CohenWW.Randomwalkinferenceandlearningin"
   }
  ],
  "pre_existing_units": [
@@ -184,28 +196,6 @@
   {
    "unit": [
     "ref",
-    "r1"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[1]ChristianB,HeathT,Berners-LeeT.Linkeddata-thestorysofar[J"
-  },
-  {
-   "unit": [
-    "ref",
-    "r10"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[10]LingXiao,WeldD.S.Fine-grainedentityrecognition[C]??Proco"
-  },
-  {
-   "unit": [
-    "ref",
     "r11"
    ],
    "alarms": [
@@ -228,13 +218,13 @@
   {
    "unit": [
     "ref",
-    "r41"
+    "r25"
    ],
    "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
    ],
-   "text": "[41]RatinovL,RothD,DowneyD,etal.Localandglobalalgorithmsford"
+   "text": "[25]AlanA,AlexanderL.KrakeN:N-aryfactsinopeninformationextra"
   },
   {
    "unit": [
@@ -261,13 +251,13 @@
   {
    "unit": [
     "ref",
-    "r46"
+    "r5"
    ],
    "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
    ],
-   "text": "[46]McCarthyJF,LehnertWG.Usingdecisiontreesforcoreferenceres"
+   "text": "[5]ChinchorN,MarshE.Muc-7informationextractiontaskdefinition"
   },
   {
    "unit": [
@@ -283,35 +273,13 @@
   {
    "unit": [
     "ref",
-    "r62"
+    "r73"
    ],
    "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
    ],
-   "text": "[62]WangZhigang,LiJuanzi,LiShuangjie,etal.Cross-lingualknowl"
-  },
-  {
-   "unit": [
-    "ref",
-    "r68"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[68]LaoNi,MitchellT,CohenWW.Randomwalkinferenceandlearningin"
-  },
-  {
-   "unit": [
-    "ref",
-    "r79"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[79]YaoXuchen,BenjaminVD.Informationextractionoverstructured"
+   "text": "[73]WangZhigang,LiJuanzi,WangZhichun,etal.XLore:Alarge-scale"
   },
   {
    "unit": [
@@ -352,54 +320,6 @@
   {
    "unit": [
     "span",
-    "p15",
-    245,
-    307
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "表1给出了当前主流的知识库产品和相关应用，其中，包含实体数最多的是WolframAlpha知识库，实体总数已超过10万亿"
-  },
-  {
-   "unit": [
-    "span",
-    "p171",
-    0,
-    78
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "模式层链接的核心是本体映射（对齐），其内涵是如果2个本体间如果存在语义上的概念关联，则通过语义关联实现二者之间的映射，本"
-  },
-  {
-   "unit": [
-    "span",
-    "p173",
-    0,
-    101
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Wang等人[77]提出了基于链接因子图模型的跨语言知识链接方法，根据本体的出链相似度、入链相似度、开放分类相似度以及作"
-  },
-  {
-   "unit": [
-    "span",
-    "p173",
-    99,
-    113
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "8%，召回率达到88．1"
-  },
-  {
-   "unit": [
-    "span",
     "p5",
     0,
     119
@@ -432,18 +352,6 @@
     "revision:typo"
    ],
    "text": "如果以“实体-关系-实体”或者“实体-属性-性值”三元组作为事实的基本表达方式，则存储在图数据库中的所有数据将构成庞大的"
-  },
-  {
-   "unit": [
-    "span",
-    "p8",
-    25,
-    84
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "自然语言处理信息技术的发展不断推动着互联网技术的变革，Web技术作为互联网时代的标志性技术，正处于这场技术变革的核心．"
   }
  ]
 }

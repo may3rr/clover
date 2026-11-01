@@ -68,12 +68,12 @@
   "tp": 9,
   "fn": 0,
   "fp_new": 0,
-  "pre_existing": 81,
-  "tn": 320,
+  "pre_existing": 67,
+  "tn": 332,
   "excluded": 5,
-  "claims": 168,
+  "claims": 172,
   "refs": 230,
-  "support_definitive": 89
+  "support_definitive": 107
  },
  "lenient": [
   1.0,
@@ -81,16 +81,16 @@
   1.0
  ],
  "strict": [
-  0.1,
+  0.11842105263157894,
   1.0,
-  0.802439024390244
+  0.8357843137254902
  ],
  "fp_units": [],
  "pre_existing_units": [
   {
    "unit": [
     "claim",
-    "c113"
+    "c117"
    ],
    "alarms": [
     "revision:typo"
@@ -100,58 +100,12 @@
   {
    "unit": [
     "claim",
-    "c12"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "revision:typo"
-   ],
-   "text": "随着对背景建模研究工作的推进,又出现了统计模型、聚类模型、神经网络模型、估计模型、]模糊模型、鲁棒子空间模型、稀疏模型、"
-  },
-  {
-   "unit": [
-    "claim",
     "c13"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "Bouwmans等分别在换域模型"
-  },
-  {
-   "unit": [
-    "claim",
-    "c14"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "Bouwmans等分别在换域模型2010年、2011年和2014年对背景建模进行了综述工作,对背景建模方法进行了详细的分"
-  },
-  {
-   "unit": [
-    "claim",
-    "c145"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
-   ],
-   "text": "在UCI数据集上进行实验取得了鲁棒的实验结果"
-  },
-  {
-   "unit": [
-    "claim",
-    "c148"
-   ],
-   "alarms": [
-    "revision:typo",
-    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
-   ],
-   "text": "Lin等将目标与背景分别看作高斯分布"
+   "text": "也有一些学者对运动目标检测与跟踪进行了较为全面的阐述、分析与整理"
   },
   {
    "unit": [
@@ -162,16 +116,36 @@
     "label:unsupported",
     "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
+   "text": "在UCI数据集上进行实验取得了鲁棒的实验结果"
+  },
+  {
+   "unit": [
+    "claim",
+    "c152"
+   ],
+   "alarms": [
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Lin等将目标与背景分别看作高斯分布"
+  },
+  {
+   "unit": [
+    "claim",
+    "c153"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
    "text": "提出了一种基于增量Fisher的线性判别分析的表观建模方法,能较好地自适应目标外观及背景的变化"
   },
   {
    "unit": [
     "claim",
-    "c150"
+    "c154"
    ],
    "alarms": [
     "label:unsupported",
-    "revision:typo",
     "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "线性判别分析是较简单、使用也较广泛的一种方法,Lin等将目标与背景分别看作高斯分布,https://archive.ic"
@@ -179,7 +153,29 @@
   {
    "unit": [
     "claim",
-    "c158"
+    "c156"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Li等将二维线性判别分析引入了跟踪目标的表观建模中,并采用了矩阵形式进行计算,极大地提高了跟踪效率."
+  },
+  {
+   "unit": [
+    "claim",
+    "c16"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "revision:typo"
+   ],
+   "text": "随着对背景建模研究工作的推进,又出现了统计模型、聚类模型、神经网络模型、估计模型、]模糊模型、鲁棒子空间模型、稀疏模型、"
+  },
+  {
+   "unit": [
+    "claim",
+    "c162"
    ],
    "alarms": [
     "label:unsupported",
@@ -191,7 +187,7 @@
   {
    "unit": [
     "claim",
-    "c160"
+    "c164"
    ],
    "alarms": [
     "label:unsupported",
@@ -202,17 +198,7 @@
   {
    "unit": [
     "claim",
-    "c163"
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "从评测结果可以明显看到,MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标三个跟踪精度指标上,分"
-  },
-  {
-   "unit": [
-    "claim",
-    "c165"
+    "c169"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
@@ -224,7 +210,30 @@
   {
    "unit": [
     "claim",
-    "c20"
+    "c17"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Bouwmans等分别在换域模型"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Bouwmans等分别在换域模型2010年、2011年和2014年对背景建模进行了综述工作,对背景建模方法进行了详细的分"
+  },
+  {
+   "unit": [
+    "claim",
+    "c24"
    ],
    "alarms": [
     "revision:typo"
@@ -234,7 +243,7 @@
   {
    "unit": [
     "claim",
-    "c21"
+    "c25"
    ],
    "alarms": [
     "revision:typo"
@@ -244,7 +253,7 @@
   {
    "unit": [
     "claim",
-    "c28"
+    "c32"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -254,7 +263,7 @@
   {
    "unit": [
     "claim",
-    "c29"
+    "c33"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -264,7 +273,7 @@
   {
    "unit": [
     "claim",
-    "c30"
+    "c34"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -274,7 +283,7 @@
   {
    "unit": [
     "claim",
-    "c39"
+    "c43"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -284,7 +293,7 @@
   {
    "unit": [
     "claim",
-    "c40"
+    "c44"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -294,7 +303,7 @@
   {
    "unit": [
     "claim",
-    "c41"
+    "c45"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -304,7 +313,7 @@
   {
    "unit": [
     "claim",
-    "c43"
+    "c47"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -314,7 +323,7 @@
   {
    "unit": [
     "claim",
-    "c44"
+    "c48"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -324,7 +333,7 @@
   {
    "unit": [
     "claim",
-    "c45"
+    "c49"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -334,7 +343,7 @@
   {
    "unit": [
     "claim",
-    "c46"
+    "c50"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -344,7 +353,7 @@
   {
    "unit": [
     "claim",
-    "c47"
+    "c51"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -354,7 +363,7 @@
   {
    "unit": [
     "claim",
-    "c48"
+    "c52"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -364,7 +373,7 @@
   {
    "unit": [
     "claim",
-    "c50"
+    "c54"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -374,7 +383,7 @@
   {
    "unit": [
     "claim",
-    "c59"
+    "c63"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -384,7 +393,7 @@
   {
    "unit": [
     "claim",
-    "c66"
+    "c70"
    ],
    "alarms": [
     "revision:typo"
@@ -394,7 +403,7 @@
   {
    "unit": [
     "claim",
-    "c77"
+    "c81"
    ],
    "alarms": [
     "label:unsupported",
@@ -405,7 +414,7 @@
   {
    "unit": [
     "claim",
-    "c86"
+    "c90"
    ],
    "alarms": [
     "revision:typo"
@@ -415,45 +424,23 @@
   {
    "unit": [
     "claim",
-    "c93"
+    "c94"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "然而,稀疏编码对特征变化非常敏感"
+  },
+  {
+   "unit": [
+    "claim",
+    "c97"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "运动估计则是采用某种运动假设来预估目标可能出现的位置,常用的运动估计方法主要有线性回归、均值漂移、隐马尔科夫模型、]卡尔"
-  },
-  {
-   "unit": [
-    "ref",
-    "r1"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[1]HaroldWA.Aircraftwarningsystem,U.S.Patent3053932,Septembe"
-  },
-  {
-   "unit": [
-    "ref",
-    "r113"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[113]GirshickR,DonahueJ,DarrellT,MalikJ.Richfeaturehierarchi"
-  },
-  {
-   "unit": [
-    "ref",
-    "r130"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[130]WangNY,LiSY,GuptaA,YeungDY.Transferringrichfeaturehiera"
   },
   {
    "unit": [
@@ -489,17 +476,6 @@
   {
    "unit": [
     "ref",
-    "r144"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[144]Gonz´alezA,V´azquezD,RamosS,L´opezAM,AmoresJ.Spatiotemp"
-  },
-  {
-   "unit": [
-    "ref",
     "r146"
    ],
    "alarms": [
@@ -522,17 +498,6 @@
   {
    "unit": [
     "ref",
-    "r15"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[15]SmeuldersAWM,ChuDM,CucchiaraR,CalderaraS,DehghanA,ShahM."
-  },
-  {
-   "unit": [
-    "ref",
     "r152"
    ],
    "alarms": [
@@ -540,17 +505,6 @@
     "status:not_found"
    ],
    "text": "[152]RahmatiH,AamoOM,StavdahlØ,AddeL.Kernel-basedobjecttrack"
-  },
-  {
-   "unit": [
-    "ref",
-    "r158"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[158]DeLaTorreF,BlackMJ.Aframeworkforrobustsub-spacelearning"
   },
   {
    "unit": [
@@ -566,56 +520,12 @@
   {
    "unit": [
     "ref",
-    "r179"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[179]ValiantL.ProbablyApproximatelyCorrect:Nature′sAl-gorith"
-  },
-  {
-   "unit": [
-    "ref",
-    "r20"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[20]WanYing,HanYi,LuHan-Qing.Themethodsformov-ingobjectdetec"
-  },
-  {
-   "unit": [
-    "ref",
-    "r201"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "[201]LinRS,RossDA,LimJ,YangMH.Adaptivediscrimina-tivegenerat"
-  },
-  {
-   "unit": [
-    "ref",
     "r209"
    ],
    "alarms": [
     "norms:这篇参考文献在正文中没有被引用"
    ],
    "text": "[209]WuY,LimJ,YangMH.Onlineobjecttracking:abench-mark.In:Pro"
-  },
-  {
-   "unit": [
-    "ref",
-    "r21"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[21]ZhangJuan,MaoXiao-Bo,ChenTie-Jun.Surveyofmovingobjecttra"
   },
   {
    "unit": [
@@ -648,17 +558,6 @@
     "status:not_found"
    ],
    "text": "[212]FisherRB.ThePETS04surveillanceground-truthdatasets.In:P"
-  },
-  {
-   "unit": [
-    "ref",
-    "r22"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[22]NiuXiang-Jie,HuangYong-Chun.Researchondetectionandtracki"
   },
   {
    "unit": [
@@ -726,17 +625,6 @@
   {
    "unit": [
     "ref",
-    "r68"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[68]YangMQ,KpalmaK,RonsinJ.Asurveyofshapefea-tureextractiont"
-  },
-  {
-   "unit": [
-    "ref",
     "r75"
    ],
    "alarms": [
@@ -748,13 +636,13 @@
   {
    "unit": [
     "ref",
-    "r96"
+    "r94"
    ],
    "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
    ],
-   "text": "[96]VedaldiA,LencK.MatConvNet-convolutionalneuralnet-worksfo"
+   "text": "[94]CollobertR,KavukcuogluK,FarabetC.Torch7:aMatlab-likeenvi"
   },
   {
    "unit": [
@@ -767,18 +655,6 @@
     "revision:typo"
    ],
    "text": "Fig.1Generalframeworkofvision-basedobjectdetectionandtrackin"
-  },
-  {
-   "unit": [
-    "span",
-    "p144",
-    100,
-    151
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "其中,人工的设计特征是一种利用人类先验知识与智慧,并将这类知识应用于目标检测、识别等任务的很好的方式."
   },
   {
    "unit": [
@@ -815,18 +691,6 @@
     "revision:typo"
    ],
    "text": "Google在第一代深度学习系统(DistBelief)[92]的基础上对网络架构等进行优化,推出了第二代深度学习系统("
-  },
-  {
-   "unit": [
-    "span",
-    "p25",
-    95,
-    223
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "另外,从2011年到2016年相继召开了6届视觉与学习青年研讨会(VisionandLearningSeminar,VA"
   },
   {
    "unit": [
@@ -879,18 +743,6 @@
   {
    "unit": [
     "span",
-    "p310",
-    0,
-    87
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "edu/ImageDatasets/Caltech得,行人之间存在一定的遮挡Pedestrians/提供了多种应用场景,"
-  },
-  {
-   "unit": [
-    "span",
     "p385",
     0,
     44
@@ -899,18 +751,6 @@
     "revision:typo"
    ],
    "text": "Table6Typicaldatasetsforobjecttracking"
-  },
-  {
-   "unit": [
-    "span",
-    "p405",
-    0,
-    97
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "data/vividEval/datasets/跟踪,具有表观微小、相似等特点datasets.html主要用于人体目标"
   },
   {
    "unit": [

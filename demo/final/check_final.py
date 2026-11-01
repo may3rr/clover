@@ -1,6 +1,10 @@
 """逐条核对演示稿里的注入是否都被挑出来，并列出注入以外的报警。
 
     python demo/final/check_final.py demo/final/runs/demo_v1.json
+    python demo/final/check_final.py demo/final/runs/en_v1.json demo/final/injections_en.json
+
+第二个参数是注入清单，默认 injections.json（中文演示稿）。LaTeX 稿件的条目
+没有 [n] 前缀，注入按 bibkey（key 字段）找到对应条目。
 
 退出码 0 表示全部检出。
 """
@@ -21,13 +25,17 @@ def squash(s: str) -> str:
 
 def main() -> int:
     rep = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-    spec = json.loads((HERE / "injections.json").read_text(encoding="utf-8"))
+    spec_path = Path(sys.argv[2]) if len(sys.argv) > 2 else HERE / "injections.json"
+    spec = json.loads(spec_path.read_text(encoding="utf-8"))
     paras = {p["id"]: p["text"] for p in rep["paragraphs"]}
-    by_label = {}
+    by_label: dict[str, str] = {}
+    by_key: dict[str, str] = {}
     for r in rep["references"]:
         m = re.match(r"^\[(\d{1,3})\]", r["raw"].strip())
         if m:
             by_label[m.group(1)] = r["id"]
+        if r.get("key"):
+            by_key[r["key"]] = r["id"]
     checks = {c["ref_id"]: c for c in rep["ref_checks"]}
     claims = {c["id"]: c for c in rep["claims"]}
 
@@ -50,7 +58,7 @@ def main() -> int:
     results = []
     for inj in spec["injections"]:
         k = inj["kind"]
-        rid = by_label.get(inj.get("label", ""))
+        rid = by_label.get(inj.get("label", "")) or by_key.get(inj.get("key", ""))
         ok, how = False, ""
         if k == "fake_ref":
             st = checks.get(rid, {}).get("status")

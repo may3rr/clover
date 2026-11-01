@@ -25,14 +25,14 @@
    "id": "misattr1",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
    "located": true
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "detail": "labels=['unsupported'] offtopic=0 findings=1",
    "located": true
   },
   {
@@ -61,12 +61,12 @@
   "tp": 8,
   "fn": 0,
   "fp_new": 0,
-  "pre_existing": 37,
-  "tn": 241,
+  "pre_existing": 42,
+  "tn": 247,
   "excluded": 3,
-  "claims": 153,
+  "claims": 155,
   "refs": 135,
-  "support_definitive": 99
+  "support_definitive": 133
  },
  "lenient": [
   1.0,
@@ -74,16 +74,16 @@
   1.0
  ],
  "strict": [
-  0.17777777777777778,
+  0.16,
   1.0,
-  0.8706293706293706
+  0.8585858585858586
  ],
  "fp_units": [],
  "pre_existing_units": [
   {
    "unit": [
     "claim",
-    "c106"
+    "c108"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -93,42 +93,13 @@
   {
    "unit": [
     "claim",
-    "c11"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "TheTransformerwasinitiallyshowntobeeffectiveformachinetransl"
-  },
-  {
-   "unit": [
-    "claim",
-    "c115"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "Thefindingthatamulti-taskmodelisoutperformedbyseparatemodels"
-  },
-  {
-   "unit": [
-    "claim",
-    "c118"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Sinceotherfields(e.g.computervision)useasuperviseddatasetfor"
-  },
-  {
-   "unit": [
-    "claim",
-    "c119"
+    "c121"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "The“bitterlesson”ofmachinelearningresearcharguesthatgeneralm"
   },
@@ -138,14 +109,15 @@
     "c13"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "TheprimarybuildingblockoftheTransformerisself-attention"
   },
   {
    "unit": [
     "claim",
-    "c130"
+    "c132"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -155,17 +127,7 @@
   {
    "unit": [
     "claim",
-    "c131"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "RTEandWNLIaretwoofthetaskswheremachineperformancehashistoric"
-  },
-  {
-   "unit": [
-    "claim",
-    "c135"
+    "c137"
    ],
    "alarms": [
     "label:unsupported",
@@ -176,27 +138,29 @@
   {
    "unit": [
     "claim",
+    "c138"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "ForSuperGLUE,weimproveduponthestate-of-the-artbyalargemargin"
+  },
+  {
+   "unit": [
+    "claim",
     "c14"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
    "text": "Self-attentionisavariantofattention"
   },
   {
    "unit": [
     "claim",
-    "c144"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "generativemodelstrainedwithmaximumlikelihoodarepronetoproduc"
-  },
-  {
-   "unit": [
-    "claim",
-    "c147"
+    "c149"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -209,9 +173,11 @@
     "c15"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
-   "text": "wasintendedforsequence-to-sequencetasks"
+   "text": "TheoriginalTransformerconsistedofanencoder-decoderarchitectu"
   },
   {
    "unit": [
@@ -219,20 +185,9 @@
     "c2"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "Inapplicationsoftransferlearningtocomputervision"
-  },
-  {
-   "unit": [
-    "claim",
-    "c22"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "ithasrecentlybecomemorecommontouserelativepositionembeddings"
   },
   {
    "unit": [
@@ -247,23 +202,34 @@
   {
    "unit": [
     "claim",
-    "c33"
-   ],
-   "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "arelimitedtoNewsdata"
-  },
-  {
-   "unit": [
-    "claim",
     "c36"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Paraphrasing/sentencesimilarity(MRPC"
+  },
+  {
+   "unit": [
+    "claim",
+    "c37"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Naturallanguageinference(MNLI"
+  },
+  {
+   "unit": [
+    "claim",
+    "c38"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "GLUEandSuperGLUEeachcompriseacollectionoftextclassificationt"
   },
@@ -284,19 +250,10 @@
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
    "text": "neuralnetworks,whichhavebeenshowntoexhibitremarkablescalabil"
-  },
-  {
-   "unit": [
-    "claim",
-    "c52"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "OmittingresultsontheWNLIvalidationsetisstandardpractice"
   },
   {
    "unit": [
@@ -305,7 +262,8 @@
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
    "text": "Thissynergyhasresultedinagreatdealofrecentworkdevelopingtran"
   },
@@ -318,12 +276,23 @@
     "label:unsupported",
     "support:被引文献不支持这条论断"
    ],
-   "text": "encodetextasWordPiecetokens"
+   "text": "whichusedroughly137Btokens,orRoBERTa"
   },
   {
    "unit": [
     "claim",
-    "c65"
+    "c66"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "toencodetextasWordPiecetokens"
+  },
+  {
+   "unit": [
+    "claim",
+    "c67"
    ],
    "alarms": [
     "support:被引文献不支持这条论断"
@@ -333,32 +302,24 @@
   {
    "unit": [
     "claim",
-    "c67"
+    "c68"
    ],
    "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Preliminaryworkthatappliedthetransferlearningparadigmofpre-t"
+  },
+  {
+   "unit": [
+    "claim",
+    "c69"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
    ],
    "text": "“denoising”objectives(alsocalled“maskedlanguagemodeling”)pro"
-  },
-  {
-   "unit": [
-    "claim",
-    "c72"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "BERTalsousesafully-visiblemaskingpatternandappendsaspecial“c"
-  },
-  {
-   "unit": [
-    "claim",
-    "c83"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "itshistoricuseasapre-trainingobjective"
   },
   {
    "unit": [
@@ -366,30 +327,29 @@
     "c85"
    ],
    "alarms": [
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "XLNetalsobearssomeresemblancetothesharedencoder-decoderappro"
+   "text": "Weincludethelanguagemodelingobjectiveduetoitshistoricuseasap"
   },
   {
    "unit": [
     "claim",
-    "c86"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Thisobservationhasbeenpreviouslymadeby"
-  },
-  {
-   "unit": [
-    "claim",
-    "c87"
+    "c89"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "Thishasledtothedevelopmentofawidevarietyofpre-trainingobject"
+  },
+  {
+   "unit": [
+    "claim",
+    "c91"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "abasicdeshufflingobjectiveasusede.g.in"
   },
   {
    "unit": [
@@ -404,72 +364,191 @@
   {
    "unit": [
     "ref",
-    "r80"
+    "r2"
    ],
    "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
    ],
-   "text": "Papineni,Kishore,Roukos,Salim,Ward,Todd,Zhu,Wei-Jing.BLEU:am"
+   "text": "Anil,Rohan,Gupta,Vineet,Koren,Tomer,Singer,Yoram.Memory-Effi"
   },
   {
    "unit": [
     "ref",
-    "r93"
+    "r42"
    ],
    "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
    ],
-   "text": "Ratner,Alex,Hancock,Braden,Dunnmon,Jared,Goldman,Roger,Ré,Ch"
+   "text": "Huang,Yanping,Cheng,Yonglong,Chen,Dehao,Lee,HyoukJoong,Ngiam"
+  },
+  {
+   "unit": [
+    "ref",
+    "r86"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "Pilehvar,MohammadTaher,Camacho-Collados,Jose.WIC:10,000examp"
+  },
+  {
+   "unit": [
+    "span",
+    "p112",
+    1551,
+    1845
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Further,forthemodelsizesweconsider,thenumberofparametersinth"
+  },
+  {
+   "unit": [
+    "span",
+    "p1264",
+    0,
+    144
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "•Ground-truth:executionshavebeentemporarilyhaltedinthestatea"
+  },
+  {
+   "unit": [
+    "span",
+    "p1264",
+    412,
+    531
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "itis’essentialthatexecutionsarecarriedoutinaconstitutionalma"
   },
   {
    "unit": [
     "span",
     "p1266",
-    166,
-    241
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "thisweekalvesreleasedacharitysinglewithformerteam-matjosepin"
-  },
-  {
-   "unit": [
-    "span",
-    "p1299",
     0,
-    70
+    91
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Processedinput:copachoice1:Manycitizensrelocatedtothecapitol"
+   "text": "•Ground-truth:danialveswasnotselectedforthebrazilsquadtoface"
   },
   {
    "unit": [
     "span",
-    "p1307",
-    141,
-    220
+    "p1266",
+    242,
+    309
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "alargeswingingwindowopenedintotheyard,whichmadeitpleasantand"
+   "text": "alveslookssettoleavebarcelonaonafreetransferthissummer."
   },
   {
    "unit": [
     "span",
-    "p444",
+    "p1266",
+    310,
+    379
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "reportsinspanishpressclaimhewillsignforparissaint-germain."
+  },
+  {
+   "unit": [
+    "span",
+    "p1266",
+    92,
+    165
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "barcelonadefenderwasfilmedservinguphotdogstopeopleonsaturday"
+  },
+  {
+   "unit": [
+    "span",
+    "p1289",
     0,
-    79
+    151
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Wecomparethespan-corruptionobjectivetothei.i.d-corruptionobj"
+   "text": "Originalinput:Sentence:itconfirmsfincher’sstatusasafilmmaker"
+  },
+  {
+   "unit": [
+    "span",
+    "p1298",
+    86,
+    135
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Choice1:Manycitizensrelocatedtothecapitol."
+  },
+  {
+   "unit": [
+    "span",
+    "p269",
+    1151,
+    1265
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thisapproachtakesasequenceoftokens,shufflesit,andthenusesthe"
+  },
+  {
+   "unit": [
+    "span",
+    "p523",
+    540,
+    648
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Weinvestigateatwhatpointusingasmallerpre-trainingdatasetspos"
+  },
+  {
+   "unit": [
+    "span",
+    "p652",
+    0,
+    124
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Examples-proportionalmixingAmajorfactorinhowquicklyamodelwil"
+  },
+  {
+   "unit": [
+    "span",
+    "p95",
+    766,
+    986
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Sinceweperformearlystoppingbyselectingthebest-performingchec"
   }
  ]
 }

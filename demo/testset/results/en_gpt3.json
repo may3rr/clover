@@ -25,21 +25,21 @@
    "id": "wrongyear",
    "kind": "wrong_year",
    "detected": true,
-   "detail": "status=mismatch issues=['年份不一致：文中写 2015，数据库记录为 2019']",
+   "detail": "status=mismatch issues=['年份不一致：文中写 2015，数据库记录为 2019', '本地原文年份为 2019，文中写 2015']",
    "located": true
   },
   {
    "id": "misattr1",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "detail": "labels=['unsupported'] offtopic=0 findings=1",
    "located": true
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
    "located": true
   },
   {
@@ -68,35 +68,34 @@
   "tp": 9,
   "fn": 0,
   "fp_new": 1,
-  "pre_existing": 68,
-  "tn": 243,
+  "pre_existing": 74,
+  "tn": 242,
   "excluded": 4,
-  "claims": 152,
+  "claims": 159,
   "refs": 147,
-  "support_definitive": 90
+  "support_definitive": 119
  },
  "lenient": [
   0.9,
   1.0,
-  0.9960474308300395
+  0.996031746031746
  ],
  "strict": [
-  0.11538461538461539,
+  0.10714285714285714,
   1.0,
-  0.7850467289719626
+  0.7699386503067485
  ],
  "fp_units": [
   {
    "unit": [
-    "span",
-    "p109",
-    438,
-    971
+    "ref",
+    "r6"
    ],
    "alarms": [
-    "revision:typo"
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
    ],
-   "text": "Therefore,wetook3stepstoimprovetheaveragequalityofourdataset"
+   "text": "LuisaBentivogli,IdoDagan,HoaTrangDang,DaniloGiampiccolo,andB"
   }
  ],
  "pre_existing_units": [
@@ -116,8 +115,7 @@
     "c1"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "RNNswithmultiplelayersofrepresentationsandcontextualstatewer"
   },
@@ -129,7 +127,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "1.5billionparameters"
+   "text": "from100millionparameters"
   },
   {
    "unit": [
@@ -139,12 +137,22 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "Inrecentyearsthecapacityoftransformerlanguagemodelshasincrea"
+   "text": "to300millionparameters"
   },
   {
    "unit": [
     "claim",
-    "c117"
+    "c12"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "to1.5billionparameters"
+  },
+  {
+   "unit": [
+    "claim",
+    "c121"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
@@ -155,7 +163,18 @@
   {
    "unit": [
     "claim",
-    "c118"
+    "c122"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "andmostrecently17billionparameters"
+  },
+  {
+   "unit": [
+    "claim",
+    "c123"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献",
@@ -167,43 +186,54 @@
   {
    "unit": [
     "claim",
-    "c123"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "findasmoothpower-lawtrendinlossasautoregressivelanguagemodel"
-  },
-  {
-   "unit": [
-    "claim",
-    "c124"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "ThisapproachincludesALBERTaswellasgeneralandtask-specificapp"
-  },
-  {
-   "unit": [
-    "claim",
-    "c125"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
-   ],
-   "text": "adversariallyconstructeddatasetsdesignedtobedifficultforexis"
-  },
-  {
-   "unit": [
-    "claim",
     "c126"
    ],
    "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "hasbeenusedtoproduce100billionparametermodelsandmorerecently"
+  },
+  {
+   "unit": [
+    "claim",
+    "c128"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": ",findasmoothpower-lawtrendinlossasautoregressivelanguagemode"
+  },
+  {
+   "unit": [
+    "claim",
+    "c129"
+   ],
+   "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "Asfine-tunedlanguagemodelshavenearedhumanperformanceonmanyst"
+   "text": "ThisapproachincludesALBERT"
+  },
+  {
+   "unit": [
+    "claim",
+    "c13"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "to8billionparameters"
+  },
+  {
+   "unit": [
+    "claim",
+    "c130"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "task-specificapproachestodistillationoflanguagemodels"
   },
   {
    "unit": [
@@ -213,73 +243,47 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
+   "text": "ThisapproachincludesALBERTaswellasgeneralandtask-specificapp"
+  },
+  {
+   "unit": [
+    "claim",
+    "c132"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "adversariallyconstructeddatasetsdesignedtobedifficultforexis"
+  },
+  {
+   "unit": [
+    "claim",
+    "c133"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Asfine-tunedlanguagemodelshavenearedhumanperformanceonmanyst"
+  },
+  {
+   "unit": [
+    "claim",
+    "c138"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
    "text": "Morebroadly,languagemodelmetalearninghasaninner-loop-outer-l"
   },
   {
    "unit": [
     "claim",
-    "c137"
+    "c14"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "Givingmulti-taskmodelsinstructionsinnaturallanguagewasfirstf"
-  },
-  {
-   "unit": [
-    "claim",
-    "c141"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "Multi-tasklearninghasshownsomepromisinginitialresults"
-  },
-  {
-   "unit": [
-    "claim",
-    "c142"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "multi-stagefine-tuninghasrecentlybecomeastandardizedpartofSO"
-  },
-  {
-   "unit": [
-    "claim",
-    "c145"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "randompermutationsduringtraining"
-  },
-  {
-   "unit": [
-    "claim",
-    "c146"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "architecturesthatimprovetheefficiencyofsampling"
-  },
-  {
-   "unit": [
-    "claim",
-    "c147"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "improvementsindataandtrainingprocedures"
+   "text": "andfinally17billionparameters"
   },
   {
    "unit": [
@@ -287,24 +291,81 @@
     "c148"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Multi-tasklearninghasshownsomepromisinginitialresults"
+  },
+  {
+   "unit": [
+    "claim",
+    "c15"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Inrecentyearsthecapacityoftransformerlanguagemodelshasincrea"
+  },
+  {
+   "unit": [
+    "claim",
+    "c152"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "randompermutationsduringtraining"
+  },
+  {
+   "unit": [
+    "claim",
+    "c153"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "architecturesthatimprovetheefficiencyofsampling"
+  },
+  {
+   "unit": [
+    "claim",
+    "c154"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "improvementsindataandtrainingprocedures"
+  },
+  {
+   "unit": [
+    "claim",
+    "c155"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "efficiencyincreasesintheembeddingparameters"
   },
   {
    "unit": [
     "claim",
-    "c149"
+    "c156"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "label:unsupported",
-    "support:被引文献不支持这条论断",
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "Algorithmicinnovationinlanguagemodelsoverthelasttwoyearshasb"
+  },
+  {
+   "unit": [
+    "claim",
+    "c157"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Allmodelsuseweightdecayof0.1toprovideasmallamountofregulariz"
   },
   {
    "unit": [
@@ -312,30 +373,9 @@
     "c2"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "pre-trainedrecurrentortransformerlanguagemodels"
-  },
-  {
-   "unit": [
-    "claim",
-    "c24"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "CommonCrawldatasethttps://commoncrawl.org/the-data/constitut"
-  },
-  {
-   "unit": [
-    "claim",
-    "c28"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "largermodelscantypicallyusealargerbatchsize,butrequireasmall"
   },
   {
    "unit": [
@@ -345,60 +385,28 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "havebeendirectlyfine-tuned,entirelyremovingtheneedfortask-sp"
+   "text": "entirelyremovingtheneedfortask-specificarchitectures"
   },
   {
    "unit": [
     "claim",
-    "c46"
+    "c49"
    ],
    "alarms": [
     "label:unsupported",
     "support:被引文献不支持这条论断"
    ],
-   "text": "outperformingthe75.4%accuracyofafine-tuned1.5Bparameterlangu"
+   "text": "GPT-3achieves78.1%accuracyintheone-shotsettingand79.3%accura"
   },
   {
    "unit": [
     "claim",
-    "c51"
+    "c54"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "alargelanguagemodelcanperformsurprisinglywelldirectlyansweri"
-  },
-  {
-   "unit": [
-    "claim",
-    "c55"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Existingunsupervisedmachinetranslationapproachesoftencombine"
-  },
-  {
-   "unit": [
-    "claim",
-    "c57"
-   ],
-   "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "label:unsupported",
-    "support:被引文献不支持这条论断"
-   ],
-   "text": "abcdef[SacreBLEUsignature:BLEU+case.mixed+numrefs.1+smooth.e"
-  },
-  {
-   "unit": [
-    "claim",
-    "c58"
-   ],
-   "alarms": [
-    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
-   ],
-   "text": "ForRo-En,fewshotGPT-3performswithin0.5BLEUoftheoverallSOTAwh"
+   "text": "recentlydemonstratedthatalargelanguagemodelcanperformsurpris"
   },
   {
    "unit": [
@@ -406,14 +414,25 @@
     "c60"
    ],
    "alarms": [
-    "revision:typo"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "TheWinogradSchemasChallengeisaclassicaltaskinNLPthatinvolves"
+   "text": "abcdef[SacreBLEUsignature:BLEU+case.mixed+numrefs.1+smooth.e"
   },
   {
    "unit": [
     "claim",
-    "c69"
+    "c61"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "ForRo-En,fewshotGPT-3performswithin0.5BLEUoftheoverallSOTAwh"
+  },
+  {
+   "unit": [
+    "claim",
+    "c72"
    ],
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
@@ -423,32 +442,66 @@
   {
    "unit": [
     "claim",
-    "c71"
+    "c73"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "performsworst(13F1belowanELMobaseline)onQuACadatasetwhichreq"
+   "text": "GPT-3performsbest(within3pointsofthehumanbaseline)onCoQA"
   },
   {
    "unit": [
     "claim",
-    "c75"
+    "c78"
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "amultiplechoicedatasetofmiddleschoolandhighschoolenglishexam"
+   "text": "OnRACE,amultiplechoicedatasetofmiddleschoolandhighschoolengl"
   },
   {
    "unit": [
     "claim",
-    "c76"
+    "c79"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献"
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
    "text": "InordertobetteraggregateresultsonNLPtasksandcomparetopopular"
+  },
+  {
+   "unit": [
+    "claim",
+    "c82"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Foreachtaskwegenerate10,000examples,whichwechosetobethetop10"
+  },
+  {
+   "unit": [
+    "claim",
+    "c84"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "OnthistaskGPT-3achieves65.2%inthefew-shotsetting,59.1%intheo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c89"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "RelatedworkonlanguagemodeldetectionbyIppolitoetal."
   },
   {
    "unit": [
@@ -456,9 +509,52 @@
     "c90"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "support:被引文献不支持这条论断"
    ],
-   "text": "OneofthefirstpaperstotrainalanguagemodelonCommonCrawldatadet"
+   "text": "indicatesthatautomaticdiscriminatorslikeGrover"
+  },
+  {
+   "unit": [
+    "claim",
+    "c91"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "RelatedworkonlanguagemodeldetectionbyIppolitoetal.indicatest"
+  },
+  {
+   "unit": [
+    "claim",
+    "c92"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "Ippolitoetal.alsonotethathumanaccuracyatdetectingmodelgenera"
+  },
+  {
+   "unit": [
+    "claim",
+    "c98"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "demonstratebenefitsofcustomizingpredictiontoentitiesofintere"
+  },
+  {
+   "unit": [
+    "ref",
+    "r122"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "RoySchwartz,JesseDodge,NoahA.Smith,andOrenEtzioni.GreenAI.Co"
   },
   {
    "unit": [
@@ -484,24 +580,13 @@
   {
    "unit": [
     "ref",
-    "r19"
+    "r18"
    ],
    "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
    ],
-   "text": "KateCrawford.Thetroublewithbias.NIPS2017Keynote,2017."
-  },
-  {
-   "unit": [
-    "ref",
-    "r2"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "WeChatAI.Tr-mt(ensemble),December2019."
+   "text": "Yen-ChunChen,LinjieLi,LichengYu,AhmedElKholy,FaisalAhmed,Zhe"
   },
   {
    "unit": [
@@ -509,32 +594,10 @@
     "r31"
    ],
    "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
    ],
    "text": "YaroslavFyodorov.Anaturallogicinferencesystem,2000."
-  },
-  {
-   "unit": [
-    "ref",
-    "r39"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "DanielHernandezandTomBrown.Aiandefficiency,May2020."
-  },
-  {
-   "unit": [
-    "ref",
-    "r50"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "ZhengJunyuanandGammaLabNYC.Numerictransformer-albert,March20"
   },
   {
    "unit": [
@@ -546,17 +609,6 @@
     "status:mismatch"
    ],
    "text": "RoyBarHaim,IdoDagan,BillDolan,LisaFerro,DaniloGiampiccolo,Be"
-  },
-  {
-   "unit": [
-    "ref",
-    "r86"
-   ],
-   "alarms": [
-    "authenticity:未能在数据库中找到这篇文献",
-    "status:not_found"
-   ],
-   "text": "MitchellMarcus,GraceKim,MaryAnnMarcinkiewicz,RobertMacIntyre"
   },
   {
    "unit": [
@@ -582,6 +634,17 @@
   },
   {
    "unit": [
+    "ref",
+    "r96"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "MohammadTaherPilehvarandJoseCamacho-Collados.WIC:10,000examp"
+  },
+  {
+   "unit": [
     "span",
     "p10",
     396,
@@ -591,42 +654,6 @@
     "revision:typo"
    ],
    "text": "Toavoidthisconfusion,weusetheterm“meta-learning”tocapturethe"
-  },
-  {
-   "unit": [
-    "span",
-    "p106",
-    546,
-    699
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Theprecisearchitecturalparametersforeachmodelarechosenbasedo"
-  },
-  {
-   "unit": [
-    "span",
-    "p1327",
-    0,
-    307
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Thisoverlapmetrictendstoshowahighrateoffalsepositivesfordata"
-  },
-  {
-   "unit": [
-    "span",
-    "p139",
-    463,
-    559
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "AllmodelsweretrainedonV100GPU’sonpartofahigh-bandwidthcluste"
   },
   {
    "unit": [
@@ -643,6 +670,18 @@
   {
    "unit": [
     "span",
+    "p1498",
+    262,
+    426
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Fiveoutputsperquestionweregeneratedbyeachmodelandthegenerati"
+  },
+  {
+   "unit": [
+    "span",
     "p1700",
     586,
     734
@@ -655,14 +694,26 @@
   {
    "unit": [
     "span",
-    "p1737",
-    0,
-    67
+    "p1700",
+    72,
+    216
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "A:Ifakidhatedfourpeople,heorshehadtocarryfourpotatoes."
+   "text": "Beforeyoustartadiscussion,however,makesureyouunderstandwhich"
+  },
+  {
+   "unit": [
+    "span",
+    "p1768",
+    279,
+    399
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "\"Trump’swordsareanincitementtothetypeofpoliticalviolencethat"
   },
   {
    "unit": [
@@ -691,6 +742,18 @@
   {
    "unit": [
     "span",
+    "p1977",
+    0,
+    342
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Normalforce–Inasimplecasesuchasanobjectrestinguponatable,the"
+  },
+  {
+   "unit": [
+    "span",
     "p2059",
     37,
     230
@@ -703,74 +766,74 @@
   {
    "unit": [
     "span",
-    "p2078",
-    0,
-    286
+    "p234",
+    367,
+    630
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Adevărulestecăvădoriţi,cuoricepreţşiı̂mpotrivadorinţeieurope"
+   "text": "Notably,comparedtoTriviaQA,WebQSshowsamuchlargergainfromzero"
   },
   {
    "unit": [
     "span",
-    "p2081",
-    0,
-    286
+    "p298",
+    29,
+    165
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Adevărulestecăvădoriţi,cuoricepreţşiı̂mpotrivadorinţeieurope"
+   "text": "Zero-shotGPT-3,whichonlyreceivesonanaturallanguagedescriptio"
   },
   {
    "unit": [
     "span",
-    "p476",
-    91,
-    428
+    "p320",
+    196,
+    398
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Thereisasignificantjumpfromthesecondlargestmodel(GPT-313B)to"
+   "text": "Forcomparisonafine-tunedRoBERTAmodelachieves79%,state-of-the"
   },
   {
    "unit": [
     "span",
-    "p561",
-    0,
-    88
+    "p554",
+    858,
+    883
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Zero-,one-,andfew-shotperformanceonSATanalogytasks,fordiffer"
+   "text": "e.ssi/o/n=succession."
   },
   {
    "unit": [
     "span",
-    "p565",
-    740,
-    741
+    "p564",
+    548,
+    640
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "."
+   "text": "Thistaskisalsorelevanttothepotentialmisuseoflanguagemodelsdi"
   },
   {
    "unit": [
     "span",
-    "p623",
-    0,
-    130
+    "p618",
+    180,
+    431
    ],
    "alarms": [
-    "support:正文作者归属与文献作者不一致，可能引错了文献"
+    "revision:typo"
    ],
-   "text": "Ippolitoetal.[IDCBE19]alsonotethathumanaccuracyatdetectingmo"
+   "text": "Accuracyontheoutputsonthedeliberately-badcontrolmodel(anunco"
   },
   {
    "unit": [
@@ -787,14 +850,14 @@
   {
    "unit": [
     "span",
-    "p666",
-    655,
-    927
+    "p662",
+    998,
+    1439
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Synthetictaskssuchaswordscramblingordefiningnonsensewordssee"
+   "text": "Quantitatively,GPT-3’sin-contextlearningperformancehassomeno"
   },
   {
    "unit": [
@@ -811,38 +874,26 @@
   {
    "unit": [
     "span",
-    "p692",
-    195,
-    301
+    "p690",
+    444,
+    680
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "Onemethodmeasuredthemodelsabilitytocorrectlyassignapronounas"
+   "text": "Wemeasuredthisbyfeedingthemodelacontextsuchas\"Thedetectivewa"
   },
   {
    "unit": [
     "span",
-    "p694",
-    738,
-    739
+    "p778",
+    0,
+    62
    ],
    "alarms": [
     "revision:typo"
    ],
-   "text": "."
-  },
-  {
-   "unit": [
-    "span",
-    "p724",
-    111,
-    215
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Ontheotherhand,’Black’hadaconsistentlylowsentiment-itrankedt"
+   "text": "RewonChildandScottGraycontributedthesparsetransformer."
   },
   {
    "unit": [

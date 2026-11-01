@@ -1,0 +1,127 @@
+{
+ "target": "英文演示稿/deep_residual_learning.zip",
+ "injections": [
+  {
+   "id": "fake_en",
+   "layer": "真实性",
+   "kind": "fake_ref",
+   "key": "Wang2015scale",
+   "what": "完全编造的文献（作者、标题、期刊卷期都像真的）",
+   "snippet": "further aggregated residual vectors across scales"
+  },
+  {
+   "id": "chimera",
+   "layer": "真实性",
+   "kind": "fake_ref",
+   "key": "Girshick2015refine",
+   "what": "真实作者配编造标题（大模型幻觉文献的典型样子）",
+   "snippet": "further refined region proposals with iterative feedback"
+  },
+  {
+   "id": "wrong_year",
+   "layer": "真实性",
+   "kind": "wrong_year",
+   "key": "Hochreiter1997",
+   "what": "真实文献年份写错（LSTM 1997 写成 1993）",
+   "old": "1997",
+   "new": "1993"
+  },
+  {
+   "id": "author_swap",
+   "layer": "支持度",
+   "kind": "author_swap",
+   "key": "Ioffe2015",
+   "what": "正文写的作者与被引文献作者对不上（BN 写成 Glorot 等人）",
+   "snippet": "batch normalization (BN) by Glorot et al."
+  },
+  {
+   "id": "misattr_topic",
+   "layer": "支持度",
+   "kind": "misattribution",
+   "key": "Jegou2011",
+   "what": "张冠李戴：ReLU 引成了乘积量化的论文",
+   "snippet": "denotes ReLU"
+  },
+  {
+   "id": "misattr_dataset",
+   "layer": "支持度",
+   "kind": "misattribution",
+   "key": "Russakovsky2014",
+   "what": "张冠李戴：介绍 MS COCO 却引了 ImageNet 的论文",
+   "snippet": "PASCAL VOC 2007 and 2012"
+  },
+  {
+   "id": "number_coco",
+   "layer": "支持度",
+   "kind": "number",
+   "key": "Lin2014",
+   "what": "数字与原文不符：MS COCO 的 80 类写成 180 类",
+   "snippet": "involves 180 object categories"
+  },
+  {
+   "id": "overclaim",
+   "layer": "支持度",
+   "kind": "number",
+   "key": "Ren2015",
+   "what": "夸大效果：Faster R-CNN 原文约 5 fps，写成 50 fps",
+   "snippet": "which runs at 50 frames per second on a GPU"
+  },
+  {
+   "id": "number_bn",
+   "layer": "支持度",
+   "kind": "number",
+   "key": "Ioffe2015",
+   "what": "数字放大十倍：BN 用少 14 倍的训练步数写成少 140 倍",
+   "snippet": "with 140 times fewer training steps"
+  },
+  {
+   "id": "stacking",
+   "layer": "分布",
+   "kind": "stacking",
+   "what": "一句话堆了 7 篇文献，没说各自的贡献",
+   "snippet": "Many works have since improved deep architectures"
+  },
+  {
+   "id": "duplicate",
+   "layer": "规范",
+   "kind": "duplicate",
+   "key": "Ren2015b",
+   "what": "同一篇 Faster R-CNN 在列表里出现两次"
+  },
+  {
+   "id": "uncited",
+   "layer": "规范",
+   "kind": "uncited",
+   "key": "Redmon2016",
+   "what": "列表里的 YOLO 正文从未引用"
+  },
+  {
+   "id": "dangling",
+   "layer": "规范",
+   "kind": "dangling",
+   "what": "正文引了 \\cite{Redmon2015}，列表里没有这个键（列表里是 Redmon2016）",
+   "snippet": "Single-stage detectors"
+  },
+  {
+   "id": "typo_1",
+   "layer": "规范",
+   "kind": "typo",
+   "what": "错别字：convergance",
+   "wrong": "convergance"
+  },
+  {
+   "id": "typo_2",
+   "layer": "规范",
+   "kind": "typo",
+   "what": "错别字：verifed",
+   "wrong": "verifed"
+  },
+  {
+   "id": "typo_3",
+   "layer": "规范",
+   "kind": "typo",
+   "what": "错别字：effecitve",
+   "wrong": "effecitve"
+  }
+ ]
+}

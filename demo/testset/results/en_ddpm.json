@@ -25,14 +25,14 @@
    "id": "misattr1",
    "kind": "misattribution",
    "detected": true,
-   "detail": "labels=['undetermined'] offtopic=1 findings=1",
+   "detail": "labels=['unsupported'] offtopic=0 findings=1",
    "located": true
   },
   {
    "id": "misattr2",
    "kind": "misattribution",
    "detected": false,
-   "detail": "labels=['undetermined'] offtopic=0 findings=0",
+   "detail": "labels=['supported'] offtopic=0 findings=0",
    "located": true
   },
   {
@@ -61,22 +61,22 @@
   "tp": 7,
   "fn": 1,
   "fp_new": 0,
-  "pre_existing": 11,
-  "tn": 106,
+  "pre_existing": 9,
+  "tn": 107,
   "excluded": 4,
-  "claims": 52,
+  "claims": 53,
   "refs": 74,
-  "support_definitive": 34
+  "support_definitive": 50
  },
  "lenient": [
   1.0,
   0.875,
-  0.9912280701754386
+  0.991304347826087
  ],
  "strict": [
-  0.3888888888888889,
+  0.4375,
   0.875,
-  0.904
+  0.9193548387096774
  ],
  "fp_units": [],
  "pre_existing_units": [
@@ -86,8 +86,7 @@
     "c0"
    ],
    "alarms": [
-    "distribution:这句话同时引用了 N 篇文献",
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "Generativeadversarialnetworks(GANs),autoregressivemodels,flo"
   },
@@ -104,12 +103,13 @@
   {
    "unit": [
     "claim",
-    "c19"
+    "c12"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
-   "text": "SeeforCIFAR10andCelebA-HQ256×256samples,andforLSUN256×256sam"
+   "text": "itisaweightedvariationalboundthatemphasizesdifferentaspectso"
   },
   {
    "unit": [
@@ -119,7 +119,7 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "diffusionmodelsmightresembleflows"
+   "text": "Whilediffusionmodelsmightresembleflows"
   },
   {
    "unit": [
@@ -130,16 +130,6 @@
     "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "WhilediffusionmodelsmightresembleflowsandVAEs,diffusionmodel"
-  },
-  {
-   "unit": [
-    "claim",
-    "c3"
-   ],
-   "alarms": [
-    "support:被引文献只部分支持这条论断"
-   ],
-   "text": "Inaddition,weshowthatacertainparameterizationofdiffusionmode"
   },
   {
    "unit": [
@@ -159,41 +149,28 @@
    "alarms": [
     "distribution:这句话同时引用了 N 篇文献"
    ],
-   "text": "Bytheknownconnectionbetweenscorematchingandenergy-basedmodel"
+   "text": "OthermethodsforlearningtransitionoperatorsofMarkovchainsincl"
   },
   {
    "unit": [
     "claim",
-    "c44"
+    "c32"
    ],
    "alarms": [
-    "support:被引文献只部分支持这条论断"
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "ourworkcouldhaveimplicationsforotherrecentworkonenergy-based"
+  },
+  {
+   "unit": [
+    "claim",
+    "c45"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
    ],
    "text": "Allmodelshavetwoconvolutionalresidualblocksperresolutionleve"
-  },
-  {
-   "unit": [
-    "span",
-    "p132",
-    0,
-    106
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Whenappliedtox_0∼q(x_0),transmitx_T,,x_0insequenceusingatota"
-  },
-  {
-   "unit": [
-    "span",
-    "p26",
-    194,
-    308
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "Thecompletesamplingprocedure,,resemblesLangevindynamicswithε"
   }
  ]
 }

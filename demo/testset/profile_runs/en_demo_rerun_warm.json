@@ -1,0 +1,106 @@
+{
+ "tag": "en_demo_rerun",
+ "phase": "warm",
+ "input": "demo/final/英文演示稿/deep_residual_learning.zip",
+ "library": "demo/final/英文演示稿/ref",
+ "wall_s": 4.3,
+ "duration_s": 4.3,
+ "timings": {
+  "parse": 0.0,
+  "layers": {
+   "distribution": 0.1,
+   "norms": 0.1,
+   "authenticity": 3.1,
+   "support": 4.2
+  },
+  "overview": 0.0,
+  "sources": {
+   "arxiv": {
+    "calls": 7,
+    "seconds": 0.0,
+    "cached": 7
+   },
+   "crossref": {
+    "calls": 77,
+    "seconds": 0.0,
+    "cached": 77
+   },
+   "openalex": {
+    "calls": 58,
+    "seconds": 0.0,
+    "cached": 58
+   },
+   "s2": {
+    "calls": 12,
+    "seconds": 15.646,
+    "cached": 0
+   }
+  }
+ },
+ "size": {
+  "paragraphs": 678,
+  "references": 54,
+  "markers": 142,
+  "claims": 112,
+  "support_checks": 156,
+  "linked_pdfs": 29
+ },
+ "tasks": {
+  "structure": {
+   "calls": 11,
+   "cached": 11,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "function": {
+   "calls": 71,
+   "cached": 71,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "extract": {
+   "calls": 95,
+   "cached": 95,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "typo": {
+   "calls": 120,
+   "cached": 120,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "judge": {
+   "calls": 409,
+   "cached": 409,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "review": {
+   "calls": 22,
+   "cached": 22,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  }
+ },
+ "findings": 42,
+ "revisions": 10
+}

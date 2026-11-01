@@ -1,0 +1,124 @@
+{
+ "tag": "zh_demo",
+ "phase": "cold",
+ "input": "demo/final/演示稿/基于深度学习的目标检测研究综述.docx",
+ "library": "demo/final/演示稿/ref",
+ "wall_s": 241.5,
+ "duration_s": 241.4,
+ "timings": {
+  "parse": 0.0,
+  "layers": {
+   "norms": 43.2,
+   "distribution": 56.0,
+   "authenticity": 164.1,
+   "support": 241.3
+  },
+  "overview": 0.0,
+  "sources": {
+   "openalex": {
+    "calls": 90,
+    "seconds": 880.835,
+    "cached": 0
+   },
+   "crossref": {
+    "calls": 115,
+    "seconds": 2994.305,
+    "cached": 0
+   },
+   "s2": {
+    "calls": 11,
+    "seconds": 2.586,
+    "cached": 0
+   },
+   "arxiv": {
+    "calls": 6,
+    "seconds": 251.743,
+    "cached": 0
+   }
+  }
+ },
+ "size": {
+  "paragraphs": 149,
+  "references": 73,
+  "markers": 96,
+  "claims": 79,
+  "support_checks": 109,
+  "linked_pdfs": 52
+ },
+ "tasks": {
+  "extract": {
+   "calls": 65,
+   "cached": 0,
+   "prompt": 11180,
+   "completion": 5501,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "structure": {
+   "calls": 16,
+   "cached": 0,
+   "prompt": 8413,
+   "completion": 6705,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "typo": {
+   "calls": 65,
+   "cached": 0,
+   "prompt": 17255,
+   "completion": 1265,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "function": {
+   "calls": 40,
+   "cached": 0,
+   "prompt": 9635,
+   "completion": 2740,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "judge": {
+   "calls": 303,
+   "cached": 33,
+   "prompt": 260628,
+   "completion": 24577,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "embed": {
+   "calls": 1079,
+   "cached": 0,
+   "prompt": 2966891,
+   "completion": 0,
+   "models": [
+    "Qwen/Qwen3-Embedding-0.6B"
+   ]
+  },
+  "rerank": {
+   "calls": 91,
+   "cached": 0,
+   "prompt": 914597,
+   "completion": 0,
+   "models": [
+    "Qwen/Qwen3-Reranker-0.6B"
+   ]
+  },
+  "review": {
+   "calls": 21,
+   "cached": 2,
+   "prompt": 42385,
+   "completion": 2881,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  }
+ },
+ "findings": 33,
+ "revisions": 14
+}

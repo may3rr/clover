@@ -68,12 +68,12 @@
   "tp": 9,
   "fn": 0,
   "fp_new": 0,
-  "pre_existing": 76,
-  "tn": 236,
+  "pre_existing": 67,
+  "tn": 240,
   "excluded": 4,
   "claims": 171,
   "refs": 133,
-  "support_definitive": 115
+  "support_definitive": 116
  },
  "lenient": [
   1.0,
@@ -81,9 +81,9 @@
   1.0
  ],
  "strict": [
-  0.10588235294117647,
+  0.11842105263157894,
   1.0,
-  0.7632398753894081
+  0.7879746835443038
  ],
  "fp_units": [],
  "pre_existing_units": [
@@ -215,6 +215,17 @@
     "distribution:这句话同时引用了 N 篇文献"
    ],
    "text": "Seo等人在总结了前人在阅读理解中使用注意力机制的研究工作之后提出了BiDAF模型,该模型是奠定神经阅读理解模型架构的重"
+  },
+  {
+   "unit": [
+    "claim",
+    "c144"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "另一个重要模型是Wang等人提出的R-Net模型"
   },
   {
    "unit": [
@@ -509,7 +520,6 @@
    ],
    "alarms": [
     "label:unsupported",
-    "support:正文作者归属与文献作者不一致，可能引错了文献",
     "support:被引文献不支持这条论断"
    ],
    "text": "当注意力机制在NLP领域取得巨大成功后,Vaswani等人猜测:既然注意力机制能让模型学习到两个序列的权重状态,那是否可"
@@ -521,7 +531,6 @@
    ],
    "alarms": [
     "label:unsupported",
-    "revision:typo",
     "support:被引文献不支持这条论断"
    ],
    "text": "Transformer架构由6个相同的编码-解码模块组成,其中,每个编码模块包括了自注意力模块(self-attenti"
@@ -550,17 +559,6 @@
   {
    "unit": [
     "ref",
-    "r118"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[118]XiaoY,QuY,QiuL,etal.Dynamicallyfusedgraphnetworkformult"
-  },
-  {
-   "unit": [
-    "ref",
     "r122"
    ],
    "alarms": [
@@ -578,28 +576,6 @@
     "status:mismatch"
    ],
    "text": "[19]DunnM,SagunL,HigginsM,etal.SearchQA:AnewQ&Adatasetaugmen"
-  },
-  {
-   "unit": [
-    "ref",
-    "r2"
-   ],
-   "alarms": [
-    "authenticity:文献信息与数据库记录不一致",
-    "status:mismatch"
-   ],
-   "text": "[2]LehnertWG.Theprocessofquestionandanswering[Ph.D.Thesis].Y"
-  },
-  {
-   "unit": [
-    "ref",
-    "r32"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[32]KociskýT,SchwarzJ,BlunsomP,etal.TheNarrativeQAreadingcom"
   },
   {
    "unit": [
@@ -648,34 +624,12 @@
   {
    "unit": [
     "ref",
-    "r72"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[72]RocktaschelT,GrefenstetteE,HermannKM,etal.Reasoningabout"
-  },
-  {
-   "unit": [
-    "ref",
     "r89"
    ],
    "alarms": [
     "norms:这条参考文献与前面的条目重复"
    ],
    "text": "[89]BerantJ,ChouAK,FrostigR,etal.Semanticparsingonfreebasefr"
-  },
-  {
-   "unit": [
-    "ref",
-    "r96"
-   ],
-   "alarms": [
-    "authenticity:文献信息与本地原文不一致",
-    "status:mismatch"
-   ],
-   "text": "[96]WoodsendK,LapataM.Automaticgenerationofstoryhighlights.I"
   },
   {
    "unit": [
@@ -727,18 +681,6 @@
   {
    "unit": [
     "span",
-    "p181",
-    0,
-    77
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "使用连续句子预测来训练BERT模型,可以很大程度上提高模型在类似机器阅读理解(MRC)以及自然语言推理(NLI)这些需要"
-  },
-  {
-   "unit": [
-    "span",
     "p19",
     510,
     592
@@ -759,18 +701,6 @@
     "revision:typo"
    ],
    "text": "由于数据集的类型不同,问题和答案会被表示成不同的形式,表1中的6个例子分别来自6种类型中具有代表性的数据集:CBT、Sc"
-  },
-  {
-   "unit": [
-    "span",
-    "p30",
-    234,
-    263
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "“Tommylookedveryindignant."
   },
   {
    "unit": [
@@ -799,18 +729,6 @@
   {
    "unit": [
     "span",
-    "p56",
-    0,
-    229
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "{P_n}=\\frac{{\\sum\\limits_{C\\in\\{Candidates\\}}{\\sum\\limits_{n"
-  },
-  {
-   "unit": [
-    "span",
     "p59",
     0,
     136
@@ -819,18 +737,6 @@
     "revision:typo"
    ],
    "text": "Rouge(recall-orientedunderstudyforgistingevaluation)同时也是自动文本"
-  },
-  {
-   "unit": [
-    "span",
-    "p76",
-    281,
-    383
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "而高维映射的词嵌入方法可以有效解决上述方法带来的问题,即语义相似的单词可以在几何空间中被编码成距离相近的向量,例如,co"
   },
   {
    "unit": [
@@ -855,18 +761,6 @@
     "revision:typo"
    ],
    "text": "为了填补Word2Vec的局限性,Pennington等人[52]提出了一种结合局部上下文窗口和全局矩阵分解方法的全局对"
-  },
-  {
-   "unit": [
-    "span",
-    "p86",
-    163,
-    297
-   ],
-   "alarms": [
-    "revision:typo"
-   ],
-   "text": "他们将每一个单词都视为字符袋(bag-of-character)n-gram模型,通过加入边界符号〈和〉来表示词袋的起始"
   },
   {
    "unit": [

@@ -1,0 +1,74 @@
+{
+ "zh": {
+  "findings": {
+   "support:low": 51,
+   "norms:low": 32,
+   "support:medium": 11,
+   "support:high": 69,
+   "authenticity:high": 24,
+   "authenticity:medium": 25,
+   "authenticity:low": 21,
+   "distribution:low": 5,
+   "distribution:medium": 21,
+   "norms:high": 1,
+   "norms:medium": 9
+  },
+  "revisions": {
+   "typo": 114
+  },
+  "typo_classes": {
+   "space": 33,
+   "other": 69,
+   "truncate": 2,
+   "formula": 8,
+   "hyphen": 1,
+   "width": 1
+  },
+  "precision": {
+   "tp": 43,
+   "fn": 1,
+   "fp_new": 2,
+   "pre_existing": 279,
+   "tn": 1194,
+   "pre_typo_only": 102,
+   "pre_conversion": 41,
+   "p_lenient": 0.9555555555555556,
+   "p_strict": 0.13271604938271606,
+   "p_est": 0.1519434628975265
+  }
+ },
+ "en": {
+  "findings": {
+   "support:low": 14,
+   "distribution:low": 22,
+   "support:high": 52,
+   "distribution:medium": 31,
+   "norms:low": 45,
+   "authenticity:medium": 10,
+   "norms:medium": 3,
+   "authenticity:low": 16,
+   "support:medium": 1,
+   "authenticity:high": 4
+  },
+  "revisions": {
+   "typo": 69
+  },
+  "typo_classes": {
+   "other": 65,
+   "space": 3,
+   "hyphen": 1
+  },
+  "precision": {
+   "tp": 38,
+   "fn": 4,
+   "fp_new": 2,
+   "pre_existing": 186,
+   "tn": 825,
+   "pre_typo_only": 63,
+   "pre_conversion": 4,
+   "p_lenient": 0.95,
+   "p_strict": 0.168141592920354,
+   "p_est": 0.168141592920354
+  }
+ }
+}
