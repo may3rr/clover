@@ -71,6 +71,10 @@ export default function Running({
   // 后端上报的真实阶段：获取近期论文、读取范文、汇总评审意见
   const [ovStep, setOvStep] = useState<string | null>(null)
   const [outline, setOutline] = useState<Outline | null>(null)
+  const [counts, setCounts] = useState<{
+    refs: number
+    markers: number
+  } | null>(null)
   const [anchors, setAnchors] = useState<Record<string, SkAnchor[]>>({})
   const [finished, setFinished] = useState(false)
   const [step, setStep] = useState<string | null>(null)
@@ -87,6 +91,8 @@ export default function Running({
       es.addEventListener('parsed', (ev) => {
         const d = JSON.parse((ev as MessageEvent).data)
         setOutline(d.outline ?? null)
+        if (typeof d.n_refs === 'number')
+          setCounts({ refs: d.n_refs, markers: d.n_markers ?? 0 })
       })
       es.addEventListener('layer', (ev) => {
         const d = JSON.parse((ev as MessageEvent).data)
@@ -138,7 +144,10 @@ export default function Running({
       es.addEventListener('failed', (ev) => {
         es?.close()
         const d = JSON.parse((ev as MessageEvent).data)
-        onFailed(d.error ?? '体检失败。请重试。')
+        onFailed(
+          d.error ??
+            '检查没有完成。请重新拖入论文，如果反复出现，请在设置里确认模型服务的 API Key。'
+        )
       })
       es.onerror = () => {
         es?.close()
@@ -161,19 +170,25 @@ export default function Running({
       ? overview
       : null
 
+  // a failed run stops everything that still looks busy: a spinner that
+  // keeps turning says "still working" louder than the error text
+  const halted = (st: LayerState): LayerState =>
+    error && st.status === 'running'
+      ? { ...st, status: 'failed', error: '未完成' }
+      : st
   const rows: { key: string; name: string; s: LayerState }[] = LAYERS.map(
     ({ key, name }) => ({
       key,
       name,
-      s: shown[key] ?? { status: 'waiting', findings: 0 },
+      s: halted(shown[key] ?? { status: 'waiting', findings: 0 }),
     })
   )
   const ovLayer: LayerState | null = ovStatus
-    ? {
+    ? halted({
         status:
           ovStatus === 'ok' || ovStatus === 'unavailable' ? 'done' : ovStatus,
         findings: 0,
-      }
+      })
     : null
   const progressInput: Record<string, LayerProgress> = Object.fromEntries(
     rows.map((r) => [r.key, r.s])
@@ -192,7 +207,9 @@ export default function Running({
   shownPct.current = pct
   // 四层都结束后只剩期刊评审在等，这时写它的真实阶段
   const layersDone = rows.every((r) => r.s.status === 'done')
-  const stepText = finished
+  const stepText = error
+    ? error
+    : finished
     ? '检查完成，正在打开报告'
     : !skOutline
       ? '正在解析论文'
@@ -212,13 +229,19 @@ export default function Running({
       <div className="run-col flex flex-col" style={{ width: COL_W }}>
         <div className="t26 font-semibold truncate">{fileName}</div>
         <div className="secondary" style={{ marginTop: 8 }}>
-          正在检查，通常需要一两分钟。
+          {counts
+            ? `${counts.refs} 条参考文献，${counts.markers} 处引用`
+            : skOutline
+              ? '四层检查同时进行'
+              : '正在读取论文'}
         </div>
 
         {/* overall progress: weighted over the layers, 0 → 100 */}
         <div style={{ marginTop: 24 }}>
           <div className="flex items-center justify-between t13 secondary">
-            <span className="truncate">{stepText}</span>
+            <span className={`truncate${error ? ' sem-high' : ''}`}>
+              {stepText}
+            </span>
             <span style={{ marginLeft: 12 }}>{pct}%</span>
           </div>
           <div
@@ -261,7 +284,7 @@ export default function Running({
               label={
                 {
                   waiting: '等待',
-                  running: '进行中',
+                  running: error ? '未完成' : '进行中',
                   ok: '已完成',
                   unavailable: '暂无对标',
                 }[ovStatus]
@@ -274,7 +297,6 @@ export default function Running({
             className="flex flex-col items-center gap-3"
             style={{ marginTop: 16 }}
           >
-            <div className="font-normal">{error}</div>
             <button className="pill" onClick={onReset}>
               重新选择文件
             </button>

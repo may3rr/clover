@@ -23,7 +23,7 @@ Text rules for a paragraph's visible text:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Iterator
 
 from lxml import etree

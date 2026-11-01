@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="fig.css">
+<style>
+  /* 本机区域：用户要求的虚线框，颜色取 Intel 品牌蓝 */
+  .local {
+    border: 1.5px dashed var(--brand-intel);
+    border-radius: 12px;
+    background: var(--brand-intel-tint);
+    padding: 16px;
+  }
+  .intel {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--brand-intel);
+    color: var(--on-brand);
+    border-radius: 980px;
+    padding: 2px 8px 2px 4px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .intel .ic { width: 16px; height: 16px; }
+
+  /* 五步从左到右；每步上面是步骤与模型，下面是它对例句做了什么 */
+  .steps {
+    display: grid;
+    grid-template-columns: 1fr 12px 1fr 12px 1.18fr 12px 1fr 12px 1fr;
+    column-gap: 4px;
+    align-items: stretch;
+  }
+  .step {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 12px;
+    min-width: 0;
+  }
+  .steps > .chev { align-self: center; }
+  .steps .chev svg { width: 8px; height: 14px; }
+  .head { display: flex; flex-direction: column; gap: 4px; }
+  .qwen {
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    background: var(--brand-qwen);
+    color: var(--on-brand);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+  }
+  .qwen svg { width: 18px; height: 18px; }
+  .model {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--brand-qwen);
+    line-height: 1.3;
+  }
+  .model .size { font-weight: 500; }
+  .what {
+    flex: 1;
+    background: var(--bg-subtle);
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .rank {
+    display: grid;
+    grid-template-columns: 12px 1fr;
+    column-gap: 4px;
+    align-items: baseline;
+  }
+  .bar {
+    height: 6px;
+    border-radius: 980px;
+    background: var(--fill-strong);
+    align-self: center;
+  }
+  .mark { width: 16px; height: 16px; flex: none; }
+  .ok { color: var(--ok); }
+  .no { color: var(--tile-grey); }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .verdict {
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* 上下往返：拿不准的论断上云，复核结论回本机 */
+  .between {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 8px 0;
+  }
+  .trip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+  }
+  .down svg, .up svg { width: 12px; height: 20px; }
+  .down { transform: rotate(90deg); }
+  .up { transform: rotate(-90deg); }
+
+  .cloud {
+    display: grid;
+    grid-template-columns: 212px 1fr 1fr;
+    gap: 12px;
+    align-items: stretch;
+    background: var(--bg-subtle);
+    border-radius: 12px;
+    padding: 16px;
+  }
+  .sees {
+    background: var(--bg);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  svg text { font-family: inherit; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position: absolute">
+  <!-- 千问图标，路径取自 app/src/renderer/src/components/brandPaths.ts（LobeHub lobe-icons） -->
+  <symbol id="qwen" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M19.713 2.825h-5.907c0-.251-.066-.503-.196-.728L12.819.728A1.46 1.46 0 0 0 11.559 0h-1.58c-.52 0-1 .275-1.26.728l-2.42 4.19a1.45 1.45 0 0 0 0 1.453l.791 1.37c.26.448.74.727 1.26.727h11.36c.52 0 1-.275 1.26-.728l.79-1.37a1.45 1.45 0 0 0 0-1.451l-.79-1.37a1.46 1.46 0 0 0-1.26-.728zM.195 9.905l2.951 5.115a1.46 1.46 0 0 0-.531.531l-.791 1.37a1.45 1.45 0 0 0 0 1.452l.79 1.37c.26.448.74.727 1.26.727h4.84c.52 0 1-.275 1.26-.728l.79-1.37a1.45 1.45 0 0 0 0-1.451L5.086 7.083a1.46 1.46 0 0 0-1.26-.728h-1.58c-.52 0-1 .276-1.26.728l-.79 1.37a1.45 1.45 0 0 0 0 1.452m15.888 13.367 2.951-5.115c.217.125.469.196.728.196h1.582c.52 0 1-.275 1.26-.728l.79-1.37a1.45 1.45 0 0 0 0-1.451l-2.42-4.191a1.46 1.46 0 0 0-1.259-.728h-1.582c-.52 0-1 .276-1.259.728l-5.678 9.838a1.45 1.45 0 0 0 0 1.452l.79 1.37c.26.448.74.727 1.26.727h1.582c.52 0 1-.275 1.26-.728z"/>
+  </symbol>
+</svg>
+
+<div class="fig">
+  <div class="col g4" style="margin-bottom: 24px">
+    <div class="t26">论文全文留在本机，云端只复核拿不准的判断</div>
+    <div class="t15 sec">以演示稿中的一句话为例，走一遍 Clover 的引用核查流程</div>
+  </div>
+
+  <!-- ================= 本机 ================= -->
+  <div class="local">
+    <div class="row" style="justify-content: space-between; margin-bottom: 12px">
+      <div class="row g8">
+        <span class="t17 w6">本机运行</span>
+        <span class="t13 sec">OpenVINO 推理，论文与被引文献全文不离开这台电脑</span>
+      </div>
+      <span class="intel"><i class="ic" data-ic="chip"></i>Intel</span>
+    </div>
+
+    <div class="steps">
+      <!-- 输入与解析 -->
+      <div class="step">
+        <div class="head">
+          <span class="tile lg" style="background: var(--tile-blue)" data-ic="doc"></span>
+          <span class="t15 w6">输入与解析</span>
+          <span class="t13 sec" style="line-height: 1.3">规则解析，不用模型</span>
+        </div>
+        <div class="what">
+          <div><span class="w6">论文.docx</span></div>
+          <div class="sec">ref 文件夹 52 篇被引 PDF</div>
+          <div class="sec" style="margin-top: 4px">解析出 73 条参考文献、78 条带引用的论断</div>
+        </div>
+      </div>
+      <span class="chev"></span>
+
+      <!-- 抽出论断 -->
+      <div class="step">
+        <div class="head">
+          <span class="qwen"><svg><use href="#qwen"/></svg></span>
+          <span class="t15 w6">抽出论断</span>
+          <span class="model">Qwen3<br><span class="size">1.7B</span></span>
+        </div>
+        <div class="what">
+          <span class="hl hl-model">SPP-Net的检测速率比R-CNN 快了240 ~1020 倍</span><span class="sec">[20]</span>，并打破了固定尺寸输入的束缚
+        </div>
+      </div>
+      <span class="chev"></span>
+
+      <!-- 检索嵌入：文字变成向量，与原文片段的向量比相似度 -->
+      <div class="step">
+        <div class="head">
+          <span class="qwen"><svg><use href="#qwen"/></svg></span>
+          <span class="t15 w6">检索嵌入</span>
+          <span class="model">Qwen3-Embedding<br><span class="size">0.6B</span></span>
+        </div>
+        <div class="what" style="padding: 8px 4px 8px 8px">
+          <svg viewBox="0 0 168 104" width="100%" style="display: block">
+            <rect x="0" y="38" width="40" height="28" rx="6" fill="var(--tint-model)"/>
+            <text x="20" y="56.5" font-size="13" text-anchor="middle" fill="var(--brand-qwen)" font-weight="600">论断</text>
+            <!-- 论断到向量的连线 -->
+            <g stroke="var(--brand-qwen)" stroke-opacity="0.3" stroke-width="1">
+              <line x1="40" y1="52" x2="68" y2="7"/><line x1="40" y1="52" x2="68" y2="20"/>
+              <line x1="40" y1="52" x2="68" y2="33"/><line x1="40" y1="52" x2="68" y2="46"/>
+              <line x1="40" y1="52" x2="68" y2="59"/><line x1="40" y1="52" x2="68" y2="72"/>
+              <line x1="40" y1="52" x2="68" y2="85"/><line x1="40" y1="52" x2="68" y2="98"/>
+            </g>
+            <!-- 向量：一列圆圈，深浅表示各维取值（示意） -->
+            <g fill="var(--brand-qwen)">
+              <circle cx="73" cy="7" r="5" fill-opacity="0.9"/>
+              <circle cx="73" cy="20" r="5" fill-opacity="0.3"/>
+              <circle cx="73" cy="33" r="5" fill-opacity="0.65"/>
+              <circle cx="73" cy="46" r="5" fill-opacity="0.15"/>
+              <circle cx="73" cy="59" r="5" fill-opacity="0.8"/>
+              <circle cx="73" cy="72" r="5" fill-opacity="0.45"/>
+              <circle cx="73" cy="85" r="5" fill-opacity="0.22"/>
+              <circle cx="73" cy="98" r="5" fill-opacity="0.7"/>
+            </g>
+            <!-- 向量到原文片段：越相近线越粗 -->
+            <g stroke="var(--brand-qwen)" stroke-linecap="round">
+              <line x1="82" y1="52" x2="118" y2="16" stroke-width="3" stroke-opacity="0.85"/>
+              <line x1="82" y1="52" x2="118" y2="52" stroke-width="1.6" stroke-opacity="0.45"/>
+              <line x1="82" y1="52" x2="118" y2="88" stroke-width="1" stroke-opacity="0.25"/>
+            </g>
+            <rect x="120" y="4" width="46" height="24" rx="5" fill="var(--bg)"/>
+            <rect x="120" y="40" width="46" height="24" rx="5" fill="var(--bg)"/>
+            <rect x="120" y="76" width="46" height="24" rx="5" fill="var(--bg)"/>
+            <rect x="126" y="13.5" width="32" height="5" rx="2.5" fill="var(--fill-strong)"/>
+            <rect x="126" y="49.5" width="26" height="5" rx="2.5" fill="var(--fill-strong)"/>
+            <rect x="126" y="85.5" width="34" height="5" rx="2.5" fill="var(--fill-strong)"/>
+          </svg>
+          <div class="sec" style="margin-top: 4px">论断与原文片段都变成向量，融合 BM25 取前 40 个候选</div>
+        </div>
+      </div>
+      <span class="chev"></span>
+
+      <!-- 重排 -->
+      <div class="step">
+        <div class="head">
+          <span class="qwen"><svg><use href="#qwen"/></svg></span>
+          <span class="t15 w6">重排</span>
+          <span class="model">Qwen3-Reranker<br><span class="size">0.6B</span></span>
+        </div>
+        <div class="what col g8">
+          <div class="rank">
+            <span class="w6" style="color: var(--brand-qwen)">1</span>
+            <span>… our method is <span class="hl hl-model">24-102× faster</span> than the R-CNN method …</span>
+          </div>
+          <div class="rank"><span class="sec">2</span><div class="bar" style="width: 84%"></div></div>
+          <div class="rank"><span class="sec">3</span><div class="bar" style="width: 66%"></div></div>
+        </div>
+      </div>
+      <span class="chev"></span>
+
+      <!-- 审查 -->
+      <div class="step">
+        <div class="head">
+          <span class="qwen"><svg><use href="#qwen"/></svg></span>
+          <span class="t15 w6">审查</span>
+          <span class="model">Qwen3<br><span class="size">4B</span></span>
+        </div>
+        <div class="what">
+          <div class="w6 sem-high">不支持</div>
+          <div>原文 24-102 倍，稿件写成 240~1020 倍</div>
+          <div class="sec" style="margin-top: 4px">证据在原文第 1 页逐字定位</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="split">
+      <div class="verdict">
+        <i class="ic mark ok" data-ic="check"></i>
+        <span class="t13"><span class="w6">判断确定</span><span class="sec">：留在本机，写成 Word 批注</span></span>
+      </div>
+      <div class="verdict">
+        <i class="ic mark" style="color: var(--medium)" data-ic="triangle"></i>
+        <span class="t13"><span class="w6">拿不准</span><span class="sec">：只把这一条送去云端复核</span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="between">
+    <span></span>
+    <div class="row g24" style="justify-content: center">
+      <div class="trip"><span class="chev down"></span><span class="t13 sec">论断、候选片段与首轮判断</span></div>
+      <div class="trip"><span class="chev up"></span><span class="t13 sec">复核结论</span></div>
+    </div>
+  </div>
+
+  <!-- ================= 云端 ================= -->
+  <div class="cloud">
+    <div class="col g8">
+      <div class="row g8">
+        <span class="qwen"><svg><use href="#qwen"/></svg></span>
+        <div class="col">
+          <span class="t17 w6">云端复核</span>
+          <span class="t13 sec">阿里云百炼</span>
+        </div>
+      </div>
+      <span class="model">Qwen3.8-Max</span>
+      <span class="t13 sec">复核结论返回本机，与其余判断一起写回 Word</span>
+    </div>
+    <div class="sees">
+      <div class="t13 sec w6">云端看得到</div>
+      <div class="row g4"><i class="ic mark ok" data-ic="check"></i><span class="t13">拿不准的那条论断</span></div>
+      <div class="row g4"><i class="ic mark ok" data-ic="check"></i><span class="t13">对应引文的候选片段</span></div>
+      <div class="row g4"><i class="ic mark ok" data-ic="check"></i><span class="t13">本机的首轮判断与理由</span></div>
+    </div>
+    <div class="sees">
+      <div class="t13 sec w6">云端看不到</div>
+      <div class="row g4"><i class="ic mark no" data-ic="xmark"></i><span class="t13">论文全文</span></div>
+      <div class="row g4"><i class="ic mark no" data-ic="xmark"></i><span class="t13">被引文献全文</span></div>
+      <div class="row g4"><i class="ic mark no" data-ic="xmark"></i><span class="t13">本机已经判断确定的论断</span></div>
+    </div>
+  </div>
+</div>
+<script src="icons.js"></script>
+</body>
+</html>

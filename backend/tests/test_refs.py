@@ -916,3 +916,72 @@ def test_partial_record_is_not_an_author_mismatch():
                source="openalex", year=2009)
     issues, author_diff, _ = _evaluate(ref, hit)
     assert author_diff is True
+
+
+# ------------------------------------- diacritics and re-deposited records
+def test_diacritics_fold_in_author_names():
+    for typed, record in [("Jegou H", "Hervé Jégou"), ("Kociský T", "Tomáš Kočiský"),
+                          ("Tur G", "Gokhan Tür"), ("Pasca M", "MARIUS A. PAŞCA")]:
+        ref = Reference(id="r", raw="x", title="Some title", authors=[typed, "B C"],
+                        year=2011)
+        hit = {"title": "Some title", "authors": [record, "B C"], "year": 2011,
+               "source": "crossref"}
+        assert _evaluate(ref, hit)[0] == [], typed
+
+
+def test_record_after_horizon_is_redeposit():
+    from citecheck.refs.verify import _HORIZON, _year_horizon
+
+    ref = Reference(id="r", raw="x", title="Learning multiple layers of features",
+                    authors=["Krizhevsky A"], year=2009)
+    hit = {"title": "Learning multiple layers of features",
+           "authors": ["Alex Krizhevsky"], "year": 2024, "source": "openalex"}
+    assert _evaluate(ref, hit)[0]  # no horizon: the year differs
+    refs = [Reference(id=str(y), raw="x", year=y) for y in (2015, 2017, 2019, 2020, 2020)]
+    token = _HORIZON.set(_year_horizon(refs))
+    try:
+        assert _year_horizon(refs) == 2020
+        assert _evaluate(ref, hit)[0] == []
+        # a record within the horizon still disagrees
+        hit2 = dict(hit, year=2013)
+        assert _evaluate(ref, hit2)[0]
+    finally:
+        _HORIZON.reset(token)
+
+
+def test_parse_line_break_hyphen_and_event_year():
+    r = parse_reference(
+        "Hinton G E, Zemel R S. Autoencoders, minimum descrip- tion length and "
+        "Helmholtz free energy. In: Proceedings of the 1993 Advances in Neural "
+        "Information Processing Systems. Denver, USA: MIT Press, 1994. 3-10")
+    assert r["year"] == 1994
+    assert r["title"] == ("Autoencoders, minimum description length and "
+                          "Helmholtz free energy")
+    # a suspended compound is not a line break
+    r = parse_reference("Smith J. Pre- and post-training analysis. Journal of X, 2019.")
+    assert r["title"].startswith("Pre- and post-training")
+
+
+def test_grey_talks_and_month_dated_entries():
+    from citecheck.refs.verify import _grey
+
+    def grey(raw, venue):
+        return _grey(Reference(id="r", raw=raw, title="t", venue=venue))
+
+    assert grey("Kate Crawford. The trouble with bias. NIPS 2017 Keynote, 2017.",
+                "NIPS 2017 Keynote")
+    assert grey("WeChat AI. Tr-mt (ensemble), December 2019.", "Tr-mt")
+    # a dated journal article with volume and pages is not grey
+    assert not grey("A. Smith. On things. Journal of AI, 12(3): 1-10, May 2020.",
+                    "Journal of AI")
+
+
+def test_title_word_split_matches():
+    from citecheck.refs.verify import _norm, _title_ratio
+
+    hit = {"title": "Classification and Regression by randomForest"}
+    assert _title_ratio(_norm("Classification and regression by random-forest"),
+                        hit) >= 97
+    # different words still differ
+    assert _title_ratio(_norm("Classification and regression by random trees"),
+                        hit) < 92

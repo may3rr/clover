@@ -14,7 +14,6 @@ import json
 import logging
 import os
 import threading
-from typing import Any
 
 log = logging.getLogger(__name__)
 

@@ -100,6 +100,9 @@ def _legible(text: str) -> bool:
     return bool(t) and len(squash(t)) / len(t) >= 0.6
 
 
+# what a PDF's metadata or a file-name suffix puts where no author was given
+_PLACEHOLDER = re.compile(r"^(anon(ymous)?|unknown|author|admin|user)s?$")
+
 _SPACING_ACCENT = re.compile(r"(?<=\w)[´¨ˆ˜`˝˚ˇ](?=\w)")
 
 
@@ -114,6 +117,27 @@ def _fold(names: list[str]) -> list[str]:
     return out
 
 
+def _name_tokens(name: str) -> set[str]:
+    return {squash(t) for t in re.split(r"[\s,.]+", name) if len(t) >= 2}
+
+
+def _title_on_page(ref_title: str, pdf_title: str, pdf: LocalPdf) -> bool:
+    """The largest-font text on page 1 is a figure label or a teaser
+    caption for some papers ("inference time (ms)", "0.95 0.80"), and an
+    entry may cite the short form of a title with a subtitle ("The Open
+    Images Dataset V4"). Either way the entry's title printed on the
+    opening pages, or the extracted title being the start of the entry's,
+    means the PDF names the same work."""
+    want = squash(ref_title)
+    if len(want) < 12:
+        return False
+    have = squash(pdf_title)
+    if len(have) >= 12 and want.startswith(have):
+        return True
+    head = squash(pdf.first_pages)[:6000]
+    return want in head or fuzz.partial_ratio(want, head) >= 92
+
+
 def local_issues(ref: Reference, pdf: LocalPdf) -> list[str]:
     doc = pdf.doc
     if doc.source not in _TRUSTED:
@@ -124,7 +148,8 @@ def local_issues(ref: Reference, pdf: LocalPdf) -> list[str]:
     # page — the link already matched them, so silence is the honest call
     if (ref.title and doc.title and _legible(doc.title)
             and _is_cjk(ref.title) == _is_cjk(doc.title)
-            and fuzz.ratio(squash(ref.title), squash(doc.title)) < 85):
+            and fuzz.ratio(squash(ref.title), squash(doc.title)) < 85
+            and not _title_on_page(ref.title, doc.title, pdf)):
         issues.append(f"本地原文标题为《{doc.title[:60]}》")
     # a file name suffix ("_González.pdf", "_anon.pdf") fills in the
     # authors when the page gave none; it proves nothing about the paper
@@ -132,9 +157,16 @@ def local_issues(ref: Reference, pdf: LocalPdf) -> list[str]:
     from_name = bool(fn_author) and doc.authors == [fn_author]
     want = _first_author_key(_fold(ref.authors))
     have = _first_author_key(_fold(doc.authors))
-    if (want and have and not from_name and _is_cjk(want) == _is_cjk(have)
-            and want != have
-            and want not in squash(" ".join(_fold(doc.authors)))):
+    on_page = squash(" ".join(_fold(doc.authors)))
+    # "Ling Xiao" / "Yang M Q": the order heuristic may take the given name
+    # as the surname; any full-name token of the entry's first author found
+    # among the page's authors is the same person
+    page_tokens = set().union(*(_name_tokens(n) for n in _fold(doc.authors[:6])))
+    tokens = _name_tokens(_fold(ref.authors[:1])[0]) if ref.authors else set()
+    if (want and have and not from_name and not _PLACEHOLDER.match(have)
+            and _is_cjk(want) == _is_cjk(have)
+            and want != have and want not in on_page
+            and not (tokens & page_tokens)):
         issues.append(f"本地原文首作者为 {doc.authors[0]}，文中写 {ref.authors[0]}")
     if ref.year and doc.year and abs(ref.year - doc.year) > 1:
         issues.append(f"本地原文年份为 {doc.year}，文中写 {ref.year}")

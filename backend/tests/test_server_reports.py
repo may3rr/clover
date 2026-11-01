@@ -103,3 +103,78 @@ def test_export_stored_latex_report_as_zip(client, tmp_path, monkeypatch):
     assert r.json()["path"] == str(out)
     with zipfile.ZipFile(out) as zf:
         assert "论断缺少支撑" in zf.read("paper/main.tex").decode()
+
+
+def test_benchmark_stored_report_reruns_with_venue(client, tmp_path, monkeypatch):
+    """A venue typed after the check re-runs the same manuscript with the
+    venue and the reference folder; the new report replaces the old row."""
+    import citecheck.server as srv
+    from citecheck.schema import Library, LibraryLink
+
+    src = tmp_path / "a.docx"
+    src.write_bytes(b"x")
+    folder = tmp_path / "ref"
+    folder.mkdir()
+    old = _report("a")
+    old.library = Library(folder=str(folder), links=[
+        LibraryLink(ref_id="r1", doc_id="d1", method="title", status="confirmed", score=99)])
+    _save_report("old1", src, "arxiv_cs_cl", old)
+    seen: dict = {}
+
+    async def fake_pipeline(path, **kw):
+        seen.update(kw, path=path)
+        return _report("a")
+
+    monkeypatch.setattr(srv, "run_pipeline", fake_pipeline)
+    with client:
+        assert client.post("/reports/old1/venue", data={"venue": " "},
+                           headers=H).status_code == 400
+        r = client.post("/reports/old1/venue", data={"venue": "计算机学报"},
+                        headers=H)
+        assert r.status_code == 200 and r.json()["edited"] is False
+        job_id = r.json()["job_id"]
+        # the background run finishes on the client's loop
+        for _ in range(50):
+            if srv.JOBS[job_id].task.done():
+                break
+            client.get("/health")
+    assert seen["venue"] == "计算机学报" and seen["path"] == src
+    assert seen["library_dir"] == str(folder)
+    assert [x.ref_id for x in seen["library_links"]] == ["r1"]
+    ids = [x["id"] for x in client.get("/reports", headers=H).json()]
+    assert ids == [job_id]
+
+
+def test_benchmark_stored_report_source_gone(client, tmp_path):
+    src = tmp_path / "gone.docx"
+    src.write_bytes(b"x")
+    _save_report("g1", src, "arxiv_cs_cl", _report("gone"))
+    src.unlink()
+    r = client.post("/reports/g1/venue", data={"venue": "EMNLP"}, headers=H)
+    assert r.status_code == 400 and "原稿已移动或删除" in r.json()["detail"]
+
+
+def test_benchmark_stored_report_flags_edited_source(client, tmp_path, monkeypatch):
+    import os
+    import time
+
+    import citecheck.server as srv
+
+    src = tmp_path / "a.docx"
+    src.write_bytes(b"x")
+    _save_report("e1", src, "arxiv_cs_cl", _report("a"))
+    later = time.time() + 120
+    os.utime(src, (later, later))  # the author edited the manuscript since
+
+    async def fake_pipeline(path, **kw):
+        return _report("a")
+
+    monkeypatch.setattr(srv, "run_pipeline", fake_pipeline)
+    with client:
+        r = client.post("/reports/e1/venue", data={"venue": "EMNLP"}, headers=H)
+        assert r.status_code == 200 and r.json()["edited"] is True
+        job = srv.JOBS[r.json()["job_id"]]
+        for _ in range(50):
+            if job.task.done():
+                break
+            client.get("/health")

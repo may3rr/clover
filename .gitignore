@@ -83,3 +83,9 @@ demo/testset/precision_audit/pool.csv
 demo/testset/precision_audit/sample.json
 demo/testset/precision_audit/annotate.html
 demo/testset/precision_audit/labels.csv
+
+# 决赛演示稿的文献 PDF（硬链接自 testset，不入库）
+demo/final/**/*.pdf
+demo/final/runs/*.log
+# 运行报告含被引文献原文片段，只留在本地
+demo/final/runs/*.json

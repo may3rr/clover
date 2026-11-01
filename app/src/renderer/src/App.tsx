@@ -17,6 +17,7 @@ import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
 import { ACCEPT_ERROR, isPaperPath, looksLikeFolder } from './lib/accept'
 import { readVenue, saveVenue } from './lib/targetVenue'
+import type { RebenchState } from './screens/ReportScreen'
 
 
 type Screen =
@@ -40,6 +41,12 @@ export default function App() {
   const [report, setReport] = useState<Report | null>(null)
   // 期刊对标后到：报告先开，对标算完再补；undefined = 沿用 report.overview
   const [lateOverview, setLateOverview] = useState<Report['overview']>(undefined)
+  // a venue typed on a finished report: the run behind it, while it lasts
+  const [rebench, setRebench] = useState<RebenchState | null>(null)
+  const rebenchToken = useRef<string | null>(null)
+  // the report view's identity: a report swapped in after benchmarking is
+  // the same view (selection, scroll, panes stay), a new check is not
+  const [viewKey, setViewKey] = useState<string | null>(null)
   const [benchmark, setBenchmark] = useState('arxiv_cs_cl')
   const [venue, setVenueState] = useState(readVenue)
   // the target venue: typed on the home screen, edited on the
@@ -115,13 +122,19 @@ export default function App() {
         for (const [k, v] of Object.entries(extra)) if (k !== 'venue') fd.append(k, v)
         const r = await apiFetch('/analyze', { method: 'POST', body: fd })
         if (!r.ok) {
-          setJobError(ACCEPT_ERROR)
+          // the backend says why (no API key, unreadable archive); only an
+          // unexplained refusal is blamed on the file format
+          const { detail } = (await r.json().catch(() => ({}))) as {
+            detail?: unknown
+          }
+          setJobError(typeof detail === 'string' ? detail : ACCEPT_ERROR)
           return
         }
         const { job_id } = (await r.json()) as { job_id: string }
         // the front sheet flies into the first skeleton page
         morph(() => {
           setJobId(job_id)
+          setViewKey(null)
           setRunVenue(target)
           setScreen('running')
         })
@@ -195,9 +208,12 @@ export default function App() {
   }, [analyze])
 
   const reset = useCallback(() => {
+    rebenchToken.current = null
+    setRebench(null)
     setScan(null)
     setScreen('empty')
     setJobId(null)
+    setViewKey(null)
     setReport(null)
     setLateOverview(undefined)
     setJobError(null)
@@ -205,6 +221,8 @@ export default function App() {
 
   // open a past report from the home history — no re-run, no re-upload
   const openReport = useCallback(async (id: string) => {
+    rebenchToken.current = null
+    setRebench(null)
     setJobError(null)
     try {
       const r = await apiFetch(`/reports/${id}`)
@@ -215,6 +233,7 @@ export default function App() {
       const rep = (await r.json()) as Report
       morph(() => {
         setJobId(id)
+        setViewKey(null)
         setLateOverview(undefined)
         setReport(rep)
         setScreen('report')
@@ -223,6 +242,88 @@ export default function App() {
       setJobError('无法连接本地服务。请重新打开应用。')
     }
   }, [])
+
+  // a target venue typed after the check: the manuscript runs again with it
+  // while this report stays on screen (cached, so the four layers replay);
+  // the new report swaps in when its layers are done and the venue overview
+  // then arrives the usual deferred way
+  const benchmarkReport = useCallback(
+    async (name: string) => {
+      if (!jobId) return
+      const token = Math.random().toString(36).slice(2, 10)
+      rebenchToken.current = token
+      const live = () => rebenchToken.current === token
+      const fail = (error: string) => {
+        if (live()) setRebench({ venue: name, error })
+      }
+      setRebench({ venue: name })
+      // the home field is the one source of the target venue: keep it in step
+      setVenue(name)
+      try {
+        const fd = new FormData()
+        fd.append('venue', name)
+        const r = await apiFetch(`/reports/${jobId}/venue`, {
+          method: 'POST',
+          body: fd,
+        })
+        const d = (await r.json().catch(() => ({}))) as {
+          job_id?: string
+          detail?: unknown
+          edited?: boolean
+        }
+        if (!r.ok || !d.job_id) {
+          fail(
+            typeof d.detail === 'string'
+              ? d.detail
+              : '无法开始对标。请退出 Clover 后重新打开，再试一次。'
+          )
+          return
+        }
+        const next = d.job_id
+        const edited = !!d.edited
+        if (live()) setRebench({ venue: name, edited })
+        const es = new EventSource(await eventsUrl(next))
+        es.addEventListener('progress', (ev) => {
+          const label = JSON.parse((ev as MessageEvent).data).label
+          if (live() && typeof label === 'string')
+            setRebench({ venue: name, step: label, edited })
+        })
+        es.addEventListener('done', async () => {
+          es.close()
+          if (!live()) return
+          const rr = await apiFetch(`/jobs/${next}/report`)
+          if (!rr.ok) {
+            fail('无法读取对标后的报告。请从最近检查里重新打开这篇论文。')
+            return
+          }
+          const rep = (await rr.json()) as Report
+          if (!live()) return
+          rebenchToken.current = null
+          // swapped in place, no view transition: the page stays where the
+          // reader is and only the changed parts update
+          setViewKey((k) => k ?? jobId)
+          setRebench(null)
+          setLateOverview(undefined)
+          setJobId(next)
+          setReport(rep)
+        })
+        es.addEventListener('failed', (ev) => {
+          es.close()
+          fail(
+            JSON.parse((ev as MessageEvent).data).error ??
+              '对标没有完成。请稍后再试。'
+          )
+        })
+        es.onerror = () => {
+          es.close()
+          fail('连接中断，对标没有完成。请再试一次。')
+        }
+      } catch {
+        fail('无法连接本地服务。请退出 Clover 后重新打开。')
+      }
+    },
+    [jobId, setVenue]
+  )
 
   // ------------------------------------------------------- job lifecycle
   const onJobDone = useCallback(async () => {
@@ -470,7 +571,7 @@ export default function App() {
   if (screen === 'report' && report && jobId) {
     return (
       <ReportScreen
-        key={jobId}
+        key={viewKey ?? jobId}
         report={report}
         overview={lateOverview}
         jobId={jobId}
@@ -482,6 +583,8 @@ export default function App() {
         onOpenSettings={openSettings}
         onReset={reset}
         onOpenReport={openReport}
+        rebench={rebench}
+        onBenchmark={benchmarkReport}
         onExported={(_path) => {
           if (window.citecheck.e2eFile && !e2eExportDone.current) {
             e2eExportDone.current = true

@@ -74,6 +74,23 @@ class _FuncOut(BaseModel):
     items: list[_FuncItem] = Field(default_factory=list)
 
 
+def _label_ranges(labels: list[str | None]) -> str:
+    """'[3]–[6]、[9]' from numeric labels; '' when any entry has none
+    (author-year lists have no short label to quote)."""
+    if not labels or any(not (lb or "").isdigit() for lb in labels):
+        return ""
+    nums = sorted({int(lb) for lb in labels if lb})
+    runs: list[tuple[int, int]] = []
+    for n in nums:
+        if runs and n == runs[-1][1] + 1:
+            runs[-1] = (runs[-1][0], n)
+        else:
+            runs.append((n, n))
+    return "、".join(f"[{a}]" if a == b else
+                    f"[{a}]、[{b}]" if b == a + 1 else f"[{a}]–[{b}]"
+                    for a, b in runs)
+
+
 def count_words(text: str) -> int:
     """Latin word tokens + CJK characters."""
     return len(_LATIN.findall(text)) + len(_CJK.findall(text))
@@ -175,7 +192,8 @@ async def run_distribution(
 
     # ---- sentence-level reference counts -------------------------------
     citing_counts: list[int] = []
-    stacked: list[tuple[str, int, int, int]] = []  # (para_id, start, end, n)
+    # (para_id, start, end, ref ids)
+    stacked: list[tuple[str, int, int, set[str]]] = []
     for pid, ms in markers_by_para.items():
         if para_by_id[pid].cell is not None:  # table cells aren't sentences
             continue
@@ -189,7 +207,7 @@ async def run_distribution(
                 continue
             citing_counts.append(len(ids))
             if len(ids) >= 5:
-                stacked.append((pid, sent.start, sent.end, len(ids)))
+                stacked.append((pid, sent.start, sent.end, ids))
     n_citing = len(citing_counts)
 
     def _share(k: int) -> float:
@@ -297,12 +315,12 @@ async def run_distribution(
         )
         if share_out:
             side = "低于" if sd.share_flag == "below" else "高于"
-            bits.append(f"引用占比 {sd.share * 100:.1f}%{side}常见范围 "
+            bits.append(f"引用占比 {sd.share * 100:.1f}%，{side}常见范围 "
                         f"{sd.bench_share.q1 * 100:.1f}% 至 "
                         f"{sd.bench_share.q3 * 100:.1f}%")
         if dens_out:
             side = "低于" if sd.density_flag == "below" else "高于"
-            bits.append(f"每千词引用 {sd.density:.1f} 次{side}常见范围 "
+            bits.append(f"每千词引用 {sd.density:.1f} 次，{side}常见范围 "
                         f"{sd.bench_density.q1:.1f} 至 "
                         f"{sd.bench_density.q3:.1f} 次")
         if bits:
@@ -312,23 +330,39 @@ async def run_distribution(
                 metrics=[f"share:{sd.canonical}", f"density:{sd.canonical}"]
                 if venue_ctx is not None else [],
                 detail=f"依据：本文{name}部分{'，'.join(bits)}，对标的 "
-                       f"{n_papers} 篇{bname}{'' if bname.endswith('范文') else '论文'}。\n"
+                       f"{n_papers} 篇{' ' if bname[:1].isascii() else ''}"
+                       f"{bname}{'' if bname.endswith('范文') else '论文'}。\n"
                        f"建议：确认{name}部分对已有方法、数据集和工具"
                        "的引用是否恰当。",
                 refs=[],
             ))
 
-    for pid, s, e, n in stacked:
+    ref_pos = {r.id: i for i, r in enumerate(parsed.references)}
+    ref_label = {r.id: r.label for r in parsed.references}
+    ge5 = (bench_sr.get("share_ge5") or {}).get("median")
+    bname = bench.get("name", "")
+    bname += "" if bname.endswith(("范文", "论文")) else "论文"
+    gap = " " if bname[:1].isascii() else ""  # Word has no auto-spacing
+    rate = (f"约占引用句的 {ge5 * 100:.0f}%" if ge5 is not None and ge5 >= 0.005
+            else "很少见")
+    typical = (f"对标的 {bench.get('n_papers', 0)} 篇{gap}{bname}中，"
+               f"引用 5 篇及以上的句子{rate}。"
+               if ge5 is not None and bench.get("n_papers") else "")
+    for pid, s, e, ids in stacked:
         if no_citations:
             break
+        rids = sorted(ids, key=lambda r: ref_pos.get(r, 0))
+        labels = _label_ranges([ref_label.get(r) for r in rids])
         findings.append(Finding(
             id="", layer="distribution", severity="medium",
             anchor=Anchor(paragraph_id=pid, start=s, end=e),
-            title=f"这句话同时引用了 {n} 篇文献",
-            detail="依据：一句话内集中引用了多篇文献。\n"
+            title=f"这句话同时引用了 {len(ids)} 篇文献",
+            detail=(f"依据：这句话引用了 {labels} 共 {len(ids)} 篇文献。"
+                    if labels else "依据：一句话内集中引用了多篇文献。")
+                   + typical + "\n"
                    "建议：确认每篇文献与这句话的具体关系，"
                    "必要时拆分或给出各自的对应点。",
-            refs=[],
+            refs=rids,
         ))
 
     # 未标注引用的"已有研究"式结论（只在 intro/related/discussion）

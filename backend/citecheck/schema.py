@@ -89,7 +89,7 @@ class CitationMarker(BaseModel):
 
 
 CitationStyle = Literal["numeric", "author_year", "mixed", "unknown"]
-RefManager = Literal["zotero", "endnote"]
+RefManager = Literal["zotero", "endnote", "mendeley", "noteexpress"]
 
 
 class Document(BaseModel):

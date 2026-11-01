@@ -1,14 +1,25 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+// Finder shows these folders under their localized names
+const FOLDER_ZH: Record<string, string> = {
+  Downloads: '下载',
+  Desktop: '桌面',
+  Documents: '文稿',
+}
+
 /** Where the export went, and the two things people do next: open it, or
  *  find it. Stays until dismissed (click outside, Esc, or an action). */
 export default function ExportDone({
   path,
   tex,
+  comments,
+  revisions,
   onClose,
 }: {
   path: string
   tex: boolean
+  comments: number
+  revisions: number
   onClose: () => void
 }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -30,7 +41,8 @@ export default function ExportDone({
   }, [onClose])
   const parts = path.split('/')
   const name = parts.pop() ?? path
-  const folder = parts.pop() ?? ''
+  const raw = parts.pop() ?? ''
+  const folder = FOLDER_ZH[raw] ?? raw
 
   useEffect(() => {
     const down = (e: MouseEvent) => {
@@ -70,8 +82,10 @@ export default function ExportDone({
       <div className="font-semibold">已导出</div>
       <div className="export-pop-name">{name}</div>
       <div className="t13 secondary">
-        {folder ? `保存在 ${folder} 文件夹` : '已保存'}
-        {tex ? '，批注写在源码注释里，修订在 clover-revisions.patch' : ''}
+        {folder ? `保存在「${folder}」文件夹` : '已保存'}
+        {tex
+          ? '，批注写在源码注释里，修订在 clover-revisions.patch'
+          : `，共 ${comments} 条批注${revisions ? `、${revisions} 处修订` : ''}`}
       </div>
       {err && <div className="t13 sem-high">{err}</div>}
       <div className="flex items-center gap-2" style={{ marginTop: 4 }}>

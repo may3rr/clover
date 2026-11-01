@@ -1,0 +1,134 @@
+{
+ "target": "演示稿/基于深度学习的目标检测研究综述.docx",
+ "injections": [
+  {
+   "id": "fake_en",
+   "layer": "真实性",
+   "kind": "fake_ref",
+   "label": "70",
+   "what": "完全编造的英文文献（作者、标题、期刊卷期都像真的）",
+   "snippet": "2019年Wang等人[70]提出了尺度感知的特征聚合方法"
+  },
+  {
+   "id": "chimera",
+   "layer": "真实性",
+   "kind": "fake_ref",
+   "label": "71",
+   "what": "真实作者配编造标题（大模型幻觉文献的典型样子）",
+   "snippet": "Girshick等人[71]进一步提出了迭代式的候选区域反馈优化方法"
+  },
+  {
+   "id": "wrong_year",
+   "layer": "真实性",
+   "kind": "wrong_year",
+   "label": "55",
+   "what": "真实文献年份写错（2016 写成 2012）",
+   "old": "2016",
+   "new": "2012"
+  },
+  {
+   "id": "author_swap",
+   "layer": "支持度",
+   "kind": "author_swap",
+   "label": "21",
+   "what": "正文写的作者与被引文献作者对不上（Fast R-CNN 写成 He 等人）",
+   "snippet": "2015 年，He 等人[21]提出了Fast R-CNN"
+  },
+  {
+   "id": "misattr_topic",
+   "layer": "支持度",
+   "kind": "misattribution",
+   "label": "40",
+   "what": "张冠李戴：关键点检测的思想引成了 Transformer",
+   "snippet": "借鉴了文献[40]对关键点检测的思想"
+  },
+  {
+   "id": "misattr_dataset",
+   "layer": "支持度",
+   "kind": "misattribution",
+   "label": "45",
+   "what": "张冠李戴：介绍 MS COCO 却引了 ImageNet 的论文",
+   "snippet": "MS COCO[45]数据集用于目标检测、语义分割"
+  },
+  {
+   "id": "number_rcnn",
+   "layer": "支持度",
+   "kind": "number",
+   "label": "15",
+   "what": "数字与原文不符：R-CNN 在 VOC2007 上 58.5% 写成 78.5%",
+   "snippet": "检测精度达到了78. 5%"
+  },
+  {
+   "id": "number_spp",
+   "layer": "支持度",
+   "kind": "number",
+   "label": "20",
+   "what": "数字放大十倍：SPP-Net 比 R-CNN 快 24–102 倍写成 240–1020 倍",
+   "snippet": "快了240 ~1020 倍[20]"
+  },
+  {
+   "id": "overclaim",
+   "layer": "支持度",
+   "kind": "number",
+   "label": "37",
+   "what": "夸大效果：Soft-NMS 在 COCO 上约提升 1–2 个点，写成 10 个百分点",
+   "snippet": "mAP提升了10个百分点"
+  },
+  {
+   "id": "stacking",
+   "layer": "分布",
+   "kind": "stacking",
+   "what": "一句话堆了 7 篇文献，没说各自的贡献",
+   "snippet": "近年来也有大量工作对上述两类方法进行了改进"
+  },
+  {
+   "id": "duplicate",
+   "layer": "规范",
+   "kind": "duplicate",
+   "label": "72",
+   "what": "同一篇 SSD 在列表里出现两次（[43] 与 [72]）"
+  },
+  {
+   "id": "uncited",
+   "layer": "规范",
+   "kind": "uncited",
+   "label": "73",
+   "what": "列表里的 DETR 正文从未引用"
+  },
+  {
+   "id": "dangling",
+   "layer": "规范",
+   "kind": "dangling",
+   "label": "74",
+   "what": "正文引了 [74]，列表里没有这一条（本想引 [73]，编号错位）",
+   "snippet": "直接预测检测框集合[74]"
+  },
+  {
+   "id": "typo_1",
+   "layer": "规范",
+   "kind": "typo",
+   "what": "错别字：侯选",
+   "wrong": "侯选"
+  },
+  {
+   "id": "typo_2",
+   "layer": "规范",
+   "kind": "typo",
+   "what": "错别字：制信",
+   "wrong": "制信"
+  },
+  {
+   "id": "typo_3",
+   "layer": "规范",
+   "kind": "typo",
+   "what": "错别字：Netwrok",
+   "wrong": "Netwrok"
+  },
+  {
+   "id": "reorder",
+   "layer": "规范",
+   "kind": "reorder",
+   "what": "列表里 [68] 与 [69] 顺序颠倒，正文先引 [69]，需要按首次引用顺序重排"
+  }
+ ]
+}

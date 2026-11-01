@@ -165,6 +165,8 @@ async def test_stacking_finding(tmp_path):
     assert len(f) == 1 and f[0].severity == "medium"
     assert f[0].anchor.start == 0 and "[1,2,3,4,5]" in text[:f[0].anchor.end]
     assert d.sentence_refs.share_ge5 == 1.0
+    # the note names the entries, so the comment says which five
+    assert len(f[0].refs) == 5 and "共 5 篇文献" in f[0].detail
 
 
 @pytest.mark.asyncio

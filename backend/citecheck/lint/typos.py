@@ -71,6 +71,49 @@ def _digits(s: str) -> str:
     return re.sub(r"\D", "", s)
 
 
+def _words(s: str) -> list[str]:
+    return re.sub(r"[^\w\s]|_", "", s).split()
+
+
+def _out_of_scope(text: str, old: str, new: str, start: int, end: int) -> bool:
+    """Edits the prompt asks the model not to make, which it makes anyway
+    (the clean corpus runs: 154 typo revisions on human-written papers):
+
+    - punctuation or spacing only, the words unchanged ('error' ->
+      'error.', '6 ' -> '6', ', ' -> '，', 'GPU’s' -> 'GPUs');
+    - a deletion of a whole word or of Chinese characters that is not a
+      doubling ('10万' -> '10', '敦煌' -> ''): removing content is not
+      fixing a slip, and the product never deletes the author's words.
+      '的的' -> '的' and a stray letter inside a word stay.
+    Splitting a run-together word ('Schoolof' -> 'School of') changes the
+    words and stays a revision."""
+    if _words(old) == _words(new):
+        return True
+    # the edit only removes text: what is removed must be a doubling
+    new = new.strip()
+    if len(new) < len(old) and (old.startswith(new) or old.endswith(new)):
+        if old.startswith(new):
+            start += len(new)
+        else:
+            end -= len(new)
+        o = text[start:end].strip()
+        if not o:
+            return False
+        # a stray letter inside a latin word ('helllo', 'them' -> 'the') is
+        # a slip; removing a whole word or any Chinese character is not
+        latin = o.isalpha() and not _CJK_CHAR.search(o)
+        joined = ((start > 0 and text[start - 1].isalpha())
+                  or (end < len(text) and text[end].isalpha()))
+        if latin and joined:
+            return False
+        doubled = (text[end:end + len(o)] == o
+                   or text[max(0, start - len(o)):start] == o
+                   or text[end:].lstrip().startswith(o + " ")
+                   or text[:start].rstrip().endswith(" " + o))
+        return not doubled
+    return False
+
+
 def _minimise(
     original: str, correction: str
 ) -> tuple[str, str, int, int]:
@@ -154,6 +197,8 @@ async def check_typos(
             if not old and not new:
                 continue
             a_start, a_end = s0 + i, s0 + j
+            if _out_of_scope(p.text, old, new, a_start, a_end):
+                continue
             # a Chinese "typo" whose surroundings recur elsewhere in the
             # manuscript is the author's term (决策化模型 ×10, 可分流性 ×7),
             # not a slip — never revise a word used consistently

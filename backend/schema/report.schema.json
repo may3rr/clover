@@ -381,7 +381,9 @@
             {
               "enum": [
                 "zotero",
-                "endnote"
+                "endnote",
+                "mendeley",
+                "noteexpress"
               ],
               "type": "string"
             },

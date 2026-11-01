@@ -621,7 +621,7 @@ def build(name):
              "liu24", "Position effect is right; the paper reports degradation persists even for explicitly long-context models."),
         ]:
             sub(B, old, new)
-            v.issue("partial_support", snippet=new.split(" {p:")[0].split("ELI5, and")[-1] if False else new, key=key, detail=why)
+            v.issue("partial_support", snippet=new, key=key, detail=why)
         # --- citation stacks (6+ refs in one sentence)
         s1 = (" Retrieval augmentation has been adopted in pre-training, fine-tuning and prompting alike "
               "{p:lewis20,guu20,karpukhin20,izacard21,izacard23,asai24,jiang23f}.")
@@ -663,7 +663,6 @@ def build(name):
                     reference=ref_text(d))
         # --- reference with no year / with truncated title
         d = v.db["stelmakh22"]
-        orig_year = d["y"]
         d["cy"] = d["y"]
         d["y"] = None
         v.issue("reference_no_year", key="stelmakh22", detail="Year omitted from the reference entry (text still cites 2022).")
@@ -673,7 +672,7 @@ def build(name):
         v.issue("reference_truncated_title", key="izacard23",
                 detail=f"Title truncated; full title is '{full_t}'.")
         # --- Section 4 without any citation
-        i4 = find_idx(B, "# 4 ") if False else next(i for i, b in enumerate(B) if b[0] == "h1" and b[1].startswith("4 "))
+        i4 = next(i for i, b in enumerate(B) if b[0] == "h1" and b[1].startswith("4 "))
         j4 = i4 + 1
         stripped = defaultdict(int)
         n_par = 0

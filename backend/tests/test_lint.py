@@ -165,6 +165,31 @@ def test_norms_gbt_tags_negative():
     assert not any("类型标识" in t for t in titles(check_norms(p)))
 
 
+def test_norms_bare_ol_tag():
+    # "[OL]" names the medium only: a tag, but an incomplete one
+    refs = [
+        "[1] 刘知远. 知识表示学习研究进展[J]. 计算机研究与发展, 2016.",
+        "[2] Liu L. Deep learning for object detection: a survey[OL]. http://arxiv.org/abs/1809.02165, 2018.",
+    ]
+    p = mk_parsed(["Text [1,2]."], refs, [(0, "[1,2]", "numeric", [1, 2])])
+    t = titles(check_norms(p))
+    assert "文献类型标识只写了载体 [OL]" in t
+    assert "这条参考文献缺少文献类型标识" not in t
+
+
+def test_norms_bare_ol_grouped():
+    # the same slip on several entries is one finding listing them all
+    refs = [
+        "[1] 刘知远. 知识表示学习研究进展[J]. 计算机研究与发展, 2016.",
+        "[2] Liu L. A survey[OL]. http://arxiv.org/abs/1809.02165, 2018.",
+        "[3] Tian Z. FCOS[OL]. http://arxiv.org/abs/1904.01355, 2019.",
+    ]
+    p = mk_parsed(["Text [1-3]."], refs, [(0, "[1-3]", "numeric", [1, 2, 3])])
+    f = [x for x in check_norms(p) if x.title == "文献类型标识只写了载体 [OL]"]
+    assert len(f) == 1 and f[0].refs == ["r2", "r3"]
+    assert "共 2 条" in f[0].detail
+
+
 def test_norms_managed_out_of_order_finding():
     # zotero-managed, refs listed out of first-appearance order
     p = mk_parsed(["See (1) then (2)."], ["[1] A.", "[2] B."],
@@ -502,3 +527,19 @@ def test_numeric_items_minus_sign_range():
     # Chinese journals typeset ranges with U+2212: 文献[10−12]
     assert _numeric_items("[10−12]") == [10, 11, 12]
 
+
+
+@pytest.mark.asyncio
+async def test_typos_punctuation_and_deletions_dropped():
+    # punctuation-only edits and content deletions are not slips; a split
+    # run-together word and a real misspelling still become revisions
+    p = _typo_doc(["We report the error rate here and add 10万 samples to the "
+                   "Schoolof Computing dataset with roblems noted."])
+    f, revs = await _run_typos(p, {"items": [
+        {"original": "error rate", "correction": "error. rate", "reason": "p"},
+        {"original": "10万 samples", "correction": "10 samples", "reason": "d"},
+        {"original": "Schoolof", "correction": "School of", "reason": "s"},
+        {"original": "roblems", "correction": "problems", "reason": "t"},
+    ]})
+    assert f == []
+    assert sorted(r.new for r in revs) == ["School of", "problems"]

@@ -18,12 +18,7 @@ import AccountChip from '../components/AccountChip'
 import { SideIcon, type SideIconName } from '../components/SideIcons'
 import { GITHUB_URL } from '../lib/credits'
 import { APP_NAME } from '../lib/brand'
-import {
-  BrandIcon,
-  QwenIcon,
-  OpenAIIcon,
-  DeepSeekIcon,
-} from '../components/BrandIcons'
+import { BrandIcon, QwenIcon } from '../components/BrandIcons'
 import { BRAND_PATHS } from '../components/brandPaths'
 
 /** Left-nav pane + grouped fields, in the style of macOS Settings. */
@@ -182,7 +177,7 @@ export default function Settings({
             </button>
           ))}
         </nav>
-        <div style={{ padding: '0 12px 12px' }}>
+        <div style={{ padding: '0 8px 12px' }}>
           <AccountChip prefs={prefs} onOpen={() => setSec('account')} />
         </div>
       </aside>
@@ -679,7 +674,7 @@ function providerName(id: string): string {
   return PRESETS.find((p) => p.id === id)?.name ?? id
 }
 
-type ProviderKey = 'dashscope' | 'openai' | 'deepseek'
+type ProviderKey = 'dashscope'
 
 interface Preset {
   id: ProviderKey
@@ -696,20 +691,6 @@ const PRESETS: Preset[] = [
     base: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
     fast: 'qwen3.8-flash',
     deep: 'qwen3.8-max',
-  },
-  {
-    id: 'openai',
-    name: 'OpenAI',
-    base: 'https://api.openai.com/v1',
-    fast: 'gpt-4o-mini',
-    deep: 'gpt-4o',
-  },
-  {
-    id: 'deepseek',
-    name: 'DeepSeek',
-    base: 'https://api.deepseek.com/v1',
-    fast: 'deepseek-chat',
-    deep: 'deepseek-reasoner',
   },
 ]
 
@@ -739,26 +720,11 @@ const providerStore = {
   },
 }
 
-/** Brand tile: colored rounded square + white glyph, macOS Settings style. */
-function ProviderTile({ k, size }: { k: ProviderKey; size: number }) {
-  const glyph = Math.round(size * 0.6)
-  let bg = 'var(--tile-grey)'
-  let icon: React.ReactNode = (
-    <GearshapeFillIcon size={glyph} color="var(--on-brand)" />
-  )
-  if (k === 'dashscope') {
-    bg = 'var(--brand-qwen)'
-    icon = <QwenIcon size={glyph} color="var(--on-brand)" />
-  } else if (k === 'deepseek') {
-    bg = 'var(--brand-deepseek)'
-    icon = <DeepSeekIcon size={glyph} color="var(--on-brand)" />
-  } else if (k === 'openai') {
-    bg = 'var(--text)'
-    icon = <OpenAIIcon size={glyph} color="var(--bg)" />
-  }
+/** Brand tile: Qwen blue rounded square + white glyph (lobe-icons Avatar). */
+function ProviderTile({ size }: { k: ProviderKey; size: number }) {
   return (
-    <span className="provider-badge" style={{ background: bg }}>
-      {icon}
+    <span className="provider-badge" style={{ background: 'var(--brand-qwen)' }}>
+      <QwenIcon size={Math.round(size * 0.6)} color="var(--on-brand)" />
     </span>
   )
 }
@@ -782,10 +748,6 @@ function ModelGlyph({ model }: { model?: string }) {
   const m = (model ?? '').toLowerCase()
   if (m.startsWith('qwen'))
     return <QwenIcon size={15} color="var(--brand-qwen)" />
-  if (/^(gpt|o[134])/.test(m))
-    return <OpenAIIcon size={15} color="var(--text)" />
-  if (m.startsWith('deepseek'))
-    return <DeepSeekIcon size={15} color="var(--brand-deepseek)" />
   return null
 }
 
@@ -811,7 +773,14 @@ export function ModelSection({
     () => providerStore.load().customs ?? []
   )
   const [sel, setSel] = useState(
-    () => providerStore.load().sel ?? 'dashscope'
+    // a preset removed since (OpenAI, DeepSeek) falls back to Bailian
+    () => {
+      const st = providerStore.load()
+      const known =
+        PRESETS.some((p) => p.id === st.sel) ||
+        (st.customs ?? []).some((c) => c.name === st.sel)
+      return known && st.sel ? st.sel : 'dashscope'
+    }
   )
   const [showAdd, setShowAdd] = useState(false)
   const [cname, setCname] = useState('')
@@ -925,7 +894,7 @@ export function ModelSection({
   return (
     <>
       {!compact && <h2 className="t20 settings-h">模型</h2>}
-      <div className="group-label">选择服务商，或添加自己的 OpenAI 兼容端点</div>
+      <div className="group-label">选择服务商，或添加自己部署的千问模型端点</div>
       <div className="card">
         <div className="prov-grid">
           {PRESETS.map((p) => (
@@ -1033,7 +1002,7 @@ export function ModelSection({
             onChange={(e) => setKey(e.target.value)}
           />
         </Field>
-        <Field label="接口地址" hint="OpenAI 兼容的 /v1 地址">
+        <Field label="接口地址" hint="以 /v1 结尾的接口地址">
           <input
             className="field-input"
             value={cfg.base_url}
@@ -1295,7 +1264,7 @@ function AboutSection({ onCredits }: { onCredits: () => void }) {
         </h2>
         <div className="secondary">版本 0.1.0</div>
         <p className="font-normal about-blurb">
-          拖入一篇论文，检查参考文献是否真实、引用是否支持论断，问题以批注和修订写回 Word。判断由通义千问完成，也可以接入你自己维护的 OpenAI 兼容端点。
+          拖入一篇论文，检查参考文献是否真实、引用是否支持论断，问题以批注和修订写回 Word。判断全程由千问系列模型完成，也可以接入你自己部署的千问模型端点。
         </p>
         <button
           className="pill flex items-center gap-2"
@@ -1306,12 +1275,63 @@ function AboutSection({ onCredits }: { onCredits: () => void }) {
           <span className="font-normal">在 GitHub 上查看源代码</span>
         </button>
       </div>
+      <QwenModels />
       {/* the credits live behind a little game-style button */}
       <div className="about-egg">
         <button className="egg-btn" onClick={onCredits} aria-label="播放致谢">
           <PixelClover />
         </button>
         <div className="t13 egg-blink">按下开始</div>
+      </div>
+    </>
+  )
+}
+
+/** Every Qwen model the product calls, with what it does. Names follow
+ * the shipped defaults (backend/config.example.toml). */
+const QWEN_MODELS: { name: string; role: string }[] = [
+  { name: 'Qwen3.8-Max', role: '大语言模型，复核论断与证据，撰写期刊评审' },
+  { name: 'Qwen3.8-Flash', role: '大语言模型，判断引用是否支持论断，检查错别字' },
+  { name: 'Qwen3.7-Flash', role: '大语言模型，抽取论断，结构化参考文献，识别引用功能' },
+  { name: 'Qwen3.7-Max', role: '大语言模型，复核时的备用模型' },
+  { name: 'Qwen3-Embedding', role: '嵌入模型，在被引原文中检索证据片段' },
+  { name: 'Qwen3-Reranker', role: '重排序模型，为候选证据片段排序' },
+  { name: 'Qwen2.5-3B-Instruct', role: '端侧模型，在本机抽取论断' },
+]
+
+function QwenModels() {
+  // each press adds a full turn; the bouncy spring overshoots and settles,
+  // and a press mid-turn retargets the running transition
+  const [turns, setTurns] = useState<number[]>(() => QWEN_MODELS.map(() => 0))
+  return (
+    <>
+      <div className="group-label">用到的千问模型</div>
+      <div className="card qwen-models">
+        {QWEN_MODELS.map((m, i) => (
+          <div key={m.name} className="qwen-model">
+            <button
+              className="qwen-spin"
+              aria-label={`转动 ${m.name} 图标`}
+              onClick={() =>
+                setTurns((t) => t.map((v, j) => (j === i ? v + 1 : v)))
+              }
+            >
+              <span
+                className="provider-badge"
+                style={{
+                  background: 'var(--brand-qwen)',
+                  transform: `rotate(${turns[i] * 360}deg)`,
+                }}
+              >
+                <QwenIcon size={17} color="var(--on-brand)" />
+              </span>
+            </button>
+            <div className="min-w-0">
+              <div>{m.name}</div>
+              <div className="t13 secondary">{m.role}</div>
+            </div>
+          </div>
+        ))}
       </div>
     </>
   )

@@ -117,3 +117,31 @@ def test_dakd_bilingual_entries_and_back_matter():
     assert by_id["r4"].title == "Qwen3 Technical Report"  # [EB/OL] stripped
     # affiliation superscripts and 支撑数据 [1] [2] are not citations
     assert len(doc.markers) == 5
+
+
+@pytest.mark.parametrize("instr,manager", [
+    (" ADDIN CSL_CITATION", "mendeley"),
+    (" ADDIN NE.Ref.{7A1C} ", "noteexpress"),
+])
+def test_other_reference_managers(tmp_path, instr, manager):
+    """Mendeley shares Zotero's CSL payload; NoteExpress has none and is
+    linked by its visible text. Either way the list is the manager's, so
+    no reorder revisions are planned."""
+    import zipfile
+
+    from citecheck.lint.reorder import plan_reorder
+
+    src = FIXTURES / "zotero_numeric.docx"
+    out = tmp_path / f"{manager}.docx"
+    with zipfile.ZipFile(src) as zin, zipfile.ZipFile(out, "w") as zout:
+        for item in zin.infolist():
+            data = zin.read(item.filename)
+            if item.filename == "word/document.xml":
+                data = data.replace(b" ZOTERO_ITEM CSL_CITATION", instr.encode())
+            zout.writestr(item, data)
+    base = parse_docx(src)
+    p = parse_docx(out)
+    assert p.document.managed_by == manager
+    assert plan_reorder(p) == []
+    linked = lambda d: sum(1 for m in d.markers if m.ref_ids)  # noqa: E731
+    assert linked(p) == linked(base) > 0

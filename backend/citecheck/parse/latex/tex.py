@@ -654,21 +654,6 @@ def _forward(back: list[int], n: int) -> list[int]:
     return fwd
 
 
-def map_position(runs: list[PosRun], t: int) -> tuple[int, bool]:
-    """渲染位置 → (源码位置, 是否逐字)。"""
-    if not runs:
-        return 0, False
-    lo, hi = 0, len(runs) - 1
-    while lo < hi:
-        mid = (lo + hi + 1) // 2
-        if runs[mid][0] <= t:
-            lo = mid
-        else:
-            hi = mid - 1
-    rt, rs, ex = runs[lo]
-    return (rs + (t - rt), True) if ex else (rs, False)
-
-
 def _accent_arg(src: str, i: int) -> tuple[str, int]:
     """变音命令的作用对象：{x}、\\i 这类命令，或下一个字符。"""
     i = _skip_ws(src, i)
@@ -791,16 +776,6 @@ def comment_spans(text: str) -> list[tuple[int, int]]:
     return spans
 
 
-def strip_comments(text: str) -> str:
-    """去掉 % 注释（见 comment_spans）。"""
-    out, cur = [], 0
-    for a, b in comment_spans(text):
-        out.append(text[cur:a])
-        cur = b
-    out.append(text[cur:])
-    return "".join(out)
-
-
 def read_text(path: Path) -> str:
     raw = path.read_bytes()
     for enc in ("utf-8-sig", "latin-1"):
@@ -809,10 +784,6 @@ def read_text(path: Path) -> str:
         except UnicodeDecodeError:
             continue
     return raw.decode("utf-8", errors="replace")
-
-
-def read_tex(path: Path) -> str:
-    return strip_comments(read_text(path))
 
 
 def read_src(path: Path, project: Project) -> Src:
@@ -838,14 +809,6 @@ _INPUT_RE = re.compile(
 )
 # TeX 原语写法 \input file（空格/行尾收尾，不带括号）
 _INPUT_BARE_RE = re.compile(r"\\(input)\s+([^\s{\\]+)")
-
-
-def expand_inputs(src: str, base: Path, depth: int = 0,
-                  seen: set[Path] | None = None) -> str:
-    """纯文本版本（不带映射），供只需要文本的调用方使用。"""
-    project = Project(base)
-    s = Src.of_file(src, project.add(base / "__inline__.tex", src))
-    return expand_inputs_src(s, base, project, base, depth, seen).text
 
 
 def expand_inputs_src(src: Src, base: Path, project: Project,
