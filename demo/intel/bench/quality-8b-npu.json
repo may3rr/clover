@@ -1,0 +1,315 @@
+{
+ "model": "C:\\clover-models\\Qwen3-8B-int4-cw-ov",
+ "requested_device": "NPU",
+ "device": "NPU",
+ "load_s": 4.9,
+ "judge": [
+  {
+   "id": "en_supported",
+   "lang": "en",
+   "expected": "supported",
+   "expect_off_topic": false,
+   "s": 7.12,
+   "usage": {
+    "prompt": 842,
+    "completion": 106
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "label": "supported",
+   "off_topic": false,
+   "correct": true,
+   "has_think": false,
+   "raw": "{\n  \"rationale\": \"论断提到采用Faster R-CNN作为检测基线，并指出其在GPU上运行速度为5帧/秒。被引文献明确说明其系统在VGG-16模型上运行速度为5帧/秒，与论断一致。\",\n  \"evidence\": \"Our detection system runs at 5 frames per second on a GPU for the VGG-16 model.\",\n  \"label\": \"supported\",\n  \"off_topic\": false\n}",
+   "label_correct": true,
+   "off_topic_correct": true
+  },
+  {
+   "id": "zh_supported",
+   "lang": "zh",
+   "expected": "supported",
+   "expect_off_topic": false,
+   "s": 7.1,
+   "usage": {
+    "prompt": 826,
+    "completion": 110
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "label": "supported",
+   "off_topic": false,
+   "correct": true,
+   "has_think": false,
+   "raw": "{\n  \"rationale\": \"文献明确指出，批归一化（Batch Normalization）通过减少内部协变量偏移（internal covariate shift）来加速深度网络训练，这与论断完全一致。\",\n  \"evidence\": \"Training Deep Neural Networks is complicated by the fact that the distribution of each layer's inputs changes during training. We refer to this phenomenon as internal covariate shift, and address the problem by normalizing layer inputs.\",\n  \"label\": \"supported\",\n  \"off_topic\": false\n}",
+   "label_correct": true,
+   "off_topic_correct": true
+  },
+  {
+   "id": "en_numeric_mismatch",
+   "lang": "en",
+   "expected": "unsupported",
+   "expect_off_topic": false,
+   "s": 5.32,
+   "usage": {
+    "prompt": 818,
+    "completion": 77
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "label": "supported",
+   "off_topic": false,
+   "correct": false,
+   "has_think": false,
+   "raw": "{\n  \"rationale\": \"文献明确指出 YOLO9000 在 GPU 上以 5 帧/秒的速度运行，与论断中的描述一致。\",\n  \"evidence\": \"Our model runs at 5 frames per second on a GPU while achieving competitive accuracy.\",\n  \"label\": \"supported\",\n  \"off_topic\": false\n}",
+   "label_correct": false,
+   "off_topic_correct": true
+  },
+  {
+   "id": "zh_numeric_mismatch",
+   "lang": "zh",
+   "expected": "unsupported",
+   "expect_off_topic": false,
+   "s": 7.35,
+   "usage": {
+    "prompt": 801,
+    "completion": 113
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "label": "unsupported",
+   "off_topic": false,
+   "correct": true,
+   "has_think": false,
+   "raw": "{\n  \"rationale\": \"论断声称某方法在 ImageNet 上达到 90% 的准确率，但被引文献明确指出该方法在 ImageNet 验证集上的单模型准确率为 60.1%，与论断存在明显数值差异，因此不支持论断。\",\n  \"evidence\": \"我们在 ImageNet 验证集上的单模型准确率为 60.1%，集成模型为 的确切数值。\",\n  \"label\": \"unsupported\",\n  \"off_topic\": false\n}",
+   "label_correct": true,
+   "off_topic_correct": true
+  },
+  {
+   "id": "en_off_topic",
+   "lang": "en",
+   "expected": "unsupported",
+   "expect_off_topic": true,
+   "s": 6.47,
+   "usage": {
+    "prompt": 811,
+    "completion": 98
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "label": "unsupported",
+   "off_topic": false,
+   "correct": false,
+   "has_think": false,
+   "raw": "{\n  \"rationale\": \"文献内容讨论的是残差网络（ResNet）的设计，与论断中提到的FusionNet模型无关，因此无法支持论断。\",\n  \"evidence\": \"We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously. We explicitly reformulate the layers as learning residual functions with reference to the layer inputs.\",\n  \"label\": \"unsupported\",\n  \"off_topic\": false\n}",
+   "label_correct": true,
+   "off_topic_correct": false
+  },
+  {
+   "id": "zh_off_topic",
+   "lang": "zh",
+   "expected": "unsupported",
+   "expect_off_topic": true,
+   "s": 5.28,
+   "usage": {
+    "prompt": 815,
+    "completion": 76
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "label": "unsupported",
+   "off_topic": false,
+   "correct": false,
+   "has_think": false,
+   "raw": "{\n  \"rationale\": \"文献讨论的是批归一化（Batch Normalization）技术，用于加速神经网络训练，与 FusionNet 这一特定模型无关。\",\n  \"evidence\": \"Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift\",\n  \"label\": \"unsupported\",\n  \"off_topic\": false\n}",
+   "label_correct": true,
+   "off_topic_correct": false
+  }
+ ],
+ "extract": [
+  {
+   "id": "en_1",
+   "lang": "en",
+   "s": 3.89,
+   "usage": {
+    "prompt": 191,
+    "completion": 51
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "has_think": false,
+   "claim_count": 1,
+   "texts_in_sentence": false,
+   "markers_valid": true,
+   "raw": "```json\n{\n  \"claims\": [\n    {\n      \"text\": \"We adopt Faster R-CNN, which runs at 5 frames per second on a GPU\",\n      \"marker_ids\": [\"m1\"]\n    }\n  ]\n}\n```",
+   "texts_in_sentence_norm": false,
+   "exact_ok": false,
+   "normalized_ok": false,
+   "semantic_ok": false,
+   "marker_ids": [
+    [
+     "m1"
+    ]
+   ]
+  },
+  {
+   "id": "en_2",
+   "lang": "en",
+   "s": 4.78,
+   "usage": {
+    "prompt": 190,
+    "completion": 67
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "has_think": false,
+   "claim_count": 2,
+   "texts_in_sentence": false,
+   "markers_valid": true,
+   "raw": "```json\n{\n  \"claims\": [\n    {\n      \"text\": \"Residual connections ease the training of very deep networks\",\n      \"marker_ids\": [\"m1\"]\n    },\n    {\n      \"text\": \"batch normalization speeds up convergence\",\n      \"marker_ids\": [\"m2\"]\n    }\n  ]\n}\n```",
+   "texts_in_sentence_norm": true,
+   "exact_ok": false,
+   "normalized_ok": true,
+   "semantic_ok": true,
+   "marker_ids": [
+    [
+     "m1"
+    ],
+    [
+     "m2"
+    ]
+   ]
+  },
+  {
+   "id": "en_3",
+   "lang": "en",
+   "s": 4.59,
+   "usage": {
+    "prompt": 189,
+    "completion": 64
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "has_think": false,
+   "claim_count": 2,
+   "texts_in_sentence": true,
+   "markers_valid": true,
+   "raw": "{\n  \"claims\": [\n    {\n      \"text\": \"The model is trained on COCO\",\n      \"marker_ids\": [\"m1\"]\n    },\n    {\n      \"text\": \"and achieves 5 FPS on a single GPU\",\n      \"marker_ids\": [\"m2\"]\n    }\n  ]\n}",
+   "texts_in_sentence_norm": true,
+   "exact_ok": true,
+   "normalized_ok": true,
+   "semantic_ok": true,
+   "marker_ids": [
+    [
+     "m1"
+    ],
+    [
+     "m2"
+    ]
+   ]
+  },
+  {
+   "id": "zh_1",
+   "lang": "zh",
+   "s": 3.47,
+   "usage": {
+    "prompt": 192,
+    "completion": 43
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "has_think": false,
+   "claim_count": 1,
+   "texts_in_sentence": false,
+   "markers_valid": true,
+   "raw": "{\"claims\": [{\"text\": \"我们采用 Faster R-CNN 作为检测基线，它在 GPU 上达到每秒 5 帧。\", \"marker_ids\": [\"m1\"]}]}",
+   "texts_in_sentence_norm": true,
+   "exact_ok": false,
+   "normalized_ok": true,
+   "semantic_ok": true,
+   "marker_ids": [
+    [
+     "m1"
+    ]
+   ]
+  },
+  {
+   "id": "zh_2",
+   "lang": "zh",
+   "s": 5.31,
+   "usage": {
+    "prompt": 190,
+    "completion": 77
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "has_think": false,
+   "claim_count": 2,
+   "texts_in_sentence": false,
+   "markers_valid": true,
+   "raw": "```json\n{\n  \"claims\": [\n    {\n      \"text\": \"批归一化 使得训练上百层的网络成为可能。\",\n      \"marker_ids\": [\"m1\"]\n    },\n    {\n      \"text\": \"残差连接 使得训练上百层的网络成为可能。\",\n      \"marker_ids\": [\"m2\"]\n    }\n  ]\n}\n```",
+   "texts_in_sentence_norm": false,
+   "exact_ok": false,
+   "normalized_ok": false,
+   "semantic_ok": false,
+   "marker_ids": [
+    [
+     "m1"
+    ],
+    [
+     "m2"
+    ]
+   ]
+  },
+  {
+   "id": "zh_3",
+   "lang": "zh",
+   "s": 4.92,
+   "usage": {
+    "prompt": 192,
+    "completion": 70
+   },
+   "json_ok": true,
+   "schema_ok": true,
+   "parse_error": null,
+   "has_think": false,
+   "claim_count": 2,
+   "texts_in_sentence": true,
+   "markers_valid": true,
+   "raw": "```json\n{\n  \"claims\": [\n    {\n      \"text\": \"该数据集包含 12 万张图像\",\n      \"marker_ids\": [\"m1\"]\n    },\n    {\n      \"text\": \"覆盖 80 个类别\",\n      \"marker_ids\": [\"m2\"]\n    }\n  ]\n}\n```",
+   "texts_in_sentence_norm": true,
+   "exact_ok": true,
+   "normalized_ok": true,
+   "semantic_ok": true,
+   "marker_ids": [
+    [
+     "m1"
+    ],
+    [
+     "m2"
+    ]
+   ]
+  }
+ ],
+ "summary": {
+  "judge_label_correct": 5,
+  "judge_total": 6,
+  "off_topic_flag_correct": 4,
+  "off_topic_expected": 2,
+  "extract_json_schema_ok": 6,
+  "extract_total": 6,
+  "extract_exact_substring_ok": 2,
+  "extract_normalized_ok": 4,
+  "think_leaks": 0
+ }
+}

@@ -241,3 +241,69 @@ cd C:\clover\backend
 
 - 逐字失败的 3 条都是标记删除后的双空格（`COCO  and`、`Faster R-CNN  作为`、`批归一化  和`），用 `evidence.normalize_text` 后全部匹配；产品本身按规范化比较，不算错误。
 - 质量结论：8B-int4 在 GPU 上 judge 标签 6/6，off_topic 标志需要提示词或复核层补强；extract 输出结构与原文定位都正常。
+
+## 9. NPU 8B-cw（第 3 步）
+
+### 9.1 编译缓存与加载
+
+- `CACHE_DIR=C:\clover-models\.ov_cache_npu\len2048`，`MAX_PROMPT_LEN=2048`，`MIN_RESPONSE_LEN=256`。
+- 冷编译（空缓存）：**45.33 s**；缓存后加载：**5.12 s**。
+- `MAX_PROMPT_LEN=4096`：冷编译 **53.9 s**，缓存后加载 **4.74 s**，编译通过。
+- 命令：
+
+```powershell
+.venv\Scripts\python ..\demo\intel\bench\npu_load_test.py `
+  --model C:\clover-models\Qwen3-8B-int4-cw-ov `
+  --cache-root C:\clover-models\.ov_cache_npu --max-prompt-len 2048 --timeout-s 1800 `
+  --out ..\demo\intel\bench\npu-load-2048.json
+```
+
+- 与 1.7B 非对称 int4 对比：后者编译 40+ 分钟未完成；8B 对称逐通道 int4 45 秒完成。结论：NPU 的瓶颈是量化格式，不是 NPU 本身。
+
+### 9.2 生成
+
+```powershell
+.venv\Scripts\python ..\demo\intel\bench\npu_runner.py --model C:\clover-models\Qwen3-8B-int4-cw-ov `
+  --device NPU --cache C:\clover-models\.ov_cache_npu\len2048 --max-prompt-len 2048 `
+  --mode gen --max-new-tokens 128 --out ..\demo\intel\bench\npu-gen-2048.json
+```
+
+| 指标 | 结果 |
+| --- | --- |
+| prompt | 1315 token |
+| TTFT | 2.73 s |
+| decode | 18.55 tok/s |
+| 生成 128 token 总耗时 | 9.63 s |
+| `<think>` | 无 |
+
+- 第一次用 `apply_chat_template(extra_context={"enable_thinking": False})` 生成原始 prompt，输出仍带 `<think>`；改用 `ChatHistory.set_extra_context` 后关闭成功。
+- 另一次失败：prompt 2362 token 超过 `MAX_PROMPT_LEN=2048`，报错 `2362 is passed. Set the "MAX_PROMPT_LEN" config option to increase the limit`；把 prompt 压到 1315 token 后正常。
+
+### 9.3 NPU 质量（8B-cw）
+
+| 指标 | GPU 8B | NPU 8B-cw |
+| --- | ---: | ---: |
+| judge label 正确 | 6 / 6 | 5 / 6 |
+| off_topic 标志正确 | 4 / 6 | 4 / 6 |
+| extract JSON + schema | 6 / 6 | 6 / 6 |
+| extract 规范化后子串 | 6 / 6 | 4 / 6 |
+| `<think>` 泄漏 | 0 | 0 |
+
+- NPU 的 judge 错误：`en_numeric_mismatch` 把“50 fps”与原文“5 fps”判成 supported。
+- NPU 的 extract 两条问题：`en_1` 的 claim 跨过标记后没带逗号，`zh_2` 把同一句拆成两条不连续的 claim（“批归一化 使得…” / “残差连接 使得…”），按产品规则会回退到整句。
+- NPU 单次 judge 延迟 5.28–7.35 s，extract 3.47–5.31 s，比 GPU 的 3.9–5.9 s / 2.3–3.3 s 慢，且精度有可见下降。
+
+### 9.4 组合负载（`combo_test.py`）
+
+三个工作线程同时跑 180 s：GPU 8B judge、NPU 8B-cw extract、NPU Embedding（每次 24 窗口）。
+
+| 任务 | 单独 | 组合 | 变慢 |
+| --- | ---: | ---: | ---: |
+| GPU 8B judge | 4.26 s/次，0.235 次/s | 6.08 s/次，0.165 次/s | 1.42× |
+| NPU extract | 4.13 s/次，0.242 次/s | 12.97 s/次，0.077 次/s | 3.14× |
+| NPU 向量（24 窗口） | 1.55 s/批 | 5.06 s/批 | 3.26× |
+
+- 组合峰值 RSS 11.76 GB，最低可用内存 7.41 GB。
+- 无热降频迹象：judge 前/后半段 0.165 / 0.164 次/s，extract 0.077 / 0.077 次/s。
+- 说明：组合脚本里的「solo embed」段被已加载的 NPU 8B-cw 拖慢（平均 67 s/批），不是干净基线；干净基线用 `embed_solo_test.py` 单独测得 1.55 s/批（10 次 1.48–1.78 s）。上表的 3.26× 用干净基线计算。
+- 结论：NPU 上 extract 与向量互相抢设备，各慢约 3 倍；GPU judge 只慢 42%。如果按推荐分工（GPU judge + NPU extract/向量），需要接受 NPU 内部两项的互相拖慢。

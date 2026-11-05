@@ -1,0 +1,7 @@
+{
+ "device": "NPU",
+ "load_s": 4.74,
+ "max_prompt_len": 4096,
+ "min_response_len": 256,
+ "ok": true
+}

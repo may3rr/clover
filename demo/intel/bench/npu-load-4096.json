@@ -1,0 +1,22 @@
+{
+ "model": "C:\\clover-models\\Qwen3-8B-int4-cw-ov",
+ "max_prompt_len": 4096,
+ "cold_budget_s": 1800,
+ "cache": "C:\\clover-models\\.ov_cache_npu\\len4096",
+ "cold": {
+  "device": "NPU",
+  "load_s": 53.9,
+  "max_prompt_len": 4096,
+  "min_response_len": 256,
+  "ok": true,
+  "wall_s": 54.9
+ },
+ "warm": {
+  "device": "NPU",
+  "load_s": 4.74,
+  "max_prompt_len": 4096,
+  "min_response_len": 256,
+  "ok": true,
+  "wall_s": 5.6
+ }
+}

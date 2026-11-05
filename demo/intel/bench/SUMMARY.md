@@ -83,7 +83,33 @@ Qwen3.5 的 0.8B / 2B 未下载；全部 Qwen3.5 仓库与大小见 `ov_models.j
 | 缓存后加载 | 5.12 s |
 | 生成：1315 token 输入 / 128 token 输出 | TTFT 2.73 s，decode 18.55 tok/s，总 9.63 s |
 | `<think>` | 无（用 `ChatHistory.set_extra_context`） |
-| MAX_PROMPT_LEN=4096 | 测试中 |
+| MAX_PROMPT_LEN=4096 | 冷编译 53.9 s，缓存后 4.74 s，编译通过 |
+
+### NPU 与 GPU 质量对比（8B）
+
+| 指标 | GPU 8B-int4 | NPU 8B-cw |
+| --- | ---: | ---: |
+| judge label 正确 | 6 / 6 | 5 / 6 |
+| off_topic 标志正确 | 4 / 6 | 4 / 6 |
+| extract JSON + schema | 6 / 6 | 6 / 6 |
+| extract 规范化后子串 | 6 / 6 | 4 / 6 |
+| `<think>` 泄漏 | 0 | 0 |
+
+- NPU 的 judge 把“50 fps” vs 原文“5 fps”判成 supported；extract 有两条 claim 不连续（一条跨标记丢逗号，一条把并列结构拆成两条）。
+- NPU 单次 judge 5.28–7.35 s、extract 3.47–5.31 s；GPU 分别 3.92–5.90 s、2.35–3.31 s。
+- 冷编译 45 秒完成说明 NPU 本身可用；速度与精度都不如 GPU，适合跑 extract/向量，不适合单独扛 judge。
+
+### 组合负载（180 s）
+
+| 任务 | 单独 | 组合 | 变慢 |
+| --- | ---: | ---: | ---: |
+| GPU 8B judge | 4.26 s/次 | 6.08 s/次 | 1.42× |
+| NPU extract | 4.13 s/次 | 12.97 s/次 | 3.14× |
+| NPU 向量（24 窗口） | 1.55 s/批 | 5.06 s/批 | 3.26× |
+
+- 峰值 RSS 11.76 GB，最低可用内存 7.41 GB；前/后半段速率基本一致，无热降频。
+- NPU 的 extract 和向量共用同一设备，互相拖慢约 3 倍；GPU judge 只慢 42%。
+- 组合脚本中的 solo embed 段被已加载的 NPU 大模型拖慢，干净基线由 `embed_solo_test.py` 单独测得 1.55 s/批。
 
 - 对比：1.7B 非对称 int4 在 NPU 上编译 40+ 分钟未完成；8B 对称逐通道 int4 45 秒编译完成，说明瓶颈是量化格式，不是 NPU。
 - NPU 生成速度约为 GPU 连续批处理 1 并发（15 tok/s）的 1.2 倍，但远低于 GPU 16 并发（116 tok/s）。

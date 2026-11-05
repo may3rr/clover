@@ -1,0 +1,70 @@
+{
+ "models": {
+  "gpu": "C:\\clover-models\\Qwen3-8B-int4-ov",
+  "npu": "C:\\clover-models\\Qwen3-8B-int4-cw-ov",
+  "embed": "C:\\clover-models\\Qwen3-Embedding-0.6B-int8-ov"
+ },
+ "solo_s": 30,
+ "combo_s": 180,
+ "solo_judge": {
+  "calls": 8,
+  "seconds": 30,
+  "calls_per_s": 0.235,
+  "avg_latency_s": 4.264,
+  "early_calls_per_s": 0.23,
+  "late_calls_per_s": 0.239,
+  "errors": []
+ },
+ "solo_extract": {
+  "calls": 8,
+  "seconds": 30,
+  "calls_per_s": 0.242,
+  "avg_latency_s": 4.132,
+  "early_calls_per_s": 0.24,
+  "late_calls_per_s": 0.244,
+  "errors": []
+ },
+ "solo_embed": {
+  "calls": 9,
+  "seconds": 30,
+  "calls_per_s": 0.015,
+  "avg_latency_s": 67.293,
+  "early_calls_per_s": 0.614,
+  "late_calls_per_s": 0.007,
+  "errors": []
+ },
+ "combo_peak_rss_gb": 11.76,
+ "combo_min_available_gb": 7.41,
+ "combo": {
+  "extract": {
+   "calls": 14,
+   "seconds": 180,
+   "calls_per_s": 0.077,
+   "avg_latency_s": 12.967,
+   "early_calls_per_s": 0.077,
+   "late_calls_per_s": 0.077,
+   "errors": [],
+   "slowdown_vs_solo": 3.14
+  },
+  "embed": {
+   "calls": 36,
+   "seconds": 180,
+   "calls_per_s": 0.198,
+   "avg_latency_s": 5.061,
+   "early_calls_per_s": 0.196,
+   "late_calls_per_s": 0.199,
+   "errors": [],
+   "slowdown_vs_solo": 0.08
+  },
+  "judge": {
+   "calls": 30,
+   "seconds": 180,
+   "calls_per_s": 0.165,
+   "avg_latency_s": 6.075,
+   "early_calls_per_s": 0.165,
+   "late_calls_per_s": 0.164,
+   "errors": [],
+   "slowdown_vs_solo": 1.42
+  }
+ }
+}
