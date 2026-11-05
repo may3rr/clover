@@ -61,6 +61,15 @@ async def run_pair(pair: dict, sem: asyncio.Semaphore) -> dict:
 
 async def main_async(a: argparse.Namespace) -> None:
     pairs = json.loads(Path(a.pairs).read_text(encoding="utf-8"))
+    if a.sample:
+        wanted = {}
+        for part in a.sample.split(","):
+            why, n = part.split(":")
+            wanted[why] = int(n)
+        selected = []
+        for why, n in wanted.items():
+            selected += [p for p in pairs if p.get("why") == why][:n]
+        pairs = selected
     if a.limit:
         pairs = pairs[: a.limit]
     print(f"pairs: {len(pairs)}", flush=True)
@@ -143,6 +152,8 @@ def main() -> None:
     ap.add_argument("--max-tokens", type=int, default=0,
                     help="cap local output tokens (bench-only monkeypatch)")
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--sample", default="",
+                    help="stratified sample, e.g. injected:41,true_issue:52,false_alarm:57")
     a = ap.parse_args()
     if a.max_tokens:
         from citecheck.llm import local as _local

@@ -177,7 +177,7 @@ Qwen3.5 的 0.8B / 2B 未下载；全部 Qwen3.5 仓库与大小见 `ov_models.j
 | 云端 flash 基线 | 37 / 41 | 39 / 52 | 233 / 415 | 0 | — | — |
 | 8B GPU 批处理 | 27 / 41 | 24 / 52 | 127 / 415 | 8 | 120 | 911.6 s |
 | 4B GPU | — | — | — | 508 | — | 加载失败 |
-| 8B-cw NPU（256 上限） | 待补 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| 8B-cw NPU（256 上限） | 未完成 | 未完成 | 未完成 | 未完成 | 未完成 | 不可行 |
 
 - 8B 与云端逐条一致 311/500（62.2%）；本地更保守，false_alarm 少但召回也低。
 - 120 条 evidence 无法逐字定位被降级为 undetermined，是召回损失的主要来源。
@@ -187,5 +187,5 @@ Qwen3.5 的 0.8B / 2B 未下载；全部 Qwen3.5 仓库与大小见 `ov_models.j
 - Qwen3.5 放弃（VLM IR；LLMPipeline 不支持，VLMPipeline 关不掉 thinking）。
 - 4B 加载失败（Reshape 动态边界，OpenVINO 2026.4.1）。
 - NPU 的 extract/向量不要与大模型共存：会互相拖慢约 3 倍。
-- NPU judge 用 256 token 上限后约 8.8 s/对，200 对约 29 min，不适合实时判断。
+- NPU judge 的 prompt 常见 2200+ token：2048 直接拒绝；改 4096 后单条约 5 分钟，150 条采样预计 12 小时，按时间盒停止。8 条短 prompt 冒烟 8.8 s/对（2 条失败）。NPU 只适合向量。
 - 详细命令与偏差记录见 `LOG.md`，任务进度见 `PROGRESS.md`，晨报见 `MORNING_REPORT.md`。

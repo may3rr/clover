@@ -9,7 +9,7 @@
 | 云端基线 | qwen3.8-flash 首轮 | 37 / 41 | 39 / 52 | 233 / 415 | 0 | — | — | — | — |
 | a | Qwen3-8B-int4-ov / GPU，批处理 | 27 / 41 | 24 / 52 | 127 / 415 | 8 | 120 | 911.6 s | 27.9 s | 约 6.0 min |
 | b | Qwen3-4B-int4-ov / GPU，批处理 | — | — | — | 508 | — | — | — | 无法加载 |
-| c | Qwen3-8B-int4-cw-ov / NPU，逐条 | 待补 | 待补 | 待补 | 待补 | 待补 | 待补 | 待补 | 待补 |
+| c | Qwen3-8B-int4-cw-ov / NPU，逐条 | 未完成 | 未完成 | 未完成 | 未完成 | 未完成 | 未完成 | 未完成 | 未完成 |
 
 - 8B GPU 与云端逐条一致率：**311 / 500 = 62.2%**（8 条本地失败，不计入）。
 - 分歧 189 条；本地整体更保守：false_alarm 从 233 降到 127，但 injected/true_issue 的召回也明显下降。
@@ -44,6 +44,13 @@ Output pattern dim[1] has invalid bounds: -3891109803858067456,-3891109803858067
 ```
 
 因此 508 对所有失败，batch/quality 也无法执行。
+
+## NPU 组为什么没跑完
+
+- 8B-cw 的 judge prompt 经常超过 2048 token（实际见到 2206），`MAX_PROMPT_LEN=2048` 直接拒绝。
+- 改成 4096 后可以进入，但单条 3000+ token 的 prefill + 256 token decode 约 5 分钟；150 条分层采样预计 12 小时，超过任务单“两倍时间盒”的规则，停止并记录。
+- 8 条冒烟（2048）：70.2 s，injected 1/2、true_issue 2/4、false_alarm 0/2，failed 2，平均 8.8 s/对。
+- 结论：NPU 不适合 judge，只用于向量；judge 放 GPU。
 
 ## 备注
 

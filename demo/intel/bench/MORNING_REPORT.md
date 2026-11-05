@@ -9,11 +9,11 @@
 | T0 准备 | 完成 | 防睡眠；同步 `ee8f4c3`；uv sync；pytest 506 passed / 8 skipped；LaTeX 与缺 PDF 两项修复 |
 | T1 本地连续批处理 | 完成 | `BatchGenerator` + 30 ms 微批；32 并发本地 extract 13.98 s，32/32 成功 |
 | T2 按任务路由 | 完成 | `[llm.local].tasks`、独立本地并发上限、测试与示例配置 |
-| T3 judge 准确率 | 进行中 | 8B GPU 与 4B 已跑；NPU 组待跑 |
-| T4 端到端本地流程 | 未开始 | |
-| T5 调优测速 | 进行中 | 批处理调优完成；向量吞吐进行中；4B 加载失败 |
-| T6 向量预选方案 | 完成 | `EMBED_PREFILTER.md` |
-| T7 Windows 前端截断 | 未开始 | |
+| T3 judge 准确率 | 部分完成 | 8B GPU 全量；4B 加载失败；NPU judge 因 prompt>2048 与单条约 5 分钟，按时间盒停止 |
+| T4 端到端本地流程 | 完成 | 中文 533.2 s / 检出 14/17；英文 736.0 s / 检出 12/16；英文峰值 18.07 GB 超限 |
+| T5 调优测速 | 完成 | 批处理 122–158 tok/s；向量 NPU 16.1 / GPU 84 / CPU 1.6 窗口/s；4B 加载失败 |
+| T6 向量预选方案 | 完成 | `EMBED_PREFILTER.md`（BM25 top-K + 邻居，预计降到 2–6% 向量量） |
+| T7 Windows 前端截断 | 完成（分析） | 字体回落 + 固定栏宽；方案见下，未改代码 |
 
 ## 二、最重要的三组数字
 
@@ -62,6 +62,8 @@
 - NPU TextEmbeddingPipeline batch>1 直接 LLVM abort：
   `LLVM ERROR: Failed to infer result type(s): "IE.Add"(tensor<1x128x512x512xf32>, tensor<1x64x512x512xf32>)`。
 - NPU 1.7B 非对称 int4 编译 40+ 分钟未完成（已记录超时）。
+- NPU judge：judge prompt 常见 2200+ token，`MAX_PROMPT_LEN=2048` 直接拒绝；改 4096 后单条约 5 分钟，150 条采样预计 12 小时，按两倍时间盒停止。8 条冒烟 70.2 s（2 条失败）。
+- 英文 T4 峰值 RSS 18.07 GB、最低可用 2.61 GB，超过 16 GB/3 GB 限制；需要降 `batch_cache_size` 或限制 support 并发。
 
 ## 四、需要人处理
 
