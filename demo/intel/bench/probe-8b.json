@@ -1,0 +1,74 @@
+{
+ "machine": "Windows-10-10.0.26200-SP0",
+ "processor": "Intel64 Family 6 Model 204 Stepping 2, GenuineIntel",
+ "python": "3.11.18",
+ "openvino": "2026.4.1-22982-e213a147257-releases/2026/4",
+ "openvino_genai": "2026.4.1.0-3408-ab01d1771e4",
+ "devices": {
+  "CPU": "Intel(R) Core(TM) Ultra 5 338H",
+  "GPU": "Intel(R) Arc(TM) B370 GPU (iGPU)",
+  "NPU": "Intel(R) AI Boost"
+ },
+ "results": {
+  "llm": [
+   {
+    "device": "GPU",
+    "load_cold_s": 18.70674379999764,
+    "extract": [
+     {
+      "s": 2.3117648999977973,
+      "usage": {
+       "prompt": 191,
+       "completion": 44
+      },
+      "json_ok": true,
+      "out": "{\n  \"claims\": [\n    {\n      \"text\": \"which runs at 5 frames per second on a GPU\",\n      \"marker_ids\": [\"m1\"]\n    }\n  ]\n}"
+     },
+     {
+      "s": 2.58300650000092,
+      "usage": {
+       "prompt": 190,
+       "completion": 56
+      },
+      "json_ok": true,
+      "out": "{\n  \"claims\": [\n    {\n      \"text\": \"批归一化 和 残差连接 使得训练上百层的网络成为可能\",\n      \"marker_ids\": [\"m1\", \"m2\"]\n    }\n  ]\n}"
+     }
+    ],
+    "ok": true,
+    "wall_s": 24.9
+   },
+   {
+    "device": "CPU",
+    "load_cold_s": 8.852078300002177,
+    "extract": [
+     {
+      "s": 13.669290300000284,
+      "usage": {
+       "prompt": 191,
+       "completion": 44
+      },
+      "json_ok": true,
+      "out": "{\n  \"claims\": [\n    {\n      \"text\": \"which runs at 5 frames per second on a GPU\",\n      \"marker_ids\": [\"m1\"]\n    }\n  ]\n}"
+     },
+     {
+      "s": 6.162934500000119,
+      "usage": {
+       "prompt": 190,
+       "completion": 56
+      },
+      "json_ok": true,
+      "out": "{\n  \"claims\": [\n    {\n      \"text\": \"批归一化 和 残差连接 使得训练上百层的网络成为可能\",\n      \"marker_ids\": [\"m1\", \"m2\"]\n    }\n  ]\n}"
+     }
+    ],
+    "ok": true,
+    "wall_s": 30.2
+   }
+  ]
+ },
+ "probe_mode": "probe_timeout.py",
+ "timeouts_s": {
+  "embed": 300,
+  "rerank": 300,
+  "llm": 300
+ }
+}

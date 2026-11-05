@@ -35,6 +35,7 @@ def main() -> None:
     ap.add_argument("--rerank", default="Qwen3-Reranker-0.6B-int8-ov")
     ap.add_argument("--llm", default="Qwen3-1.7B-int4-ov")
     ap.add_argument("--only", choices=["embed", "rerank", "llm"], action="append")
+    ap.add_argument("--devices", default="", help="comma list, e.g. CPU,GPU (default: all, CPU first)")
     ap.add_argument("--out", default="probe.json")
     a = ap.parse_args()
 
@@ -53,6 +54,19 @@ def main() -> None:
     print(json.dumps({k: report[k] for k in ("machine", "openvino", "devices")},
                      ensure_ascii=False, indent=1))
     devs = probe._devices()
+    if a.devices:
+        present = list(devs)
+        order = []
+        for want in (d.strip().upper() for d in a.devices.split(",")):
+            if not want:
+                continue
+            for have in present:
+                if (have.upper() == want or have.split(".")[0].upper() == want) and have not in order:
+                    order.append(have)
+                    break
+        devs = order
+    else:
+        devs = list(reversed(devs))  # CPU first, as in probe.py
     todo = a.only or ["embed", "rerank", "llm"]
     runner = str(HERE / "runner.py")
     for kind in todo:

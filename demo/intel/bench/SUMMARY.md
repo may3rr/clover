@@ -15,13 +15,15 @@
 | Qwen3-Embedding-0.6B-int8-ov | 613 MB | 完成，sha256 与 HF LFS 一致 |
 | Qwen3-Reranker-0.6B-int8-ov | 595 MB | 完成，sha256 与 HF LFS 一致 |
 | Qwen3-1.7B-int4-ov | 1152 MB | 完成，sha256 与 HF LFS 一致 |
-| Qwen3-8B-int4-ov | 4.66 GB | 完成，下载前预检哈希一致 |
-| Qwen3-8B-int4-cw-ov | 4.50 GB | 下载中 |
-| Qwen3-4B-int4-ov | 2.16 GB | ModelScope 版本哈希不符，待从 hf-mirror 重下 |
+| Qwen3-8B-int4-ov | 4.66 GB | 完成，sha256 一致 |
+| Qwen3-8B-int4-cw-ov | 4.53 GB | 完成，sha256 与 HF LFS 一致 |
+| Qwen3-4B-int4-ov | 2.16 GB | 下载中（hf-mirror，速度很慢） |
+| Qwen3.5-9B-int4-ov | 5.85 GB | 下载中 |
+| Qwen3.5-4B-int4-ov | 3.33 GB | 排队 |
 
-Qwen3.5 系列未下载，仓库与大小见 `ov_models.json`。
+Qwen3.5 的 0.8B / 2B 未下载；全部 Qwen3.5 仓库与大小见 `ov_models.json`。
 
-## 2. probe.py 基线（1.7B / Embedding / Reranker）
+## 2. probe 基线
 
 | 任务 | 设备 | 能否加载 | 冷加载 | 缓存后加载 | 单次推理 |
 | --- | --- | --- | ---: | ---: | --- |
@@ -31,16 +33,62 @@ Qwen3.5 系列未下载，仓库与大小见 `ov_models.json`。
 | Reranker | CPU | ✅ | 3.15 s | — | 6 候选 1.62 s；24 候选 5.93 s |
 | Reranker | GPU | ✅ | 9.57 s | — | 6 候选 0.22 s；24 候选 0.29 s |
 | Reranker | NPU | ❌ | — | — | Reshape 动态边界不支持 |
-| 1.7B 抽取 | CPU | ✅ | 3.03 s | — | 6.10 s / 3.20 s，JSON 均可解析 |
-| 1.7B 抽取 | GPU | ✅ | 10.41 s | — | 3.71 s / 3.19 s，JSON 均可解析 |
-| 1.7B 抽取 | NPU | ❌ | 超时 300 s | — | 编译 40+ 分钟未完成 |
+| 1.7B 抽取 | CPU | ✅ | 3.03 s | — | 6.10 / 3.20 s，JSON 均可解析 |
+| 1.7B 抽取 | GPU | ✅ | 10.41 s | — | 3.71 / 3.19 s，JSON 均可解析 |
+| 1.7B 抽取 | NPU | ❌ | 超时 300 s | — | 非对称 int4，编译 40+ 分钟未完成 |
+| 8B 抽取 | GPU | ✅ | 18.7 s | — | 2.31 / 2.58 s，JSON 均可解析 |
+| 8B 抽取 | CPU | ✅ | 8.9 s | — | 13.67 / 6.16 s，JSON 均可解析 |
 
 - Embedding 三设备的 top-1 检索结果都与预期一致。
-- Reranker NPU 报错原文：
-  `Compilation failed. vclAllocatedExecutableCreate4 result: 0x78000004 ... Reshape node ... expected exactly 1 dynamic output bound dimension, got 2`
-- 1.7B 是**非对称、按组量化**的 int4，NPU 编译超时；按结论不再把这类模型放到 NPU 上测，NPU 用对称逐通道的 `-cw-` 版本。
+- Reranker NPU 报错：`Reshape node ... expected exactly 1 dynamic output bound dimension, got 2`。
+- 1.7B 是**非对称、按组量化**的 int4，NPU 不适用；NPU 改用对称逐通道的 `-cw-` 版本。
 
-## 3. Windows 前端
+## 3. GPU 8B 并发与质量
+
+### 3.1 连续批处理（`batch_test.py`）
+
+- `ContinuousBatchingPipeline`，GPU，8B-int4，prompt 1315 token，128 new token，贪心，`ignore_eos=True`。
+- `max_num_seqs=16`、`max_num_batched_tokens=32768`、`cache_size=8`，关闭 prefix caching。
+
+| 并发 | 总耗时 | 平均每请求 | 总吞吐 | 峰值 RSS | 最低可用内存 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 8.53 s | 8.53 s | 15.0 tok/s | 13.11 GB | 5.95 GB |
+| 4 | 8.70 s | 2.18 s | 58.8 tok/s | 13.59 GB | 5.52 GB |
+| 8 | 11.61 s | 1.45 s | 88.2 tok/s | 14.36 GB | 4.88 GB |
+| 16 | 17.60 s | 1.10 s | 116.3 tok/s | 15.60 GB | 3.83 GB |
+| 逐个 × 8（LLMPipeline） | 49.22 s | 6.15 s | 20.8 tok/s | 5.33 GB | 14.43 GB |
+
+- 16 并发吞吐是逐个跑的 5.6 倍；单请求延迟从 8.53 s 降到 1.10 s。
+- 峰值 RSS 高来自 `cache_size=8` 的 KV 预分配；逐个跑只有 5.3 GB。
+
+### 3.2 真实 prompt 质量（`quality_test.py`）
+
+| 指标 | 结果 |
+| --- | --- |
+| judge label 正确 | 6 / 6 |
+| off_topic 标志正确 | 4 / 6（两条张冠李戴判了 unsupported，但 `off_topic=false`） |
+| extract JSON + schema | 6 / 6 |
+| extract 逐字子串 | 3 / 6 |
+| extract 规范化后子串 | 6 / 6 |
+| `<think>` 泄漏 | 0 |
+
+- 3 条逐字失败都是标记删除后的双空格，用 `evidence.normalize_text` 后全部匹配，不是语义错误。
+- judge 延迟 3.92–5.90 s，extract 2.35–3.31 s。
+
+## 4. NPU 8B-cw
+
+| 项 | 结果 |
+| --- | --- |
+| 冷编译（MAX_PROMPT_LEN=2048，空缓存） | 45.33 s |
+| 缓存后加载 | 5.12 s |
+| 生成：1315 token 输入 / 128 token 输出 | TTFT 2.73 s，decode 18.55 tok/s，总 9.63 s |
+| `<think>` | 无（用 `ChatHistory.set_extra_context`） |
+| MAX_PROMPT_LEN=4096 | 测试中 |
+
+- 对比：1.7B 非对称 int4 在 NPU 上编译 40+ 分钟未完成；8B 对称逐通道 int4 45 秒编译完成，说明瓶颈是量化格式，不是 NPU。
+- NPU 生成速度约为 GPU 连续批处理 1 并发（15 tok/s）的 1.2 倍，但远低于 GPU 16 并发（116 tok/s）。
+
+## 5. Windows 前端
 
 - `npm ci` 80 s；Electron 二进制需手动 `node node_modules/electron/install.js`（241 s）。
 - `npm run dev` 启动成功，窗口标题 `Clover`；后端 `/health`、`/prefs`、`/reports`、`/venues`、`/benchmarks` 均 200。
@@ -57,12 +105,10 @@ Qwen3.5 系列未下载，仓库与大小见 `ov_models.json`。
 
 截图目录：`screenshots/`。
 
-## 4. 待完成
+## 6. 待完成
 
-- GPU 8B 的批量并发测试（`batch_test.py`）。
-- GPU/NPU 8B 的真实 prompt 质量测试。
-- NPU 8B-cw 的编译缓存、MAX_PROMPT_LEN、组合负载测试。
-- 4B / Qwen3.5-9B / Qwen3.5-4B 的 probe 与批量测试。
-- 全量 sha256 复核与单篇耗时估算。
+- NPU 8B-cw：MAX_PROMPT_LEN=4096 结果、judge/extract 质量、组合负载。
+- 4B / Qwen3.5-9B / Qwen3.5-4B 的 probe、批量与质量。
+- 单篇耗时估算与最终结论。
 
 详细命令与偏差记录见 `LOG.md`。

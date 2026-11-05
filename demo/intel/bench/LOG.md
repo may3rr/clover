@@ -190,3 +190,54 @@ npm run dev
 - Git 使用 MinGit，未用 winget。
 - Qwen3.5 未下载，仅记录清单与大小。
 - 第 4 步（`bench_llm.py`）按要求等待指示后再做。
+
+## 8. GPU 8B 测试（第 2 步）
+
+### 8.1 probe（CPU / GPU）
+
+```powershell
+cd C:\clover\backend
+.venv\Scripts\python ..\demo\intel\bench\probe_timeout.py --models C:\clover-models \
+  --llm Qwen3-8B-int4-ov --only llm --devices CPU,GPU --out ..\demo\intel\bench\probe-8b.json
+```
+
+| 设备 | 冷加载 | 抽取 1 | 抽取 2 | JSON |
+| --- | ---: | ---: | ---: | --- |
+| GPU | 18.7 s | 2.31 s / 44 tok | 2.58 s / 56 tok | 均可解析 |
+| CPU | 8.9 s | 13.67 s / 44 tok | 6.16 s / 56 tok | 均可解析 |
+
+### 8.2 连续批处理（`batch_test.py`）
+
+- `ContinuousBatchingPipeline`，GPU，8B-int4，prompt 1315 token，`max_new_tokens=128`，`ignore_eos=True`，贪心。
+- `SchedulerConfig.max_num_seqs=16`、`max_num_batched_tokens=32768`、`cache_size=8`、关闭 prefix caching。
+- 注意：批处理下每个结果的 `perf_metrics.get_num_generated_tokens()` 返回的是**整批** token 数；因此按 `并发数 × 128` 计总 token。
+- 峰值内存用 0.2 s 采样的进程 RSS 与系统可用内存。
+
+| 并发 | 总耗时 | 平均每请求 | 总吞吐 | 峰值 RSS | 最低可用内存 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 8.53 s | 8.53 s | 15.0 tok/s | 13.11 GB | 5.95 GB |
+| 4 | 8.70 s | 2.18 s | 58.8 tok/s | 13.59 GB | 5.52 GB |
+| 8 | 11.61 s | 1.45 s | 88.2 tok/s | 14.36 GB | 4.88 GB |
+| 16 | 17.60 s | 1.10 s | 116.3 tok/s | 15.60 GB | 3.83 GB |
+| 逐个（LLMPipeline × 8） | 49.22 s | 6.15 s | 20.8 tok/s | 5.33 GB | 14.43 GB |
+
+- 16 并发时最低可用内存 3.83 GB，未触发 3 GB 停止条件。
+- 连续批处理 16 并发的吞吐是逐个跑的 5.6 倍；单请求延迟从 8.53 s 降到 1.10 s。
+- 峰值 RSS 高是因为 `cache_size=8` 预分配 KV 缓存；逐个跑时只有 5.3 GB。
+
+### 8.3 真实 prompt 质量（`quality_test.py`）
+
+- judge 6 条（中英各 3；2 支持、2 数字不符、2 张冠李戴），extract 6 条（中英各 3）。
+- 用产品里的 `judge._PROMPT` / `claims._PROMPT`，Pydantic `JudgeOut` / `_ClaimsOut` 校验。
+
+| 指标 | 结果 |
+| --- | --- |
+| judge label 正确 | 6 / 6 |
+| off_topic 标志正确 | 4 / 6（两条张冠李戴都判了 unsupported，但 `off_topic=false`） |
+| extract JSON + schema | 6 / 6 |
+| extract 逐字子串 | 3 / 6 |
+| extract 规范化后子串 | 6 / 6 |
+| `<think>` 泄漏 | 0 |
+
+- 逐字失败的 3 条都是标记删除后的双空格（`COCO  and`、`Faster R-CNN  作为`、`批归一化  和`），用 `evidence.normalize_text` 后全部匹配；产品本身按规范化比较，不算错误。
+- 质量结论：8B-int4 在 GPU 上 judge 标签 6/6，off_topic 标志需要提示词或复核层补强；extract 输出结构与原文定位都正常。

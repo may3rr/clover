@@ -1,0 +1,13 @@
+{
+ "device": "NPU",
+ "load_s": 4.87,
+ "max_prompt_len": 2048,
+ "min_response_len": 256,
+ "ok": true,
+ "prompt_tokens": 1315,
+ "ttft_s": 2.732,
+ "total_s": 9.63,
+ "generated_tokens": 128,
+ "decode_tok_s": 18.55,
+ "output_head": "It appears that your message is a repeated and slightly altered version of the same sentence, likely due to a technical issue or a copy-paste error. However, I can provide a clear and accurate explanation of what **academic citation verification** entails, based on the content of your repeated query"
+}

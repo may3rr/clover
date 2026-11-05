@@ -1,0 +1,108 @@
+{
+ "model": "C:\\clover-models\\Qwen3-8B-int4-ov",
+ "device": "GPU",
+ "levels": [
+  1,
+  4,
+  8,
+  16
+ ],
+ "max_new_tokens": 128,
+ "results": [
+  {
+   "concurrency": 1,
+   "ok": true,
+   "error": null,
+   "total_s": 8.53,
+   "avg_per_request_s": 8.53,
+   "generated_tokens": 128,
+   "throughput_tok_s": 15.0,
+   "peak_rss_gb": 13.11,
+   "min_available_gb": 5.95,
+   "perf_metrics_tokens_per_result": [
+    128
+   ]
+  },
+  {
+   "concurrency": 4,
+   "ok": true,
+   "error": null,
+   "total_s": 8.7,
+   "avg_per_request_s": 2.18,
+   "generated_tokens": 512,
+   "throughput_tok_s": 58.8,
+   "peak_rss_gb": 13.59,
+   "min_available_gb": 5.52,
+   "perf_metrics_tokens_per_result": [
+    512,
+    512,
+    512,
+    512
+   ]
+  },
+  {
+   "concurrency": 8,
+   "ok": true,
+   "error": null,
+   "total_s": 11.61,
+   "avg_per_request_s": 1.45,
+   "generated_tokens": 1024,
+   "throughput_tok_s": 88.2,
+   "peak_rss_gb": 14.36,
+   "min_available_gb": 4.88,
+   "perf_metrics_tokens_per_result": [
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024
+   ]
+  },
+  {
+   "concurrency": 16,
+   "ok": true,
+   "error": null,
+   "total_s": 17.6,
+   "avg_per_request_s": 1.1,
+   "generated_tokens": 2048,
+   "throughput_tok_s": 116.3,
+   "peak_rss_gb": 15.6,
+   "min_available_gb": 3.83,
+   "perf_metrics_tokens_per_result": [
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048,
+    2048
+   ]
+  }
+ ],
+ "sequential": {
+  "ok": true,
+  "error": null,
+  "requests": 8,
+  "load_s": 1.9,
+  "total_s": 49.22,
+  "avg_per_request_s": 6.15,
+  "generated_tokens": 1024,
+  "throughput_tok_s": 20.8,
+  "peak_rss_gb": 5.33,
+  "min_available_gb": 14.43
+ },
+ "prompt_tokens": 1315,
+ "load_s": 1.9
+}
