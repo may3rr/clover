@@ -13,6 +13,7 @@ import { putPrefs, type Prefs } from '../lib/prefs'
 import { GITHUB_URL } from '../lib/credits'
 import { APP_NAME, APP_TAGLINE } from '../lib/brand'
 import ShuffleTitle from '../components/ShuffleTitle'
+import { IS_WIN } from '../lib/platform'
 
 /** First run: a short intro, then model endpoint → name & avatar →
  * privacy consent. The app opens only after the privacy note is ticked. */
@@ -202,7 +203,7 @@ export default function Onboarding({
               <PrivacyRow
                 icon={<DesktopFillIcon size={13} />}
                 color="var(--tile-blue)"
-                title="一切留在这台 Mac 上"
+                title={IS_WIN ? '一切留在这台电脑上' : '一切留在这台 Mac 上'}
                 body="论文在本机解析，检查记录、设置和缓存都存在本地，没有任何同步服务。"
               />
               <PrivacyRow

@@ -24,6 +24,7 @@ import os
 import re
 import secrets
 import tempfile
+from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -42,7 +43,13 @@ TOKEN = os.environ.get("CITECHECK_TOKEN")
 BENCH_DIR = Path(__file__).resolve().parents[1] / "benchmarks"
 _UPLOADS = Path(tempfile.gettempdir()) / "citecheck_uploads"
 
-app = FastAPI(title="citecheck")
+@asynccontextmanager
+async def _lifespan(_app):
+    _warn_retrieval_keys()
+    yield
+
+
+app = FastAPI(title="citecheck", lifespan=_lifespan)
 # 本地服务；token 存在时仍要求鉴权，'*' 只在没有 token 的开发模式下裸奔
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
@@ -62,9 +69,6 @@ def _warn_retrieval_keys() -> None:
         log.warning("rerank is enabled but %s is not set or belongs to another "
                     "provider; keeping the fused ranking",
                     s.llm.rerank.api_key_env)
-
-
-app.add_event_handler("startup", _warn_retrieval_keys)
 
 
 @app.middleware("http")
