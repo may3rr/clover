@@ -1,0 +1,19 @@
+G='raw/2005.14165 '; F='en_papers/gpt3/ref/'
+J=lambda u,ev,note,sel=None: L(u,'false_alarm','judge_error',ev,note,sel=sel,sev=False)
+for u in ['125d4145a7','8e56d7e91a','80e9bc9602']:
+    J(u,G+'Related_Work.tex:1「300 million parameters [DCLT18], 1.5 billion parameters [RWC+19], ... 11 billion parameters [RSR+19]」；GPT-2 [RWC+19] 为 1.5B，T5 [RSR+19] 为 11B','一句多引时模型把 1.5B 对到 T5 上；BERT-Large 340M 写成约 300M 属取整。')
+    L(u,'false_alarm','stacking_normal_in_survey',G+'Related_Work.tex:1 逐个模型规模列举','每个规模各带一篇引用。',sel='distribution',sub='enumeration_each_item_cited')
+L('fc11103a68','true_issue','real_miscitation',G+'Related_Work.tex:1「more recently 50 billion parameter translation models [AJF19]」；main.bbl:15 \\bibitem[AJF19]{aharoni201950B} Aharoni, Johnson, Firat, Massively multilingual NMT, NAACL 2019；'+F+'Massively Multilingual NMT p5「This results in a model with approximately 473.7M parameters」','50B 的 MoE 翻译模型出自 Arivazhagan et al. 2019 Massively Multilingual NMT in the Wild，GPT-3 引成了同名相近的 Aharoni et al.，bib 键名里的 50B 也说明是混淆。')
+L('e15afa2a05','debatable','co_citation_partial',G+'Related_Work.tex:3「[KMH+20,RRBS19,LWS+20,HNA+17], find a smooth power-law trend」；'+F+'Train Large, Then Compress 原文「In concurrent work, Kaplan et al. (2020) study the impact of model size」','Li et al. 2020 主要讲大模型训练更快再压缩，不以幂律为结论，成组引用中这一篇偏弱。',sev=False)
+L('1b9213a226','debatable','co_citation_partial',G+'Related_Work.tex:18「Multi-task learning has shown some promising initial results [LGH+15,LSP+18]」；main.bbl:439 LSP+18 = Generating Wikipedia by Summarizing Long Sequences','Generating Wikipedia 不是多任务学习工作，原文可能想引别的文献，但无法确定，列为可商榷。',sev=False)
+J('229c93ab4a',G+'appendices/model_training.tex:1「weight decay of 0.1 to provide a small amount of regularization [LH17]」','引 AdamW 作为所用权重衰减方法的出处，是标准做法。')
+L('4cd6bad612','debatable','number_from_other_source',G+'HellaSwag.tex:1「outperforming the 75.4% accuracy of a fine-tuned 1.5B parameter language model [ZHR+19]」；Grover 论文 p4「Grover-Mega has 48 layers and 1.5 billion parameters」','引用指明 1.5B 的 Grover 模型，75.4 来自 HellaSwag 排行榜，所引论文无此数，属常见写法。',sev=False)
+L('0d161d901d','true_issue','real_miscitation',G+'content/3_results/Translation.tex:12「the overall SOTA which is achieved by a combination of unsupervised pretraining, supervised finetuning on 608K labeled examples, and backtranslation \\cite{liu2019multi}」；main.bbl:403 liu2019multi = MT-DNN；表格脚注同一结果引 [LGG+20] liu2020multilingual (mBART)','正文把 mBART 的 bib 键写成了 MT-DNN 的键，原文引错。')
+J('4ab3aa4905',G+'Reading_Comprehension.tex:5「on CoQA [RCM19] a free-form conversational dataset」','[RCM19] 只指明数据集，GPT-3 的成绩不需要它支持。')
+J('844da2baf3',G+'SuperGLUE.tex:1「the SuperGLUE benchmark [WPN+19] [WPN+19] [CLC+19] [DMST19] [RBG11] [KCR+18] [ZLL+...]」','SuperGLUE 后面成串列出的是组成数据集的出处，[PHR+18] 属其中之一。')
+L('844da2baf3','false_alarm','stacking_normal_in_survey',G+'SuperGLUE.tex:1','基准及其组成数据集逐一引用。',sel='distribution',sub='enumeration_each_item_cited')
+J('cfc725d8a2',F+'Corpus-based Learning of Analogies p19「less than the 57% correct that would be expected for the average college-bound senior high school student」','原文直接给出 57%，[TL05] 只负责这一数字。')
+for u in ['af95e0ddf3','473a9c10c0','8584925f7a']:
+    J(u,G+'News_Article_Generation.tex:20「Related work ... by Ippolito et al. [IDCBE19] indicates that automatic discriminators like Grover [ZHR+19] and GLTR [GSR19] may have greater success」','观点归属 Ippolito et al.，[GSR19] 只是 GLTR 名称的出处。')
+L('c919d85aa7','false_alarm','name_or_title_normalization',G+'News_Article_Generation.tex:22「Ippolito et al. [IDCBE19]」；第一作者 Daphne Ippolito','正文用姓 Ippolito，规则拿全名 Daphne Ippolito 比对，姓名规范化缺陷。')
+L('8ac4e4beea','false_alarm','retrieval_miss',F+'How Much Knowledge Can You Pack Into the Parameters p4「Salient Span Masking ... produced substantially better results in open-domain question answering」','SSM 针对命名实体与日期做掩码并提升效果，即定制到感兴趣的实体，原文支持。')

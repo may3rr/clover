@@ -19,7 +19,8 @@ body {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text',
-    'PingFang SC', system-ui, sans-serif;
+    'PingFang SC', 'Segoe UI Variable Text', 'Segoe UI', 'Microsoft YaHei UI',
+    system-ui, sans-serif;
   font-size: 15px;
   line-height: var(--lh-15);
   color: var(--text);
@@ -528,6 +529,60 @@ select {
    gone — keep the toggle and the title clear of them */
 .center-pane.no-left > .drag-strip {
   padding-left: 84px;
+}
+
+/* ---- progress toast (its own window, screens/Toast.tsx) --------------
+   The window is transparent and 16px larger than the card on every side
+   so the floating-panel shadow has room. */
+.toast-shell {
+  height: 100vh;
+  max-width: 376px; /* = the window; keeps the #toast-demo page true to size */
+  padding: 16px;
+  display: flex;
+  align-items: flex-end;
+}
+.toast-card {
+  width: 100%;
+  padding: 16px;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--glass-edge), var(--glass-shadow);
+  color: var(--text);
+  cursor: default;
+  animation: toast-in 240ms var(--ease-out) both;
+  transition: transform 160ms var(--ease-out);
+}
+.toast-card:active {
+  transform: scale(0.97);
+}
+.toast-pct {
+  min-width: 32px;
+  text-align: right;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ---- Windows (html[data-platform='win32'], set in main.tsx) -----------
+   No vibrancy and no traffic lights. The system caption buttons are drawn
+   over the top-right corner (titleBarOverlay, 52px tall like the strips),
+   so whichever strip reaches the right window edge keeps clear of them. */
+:root {
+  --win-caption: 144px;
+}
+html[data-platform='win32'] .glass-sidebar {
+  background: var(--bg-subtle);
+}
+html[data-platform='win32'] .center-pane.no-left > .drag-strip {
+  padding-left: 24px;
+}
+html[data-platform='win32'] .inspector .drag-strip,
+html[data-platform='win32'] .center-pane.no-right > .drag-strip,
+html[data-platform='win32'] header.drag-strip {
+  padding-right: var(--win-caption) !important;
 }
 
 /* ---- scroll edge fade --------------------------------------------------
@@ -2045,6 +2100,9 @@ select {
   .run-fill:not(.ok):not(.failed) {
     animation: none;
   }
+  @keyframes toast-in {
+    from { opacity: 0; }
+  }
   @keyframes cc-detail-in {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -2103,7 +2161,8 @@ select {
 .onboard-privacy,
 .src-snippet,
 .run-panel,
-.overview-card {
+.overview-card,
+.toast-card {
   -electron-corner-smoothing: system-ui;
 }
 .run-panel,

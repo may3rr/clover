@@ -47,6 +47,9 @@ class CloudSettings(BaseModel):
     base_url: str = "https://dashscope.aliyuncs.com/compatible-mode/v1"
     timeout: float = 60
     max_concurrency: int = 12
+    # transient failures (connection, timeout, rate limit, 5xx) are retried
+    # with exponential backoff until this many seconds have passed
+    retry_seconds: float = 180
 
 
 # The settings UI exposes two tiers; each tier fans out to these tasks.
@@ -92,11 +95,27 @@ _DEFAULT_PRICES: dict[str, dict[str, float]] = {
 }
 
 
+# OpenVINO device order: the first one that compiles the model is used
+_OV_DEVICES = "NPU,GPU,CPU"
+
+
 class LocalSettings(BaseModel):
+    """On-device generation for ``extract``. ``engine = "mlx"`` runs an
+    mlx-lm model on Apple silicon; ``"openvino"`` runs an OpenVINO IR
+    directory (``model`` is then a local path) on an Intel NPU/GPU/CPU."""
+
     enabled: bool = False
+    engine: Literal["mlx", "openvino"] = "mlx"
     model: str = "mlx-community/Qwen2.5-3B-Instruct-4bit"
     hf_endpoint: str = "https://hf-mirror.com"
     timeout: float = 20
+    device: str = _OV_DEVICES
+    # NPU compiles static shapes: the longest prompt and the shortest
+    # answer it is prepared for
+    max_prompt_len: int = 1024
+    min_response_len: int = 256
+    # compiled-blob cache; empty = the platform cache folder
+    ov_cache_dir: str = ""
 
 
 class EmbeddingSettings(BaseModel):
@@ -104,12 +123,19 @@ class EmbeddingSettings(BaseModel):
     default: it sends the cited PDFs' text to the embedding service."""
 
     enabled: bool = False
+    # "api": the OpenAI-compatible endpoint below; "openvino": an IR
+    # directory on this machine (local_model), nothing leaves it
+    backend: Literal["api", "openvino"] = "api"
     base_url: str = "https://api.siliconflow.cn/v1"
     model: str = "Qwen/Qwen3-Embedding-0.6B"
     api_key_env: str = "SILICONFLOW_API_KEY"
     timeout: float = 60
     batch: int = 32
     max_concurrency: int = 4
+    local_model: str = ""
+    device: str = _OV_DEVICES
+    # tokens per window; NPU pads every input to this length
+    max_length: int = 512
 
 
 class RerankSettings(BaseModel):
@@ -123,6 +149,10 @@ class RerankSettings(BaseModel):
     api_format: Literal["siliconflow", "dashscope"] = "siliconflow"
     candidates: int = 40
     timeout: float = 60
+    backend: Literal["api", "openvino"] = "api"
+    local_model: str = ""
+    device: str = _OV_DEVICES
+    max_length: int = 512
 
 
 class LLMSettings(BaseModel):

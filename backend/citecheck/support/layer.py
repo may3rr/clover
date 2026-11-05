@@ -21,13 +21,55 @@ import httpx
 from ..cache import Cache
 from ..config import get_settings
 from ..parse.parser import ParsedDocument
-from ..schema import Anchor, Claim, Finding, RefCheck, SupportCheck
+from ..schema import (
+    Anchor, CitationMarker, Claim, Finding, RefCheck, SupportCheck,
+)
 from .claims import extract_claims
+from .consistency import review_hint
 from .evidence import locate_evidence, locate_spliced
 from .judge import JudgeOut, check_details, judge_claim, search_terms
 from .sources import build_source
 
 log = logging.getLogger(__name__)
+
+
+THIS_REF = "⟦本条文献⟧"
+OTHER_REF = "⟦其他文献⟧"
+
+
+def focus_sentence(
+    text: str, sentence: str | None, claim_start: int,
+    markers: list[CitationMarker], rid: str,
+) -> str | None:
+    """The claim's sentence with each citation tagged by who it points to:
+    THIS_REF after the markers citing ``rid``, OTHER_REF after markers
+    citing only other works. The judge then reads which part of a sentence
+    that cites several works this one is responsible for, whatever the
+    language or citation style. Returns the sentence unchanged when every
+    citation in it points to ``rid``, None when it cannot be placed."""
+    if not sentence:
+        return sentence
+    start = -1
+    pos = text.find(sentence)
+    while pos >= 0:
+        if pos <= claim_start < pos + len(sentence):
+            start = pos
+            break
+        pos = text.find(sentence, pos + 1)
+    if start < 0:
+        return sentence
+    end = start + len(sentence)
+    inside = sorted((m for m in markers if start <= m.start and m.end <= end),
+                    key=lambda m: m.start)
+    if all(rid in m.ref_ids for m in inside):
+        return sentence
+    out, cur = [], start
+    for m in inside:
+        out.append(text[cur:m.end])
+        out.append(THIS_REF if rid in m.ref_ids else OTHER_REF)
+        cur = m.end
+    out.append(text[cur:end])
+    return "".join(out)
 
 
 class SupportRun:
@@ -49,6 +91,10 @@ class SupportRun:
     ):
         self._parsed = parsed
         self._ref_by_id = {r.id: r for r in parsed.references}
+        self._para_text = {p.id: p.text for p in parsed.paragraphs}
+        self._para_markers: dict[str, list[CitationMarker]] = {}
+        for m in parsed.markers:
+            self._para_markers.setdefault(m.paragraph_id, []).append(m)
         # ref_id -> LocalPdf from the user's reference folder: the local
         # full text replaces the network source for that reference
         self._local = local or {}
@@ -178,9 +224,15 @@ class SupportRun:
                 matched, c.text, cache=self._cache, client=self._http)
         cocited = [self._ref_by_id[o].raw for o in self._claim_refs.get(c.id, [])
                    if o != rid and o in self._ref_by_id]
+        # the judge reads the sentence with this work's citation marked
+        focused = focus_sentence(
+            self._para_text.get(c.paragraph_id, ""), c.sentence, c.start,
+            self._para_markers.get(c.paragraph_id, []), rid)
+        judged = c if focused == c.sentence else c.model_copy(
+            update={"sentence": focused})
         async with self._judge_sem:
             out = await _judge_with_source(
-                c, rid, matched, source, entry=ref.raw if ref else None,
+                judged, rid, matched, source, entry=ref.raw if ref else None,
                 cocited=cocited, expand=expand, alternate=alternate)
             if pdf is not None and source.kind != "none":
                 from ..library.source import page_of
@@ -429,15 +481,20 @@ async def _cascade(
                 rationale = "证据未能在原文中定位"
 
     escalate = label in _ESCALATE
+    hint: str | None = None
     if label == "supported":
+        # a number the excerpt states differently for the same quantity
+        # sends it to the review with a neutral note
+        hint = review_hint(claim.text, excerpt)
         # a located contradiction in one detail sends it to the review too
         d = await check_details(claim.text, title, excerpt, sentence=claim.sentence)
         escalate = bool(d and d.conflict and locate_evidence(d.quote, excerpt))
+        escalate = escalate or hint is not None
     if escalate:
         wide = await widened()
-        rev = await ask(wide, task="review")
+        rev = await ask(wide, task="review", hint=hint)
         if rev is None:
-            rev = await ask(wide, task="review_fallback")
+            rev = await ask(wide, task="review_fallback", hint=hint)
         if rev is None:
             log.warning(
                 "review cascade failed for claim %s; keeping first-pass %s",
@@ -449,7 +506,8 @@ async def _cascade(
             used = wide
             if rationale == "证据未能在原文中定位":
                 # same single re-ask as the first pass, on the review model
-                rev2 = await ask(wide, task="review", correction=True)
+                rev2 = await ask(wide, task="review", correction=True,
+                                 hint=hint)
                 if rev2 is not None:
                     label, evidence, rationale, span = _apply_verdict(rev2, wide)
                     final = rev2

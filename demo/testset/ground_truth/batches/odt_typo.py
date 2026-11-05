@@ -1,0 +1,18 @@
+LP='zh_papers/luohuilan_odt/manuscript.pdf'; YP='zh_pdfs/aas_yinhongpeng_2016.pdf'
+L('745d81a43d','false_alarm','conversion_artifact',LP+'「Fully Convolutional⏎Network」','PDF 中换行处有空格，转换后粘连。')
+L('239d38525d','true_issue','real_typo',LP+' p4「使得网络定位的更加准确」','原刊的得误用，属真实笔误。')
+L('2819a2374c','true_issue','real_typo',LP+' p7「Duan等人[65]发现ConerNet只使用左右角点」','原刊把 CornerNet 写成 ConerNet，同段其他处拼写正确。')
+L('81197d7fa5','true_issue','real_typo',LP+' p5「构建了名为DarNet-53的53层基准网络」','原刊写作 DarNet-53，YOLOv3 论文称 Darknet-53。')
+L('cd2c2bc779','true_issue','real_typo',YP+'「极大地提高了跟踪精确.」','原刊把精度或精确度写成精确，动词宾语缺名词，属用词笔误。')
+L('fc5953e838','false_alarm','typo_overcorrection',YP+'「3dSOBS+)[44]」；Maddalena & Petrosino 2014 原题 The 3dSOBS+ algorithm for moving object detection','3dSOBS+ 是算法的原名，改成 3D-SOBS 是误改。')
+L('650208c90d','false_alarm','typo_overcorrection',YP+'「3dSOBS+)[44]」','同上，3dSOBS+ 是算法原名。')
+L('7ae39280e4','false_alarm','typo_overcorrection',YP+'「用于对3D目标的识别中」','原刊确有轻微句式杂糅，但不属错别字，修订实为改写句子。')
+L('0cc56c62e3','true_issue','real_typo',YP+'「RBF、GussianRBF 等[132]」','原刊拼错 Gaussian。')
+for u in ['4faf0c7615','ea60fcbf69','91bc98932f','d93f71e7d4','7db29c22fa','aaf69249b5','c18bb28b1b','58c34583d5']:
+    L(u,'false_alarm','conversion_artifact',YP+' 图表题注「Fig. N⏎英文题名」分行排版','PDF 中编号与英文题名分行，转换后粘连。')
+L('8b6bac799a','false_alarm','typo_overcorrection',YP+'「递归神经⏎网络(Recurrent neural network, RNN)」','递归神经网络是 2016 年前后中文文献对 RNN 的常见译名，不是笔误。')
+L('43c471c12e','false_alarm','typo_overcorrection',YP+'「适用范围比较狭小」','用词偏好，不是错别字。')
+L('883c823f9c','false_alarm','typo_overcorrection',YP+'「不需再度进行分割」','再度是正确用法，模型按文风改词。')
+L('374f428921','false_alarm','conversion_artifact',YP+' 表6「行人跟⏎http://…⏎踪,可用于评测」','表格单元格换行，踪字被挤到网址之后，转换痕迹。')
+L('ad58adfdca','false_alarm','conversion_artifact',YP+' 表「visual object⏎…tracking」','表格单元格内换行导致截断。')
+L('f17fe0c756','false_alarm','typo_overcorrection',YP+'「目前大多算法还只是」','大多修饰名词在书面语中常见，不是错别字。')

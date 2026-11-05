@@ -29,6 +29,7 @@ Output: results/<paper>.json, results/summary.md (summary_en.md)
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -451,9 +452,10 @@ def _fmt(x):
 def main() -> int:
     en = sys.argv[1:] == ["en"]
     papers = PAPERS_EN if en else PAPERS
-    reports = HERE / "reports"
-    outdir = HERE / "results"
-    outdir.mkdir(exist_ok=True)
+    # CLOVER_REPORTS / CLOVER_RESULTS point a rerun at its own directories
+    reports = Path(os.environ.get("CLOVER_REPORTS", HERE / "reports"))
+    outdir = Path(os.environ.get("CLOVER_RESULTS", HERE / "results"))
+    outdir.mkdir(parents=True, exist_ok=True)
     tot = {"tp": 0, "fn": 0, "fp_new": 0, "pre_existing": 0, "tn": 0}
     by_kind: dict[str, list[int]] = {}
     pre_types: dict[str, int] = {}

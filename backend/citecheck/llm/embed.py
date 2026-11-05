@@ -2,8 +2,10 @@
 llm/).
 
 Qwen3 embeddings through the OpenAI-compatible ``/embeddings`` endpoints
-of DashScope or SiliconFlow. Model, endpoint and key variable come from
-``[llm.embedding]`` in config.toml. Synchronous, because excerpts are built
+of DashScope or SiliconFlow, or on this machine through OpenVINO
+(``backend = "openvino"``, ``llm/ov.py``), in which case no text leaves
+it. Model, endpoint and key variable come from ``[llm.embedding]`` in
+config.toml. Synchronous, because excerpts are built
 in worker threads. Vectors are L2-normalized
 and cached per text (key: model + text) as float16 in the cache's
 ``vectors`` table. ``embed`` returns None when embeddings are disabled,
@@ -17,6 +19,7 @@ import logging
 import os
 import threading
 import time
+from pathlib import Path
 
 import httpx
 import numpy as np
@@ -31,6 +34,9 @@ _INSTRUCT = ("Instruct: Given a claim from a survey paper, retrieve the passage 
              "of the cited paper that supports or contradicts it\nQuery: ")
 
 _cache: Cache | None = None
+# on-device embedder, built on first use; a failed build is not retried
+_local = None
+_local_error: str | None = None
 _cache_lock = threading.Lock()
 _sem: threading.Semaphore | None = None
 # a failing service is not retried call after call for the rest of a run
@@ -45,10 +51,48 @@ def _get_cache() -> Cache:
         return _cache
 
 
+def is_local() -> bool:
+    return get_settings().llm.embedding.backend == "openvino"
+
+
 def enabled() -> bool:
     s = get_settings()
-    return (s.llm.embedding.enabled and bool(s.embedding_api_key)
-            and os.environ.get("CITECHECK_EMBED") != "0")
+    cfg = s.llm.embedding
+    ready = (bool(cfg.local_model) and _local_error is None) if is_local() \
+        else bool(s.embedding_api_key)
+    return cfg.enabled and ready and os.environ.get("CITECHECK_EMBED") != "0"
+
+
+def model_id() -> str:
+    """Cache-key model name; local and remote vectors never mix."""
+    cfg = get_settings().llm.embedding
+    if is_local():
+        return "ov:" + Path(cfg.local_model).expanduser().name
+    return cfg.model
+
+
+def local_embedder():
+    """The OpenVINO embedder, or None when it cannot be built."""
+    global _local, _local_error
+    with _cache_lock:
+        if _local is None and _local_error is None:
+            cfg = get_settings().llm.embedding
+            try:
+                from . import ov
+
+                _local = ov.Embedder(cfg.local_model, cfg.device, cfg.max_length,
+                                     get_settings().llm.local.ov_cache_dir)
+            except Exception as e:  # noqa: BLE001 — BM25 carries on alone
+                _local_error = str(e)
+                log.warning("local embedding unavailable (%s); ranking with BM25 only", e)
+        return _local
+
+
+def status() -> dict:
+    """For the settings page: where embeddings are computed."""
+    e = _local
+    return {"backend": get_settings().llm.embedding.backend,
+            "device": getattr(e, "device", None), "error": _local_error}
 
 
 def embed(texts: list[str], *, query: bool = False) -> np.ndarray | None:
@@ -61,13 +105,16 @@ def embed(texts: list[str], *, query: bool = False) -> np.ndarray | None:
         if _sem is None:
             _sem = threading.Semaphore(cfg.max_concurrency)
     inputs = [_INSTRUCT + t if query else t for t in texts]
-    keys = [make_key("emb", cfg.model, t) for t in inputs]
+    model = model_id()
+    keys = [make_key("emb", model, t) for t in inputs]
     cache = _get_cache()
     have = cache.get_vectors(list(dict.fromkeys(keys)))
     todo = list(dict.fromkeys(k for k in keys if k not in have))
     if todo:
         text_of = dict(zip(keys, inputs))
         fresh: dict[str, bytes] = {}
+        if is_local():
+            return _embed_local(keys, todo, text_of, have, cache)
         try:
             for i in range(0, len(todo), cfg.batch):
                 chunk = todo[i:i + cfg.batch]
@@ -83,7 +130,27 @@ def embed(texts: list[str], *, query: bool = False) -> np.ndarray | None:
             return None
         cache.set_vectors(fresh)
         have.update(fresh)
+    return _stack(keys, have)
+
+
+def _stack(keys: list[str], have: dict[str, bytes]) -> np.ndarray:
     return np.stack([np.frombuffer(have[k], dtype=np.float16) for k in keys]).astype(np.float32)
+
+
+def _embed_local(keys, todo, text_of, have, cache) -> np.ndarray | None:
+    emb = local_embedder()
+    if emb is None:
+        return None
+    try:
+        vecs = emb.embed([text_of[k] for k in todo])
+    except Exception as e:  # noqa: BLE001 — BM25 carries on alone
+        log.warning("local embedding failed (%s); ranking with BM25 only", e)
+        return None
+    fresh = {k: v.astype(np.float16).tobytes() for k, v in zip(todo, vecs)}
+    cache.set_vectors(fresh)
+    cache.record_usage("openvino-local", model_id(), "embed")
+    have.update(fresh)
+    return _stack(keys, have)
 
 
 def _request(inputs: list[str]) -> tuple[list[np.ndarray], int]:

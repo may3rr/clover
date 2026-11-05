@@ -103,7 +103,10 @@ _PROMPT = (
     "你是学术写作分析助手。下面句子中的 ⟦mN⟧ 是引用标记。找出每个引用标记"
     "所支撑的论断片段，输出 JSON：{{\"claims\": [{{\"text\": \"...\", "
     "\"marker_ids\": [\"m3\"]}}]}}。规则：text 必须是句子的原文连续片段，"
-    "不包含 ⟦⟧ 标记本身；找不到对应论断就不要输出；只输出 JSON。\n\n"
+    "不包含 ⟦⟧ 标记本身；片段要完整包含句中归属给这篇文献的内容，即被引的"
+    "工作、方法、数据集或结论，以及紧接着对它的描述（修饰从句、同位语、括号"
+    "中的数值等），不要只截到被引工作的名称为止；作者本人的做法和观点不属于"
+    "被引文献；找不到对应论断就不要输出；只输出 JSON。\n\n"
     "句子：{sentence}"
 )
 
@@ -186,15 +189,22 @@ async def extract_claims(
         verifiable, idx_map = _remove_spans(sent.text, marker_spans)
         n_verifiable, vmap = normalize(verifiable)
 
+        # spaces are ignored when locating: removing a marker leaves
+        # "R-CNN , which" where the model writes "R-CNN, which"
+        dense_idx = [k for k, ch in enumerate(n_verifiable) if not ch.isspace()]
+        dense = "".join(n_verifiable[k] for k in dense_idx)
+
         def locate(claim_text: str) -> tuple[int, int] | None:
-            n_claim, _ = normalize(claim_text)
+            n_claim = re.sub(r"\s+", "", normalize(claim_text)[0])
             if not n_claim:
                 return None
-            pos = n_verifiable.find(n_claim)
+            pos = dense.find(n_claim)
             if pos < 0:
                 return None
-            v_start = idx_map[vmap[pos]]
-            v_end = idx_map[vmap[pos + len(n_claim) - 1]] + 1
+            first = dense_idx[pos]
+            last = dense_idx[pos + len(n_claim) - 1]
+            v_start = idx_map[vmap[first]]
+            v_end = idx_map[vmap[last]] + 1
             return sent.start + v_start, sent.start + v_end
 
         def add_fallback(mids: list[str]) -> None:
@@ -264,6 +274,8 @@ async def extract_claims(
             ]
             if inner_spans:
                 inner, _ = _remove_spans(inner, inner_spans)
+            # "Faster R-CNN [34], which" -> "Faster R-CNN, which"
+            inner = re.sub(r"\s+([,，;；:：.。])", r"\1", inner)
             claims.append(
                 Claim(
                     id="", paragraph_id=paragraph.id,

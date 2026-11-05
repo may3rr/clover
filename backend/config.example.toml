@@ -11,6 +11,8 @@ temperature = 0
 base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 timeout = 60
 max_concurrency = 12
+# 网络中断、超时、限流和服务端 5xx 按指数退避重试，总等待不超过这么多秒
+retry_seconds = 180
 
 [llm.models]
 judge = "qwen3.8-flash"
@@ -24,10 +26,17 @@ profile = "qwen3.8-flash"
 overview = "qwen3.8-max"
 
 [llm.local]
+# extract (claim extraction, bibliography guessing) on this machine, cloud
+# as fallback. engine "mlx": Apple silicon, model is an mlx-community repo.
+# engine "openvino": Intel, model is an OpenVINO IR directory, e.g.
+# "D:/clover-models/Qwen3-1.7B-int4-ov"; device is tried left to right
+# (pip install -e .[intel]).
 enabled = false
+engine = "mlx"
 model = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 hf_endpoint = "https://hf-mirror.com"
 timeout = 20
+# device = "NPU,GPU,CPU"
 
 [llm.embedding]
 # Bailian text-embedding-v4 (Qwen3-based) fused with BM25 when ranking
@@ -40,6 +49,10 @@ base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
 model = "text-embedding-v4"
 api_key_env = "DASHSCOPE_API_KEY"
 batch = 10
+# On-device instead (no text leaves the machine):
+# backend = "openvino"
+# local_model = "D:/clover-models/Qwen3-Embedding-0.6B-int8-ov"
+# device = "NPU,GPU,CPU"
 
 [llm.rerank]
 # Bailian qwen3-rerank over the top fused candidates (needs [llm.embedding]).
@@ -51,6 +64,8 @@ base_url = "https://dashscope.aliyuncs.com/api/v1/services/rerank/text-rerank/te
 model = "qwen3-rerank"
 api_key_env = "DASHSCOPE_API_KEY"
 api_format = "dashscope"
+# backend = "openvino"
+# local_model = "D:/clover-models/Qwen3-Reranker-0.6B-int8-ov"
 
 [support]
 # re-judge each flagged pair on a second, BM25-only excerpt and keep the

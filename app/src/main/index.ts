@@ -5,6 +5,7 @@ import {
   ipcMain,
   Menu,
   nativeTheme,
+  screen,
   shell,
 } from 'electron'
 import { spawn, ChildProcess } from 'node:child_process'
@@ -14,13 +15,17 @@ import path from 'node:path'
 import fs from 'node:fs'
 
 // packaged: a standalone CPython and the backend ship in Resources
-// (scripts/bundle-python.sh); dev: the conda env and the repo's backend/
+// (scripts/bundle-python.sh); dev: the conda env and the repo's backend/.
+// Windows dev: CITECHECK_PYTHON, else the venv in backend/.venv, else PATH
 const PACKAGED = app.isPackaged
-const PYTHON =
-  process.env.CITECHECK_PYTHON ||
-  (PACKAGED
-    ? path.join(process.resourcesPath, 'python/bin/python3')
-    : '/opt/anaconda3/envs/claude/bin/python')
+const IS_MAC = process.platform === 'darwin'
+const IS_WIN = process.platform === 'win32'
+
+function devPython(backendDir: string): string {
+  if (!IS_WIN) return '/opt/anaconda3/envs/claude/bin/python'
+  const venv = path.join(backendDir, '.venv', 'Scripts', 'python.exe')
+  return fs.existsSync(venv) ? venv : 'python'
+}
 /** where .env and config.toml live once packaged — never inside the bundle */
 const USER_HOME = path.join(app.getPath('appData'), 'Clover')
 const TOKEN = randomBytes(32).toString('hex')
@@ -32,6 +37,14 @@ const THEME = process.env.CITECHECK_THEME
 const BACKEND_DIR = PACKAGED
   ? path.join(process.resourcesPath, 'backend')
   : path.resolve(import.meta.dirname, '../../../backend')
+const PYTHON =
+  process.env.CITECHECK_PYTHON ||
+  (PACKAGED
+    ? path.join(
+        process.resourcesPath,
+        IS_WIN ? 'python/python.exe' : 'python/bin/python3'
+      )
+    : devPython(BACKEND_DIR))
 
 let win: BrowserWindow | null = null
 let backend: ChildProcess | null = null
@@ -84,6 +97,9 @@ async function startBackend(): Promise<void> {
       env: {
         ...process.env,
         CITECHECK_TOKEN: TOKEN,
+        // file I/O names its encodings; this guards anything that does not
+        // (Windows defaults to the ANSI code page, GBK on Chinese systems)
+        PYTHONUTF8: '1',
         ...(PACKAGED && {
           CITECHECK_HOME: USER_HOME,
           // the bundle is read-only and must not pick up user site-packages
@@ -196,6 +212,121 @@ ipcMain.handle('citecheck:open-external', (_e, url: string) => {
   if (typeof url === 'string' && url.startsWith('https://')) {
     shell.openExternal(url)
   }
+})
+
+// ---------------------------------------------------------------- toast
+// A small always-on-top window in the screen's bottom-right corner while a
+// check runs and Clover is not in front (Windows by default; elsewhere with
+// CITECHECK_TOAST=1). It mirrors the running screen's real stage and
+// progress; a click brings the main window back.
+
+interface ToastState {
+  visible: boolean
+  file?: string
+  step?: string
+  pct?: number
+  /** finished or failed: stays a few seconds, then hides itself */
+  done?: boolean
+}
+const TOAST_ON = IS_WIN || process.env.CITECHECK_TOAST === '1'
+// card 344×96 plus room for its shadow on every side
+const TOAST_W = 376
+const TOAST_H = 128
+const TOAST_LINGER_MS = 6000
+let toastWin: BrowserWindow | null = null
+let toastState: ToastState = { visible: false }
+let toastTimer: NodeJS.Timeout | null = null
+
+function placeToast() {
+  if (!toastWin) return
+  const area = screen.getPrimaryDisplay().workArea
+  toastWin.setBounds({
+    x: area.x + area.width - TOAST_W,
+    y: area.y + area.height - TOAST_H,
+    width: TOAST_W,
+    height: TOAST_H,
+  })
+}
+
+function ensureToast(): BrowserWindow {
+  if (toastWin && !toastWin.isDestroyed()) return toastWin
+  toastWin = new BrowserWindow({
+    width: TOAST_W,
+    height: TOAST_H,
+    show: false,
+    frame: false,
+    transparent: true,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    focusable: false,
+    alwaysOnTop: true,
+    hasShadow: false,
+    backgroundColor: '#00000000',
+    webPreferences: {
+      preload: path.join(import.meta.dirname, '../preload/index.mjs'),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: false,
+    },
+  })
+  toastWin.setAlwaysOnTop(true, 'screen-saver')
+  if (IS_MAC) toastWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  placeToast()
+  const devUrl = process.env.ELECTRON_RENDERER_URL
+  if (devUrl) toastWin.loadURL(`${devUrl}#toast`)
+  else
+    toastWin.loadFile(path.join(import.meta.dirname, '../renderer/index.html'), {
+      hash: 'toast',
+    })
+  toastWin.webContents.on('did-finish-load', () => {
+    toastWin?.webContents.send('citecheck:toast', toastState)
+  })
+  toastWin.on('closed', () => {
+    toastWin = null
+  })
+  return toastWin
+}
+
+function updateToast() {
+  if (!TOAST_ON) return
+  const mainHidden = !win || !win.isVisible() || win.isMinimized() || !win.isFocused()
+  const show = toastState.visible && mainHidden
+  if (!show) {
+    toastWin?.hide()
+    return
+  }
+  const t = ensureToast()
+  t.webContents.send('citecheck:toast', toastState)
+  if (!t.isVisible()) {
+    placeToast()
+    t.showInactive()
+  }
+}
+
+ipcMain.on('citecheck:toast-state', (_e, s: ToastState) => {
+  toastState = s
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = null
+  if (s.visible && s.done) {
+    toastTimer = setTimeout(() => {
+      toastState = { visible: false }
+      updateToast()
+    }, TOAST_LINGER_MS)
+  }
+  updateToast()
+})
+
+ipcMain.on('citecheck:toast-click', () => {
+  if (!win) return
+  if (win.isMinimized()) win.restore()
+  win.show()
+  win.focus()
+  if (toastState.done) toastState = { visible: false }
+  updateToast()
 })
 
 ipcMain.on('citecheck:renderer-ready', () => {
@@ -344,6 +475,28 @@ async function runShots() {
   app.quit()
 }
 
+// Windows / Linux: files arrive as argv ("Open with", drop on the exe),
+// and a second launch hands its argv to the running instance
+function argvFiles(argv: string[]): string[] {
+  return argv
+    .slice(PACKAGED ? 1 : 2)
+    .filter((a) => !a.startsWith('-') && /\.(docx|zip|gz|tgz|tex)$/i.test(a))
+    .filter((a) => fs.existsSync(a))
+}
+
+if (!IS_MAC) {
+  if (!app.requestSingleInstanceLock()) app.quit()
+  pendingOpenFiles.push(...argvFiles(process.argv))
+  app.on('second-instance', (_e, argv) => {
+    pendingOpenFiles.push(...argvFiles(argv))
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+    }
+    flushOpenFiles()
+  })
+}
+
 // macOS "open-file" — Dock drops / Finder Open With
 app.on('open-file', (e, p) => {
   e.preventDefault()
@@ -365,9 +518,10 @@ function menuClick(cmd: string) {
 }
 
 function buildMenu() {
-  const template: Electron.MenuItemConstructorOptions[] = [
-    {
-      label: app.name,
+  const appMenu: Electron.MenuItemConstructorOptions[] = IS_MAC
+    ? [
+        {
+          label: app.name,
       submenu: [
         { role: 'about', label: `关于${app.name}` },
         { type: 'separator' },
@@ -380,6 +534,10 @@ function buildMenu() {
         { role: 'quit', label: `退出${app.name}` },
       ],
     },
+      ]
+    : []
+  const template: Electron.MenuItemConstructorOptions[] = [
+    ...appMenu,
     {
       label: '文件',
       submenu: [
@@ -400,6 +558,12 @@ function buildMenu() {
           accelerator: 'CmdOrCtrl+N',
           click: menuClick('new'),
         },
+        ...(IS_MAC
+          ? []
+          : ([
+              { type: 'separator' },
+              { role: 'quit', label: '退出' },
+            ] as Electron.MenuItemConstructorOptions[])),
       ],
     },
     { label: '编辑', role: 'editMenu' },
@@ -411,6 +575,36 @@ function buildMenu() {
 
 // ---------------------------------------------------------------- window
 
+// Windows: no vibrancy or traffic lights; a hidden title bar with the
+// system caption buttons drawn over the top-right corner, on Mica
+// (Windows 11; Windows 10 shows the solid background colour)
+function overlayColors() {
+  const dark = nativeTheme.shouldUseDarkColors
+  // tokens.css --bg-subtle / --text (the inspector pane sits under them)
+  return dark
+    ? { color: '#202020', symbolColor: '#dedede' }
+    : { color: '#f7f7f5', symbolColor: '#37352f' }
+}
+
+function chromeOptions(): Electron.BrowserWindowConstructorOptions {
+  if (IS_MAC) {
+    return {
+      titleBarStyle: 'hiddenInset',
+      trafficLightPosition: { x: 20, y: 20 },
+      vibrancy: 'sidebar',
+      visualEffectState: 'followWindow',
+      backgroundColor: '#00000000',
+    }
+  }
+  return {
+    titleBarStyle: 'hidden',
+    titleBarOverlay: { ...overlayColors(), height: 52 },
+    backgroundMaterial: 'mica',
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#191919' : '#ffffff',
+    autoHideMenuBar: true,
+  }
+}
+
 async function createWindow() {
   win = new BrowserWindow({
     width: 1280,
@@ -418,11 +612,7 @@ async function createWindow() {
     minWidth: 1100,
     minHeight: 720,
     show: false,
-    titleBarStyle: 'hiddenInset',
-    trafficLightPosition: { x: 20, y: 20 },
-    vibrancy: 'sidebar',
-    visualEffectState: 'followWindow',
-    backgroundColor: '#00000000',
+    ...chromeOptions(),
     webPreferences: {
       preload: path.join(import.meta.dirname, '../preload/index.mjs'),
       contextIsolation: true,
@@ -436,6 +626,15 @@ async function createWindow() {
 
   if (THEME === 'light' || THEME === 'dark') {
     nativeTheme.themeSource = THEME
+  }
+  // the toast shows only while the main window is out of sight
+  for (const ev of ['focus', 'blur', 'minimize', 'restore', 'show', 'hide'] as const) {
+    win.on(ev as 'focus', updateToast)
+  }
+  if (!IS_MAC) {
+    nativeTheme.on('updated', () => {
+      win?.setTitleBarOverlay({ ...overlayColors(), height: 52 })
+    })
   }
 
   // surface renderer console in shot/e2e runs

@@ -1,0 +1,13 @@
+PDF='zh_papers/liuqiao_kg/manuscript.pdf'
+L('e7cc5f1c25','false_alarm','conversion_artifact',PDF+' p? 原文「引入N-Gram特征」','PDF 原文无空格，docx 转换时把 m 拆开。')
+L('22a246a8a1','false_alarm','conversion_artifact',PDF+' p6「Mausam等人[22]」','PDF 原文为 Mausam，转换引入空格；作者归属报警同源。')
+L('ab50bc64de','true_issue','real_typo',PDF+' p8「基于维基百科和Wordnet知识库」，p7/p11 写作 WordNet','原刊确实写作 Wordnet，与全文 WordNet 不统一，属轻微大小写错误。')
+L('45c18bf38a','false_alarm','conversion_artifact',PDF+'「[66]借助SWRL规则」','PDF 原文为 SWRL，空格来自转换。')
+L('b412c76841','true_issue','real_typo',PDF+' p13「例如Nguye等人[74]」；参考文献[74] Nguyen T','原刊正文把 Nguyen 误写为 Nguye，作者归属报警与修订都指向同一真实笔误；归属报警把笔误说成可能引错文献，提示语偏重。')
+L('968597d167','false_alarm','conversion_artifact',PDF+' p14「(logic form)」','PDF 原文为 logic form。')
+L('6b6b6e52fa','true_issue','real_typo',PDF+'「并籍此获得了该公司的语义搜索核心技术」','原刊写作籍此，应为藉此或借此，属真实错别字。')
+L('1e19d70bf1','false_alarm','conversion_artifact',PDF+' p8「“he”,“him”等」','PDF 原文为 him。')
+L('0ede7cf52d','false_alarm','conversion_artifact',PDF+'「domestic animal」','PDF 原文无空格，转换痕迹。')
+L('a34780c7fa','false_alarm','conversion_artifact',PDF+' p1「(School⏎of Information」','PDF 原文换行处有空格，转换后丢失。')
+L('18214c65e6','debatable','real_grammar',PDF+' 英文摘要「drawn a lot of research attentions」','原刊英文摘要确有语法错误，不是错别字范畴，修订可接受但超出错别字口径。')
+L('cf60126644','true_issue','real_typo',PDF+'「“实体-属性-性值”三元组」','原刊漏字，应为属性值。')

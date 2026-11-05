@@ -1,0 +1,295 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2016，数据库记录为 2020', '本地原文年份为 2020，文中写 2016']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=0 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=0 findings=1",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 8,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 19,
+  "tn": 106,
+  "excluded": 4,
+  "claims": 69,
+  "refs": 60,
+  "support_definitive": 58
+ },
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.2962962962962963,
+  1.0,
+  0.8571428571428571
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c23"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Theuseofadditionaldatasourcesallowstoachievestate-of-the-art"
+  },
+  {
+   "unit": [
+    "claim",
+    "c28"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Layernorm(LN)isappliedbeforeeveryblock,andresidualconnection"
+  },
+  {
+   "unit": [
+    "claim",
+    "c36"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Wetransferthemodelstrainedonthesedatasettoseveralbenchmarkta"
+  },
+  {
+   "unit": [
+    "claim",
+    "c40"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "ForthebaselineCNNs,weuseResNet,butreplacetheBatchNormalizati"
+  },
+  {
+   "unit": [
+    "claim",
+    "c49"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "BiT,VIVI–aResNetco-trainedonImageNetandYoutube"
+  },
+  {
+   "unit": [
+    "claim",
+    "c50"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "S4L–supervisedplussemi-supervisedlearningonImageNet"
+  },
+  {
+   "unit": [
+    "claim",
+    "c6"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "classicResNet-likearchitecturesarestillstateoftheart"
+  },
+  {
+   "unit": [
+    "claim",
+    "c64"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "AxialAttentionisasimple,yeteffectivetechniquetorunself-atten"
+  },
+  {
+   "unit": [
+    "claim",
+    "c67"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Tocomputemapsoftheattentionfromtheoutputtokentotheinputspace"
+  },
+  {
+   "unit": [
+    "ref",
+    "r21"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "ZilongHuang,XinggangWang,YunchaoWei,LichaoHuang,HumphreyShi,"
+  },
+  {
+   "unit": [
+    "ref",
+    "r49"
+   ],
+   "alarms": [
+    "norms:这条参考文献与前面的条目重复"
+   ],
+   "text": "Wang,Huiyu,Zhu,Yukun,Green,Bradley,Adam,Hartwig,Yuille,Alan,"
+  },
+  {
+   "unit": [
+    "span",
+    "p130",
+    505,
+    533
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Figurecontainstheresults."
+  },
+  {
+   "unit": [
+    "span",
+    "p134",
+    517,
+    778
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "and5hybrids,R50+ViT-B/32,B/16,L/32,L/16pre-trainedfor7epochs"
+  },
+  {
+   "unit": [
+    "span",
+    "p20",
+    311,
+    451
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "TheclassificationheadisimplementedbyaMLPwithonehiddenlayerat"
+  },
+  {
+   "unit": [
+    "span",
+    "p5",
+    379,
+    444
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Wetrainthemodelonimageclassificationinsupervisedfashion."
+  },
+  {
+   "unit": [
+    "span",
+    "p709",
+    140,
+    424
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Forthe1-dimensionaland2-dimensionalpositionalembeddings,wetr"
+  },
+  {
+   "unit": [
+    "span",
+    "p719",
+    0,
+    315
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Moreover,wehavemodifiedViTtoprocessinputsinthe2-dimensionals"
+  },
+  {
+   "unit": [
+    "span",
+    "p721",
+    0,
+    248
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Figure,presenttheperformanceofAxialResNet,Axial-ViT-B/32andA"
+  },
+  {
+   "unit": [
+    "span",
+    "p721",
+    409,
+    721
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "ThisisbecauseinAxial-ViTmodels,eachTransformerblockwithgloba"
+  }
+ ]
+}

@@ -1,0 +1,320 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2013，数据库记录为 2017', '本地原文年份为 2016，文中写 2013']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=2",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 8,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 22,
+  "tn": 113,
+  "excluded": 4,
+  "claims": 75,
+  "refs": 72,
+  "support_definitive": 65
+ },
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.26666666666666666,
+  1.0,
+  0.8461538461538461
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c15"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "RPN是一种全卷积神经网络(FullyConvolutionalNetwork，FCN)结构，它将任意大小的特征图作为输"
+  },
+  {
+   "unit": [
+    "claim",
+    "c21"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "2018年Bharat等人提出了图像金字塔的尺度归一化方法(ScaleNormalizationforImagePyra"
+  },
+  {
+   "unit": [
+    "claim",
+    "c22"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "2016年Dai等人提出了基于区域的全卷积神经网络(Region-basedFullyConvolutionalNetw"
+  },
+  {
+   "unit": [
+    "claim",
+    "c24"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "2017年Dai等人提出了形变卷积网络(DeformationConvolutionNetwork，DCN)，设计了可形"
+  },
+  {
+   "unit": [
+    "claim",
+    "c27"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "通过级联三个区域交并比(IntersectionOverUnion，IOU)阈值递增的R-CNN检测模型，对RPN产生的"
+  },
+  {
+   "unit": [
+    "claim",
+    "c28"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "2017年，Zhao等人提出了CascadeR-CNN算法，通过级联三个区域交并比(IntersectionOverUn"
+  },
+  {
+   "unit": [
+    "claim",
+    "c29"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "2018年Chen等人在RPN阶段引入上下文信息对候选区域进行微调，使得网络定位的更加准确"
+  },
+  {
+   "unit": [
+    "claim",
+    "c3"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Sharma等人仅仅综述了传统的目标检测算法"
+  },
+  {
+   "unit": [
+    "claim",
+    "c34"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "RM借鉴了文献的思想对不同目标间的关系进行建模"
+  },
+  {
+   "unit": [
+    "claim",
+    "c37"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "2019年Hamid等人提出了GIOU作为边界框回归损失函数，在计算检测框与真值框IOU的基础上，添加了对这两个框的最小"
+  },
+  {
+   "unit": [
+    "claim",
+    "c42"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "2018年Redmon等人提出了YOLOv3算法，它借鉴残差网络中跳跃连接的思路，构建了名为DarNet-53的53层基"
+  },
+  {
+   "unit": [
+    "claim",
+    "c47"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "并在VGG16网络末端添加了几个使特征图尺寸逐渐减小的辅助性卷积层，用于提取不同尺度的特征图，而且直接采用卷积操作对不同"
+  },
+  {
+   "unit": [
+    "claim",
+    "c51"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Lin等人提出了RetinaNet算法，针对SSD算法因密集采样导致的难易样本严重失衡问题，提出了FocalLoss函数"
+  },
+  {
+   "unit": [
+    "claim",
+    "c54"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "RFB结构借鉴了Inception的思想，引入三个不同扩张率的3×3卷积层增大感受野，并且将这三个卷积的输出以串接方式进"
+  },
+  {
+   "unit": [
+    "claim",
+    "c56"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "SSD最新的改进研究更加关注于合理和高效的运用FPN结构，提取具有丰富上下文信息和空间信息的多尺度特征，解决目标尺度变化"
+  },
+  {
+   "unit": [
+    "claim",
+    "c57"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "Ghaisi等人受到神经结构搜索(NeuralArchitectureSearch，NAS)的启发，提出了NAS-FPN"
+  },
+  {
+   "unit": [
+    "claim",
+    "c63"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Duan等人发现ConerNet只使用左右角点会造成大量的误检"
+  },
+  {
+   "unit": [
+    "claim",
+    "c64"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "使用非常庞大的Hourglass-104网络作为特征提取网络"
+  },
+  {
+   "unit": [
+    "claim",
+    "c66"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "当前通用目标检测任务中流行的数据集有:PAS-CALVOC2007、PASCALVOC2012、MSCOCO、Image"
+  },
+  {
+   "unit": [
+    "claim",
+    "c73"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "OpenImages数据集是对图像分类、目标检测、视觉关系检测和实例分割等任务具有统一注释的单个数据集，对于目标检测任务"
+  },
+  {
+   "unit": [
+    "ref",
+    "r38"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[38]HEYi-hui,ZHANGXiang-yu,MARIOSS,etal.Softer-NMS:Rethinkin"
+  },
+  {
+   "unit": [
+    "ref",
+    "r7"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[7]LIAWA,WIENERM.Classificationandregressionbyrandom-forest["
+  }
+ ]
+}

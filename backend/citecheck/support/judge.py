@@ -1,8 +1,8 @@
 """支持度判断 (task 'judge', cloud only per router policy).
 
 Prompt contract (PLAN T3): claim + cited entry/title + excerpt in; JSON
-{label, evidence, rationale} out. evidence must be copied verbatim from
-the excerpt (<=2 sentences), rationale one Chinese sentence, and the
+{rationale, evidence, label} out, reasoning first so the label follows it. evidence must be copied verbatim from
+the excerpt (<=2 sentences), rationale one or two Chinese sentences, and the
 model must answer undetermined rather than guess.
 """
 
@@ -32,8 +32,10 @@ _PROMPT = (
     "{cocited_line}"
     "被引文献标题：{title}\n"
     "被引文献原文片段（文献开头与和论断最相关的段落）：{excerpt}\n\n"
-    "输出 JSON：{{\"label\": \"supported|partial|unsupported|undetermined\", "
-    "\"evidence\": \"...\", \"rationale\": \"...\", \"off_topic\": false}}。\n"
+    "输出 JSON：{{\"rationale\": \"...\", \"evidence\": \"...\", "
+    "\"label\": \"supported|partial|unsupported|undetermined\", "
+    "\"off_topic\": false}}。先写 rationale 和 evidence，再依据它们给出 "
+    "label；label 必须与 rationale 的结论一致。\n"
     "按顺序判断：\n"
     "0. 论断本身残缺、看不出在说什么（例如只剩一个词、半句话或表格标题）时，"
     "label 用 undetermined，不再往下判断。\n"
@@ -53,11 +55,12 @@ _PROMPT = (
     "不要猜测。\n"
     "规则：evidence 必须是片段中一段连续的原文，原样摘抄，不超过两句，不要用省略号"
     "拼接不相邻的句子，保持原文的语言，论断是中文而原文是英文时也不要翻译；"
-    "rationale 用一句中文说明判断依据。\n"
-    "所在句子同时引了多篇文献时（上面列出了同处其他文献的条目），这篇文献只需支持"
-    "句中与它相关的那一部分，例如"
-    "句中提到的某个方法、模型或数据集正是它提出的；其余部分由别的文献负责，不能"
-    "因此判 partial 或 unsupported。句中没有任何部分与它相关时才按第 1 步处理。\n"
+    "rationale 用一到两句中文说明判断依据。\n"
+    "所在句子同时引了多篇文献时，句中 ⟦本条文献⟧ 紧跟在这篇文献的引用位置后面，"
+    "⟦其他文献⟧ 紧跟在别的文献的引用位置后面。这篇文献只需支持由 ⟦本条文献⟧ "
+    "这处引用负责的内容，通常是紧挨在它前面的方法、模型、数据集、数值或结论；"
+    "由 ⟦其他文献⟧ 负责的内容不需要这篇文献支持，不能因此判 partial 或 "
+    "unsupported。句中没有任何部分与它相关时才按第 1 步处理。\n"
     "只判断论断中归属给这篇被引文献的内容。论断里属于作者本人的做法、实验设置、"
     "应用方式或观点（例如“我们把 X 用在 Y 上”“X 被用作基线”“但这并不能……”），"
     "不需要被引文献支持，不能因此判 partial。引用工具、数据集或方法时，只要文献"
@@ -82,10 +85,15 @@ async def judge_claim(
     cocited: list[str] | None = None,
     correction: bool = False,
     task: str = "judge",
+    hint: str | None = None,
+    template: str | None = None,
 ) -> JudgeOut | None:
     """One judging pass. ``task`` selects the configured model: 'judge'
-    for the first pass, 'review'/'review_fallback' for the cascade."""
-    prompt = _PROMPT.format(
+    for the first pass, 'review'/'review_fallback' for the cascade.
+    ``hint`` (review only) names a rule-level inconsistency to look at;
+    the label stays the model's. ``template`` replaces the prompt (prompt
+    A/B runs, demo/testset/judge_ab.py)."""
+    prompt = (template or _PROMPT).format(
         claim=claim_text,
         sentence_line=f"所在句子：{sentence}\n" if sentence else "",
         entry_line=f"被引文献条目（稿件参考文献表中的著录）：{entry}\n" if entry else "",
@@ -96,6 +104,8 @@ async def judge_claim(
         title=ref_title or "（无标题）",
         excerpt=excerpt,
     )
+    if hint:
+        prompt += f"\n\n复核提示：{hint}"
     if correction:
         prompt += _CORRECTION
     res = await chat_json(

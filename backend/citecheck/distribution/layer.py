@@ -119,6 +119,24 @@ def _stat(d: dict | None) -> Stat | None:
     return Stat(median=d["median"], q1=d["q1"], q3=d["q3"])
 
 
+# text allowed between two markers of one citation cluster: "[1][2]",
+# "[1], [2]", "(Smith 2019; Lee 2020)", "[1]–[3]"
+_CLUSTER_GAP = re.compile(r"[\s,，;；、\-–—~～]*")
+
+
+def _clusters(text: str, markers: list) -> list[set[str]]:
+    """Reference-id sets of runs of adjacent markers (sorted by start)."""
+    out: list[set[str]] = []
+    prev_end: int | None = None
+    for m in markers:
+        if prev_end is not None and _CLUSTER_GAP.fullmatch(text[prev_end:m.start]):
+            out[-1].update(m.ref_ids)
+        else:
+            out.append(set(m.ref_ids))
+        prev_end = max(m.end, prev_end or 0)
+    return out or [set()]
+
+
 async def run_distribution(
     parsed: ParsedDocument,
     *,
@@ -199,15 +217,21 @@ async def run_distribution(
             continue
         text = para_by_id[pid].text
         for sent in split_sentences(text):
+            in_sent = sorted(
+                (m for m in ms if sent.start <= m.start and m.end <= sent.end),
+                key=lambda m: m.start)
             ids: set[str] = set()
-            for m in ms:
-                if sent.start <= m.start and m.end <= sent.end:
-                    ids.update(m.ref_ids)
+            for m in in_sent:
+                ids.update(m.ref_ids)
             if not ids:
                 continue
+            # the benchmark statistic is per sentence; the finding is per
+            # citation cluster, so an enumeration where each item carries
+            # its own citation ("TriviaQA [15], SQuAD [16], …") is not a stack
             citing_counts.append(len(ids))
-            if len(ids) >= 5:
-                stacked.append((pid, sent.start, sent.end, ids))
+            biggest = max(_clusters(text, in_sent), key=len)
+            if len(biggest) >= 5:
+                stacked.append((pid, sent.start, sent.end, biggest))
     n_citing = len(citing_counts)
 
     def _share(k: int) -> float:

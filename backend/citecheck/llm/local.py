@@ -1,9 +1,11 @@
-"""Local mlx-lm inference on a single dedicated worker thread.
+"""On-device generation on a single dedicated worker thread.
 
-mlx is not thread-safe, so all generation is funnelled through one
-ThreadPoolExecutor(max_workers=1). If importing mlx-lm or loading the
-model fails, the engine reports unavailable once and is never retried
-for the life of the process.
+Two engines behind one interface, picked by ``[llm.local] engine``:
+mlx-lm on Apple silicon, OpenVINO GenAI on Intel NPU/GPU/CPU
+(``llm/ov.py``). Neither runtime is thread-safe for one model, so all
+generation is funnelled through one ThreadPoolExecutor(max_workers=1).
+If importing the runtime or loading the model fails, the engine reports
+unavailable once and is never retried for the life of the process.
 """
 
 from __future__ import annotations
@@ -34,13 +36,18 @@ def _extract_json(text: str) -> str | None:
 
 
 class LocalEngine:
+    """mlx-lm engine (Apple silicon)."""
+
+    provider = "mlx-local"
+    device: str | None = "Apple GPU"
+
     def __init__(self, model_name: str, hf_endpoint: str | None, timeout: float):
         self.model_name = model_name
         self.timeout = timeout
         self.available = False
         self.unavailable_reason: str | None = None
         self._executor = concurrent.futures.ThreadPoolExecutor(
-            max_workers=1, thread_name_prefix="mlx"
+            max_workers=1, thread_name_prefix="local-llm"
         )
         self._model = None
         self._tokenizer = None
@@ -107,6 +114,45 @@ class LocalEngine:
         return _extract_json(text)
 
 
+class OpenVINOEngine(LocalEngine):
+    """OpenVINO GenAI engine (Intel NPU → GPU → CPU); ``model`` is the IR
+    directory."""
+
+    provider = "openvino-local"
+
+    def __init__(self, settings: "LocalSettings"):  # noqa: F821
+        self.model_name = settings.model
+        self.timeout = settings.timeout
+        self.available = False
+        self.unavailable_reason = None
+        self.device = None
+        self._last_usage = None
+        self._gen = None
+        self._executor = concurrent.futures.ThreadPoolExecutor(
+            max_workers=1, thread_name_prefix="local-llm"
+        )
+        try:
+            from . import ov
+
+            # compile on the worker thread that will run every generation
+            self._gen = self._executor.submit(
+                ov.Generator, settings.model, settings.device,
+                settings.max_prompt_len, settings.min_response_len,
+                settings.ov_cache_dir,
+            ).result()
+            self.device = self._gen.device
+            self.available = True
+        except Exception as e:  # noqa: BLE001
+            self.unavailable_reason = f"OpenVINO 模型加载失败: {e}"
+            log.warning("openvino LLM unavailable: %s", e)
+
+    def _generate_sync(self, messages: list[dict], max_tokens: int) -> str:
+        assert self._gen is not None
+        text, usage = self._gen.generate(messages, max_tokens)
+        self._last_usage = usage or None
+        return text
+
+
 async def generate_or_raise(
     messages: list[dict], max_tokens: int = 1024
 ) -> str:
@@ -136,11 +182,22 @@ def get_engine() -> LocalEngine | None:
     settings = get_settings()
     if not settings.llm.local.enabled:
         return None
+    cfg = settings.llm.local
     with _lock:
         if _engine is None:
-            _engine = LocalEngine(
-                settings.llm.local.model,
-                settings.llm.local.hf_endpoint,
-                settings.llm.local.timeout,
-            )
+            if cfg.engine == "openvino":
+                _engine = OpenVINOEngine(cfg)
+            else:
+                _engine = LocalEngine(cfg.model, cfg.hf_endpoint, cfg.timeout)
     return _engine
+
+
+def provider() -> str:
+    """Usage-log provider name of the configured engine."""
+    from ..config import get_settings
+
+    e = _engine
+    if e is not None:
+        return e.provider
+    return ("openvino-local" if get_settings().llm.local.engine == "openvino"
+            else "mlx-local")

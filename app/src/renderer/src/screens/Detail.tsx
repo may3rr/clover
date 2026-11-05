@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { Report, RefCheck, SectionDist } from '../types/report'
+import { keys } from '../lib/platform'
 import { refIdent, type ListItem } from '../lib/items'
 import { supportForFinding } from '../lib/claims'
 import { barGeom, comparedSections } from '../lib/dist'
@@ -50,7 +51,7 @@ export default function Detail({ item, report, backLabel, onBack, onCollapse, on
         <button
           className="icon-btn"
           aria-label="收起检查器"
-          title="收起检查器 ⌘⇧\"
+          title={`收起检查器 ${keys('⌘⇧\\')}`}
           onClick={onCollapse}
         >
           <SidebarTrailingIcon size={15} />

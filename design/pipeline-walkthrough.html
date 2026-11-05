@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clover 体检流水线：一篇 docx 怎样变成一份报告</title>
+<style>
+:root{
+  --bg:#ffffff; --bg-subtle:#f7f7f5; --text:#37352f; --text-secondary:rgba(55,53,47,0.65);
+  --accent:#2383e2; --fill:rgba(55,53,47,0.06); --fill-strong:rgba(55,53,47,0.09);
+  --high:#FF5F57; --medium:#FEBC2E; --ok:#28C840;
+  --high-tint:rgba(255,95,87,0.2); --medium-tint:rgba(254,188,46,0.22); --ok-tint:rgba(40,200,64,0.2);
+  --high-text:#D70015; --medium-text:#A05A00; --ok-text:#1E7E34;
+  --indigo:#5856D6; --blue:#007AFF; --teal:#30B0C7; --purple:#AF52DE; --grey:#8E8E93;
+  --indigo-tint:rgba(88,86,214,0.12); --blue-tint:rgba(0,122,255,0.10); --teal-tint:rgba(48,176,199,0.14);
+  --purple-tint:rgba(175,82,222,0.12); --grey-tint:rgba(142,142,147,0.14);
+  --qwen:#082dff; --qwen-tint:rgba(8,45,255,0.08);
+  --code-bg:#f7f7f5;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#191919; --bg-subtle:#202020; --text:rgba(255,255,255,0.88); --text-secondary:rgba(255,255,255,0.55);
+    --fill:rgba(255,255,255,0.06); --fill-strong:rgba(255,255,255,0.1);
+    --high:#FF6961; --medium:#FFC53D; --ok:#32D74B;
+    --high-tint:rgba(255,105,97,0.28); --medium-tint:rgba(255,197,61,0.28); --ok-tint:rgba(50,215,75,0.28);
+    --high-text:#FF6961; --medium-text:#FFC53D; --ok-text:#32D74B;
+    --indigo:#5E5CE6; --blue:#0A84FF; --teal:#40C8E0; --purple:#BF5AF2;
+    --qwen:#6f86ff; --qwen-tint:rgba(111,134,255,0.16); --code-bg:#252525;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",system-ui,sans-serif;
+  font-size:15px;line-height:22px;text-autospace:normal;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:48px 32px 96px}
+h1{font-size:32px;line-height:40px;font-weight:700;margin:0 0 12px;text-wrap:balance}
+h2{font-size:26px;line-height:34px;font-weight:600;margin:64px 0 8px;text-wrap:balance}
+h3{font-size:20px;line-height:28px;font-weight:600;margin:32px 0 8px}
+h4{font-size:15px;line-height:22px;font-weight:600;margin:16px 0 4px}
+p{margin:8px 0}
+.sec{color:var(--text-secondary);font-size:13px;line-height:18px}
+.lead{font-size:17px;line-height:29px;color:var(--text-secondary);max-width:820px}
+code,.mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;line-height:18px}
+code{background:var(--fill);border-radius:4px;padding:0 4px}
+pre{background:var(--code-bg);border-radius:8px;padding:12px 16px;margin:8px 0;overflow-x:auto;
+  font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:13px;line-height:18px;white-space:pre-wrap;word-break:break-word}
+.k{color:var(--purple)} .s{color:var(--ok-text)} .n{color:var(--medium-text)} .c{color:var(--text-secondary)}
+a{color:var(--accent);text-decoration:none}
+
+/* toc */
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 0}
+.toc a{background:var(--fill);color:var(--text);border-radius:980px;padding:4px 12px;font-size:13px;line-height:18px}
+.toc a:hover{background:var(--fill-strong)}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:4px;border-radius:980px;padding:0 8px;font-size:13px;line-height:20px;font-weight:500;white-space:nowrap}
+.chip.qwen{background:var(--qwen-tint);color:var(--qwen)}
+.chip.rule{background:var(--fill-strong);color:var(--text-secondary)}
+.chip.net{background:var(--teal-tint);color:var(--teal)}
+.chip.vec{background:var(--purple-tint);color:var(--purple)}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+
+/* flow diagram */
+.flow{background:var(--bg-subtle);border-radius:12px;padding:24px;margin:24px 0}
+.row{display:flex;gap:12px;align-items:stretch}
+.node{background:var(--bg);border-radius:10px;padding:12px 16px;flex:1;min-width:0}
+.node .t{font-weight:600}
+.node .d{color:var(--text-secondary);font-size:13px;line-height:18px;margin-top:4px}
+.node .m{margin-top:8px;display:flex;flex-wrap:wrap;gap:4px}
+.arrow{display:flex;justify-content:center;color:var(--text-secondary);height:32px;align-items:center}
+.arrow svg{width:16px;height:16px}
+.lanes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.lane{border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.lane .lt{font-weight:600;display:flex;align-items:center;gap:8px}
+.lane .step{background:var(--bg);border-radius:8px;padding:8px 12px;font-size:13px;line-height:18px}
+.lane .step b{font-weight:600;display:block;font-size:13px}
+.lane .step .m{margin-top:4px;display:flex;flex-wrap:wrap;gap:4px}
+.lane.indigo{background:var(--indigo-tint)} .lane.indigo .lt{color:var(--indigo)}
+.lane.teal{background:var(--teal-tint)} .lane.teal .lt{color:var(--teal)}
+.lane.purple{background:var(--purple-tint)} .lane.purple .lt{color:var(--purple)}
+.lane.grey{background:var(--grey-tint)} .lane.grey .lt{color:var(--grey)}
+.vsplit{display:flex;justify-content:center;color:var(--text-secondary);font-size:13px;line-height:18px;padding:4px 0}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;color:var(--text-secondary);font-size:13px;line-height:18px;align-items:center}
+
+/* tables */
+table{border-collapse:collapse;width:100%;margin:8px 0}
+th{font-weight:500;color:var(--text-secondary);font-size:13px;line-height:18px;text-align:left;padding:8px 12px}
+td{padding:8px 12px;vertical-align:top}
+tbody tr:nth-child(odd) td{background:var(--bg-subtle)}
+tbody tr td:first-child{border-radius:8px 0 0 8px} tbody tr td:last-child{border-radius:0 8px 8px 0}
+
+/* steps */
+.stepcard{display:grid;grid-template-columns:48px 1fr;gap:16px;margin:32px 0}
+.num{width:32px;height:32px;border-radius:50%;background:var(--fill-strong);display:flex;align-items:center;justify-content:center;font-weight:600}
+.stephead{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.stephead .st{font-size:20px;line-height:28px;font-weight:600}
+.io{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.io > div{min-width:0}
+.io .lab{font-size:13px;line-height:18px;color:var(--text-secondary);margin-bottom:4px}
+.note{background:var(--bg-subtle);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:20px;color:var(--text-secondary)}
+.note b{color:var(--text);font-weight:600}
+
+/* manuscript rendering */
+.ms{font-size:17px;line-height:29px;background:var(--bg-subtle);border-radius:8px;padding:16px 24px}
+.ms sup{font-size:12px;line-height:0;color:var(--accent)}
+.hl{border-radius:4px;padding:0 2px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.hl.ok{background:var(--ok-tint)} .hl.high{background:var(--high-tint)} .hl.med{background:var(--medium-tint)}
+.verdict{font-weight:600}
+.verdict.ok{color:var(--ok-text)} .verdict.high{color:var(--high-text)} .verdict.med{color:var(--medium-text)}
+
+/* excerpt bar */
+.bar{position:relative;height:24px;background:var(--fill);border-radius:5px;margin:8px 0 4px}
+.bar span{position:absolute;top:0;bottom:0;border-radius:5px}
+.bar .e1{background:var(--ok)} .bar .e2{background:var(--high)}
+.barlab{display:flex;justify-content:space-between;font-size:13px;line-height:18px;color:var(--text-secondary)}
+
+/* cascade */
+.cascade{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.cascade .b{background:var(--bg-subtle);border-radius:8px;padding:8px 12px;font-size:13px;line-height:18px}
+.cascade .b b{display:block;font-weight:600}
+.cascade .to{color:var(--text-secondary)}
+
+/* word comment mock */
+.word{display:grid;grid-template-columns:1fr 300px;gap:16px;background:var(--bg-subtle);border-radius:12px;padding:16px}
+.page{background:var(--bg);border-radius:8px;padding:24px;font-family:"Songti SC","PingFang SC",serif;font-size:15px;line-height:26px}
+.page sup{font-size:11px;line-height:0}
+.cmt{background:var(--bg);border-radius:8px;padding:12px;font-size:13px;line-height:20px}
+.cmt .who{font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between}
+.cmt + .cmt{margin-top:8px}
+del{color:var(--high-text);text-decoration:line-through}
+ins{color:var(--ok-text);text-decoration:underline;text-decoration-color:var(--ok)}
+.anchor{background:var(--medium-tint);border-radius:4px;padding:0 2px}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.stat{background:var(--bg-subtle);border-radius:10px;padding:12px 16px}
+.stat .v{font-size:26px;line-height:34px;font-weight:600}
+.stat .l{font-size:13px;line-height:18px;color:var(--text-secondary)}
+.barsrow{display:flex;height:12px;border-radius:980px;overflow:hidden;margin:8px 0 4px}
+.barsrow span{display:block;height:100%}
+.kv{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;line-height:18px;color:var(--text-secondary)}
+.kv i{font-style:normal;display:inline-flex;align-items:center;gap:4px}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:860px){.lanes,.stats{grid-template-columns:1fr 1fr}.io,.two,.word{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<p class="sec">Clover（citecheck）流水线说明，基于 <code>backend/citecheck/pipeline.py</code> 与 2026-10-31 的一次真实体检</p>
+<h1>一篇 docx 怎样变成一份引用体检报告</h1>
+<p class="lead">稿件在本机被解析成带坐标的段落、引用标记和参考文献条目，随后四个图层并发运行：真实性核验查数据库，支持度把每条论断和被引原文交给 Qwen 判断，分布和规范以本地统计与规则为主。所有结果汇成一个 <code>Report</code> 对象，前端渲染成阅读视图，导出时问题变成 Word 批注，机械性改动变成修订。</p>
+<p class="lead">下文用演示稿《基于深度学习的目标检测研究综述》中的一句话做例子，从 XML 一路跟到 Word 批注。</p>
+
+<nav class="toc">
+  <a href="#overview">1 总览图</a>
+  <a href="#models">2 用到的模型</a>
+  <a href="#walk">3 跟着一句话走一遍</a>
+  <a href="#lanes">4 并行的另外三条线</a>
+  <a href="#report">5 产物：Report</a>
+  <a href="#export">6 导出到 Word</a>
+  <a href="#notes">7 几处值得注意的地方</a>
+</nav>
+
+<!-- ================================================================ -->
+<h2 id="overview">1 总览图</h2>
+<p class="sec">箭头表示依赖。同一行的四条泳道用 <code>asyncio.gather</code> 并发，任一条泳道出错只把该层标为 failed，其余照常产出。</p>
+
+<div class="flow">
+  <div class="row">
+    <div class="node">
+      <div class="t">输入</div>
+      <div class="d">.docx 文件；可选的文献文件夹 <code>ref/*.pdf</code>；可选的目标期刊名称（首页填写）</div>
+    </div>
+  </div>
+  <div class="arrow"><svg viewBox="0 0 16 16"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="row">
+    <div class="node">
+      <div class="t">解析 <span class="sec mono">parse/</span></div>
+      <div class="d">lxml 读 <code>word/document.xml</code>，得到段落、章节、引用标记、参考文献条目并互相连接。找不到参考文献表时才问模型列表从哪一段开始。</div>
+      <div class="m"><span class="chip rule">lxml + 正则</span><span class="chip qwen">Qwen extract（兜底）</span></div>
+    </div>
+    <div class="node">
+      <div class="t">参考文献结构化 <span class="sec mono">refs/structure.py</span></div>
+      <div class="d">每 5 条一批，模型把原始著录拆成标题、作者、年份、出处、DOI；字段必须能在原条目中找到。</div>
+      <div class="m"><span class="chip qwen">Qwen structure</span></div>
+    </div>
+    <div class="node">
+      <div class="t">文献文件夹（可选） <span class="sec mono">library/</span></div>
+      <div class="d">pypdf 扫描 PDF 抽元数据，按 DOI、标题、首作者与条目一对一连接，中间分数段交给模型做选择题。</div>
+      <div class="m"><span class="chip rule">pypdf + rapidfuzz</span><span class="chip qwen">Qwen structure（选择题）</span></div>
+    </div>
+  </div>
+  <div class="arrow"><svg viewBox="0 0 16 16"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+  <div class="lanes">
+    <div class="lane indigo">
+      <div class="lt"><span class="dot" style="background:var(--indigo)"></span>真实性 → 支持度</div>
+      <div class="step"><b>核验参考文献</b>Crossref / OpenAlex / S2 / arXiv 检索比对；灰区候选让模型裁决
+        <div class="m"><span class="chip net">公开 API</span><span class="chip qwen">Qwen judge（裁决）</span></div></div>
+      <div class="step"><b>抽取论断</b>把句中引用标记换成 ⟦mN⟧，问每个标记支撑哪一段
+        <div class="m"><span class="chip qwen">Qwen extract</span></div></div>
+      <div class="step"><b>取被引原文</b>本地 PDF → 开放全文 PDF → 摘要 → 无；全文用 BM25 + 向量 + 重排挑片段
+        <div class="m"><span class="chip vec">Qwen3-Embedding</span><span class="chip vec">Qwen3-Reranker</span></div></div>
+      <div class="step"><b>判断支持度</b>输出 label / evidence / rationale；可疑的升级复核
+        <div class="m"><span class="chip qwen">Qwen judge</span><span class="chip qwen">Qwen review</span></div></div>
+      <div class="step"><b>证据逐字校验</b>NFKC + 压缩空白 + 统一引号后子串匹配，失败降级 undetermined
+        <div class="m"><span class="chip rule">确定性</span></div></div>
+    </div>
+    <div class="lane teal">
+      <div class="lt"><span class="dot" style="background:var(--teal)"></span>引用分布</div>
+      <div class="step"><b>章节统计</b>各章引用占比、密度，对标 150 篇 arXiv 计算语言学论文的四分位区间
+        <div class="m"><span class="chip rule">本地统计</span></div></div>
+      <div class="step"><b>引用堆砌</b>一句话内去重后的文献数过多
+        <div class="m"><span class="chip rule">规则</span></div></div>
+      <div class="step"><b>引用功能</b>每段一次，给每个标记分 background / method / comparison / result / critique
+        <div class="m"><span class="chip qwen">Qwen function</span></div></div>
+      <div class="step"><b>期刊范文对标（可选）</b>有 ≥3 篇范文时，用范文统计替换 arXiv 基线
+        <div class="m"><span class="chip rule">本地统计</span><span class="chip qwen">Qwen structure / profile / function</span></div></div>
+    </div>
+    <div class="lane purple">
+      <div class="lt"><span class="dot" style="background:var(--purple)"></span>格式规范</div>
+      <div class="step"><b>规则检查</b>未被引用、编号越界、重复条目、格式混用、GB/T 类型标识、卷期页码
+        <div class="m"><span class="chip rule">规则</span></div></div>
+      <div class="step"><b>作者归属</b>“He 等人[21]”与第一作者对不上
+        <div class="m"><span class="chip rule">规则</span></div></div>
+      <div class="step"><b>错别字</b>每段一次；编辑距离 ≤2 写成修订，更大的只给批注
+        <div class="m"><span class="chip qwen">Qwen typo</span></div></div>
+      <div class="step"><b>参考文献重排</b>按首次引用顺序，最长递增子序列决定哪些条目移动
+        <div class="m"><span class="chip rule">确定性</span></div></div>
+    </div>
+    <div class="lane grey">
+      <div class="lt"><span class="dot" style="background:var(--grey)"></span>期刊评审（填了期刊才有）</div>
+      <div class="step"><b>范文池</b>参考文献里属于目标期刊的条目 + 文件夹中同刊未引 PDF；刊名认不出时做选择题
+        <div class="m"><span class="chip rule">规则</span><span class="chip qwen">Qwen structure</span></div></div>
+      <div class="step"><b>画像</b>每篇范文和稿件各读一次：数据集数、基线数、有无消融等
+        <div class="m"><span class="chip qwen">Qwen profile</span></div></div>
+      <div class="step"><b>评审</b>比较画像与四层问题，按维度给档位和两三句方向
+        <div class="m"><span class="chip qwen">Qwen overview</span></div></div>
+    </div>
+  </div>
+
+  <div class="arrow"><svg viewBox="0 0 16 16"><path d="M8 2v11M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="row">
+    <div class="node">
+      <div class="t">汇总 Report</div>
+      <div class="d">四层 findings 按段落位置排序编号 f1…fN，revisions 编号 v1…vN，落库 SQLite <code>reports</code> 表，进度通过事件流推给前端。</div>
+      <div class="m"><span class="chip rule">pydantic</span></div>
+    </div>
+    <div class="node">
+      <div class="t">前端阅读视图</div>
+      <div class="d">三窗格：侧栏图层、阅读区按坐标高亮、检查器列出问题与证据。</div>
+      <div class="m"><span class="chip rule">Electron + React</span></div>
+    </div>
+    <div class="node">
+      <div class="t">导出新 docx <span class="sec mono">export/writer.py</span></div>
+      <div class="d">findings → <code>w:comment</code> 批注；revisions → <code>w:del</code>/<code>w:ins</code> 修订。原文件不动。</div>
+      <div class="m"><span class="chip rule">lxml 改写 OOXML</span></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <span class="chip qwen">Qwen 任务名</span>调用大模型，任务名对应 <code>config.toml</code> 的 <code>[llm.models]</code>
+    <span class="chip vec">向量模型</span>检索排序
+    <span class="chip net">公开 API</span>文献数据库
+    <span class="chip rule">规则</span>不调用模型
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="models">2 用到的模型</h2>
+<p>业务代码只调用 <code>llm.client.chat_json(task, messages, Schema)</code>，按任务名查模型。判断类任务一律 <code>temperature=0</code>，输出用 pydantic 校验，失败重试一次，结果按 <code>sha256(模型名 + prompt)</code> 缓存在 SQLite。下表是当前 <code>backend/config.toml</code> 的配置。</p>
+<table>
+<thead><tr><th>任务名</th><th>当前模型</th><th>在哪一步</th><th>粒度</th></tr></thead>
+<tbody>
+<tr><td><code>structure</code></td><td>qwen3.8-flash</td><td>参考文献拆字段；PDF 连接选择题；刊名归属选择题；章节标题归类</td><td>5 条 / 次</td></tr>
+<tr><td><code>extract</code></td><td>qwen3.8-flash</td><td>论断抽取；找不到参考文献表时判断列表起点。配置里可以改走本地 mlx 的 Qwen2.5-3B，目前关闭</td><td>每个含引用的句子</td></tr>
+<tr><td><code>judge</code></td><td>qwen3.8-flash</td><td>支持度首判、细节复查、双语检索词；真实性灰区裁决</td><td>每个（论断，文献）对</td></tr>
+<tr><td><code>review</code> / <code>review_fallback</code></td><td>qwen3.8-flash</td><td>首判为 partial / unsupported，或细节复查发现冲突时复核</td><td>少数可疑对</td></tr>
+<tr><td><code>function</code></td><td>qwen3.8-flash</td><td>引用功能分类</td><td>每个含引用的段落</td></tr>
+<tr><td><code>typo</code></td><td>qwen3.8-flash</td><td>错别字</td><td>每个正文段落</td></tr>
+<tr><td><code>profile</code> / <code>overview</code></td><td>qwen3.8-flash</td><td>期刊评审的画像与评审</td><td>每篇范文 1 次 + 汇总 1 次</td></tr>
+<tr><td>向量 / 重排</td><td>Qwen3-Embedding-0.6B、Qwen3-Reranker-0.6B</td><td>全文 PDF 里给论断挑最相关的片段，和 BM25 融合</td><td>每个全文来源</td></tr>
+</tbody>
+</table>
+<div class="note"><b>云端并发与优先级。</b>所有云端调用共享一个上限 32 的优先级信号量。<code>structure</code> 排在最前，因为真实性、分布和论断配对都在等它；四层自己的调用同级先到先得；画像和评审排最后。</div>
+
+<!-- ================================================================ -->
+<h2 id="walk">3 跟着一句话走一遍</h2>
+<p>例句来自演示稿第 2 节讲 SPP-Net 的一段。原文写“快了 240 ~1020 倍”，SPP-Net 论文摘要里写的是 24–102 倍。这个错误是 <code>demo/final/injections.json</code> 有意注入的“数字放大十倍”，下面看系统怎样一步步把它找出来。</p>
+
+<div class="ms">2014 年He 等人<sup>[20]</sup>提出了空间金字塔网络( Spatial Pyramid Pooling Network，SPP-Net) 检测算法，它在CNN最后一层卷积层和全连接层之间加入SPP层(如图2所示)，使得网络能够输入任意尺度的候选区域，从而每张输入图片只需一次CNN运算，就能得到所有候选区域的特征，这使得计算量大大减少．SPP-Net的检测速率比R-CNN 快了240 ~1020 倍<sup>[20]</sup>，并打破了固定尺寸输入的束缚．</div>
+
+<!-- step 1 -->
+<div class="stepcard">
+  <div class="num">1</div>
+  <div>
+    <div class="stephead"><span class="st">解析：XML 变成带坐标的对象</span><span class="chip rule">lxml + 正则，无模型</span></div>
+    <p>docx 是一个 zip，正文在 <code>word/document.xml</code>。解析器逐个读 <code>&lt;w:r&gt;</code>，拼出段落纯文本并记住每个字符来自哪个 run；上标 run 里的 <code>[20]</code> 被识别为引用标记。参考文献表里的 <code>[20]</code> 条目由编号连到标记上。</p>
+    <div class="io">
+      <div><div class="lab">输入：document.xml 片段</div>
+<pre><span class="k">&lt;w:p&gt;</span>
+  <span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>2014 年He 等人<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+  <span class="k">&lt;w:r&gt;&lt;w:rPr&gt;</span>
+    <span class="k">&lt;w:vertAlign</span> w:val=<span class="s">"superscript"</span><span class="k">/&gt;</span>
+  <span class="k">&lt;/w:rPr&gt;&lt;w:t&gt;</span>[20]<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+  <span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>提出了空间金字塔网络…快了240 ~1020 倍<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+  <span class="k">&lt;w:r&gt;</span>…superscript…<span class="k">&lt;w:t&gt;</span>[20]<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+  <span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>，并打破了固定尺寸输入的束缚．<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+<span class="k">&lt;/w:p&gt;</span></pre>
+      </div>
+      <div><div class="lab">输出：Paragraph / CitationMarker / Reference</div>
+<pre>Paragraph {
+  id: <span class="s">"p18"</span>, section_id: <span class="s">"s2"</span>,   <span class="c">// 2 基于候选区域的…</span>
+  char_offset: <span class="n">2412</span>,
+  text: <span class="s">"2014 年He 等人[20]提出了…"</span>
+}
+CitationMarker { id: <span class="s">"m19"</span>, start: <span class="n">11</span>, end: <span class="n">15</span>,
+  raw: <span class="s">"[20]"</span>, kind: <span class="s">"superscript"</span>, ref_ids: [<span class="s">"r20"</span>] }
+CitationMarker { id: <span class="s">"m20"</span>, start: <span class="n">199</span>, end: <span class="n">203</span>,
+  raw: <span class="s">"[20]"</span>, kind: <span class="s">"superscript"</span>, ref_ids: [<span class="s">"r20"</span>] }
+Reference { id: <span class="s">"r20"</span>, label: <span class="s">"20"</span>, paragraph_id: <span class="s">"p95"</span>,
+  raw: <span class="s">"[20] HE K,ZHANG X,REN S,et al.Spatial pyramid
+       pooling in deep convolutional networks for visual
+       recognition[A].Proceedings of the European
+       Conference on Computer Vision[C].Switzerland:
+       IEEE,2014.346 -361."</span> }</pre>
+      </div>
+    </div>
+    <div class="note"><b>坐标是贯穿全程的主键。</b>之后每个论断、问题和修订都用 <code>{paragraph_id, start, end}</code> 指回这段文字，前端靠它高亮，导出时靠它切分 run 挂批注。标记识别的优先级是 Zotero / EndNote 域代码，其次上标 run，最后正则匹配 <code>[1]</code>、<code>(Smith, 2020)</code>、<code>张三等(2020)</code> 等写法。</div>
+  </div>
+</div>
+
+<!-- step 2 -->
+<div class="stepcard">
+  <div class="num">2</div>
+  <div>
+    <div class="stephead"><span class="st">参考文献结构化</span><span class="chip qwen">Qwen structure</span></div>
+    <p>正则先粗拆一遍，随后每条条目都再交给模型，每次 5 条。模型给出的字段必须能在原条目文本里找到，所以它只能重组字段，不能补写条目里没有的信息。这一步完成后，标记和条目会重新连接一次。</p>
+    <div class="io">
+      <div><div class="lab">发给模型（示意）</div>
+<pre>[1] HE K,ZHANG X,REN S,et al.Spatial pyramid pooling
+    in deep convolutional networks for visual
+    recognition[A].Proceedings of the European ...
+[2] …（同批另外 4 条）</pre></div>
+      <div><div class="lab">得到的 Reference 字段</div>
+<pre>title:   <span class="s">"Spatial pyramid pooling in deep convolutional
+          networks for visual recognition"</span>
+authors: [<span class="s">"HE K"</span>, <span class="s">"ZHANG X"</span>, <span class="s">"REN S"</span>]
+year:    <span class="n">2014</span>
+venue:   <span class="s">"Proceedings of the European Conference on
+          Computer Vision"</span>
+doi:     <span class="k">null</span>
+lang:    <span class="s">"en"</span></pre></div>
+    </div>
+  </div>
+</div>
+
+<!-- step 3 -->
+<div class="stepcard">
+  <div class="num">3</div>
+  <div>
+    <div class="stephead"><span class="st">真实性核验</span><span class="chip net">Crossref · OpenAlex · S2 · arXiv</span><span class="chip qwen">Qwen judge（只在灰区）</span></div>
+    <p>每条参考文献先并行查 Crossref、OpenAlex、Semantic Scholar，没核验上的再批量查 arXiv。候选记录按标题相似度、首作者、年份打分。标题相同但作者和年份都不同的记录视为另一篇同名文献，直接剔除。分数落在灰区的最多 3 个候选交给模型做选择题。</p>
+    <div class="io">
+      <div><div class="lab">r20 的检索结果</div>
+<pre>RefCheck {
+  ref_id: <span class="s">"r20"</span>,
+  status: <span class="s">"verified"</span>,
+  matched: {
+    source:  <span class="s">"crossref"</span>,
+    title:   <span class="s">"Spatial Pyramid Pooling in Deep
+              Convolutional Networks for Visual Recognition"</span>,
+    authors: [<span class="s">"He, Kaiming"</span>, <span class="s">"Zhang, Xiangyu"</span>, …],
+    year:    <span class="n">2015</span>,           <span class="c">// 条目写 2014，差 1 年在容差内</span>
+    venue:   <span class="s">"IEEE TPAMI"</span>,
+    doi:     <span class="s">"10.1109/tpami.2015.2389824"</span>,
+    abstract:<span class="s">"Existing deep convolutional …"</span>  <span class="c">// 下一步要用</span>
+  }
+}</pre></div>
+      <div><div class="lab">同一篇稿件里的其他结果</div>
+      <table>
+        <tbody>
+        <tr><td><span class="verdict ok">verified</span></td><td>64 条，标题、首作者、年份都对上</td></tr>
+        <tr><td><span class="verdict med">mismatch</span></td><td>[55] Szegedy 等 Rethinking the inception architecture：文中写 2012，数据库记录 2016</td></tr>
+        <tr><td><span class="verdict high">not_found</span></td><td>[7] [70] [71]：英文文献，三个必需源都正常响应且都没有匹配</td></tr>
+        <tr><td><span class="sec">unverifiable</span></td><td>[8] [10] [16] [25] [60]：中文文献查不到，只标“无法核验”，不说“不存在”</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+    <div class="note"><b>与支持度重叠运行。</b>每条文献的 RefCheck 一落定就通过 <code>on_ref</code> 回调把它的论断配对送进支持度队列，不等全部 73 条核验完。核验记录里的摘要和开放获取 PDF 链接就是下一步的原文来源。</div>
+  </div>
+</div>
+
+<!-- step 4 -->
+<div class="stepcard">
+  <div class="num">4</div>
+  <div>
+    <div class="stephead"><span class="st">论断抽取</span><span class="chip qwen">Qwen extract</span></div>
+    <p>中英文分句后，把句中的标记换成局部编号 ⟦m1⟧、⟦m2⟧，问模型每个标记支撑句子里的哪一段。返回的 <code>text</code> 必须是原句的连续子串，否则退回整句。这一步在解析完成后立即开始，不等真实性。</p>
+    <div class="io">
+      <div><div class="lab">发给模型的句子</div>
+<pre>句子：SPP-Net的检测速率比R-CNN 快了240 ~1020 倍⟦m1⟧，
+并打破了固定尺寸输入的束缚．</pre>
+<div class="lab" style="margin-top:8px">模型返回</div>
+<pre>{<span class="s">"claims"</span>: [{<span class="s">"text"</span>: <span class="s">"SPP-Net的检测速率比R-CNN 快了240 ~1020 倍"</span>,
+              <span class="s">"marker_ids"</span>: [<span class="s">"m1"</span>]}]}</pre></div>
+      <div><div class="lab">得到的两条 Claim</div>
+<pre>Claim { id: <span class="s">"c10"</span>, paragraph_id: <span class="s">"p18"</span>,
+  start: <span class="n">0</span>, end: <span class="n">72</span>, marker_ids: [<span class="s">"m19"</span>],
+  text: <span class="s">"2014 年He 等人提出了空间金字塔网络(…SPP-Net) 检测算法"</span> }
+
+Claim { id: <span class="s">"c11"</span>, paragraph_id: <span class="s">"p18"</span>,
+  start: <span class="n">167</span>, end: <span class="n">199</span>, marker_ids: [<span class="s">"m20"</span>],
+  text: <span class="s">"SPP-Net的检测速率比R-CNN 快了240 ~1020 倍"</span> }</pre></div>
+    </div>
+  </div>
+</div>
+
+<!-- step 5 -->
+<div class="stepcard">
+  <div class="num">5</div>
+  <div>
+    <div class="stephead"><span class="st">获取被引原文</span><span class="chip rule">下载 + pypdf</span><span class="chip vec">BM25 + Qwen3-Embedding + Qwen3-Reranker</span></div>
+    <p>按优先级找原文，结果记在 <code>source_kind</code> 里：</p>
+    <div class="cascade">
+      <div class="b"><b>本地 PDF</b>文献文件夹里连上的那篇</div><span class="to">→</span>
+      <div class="b"><b>开放全文</b>openAccessPdf / arXiv PDF，≤20 MB</div><span class="to">→</span>
+      <div class="b"><b>摘要</b>OpenAlex / S2 / Crossref / arXiv</div><span class="to">→</span>
+      <div class="b"><b>none</b>不问模型，直接 undetermined</div>
+    </div>
+    <p>全文较长时，切成约 3 句的窗口，BM25 与向量相似度融合排序，再用重排模型精排，拼成不超过约 2500 字符的片段，开头总带上文献开头部分。r20 这次没有拿到全文，用的是 Crossref 记录里的摘要，长度 1659 字符，<code>source_kind = "abstract"</code>。</p>
+  </div>
+</div>
+
+<!-- step 6 -->
+<div class="stepcard">
+  <div class="num">6</div>
+  <div>
+    <div class="stephead"><span class="st">判断支持度</span><span class="chip qwen">Qwen judge</span><span class="chip qwen">Qwen review</span></div>
+    <p>每个（论断，文献）对发一次请求。Prompt 里有论断、所在整句、稿件里的条目原文、同处共引的其他条目、被引文献标题和原文片段。模型按顺序判断：论断是否残缺、文献是不是论断说的那项工作、片段是否支持，最后输出 JSON。</p>
+    <div class="io">
+      <div><div class="lab">Prompt 结构（节选自 support/judge.py）</div>
+<pre>你是严谨的学术评审。判断"被引文献"是否支持"论断"。
+论断：SPP-Net的检测速率比R-CNN 快了240 ~1020 倍
+所在句子：SPP-Net的检测速率比R-CNN 快了240 ~1020 倍[20]，…
+稿件中的条目：[20] HE K,ZHANG X,REN S,et al.Spatial …
+被引文献标题：Spatial Pyramid Pooling in Deep …
+被引文献原文片段：Existing deep convolutional …（1659 字符）
+
+输出 JSON：{"label": "supported|partial|unsupported|
+undetermined", "evidence": "...", "rationale": "...",
+"off_topic": false}
+……（判断顺序与证据摘抄要求）</pre></div>
+      <div><div class="lab">c11 的模型输出</div>
+<pre>{
+  <span class="s">"label"</span>: <span class="s">"unsupported"</span>,
+  <span class="s">"evidence"</span>: <span class="s">"In processing test images, our method
+               is 24-102 × faster than the R-CNN method, …"</span>,
+  <span class="s">"rationale"</span>: <span class="s">"论断声称SPP-Net比R-CNN快240~1020倍，
+               但被引文献原文明确指出是快24-102倍
+               （24-102 ×），数值范围严重不符。"</span>,
+  <span class="s">"off_topic"</span>: <span class="k">false</span>
+}</pre>
+      <div class="lab" style="margin-top:8px">c10 的模型输出</div>
+<pre>{ <span class="s">"label"</span>: <span class="s">"supported"</span>,
+  <span class="s">"evidence"</span>: <span class="s">"The new network structure, called
+               SPP-net, can generate a fixed-length …"</span> }</pre>
+      </div>
+    </div>
+    <h4>复核级联</h4>
+    <div class="cascade">
+      <div class="b"><b>首判 judge</b>得到 label</div><span class="to">→</span>
+      <div class="b"><b>partial / unsupported</b>交 review 再判；原文是本地全文时，先用双语检索词重新挑一个更大的片段</div>
+      <div class="b"><b>supported</b>同模型再做一次细节核对：数值、名称、方向、单复数等；发现可定位的冲突也送 review</div>
+      <div class="b"><b>off_topic 但证据未定位</b>必须由 review 确认才显示为“可能引错文献”</div>
+    </div>
+    <p class="sec">review 失败时改用 review_fallback，再失败保留首判结果。当前配置里三个任务都指向 qwen3.8-flash；10 月初的 demo_report_v2 里 review 用的是 qwen3.8-max。</p>
+  </div>
+</div>
+
+<!-- step 7 -->
+<div class="stepcard">
+  <div class="num">7</div>
+  <div>
+    <div class="stephead"><span class="st">证据逐字校验</span><span class="chip rule">确定性，不可跳过</span></div>
+    <p>模型给的 evidence 和原文片段两边都做 Unicode NFKC 归一化、压缩空白、统一引号，然后做子串匹配。对 PDF 断词连字符和被拆开的拉丁词另有两层宽松匹配。定位到的位置换算回原片段坐标，存为 <code>evidence_span</code>。</p>
+    <div class="lab sec">r20 摘要（1659 字符）中两条证据的位置</div>
+    <div class="bar">
+      <span class="e1" style="left:21.9%;width:7.1%"></span>
+      <span class="e2" style="left:77.2%;width:8.7%"></span>
+    </div>
+    <div class="barlab"><span>0</span><span>1659</span></div>
+    <div class="kv" style="margin-top:8px">
+      <i><span class="dot" style="background:var(--ok)"></span>c10 证据 span [363, 480]，校验通过，supported 保留</i>
+      <i><span class="dot" style="background:var(--high)"></span>c11 证据 span [1280, 1425]，校验通过，unsupported 保留</i>
+    </div>
+    <div class="note"><b>定位失败时：</b>先让模型重答一次，要求原样摘抄连续片段或承认无法判断；仍然失败就把 label 降级为 undetermined，rationale 写“证据未能在原文中定位”。界面上能看到的每一个“支持 / 不支持”，都能在原文里找到对应的句子。</div>
+  </div>
+</div>
+
+<!-- step 8 -->
+<div class="stepcard">
+  <div class="num">8</div>
+  <div>
+    <div class="stephead"><span class="st">写成 Finding</span><span class="chip rule">规则映射</span></div>
+    <p>严重度映射：unsupported 为高，复核确认主题无关为中，partial 为低；拿不到原文的文献合并成一条低优先级提示。c11 生成：</p>
+<pre>Finding {
+  id: <span class="s">"f9"</span>, layer: <span class="s">"support"</span>, severity: <span class="s">"high"</span>,
+  anchor: { paragraph_id: <span class="s">"p18"</span>, start: <span class="n">167</span>, end: <span class="n">199</span> },
+  title:  <span class="s">"被引文献不支持这条论断"</span>,
+  detail: <span class="s">"依据：论断声称SPP-Net比R-CNN快240~1020倍，但被引文献原文明确指出是快24-102倍（24-102 ×），数值范围严重不符。
+           建议：核对论断与文献内容，考虑删除引用或修改论断。"</span>,
+  refs: [<span class="s">"r20"</span>]
+}</pre>
+    <p>在阅读视图里，这段文字以红色柔和底色高亮：</p>
+    <div class="ms">…这使得计算量大大减少．<span class="hl high">SPP-Net的检测速率比R-CNN 快了240 ~1020 倍</span><sup>[20]</sup>，并打破了固定尺寸输入的束缚．</div>
+  </div>
+</div>
+
+<!-- ================================================================ -->
+<h2 id="lanes">4 并行的另外三条线</h2>
+<p>同一时刻，分布、规范和期刊评审三条泳道也在处理这篇稿件。下面各举本次体检中的真实输出。</p>
+
+<h3 style="color:var(--teal)">引用分布</h3>
+<div class="two">
+  <div>
+    <h4>引用功能分类 <span class="chip qwen">Qwen function</span></h4>
+    <p>以段落为单位，标记改写为 ⟦m1⟧ ⟦m2⟧ 后发给模型。p18 的结果：</p>
+<pre>m19（He 等人[20]提出了 SPP-Net）  → background
+m20（快了 240~1020 倍[20]）      → comparison</pre>
+    <p class="sec">全篇的功能构成会和基准语料比较，用于报告里的分布图。</p>
+  </div>
+  <div>
+    <h4>章节占比与堆砌 <span class="chip rule">本地统计</span></h4>
+    <p>引言 13 次引用，占全篇 12.0%，低于 arXiv 计算语言学 150 篇论文的常见范围 14.9% 至 32.5%，生成 f2（低）。稿件为中文、基准为英文，所以只比占比，不比密度。</p>
+    <p>第 1 节有一句同时引用了 [2] 至 [7] 共 6 篇，生成 f3“这句话同时引用了 6 篇文献”（中）。</p>
+  </div>
+</div>
+
+<h3 style="color:var(--purple)">格式规范</h3>
+<table>
+<thead><tr><th>检查</th><th>本次实例</th><th>产物</th></tr></thead>
+<tbody>
+<tr><td>错别字 <span class="chip qwen">Qwen typo</span></td><td>p22“产生<del>侯</del><ins>候</ins>选区域”，编辑距离 1</td><td>Revision（typo）</td></tr>
+<tr><td>错别字，改动较大</td><td>p10“直接对预测的目标物体进行回归”，模型建议整段改写</td><td>只给 Finding f4“疑似笔误，请确认”</td></tr>
+<tr><td>编号越界 <span class="chip rule">规则</span></td><td>p62 出现 [74]，参考文献只有 73 条</td><td>Finding f22（高）</td></tr>
+<tr><td>重复条目</td><td>[72] 与 [43] 都是 SSD: single shot multibox detector</td><td>Finding f39（中）</td></tr>
+<tr><td>未被引用</td><td>[73] 在正文中没有任何标记指向它</td><td>Finding f40（中）</td></tr>
+<tr><td>GB/T 类型标识</td><td>10 条只写了载体 [OL]，应写 [EB/OL] 或 [J/OL]</td><td>Finding f29（低）</td></tr>
+<tr><td>作者归属 <span class="chip rule">规则</span></td><td>“He 等人[21]提出了 Fast R-CNN”，[21] 第一作者是 GIRSHICK R</td><td>Finding f11（中）。支持度模型也独立判为 unsupported（f10）</td></tr>
+<tr><td>重排 <span class="chip rule">确定性</span></td><td>[68]、[69] 首次引用顺序颠倒</td><td>2 条 ref_reorder + 4 条 marker_renumber</td></tr>
+</tbody>
+</table>
+<p class="sec">错别字的模型输出要经过一串过滤才留下：原片段必须在段落中恰好出现一次，不改数字，不碰引用标记，改动所在三字窗口在全文出现两次以上就视为作者的术语而丢弃。</p>
+
+<h3 style="color:var(--grey)">期刊评审</h3>
+<p>用户在首页填了《电子学报》。范文池从参考文献和文献文件夹中收集该刊论文，本次只找到 2 篇，其中 0 篇拿到了可统计的原文，不满 3 篇的门槛，对标关闭，报告写明：</p>
+<div class="note">参考文献和文献文件夹中找到 2 篇《电子学报》论文，其中 0 篇能完成统计，至少需要 3 篇才能对标。可以在文献文件夹放入该刊近期发表的论文后重新体检。</div>
+<p>范文足够时：主题最接近的几篇范文和稿件各由 <code>profile</code> 读一次，抽出画像（稿件一侧只发标题、摘要、章节标题和图表题注）；分布层改用范文统计做基线；四层结束后 <code>overview</code> 对比画像与全部问题，按维度给档位。四层结束时报告先打开，评审完成后原地更新。</p>
+
+<!-- ================================================================ -->
+<h2 id="report">5 产物：Report</h2>
+<p>四条泳道汇合后组装成一个 pydantic <code>Report</code>，前后端共用这套结构（前端类型从 JSON Schema 生成）。本次体检的规模：</p>
+<div class="stats">
+  <div class="stat"><div class="v">149</div><div class="l">段落，7 个章节</div></div>
+  <div class="stat"><div class="v">96</div><div class="l">引用标记</div></div>
+  <div class="stat"><div class="v">73</div><div class="l">参考文献</div></div>
+  <div class="stat"><div class="v">78</div><div class="l">论断，107 个支持度判断</div></div>
+  <div class="stat"><div class="v">40</div><div class="l">问题（批注）</div></div>
+  <div class="stat"><div class="v">18</div><div class="l">修订：12 错别字，6 重排</div></div>
+  <div class="stat"><div class="v">374</div><div class="l">次云端调用，全部 qwen3.8-flash</div></div>
+  <div class="stat"><div class="v">30.1 s</div><div class="l">总耗时，约 5.1 万输入 token</div></div>
+</div>
+
+<h4>真实性 73 条</h4>
+<div class="barsrow">
+  <span style="width:87.7%;background:var(--ok)"></span>
+  <span style="width:1.4%;background:var(--medium)"></span>
+  <span style="width:4.1%;background:var(--high)"></span>
+  <span style="width:6.8%;background:var(--grey)"></span>
+</div>
+<div class="kv"><i><span class="dot" style="background:var(--ok)"></span>verified 64</i><i><span class="dot" style="background:var(--medium)"></span>mismatch 1</i><i><span class="dot" style="background:var(--high)"></span>not_found 3</i><i><span class="dot" style="background:var(--grey)"></span>unverifiable 5</i></div>
+
+<h4>支持度 107 个判断</h4>
+<div class="barsrow">
+  <span style="width:65.4%;background:var(--ok)"></span>
+  <span style="width:4.7%;background:var(--medium)"></span>
+  <span style="width:7.5%;background:var(--high)"></span>
+  <span style="width:22.4%;background:var(--grey)"></span>
+</div>
+<div class="kv"><i><span class="dot" style="background:var(--ok)"></span>supported 70</i><i><span class="dot" style="background:var(--medium)"></span>partial 5</i><i><span class="dot" style="background:var(--high)"></span>unsupported 8</i><i><span class="dot" style="background:var(--grey)"></span>undetermined 24，其中 20 个拿不到原文</i></div>
+<p class="sec">原文来源：全文 73 个、摘要 14 个、无 20 个。</p>
+
+<h4>40 个问题按图层</h4>
+<table>
+<thead><tr><th>图层</th><th>高</th><th>中</th><th>低</th><th>例子</th></tr></thead>
+<tbody>
+<tr><td><span style="color:var(--indigo)">真实性</span></td><td>3</td><td>1</td><td>5</td><td>[7] 未找到；[55] 年份不一致</td></tr>
+<tr><td><span style="color:var(--blue)">支持度</span></td><td>8</td><td>4</td><td>6</td><td>SPP-Net 倍数；VGG 论文被当作 SSD 结构的出处；ImageNet 论文被当作 COCO 的出处。4 条中等是规范层作者归属规则产出的，挂在支持度图层下</td></tr>
+<tr><td><span style="color:var(--teal)">引用分布</span></td><td>0</td><td>5</td><td>1</td><td>引言占比偏低；5 句引用堆砌</td></tr>
+<tr><td><span style="color:var(--purple)">格式规范</span></td><td>1</td><td>2</td><td>4</td><td>[74] 越界；重复条目；[OL] 标识</td></tr>
+</tbody>
+</table>
+
+<!-- ================================================================ -->
+<h2 id="export">6 导出到 Word</h2>
+<p><code>export/writer.py</code> 复制原 docx 的 zip，只改写 <code>document.xml</code> 和 <code>comments.xml</code> 等必要部件。先按所有锚点边界一次切分 run，再依次写入行内修订、参考文献移动、批注。支持度批注末尾附上被引原文，作者在 Word 里就能对照。</p>
+<div class="word">
+  <div class="page">
+    …这使得计算量大大减少．<span class="anchor">SPP-Net的检测速率比R-CNN 快了240 ~1020 倍</span><sup>[20]</sup>，并打破了固定尺寸输入的束缚．
+    <br><br>
+    虽然Fast R-CNN 有效地加快了检测速率，但仍然依赖于选择性搜索算法<sup>[18]</sup>来产生<del>侯</del><ins>候</ins>选区域．
+  </div>
+  <div>
+    <div class="cmt">
+      <div class="who"><span>Clover</span><span class="sec">批注</span></div>
+      被引文献不支持这条论断<br>
+      依据：论断声称SPP-Net比R-CNN快240~1020倍，但被引文献原文明确指出是快24-102倍（24-102 ×），数值范围严重不符。<br>
+      建议：核对论断与文献内容，考虑删除引用或修改论断。<br>
+      <span class="sec">被引原文（[20]，摘要）：In processing test images, our method is 24-102 × faster than the R-CNN method, …</span>
+    </div>
+    <div class="cmt">
+      <div class="who"><span>Clover</span><span class="sec">修订</span></div>
+      删除“侯”，插入“候”。作者在 Word 里接受或拒绝。
+    </div>
+  </div>
+</div>
+<div class="io">
+  <div><div class="lab">批注在 XML 里的样子（示意）</div>
+<pre><span class="k">&lt;w:commentRangeStart</span> w:id=<span class="s">"9"</span><span class="k">/&gt;</span>
+<span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>SPP-Net的检测速率比R-CNN 快了240 ~1020 倍<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+<span class="k">&lt;w:commentRangeEnd</span> w:id=<span class="s">"9"</span><span class="k">/&gt;</span>
+<span class="k">&lt;w:r&gt;&lt;w:commentReference</span> w:id=<span class="s">"9"</span><span class="k">/&gt;&lt;/w:r&gt;</span></pre></div>
+  <div><div class="lab">修订在 XML 里的样子（示意）</div>
+<pre><span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>来产生<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+<span class="k">&lt;w:del</span> w:author=<span class="s">"Clover"</span><span class="k">&gt;</span>
+  <span class="k">&lt;w:r&gt;&lt;w:delText&gt;</span>侯<span class="k">&lt;/w:delText&gt;&lt;/w:r&gt;</span>
+<span class="k">&lt;/w:del&gt;</span>
+<span class="k">&lt;w:ins</span> w:author=<span class="s">"Clover"</span><span class="k">&gt;</span>
+  <span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>候<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span>
+<span class="k">&lt;/w:ins&gt;</span>
+<span class="k">&lt;w:r&gt;&lt;w:t&gt;</span>选区域．<span class="k">&lt;/w:t&gt;&lt;/w:r&gt;</span></pre></div>
+</div>
+<div class="note"><b>边界。</b>40 个问题全部成为批注，18 个修订全部成为 Track Changes。“240 ~1020 倍”本身不会被改成“24~102 倍”，因为这是实质性问题，改不改由作者决定。LaTeX 稿件走同一套四层，导出时问题写成源码里的 <code>%</code> 注释，错别字放进 <code>clover-revisions.patch</code>。</div>
+
+<!-- ================================================================ -->
+<h2 id="notes">7 几处值得注意的地方</h2>
+<table>
+<tbody>
+<tr><td style="width:220px"><b>模型只在需要语义判断的地方出现</b></td><td>标记识别、统计、格式规则、重排和证据校验都是确定性代码。模型负责拆条目、抽论断、判支持度、分功能、找错字，每次输出都要过 pydantic 校验和后续规则过滤。</td></tr>
+<tr><td><b>依赖链决定了耗时</b></td><td>本次各层耗时：规范 0.3 s，真实性 19.5 s，分布 20.8 s，支持度 29.9 s。支持度排在最后，因为它要等真实性拿到摘要或 PDF 链接，并且调用次数最多。</td></tr>
+<tr><td><b>两条独立路径互相印证</b></td><td>“He 等人[21]提出了 Fast R-CNN”同时被作者归属规则（f11，不需要原文）和支持度模型（f10，读了原文）判出。</td></tr>
+<tr><td><b>拿不到原文是主要的空白</b></td><td>107 个判断中有 20 个因为没有原文而无法判断，集中在 13 篇文献上（多为中文文献和付费期刊）。把这些 PDF 放进 <code>ref/</code> 文件夹后，本地原文会优先于联网来源。</td></tr>
+<tr><td><b>中文稿件对标英文基线</b></td><td>没有填写期刊或范文不足时，分布层用 150 篇 arXiv 计算语言学论文做基线。语言不同时只比占比，并且综述类章节（canonical=other）不产生分布问题。</td></tr>
+</tbody>
+</table>
+
+<p class="sec" style="margin-top:48px">数据来源：SQLite <code>reports</code> 表中 id 为 63ee5cd5ed844e11 的报告；源文件 <code>demo/final/演示稿/基于深度学习的目标检测研究综述.docx</code>；模型配置 <code>backend/config.toml</code>。批注与修订的 XML 为简化示意，实际导出还包含日期、缩写和 rPr 等属性。</p>
+
+</div>
+</body>
+</html>

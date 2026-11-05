@@ -114,6 +114,48 @@ def _out_of_scope(text: str, old: str, new: str, start: int, end: int) -> bool:
     return False
 
 
+_LATIN_TOKEN = re.compile(r"[A-Za-z][A-Za-z'’\-]*")
+
+
+def _count_word(w: str, doc_text: str) -> int:
+    return len(re.findall(rf"(?<![A-Za-z]){re.escape(w)}(?![A-Za-z])", doc_text))
+
+
+def _overreach(doc_text: str, text: str, old: str, new: str,
+               start: int, end: int) -> bool:
+    """Latin-script edits the clean-corpus ground truth found wrong every
+    time (demo/testset/ground_truth/summary.md §3). Each rule was checked
+    against the labels: it removes only false alarms, and none of the
+    injected typos.
+
+    - a pure insertion of a word or symbol ('' -> 'X'): LaTeX drops \\ref
+      and math when rendering and the model fills the gap; adding words
+      is writing, not fixing a slip. A letter added inside a word stays;
+    - a case-only change in an all-lowercase paragraph ('dani alves' ->
+      'Dani Alves'): a lower-cased dataset sample quoted verbatim;
+    - an author's term: a non-lowercase word the manuscript uses twice or
+      more, replaced by a word it never uses ('Rewon' -> 'Rezwon',
+      'Table' -> 'Tables' after a dropped \\ref). Lowercase words are
+      exempt, since real-word slips ('expect' for 'except') live there."""
+    if _CJK_CHAR.search(old + new):
+        return False
+    if not old.strip():
+        joined = (start > 0 and text[start - 1].isalpha()
+                  and end < len(text) and text[end].isalpha())
+        return not joined
+    if old != new and old.casefold() == new.casefold():
+        letters = [c for c in text if c.isalpha()]
+        upper = sum(c.isupper() for c in letters)
+        return upper < 0.01 * max(len(letters), 1)
+    old_w = [w for w in _LATIN_TOKEN.findall(old)
+             if len(w) >= 4 and w not in _LATIN_TOKEN.findall(new)]
+    new_w = [w for w in _LATIN_TOKEN.findall(new)
+             if w not in _LATIN_TOKEN.findall(old)]
+    return (bool(old_w) and bool(new_w) and not old.islower()
+            and all(_count_word(w, doc_text) >= 2 for w in old_w)
+            and all(_count_word(w, doc_text) == 0 for w in new_w))
+
+
 def _minimise(
     original: str, correction: str
 ) -> tuple[str, str, int, int]:
@@ -198,6 +240,8 @@ async def check_typos(
                 continue
             a_start, a_end = s0 + i, s0 + j
             if _out_of_scope(p.text, old, new, a_start, a_end):
+                continue
+            if _overreach(doc_text, p.text, old, new, a_start, a_end):
                 continue
             # a Chinese "typo" whose surroundings recur elsewhere in the
             # manuscript is the author's term (决策化模型 ×10, 可分流性 ×7),

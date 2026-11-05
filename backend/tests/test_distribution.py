@@ -181,6 +181,33 @@ async def test_stacking_negative(tmp_path):
 
 
 @pytest.mark.asyncio
+async def test_stacking_enumeration_not_reported(tmp_path):
+    # each item carries its own citation: five refs in the sentence, but
+    # no cluster of five (ground truth: enumerations are normal writing)
+    text = ("Datasets include TriviaQA [1], SQuAD [2], NewsQA [3], "
+            "SearchQA [4] and MS MARCO [5].")
+    marks = [(1, f"[{i}]", [i]) for i in range(1, 6)]
+    p = mk_parsed([("Intro", "intro", [text])], marks, n_refs=5)
+    d, findings = await run_distribution(
+        p, bench_path=bench_json(tmp_path), classify=False)
+    assert not any("同时引用" in f.title for f in findings)
+    # the per-sentence statistic is unchanged
+    assert d.sentence_refs.share_ge5 == 1.0
+
+
+@pytest.mark.asyncio
+async def test_stacking_adjacent_markers_cluster(tmp_path):
+    text = "Prior work [1], [2], [3][4], [5] studied this."
+    marks = [(1, "[1]", [1]), (1, "[2]", [2]), (1, "[3]", [3]),
+             (1, "[4]", [4]), (1, "[5]", [5])]
+    p = mk_parsed([("Intro", "intro", [text])], marks, n_refs=5)
+    _, findings = await run_distribution(
+        p, bench_path=bench_json(tmp_path), classify=False)
+    f = [x for x in findings if "同时引用了 5 篇文献" in x.title]
+    assert len(f) == 1
+
+
+@pytest.mark.asyncio
 async def test_uncited_claim_positive(tmp_path):
     text = "Previous studies have shown that scaling helps. We verify it."
     p = mk_parsed([("Intro", "intro", [text])], [], n_refs=1)

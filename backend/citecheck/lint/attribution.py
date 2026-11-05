@@ -4,7 +4,8 @@
 ——与被引文献的第一作者对不上，是张冠李戴（引用编号错位）的零证据信号：
 不需要拿到被引文献的原文就能报警。
 
-只在归属词紧邻单个数字引用标记、且该句只含这一个标记时判定；中文归属
+只在归属词紧邻单个数字引用标记、且该句只引这一篇文献时判定（同一篇
+可以出现多次）；中文归属
 只认"等人"（"…数据等[5]"里的"等"不是归属），拉丁名后的"等"可以。跨
 文种（中文名对英文作者、拼音对中文作者）不判。实质性判断 → 只出批注，
 永不生成修订。
@@ -100,9 +101,12 @@ def check_attribution(parsed) -> list[Finding]:
         sentences = split_sentences(text)
         every = all_by_para.get(pid, [])
         for mk in marks:
+            # the sentence cites this one work only: a single marker, or
+            # repeats of it ("BN by Glorot et al. [17] ... following [17]")
             alone = any(
                 s.start <= mk.start < s.end
-                and sum(1 for o in every if s.start <= o.start < s.end) == 1
+                and {r for o in every if s.start <= o.start < s.end
+                     for r in o.ref_ids} == set(mk.ref_ids)
                 for s in sentences)
             if not alone:
                 continue

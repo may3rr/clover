@@ -217,6 +217,34 @@ export default function Running({
         ? ovStep
         : (step ?? '正在检查')
 
+  // bottom-right toast mirrors this screen while Clover is not in front;
+  // the main process decides whether it actually shows
+  const toastDone = finished || !!error
+  const toastStep = error
+    ? '检查未完成，点击查看原因'
+    : finished
+      ? '检查完成，点击查看报告'
+      : stepText
+  useEffect(() => {
+    if (overrideLayers) return
+    window.citecheck?.setToast?.({
+      visible: true,
+      file: fileName,
+      step: toastStep,
+      pct,
+      done: toastDone,
+    })
+  }, [overrideLayers, fileName, toastStep, pct, toastDone])
+  const doneRef = useRef(false)
+  doneRef.current = toastDone
+  useEffect(
+    () => () => {
+      // leaving mid-run (重新选择文件): no toast; a finished run lingers
+      if (!doneRef.current) window.citecheck?.setToast?.({ visible: false })
+    },
+    []
+  )
+
   return (
     <div
       className="relative h-full flex flex-col items-center justify-center"

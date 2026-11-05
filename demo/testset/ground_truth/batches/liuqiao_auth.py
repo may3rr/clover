@@ -1,0 +1,8 @@
+L('405434a9e6','false_alarm','other','参考文献[11] 为赵军等 2011《开放式文本信息抽取》中文信息学报 25(6)；匹配到 Etzioni 2010 Open Information Extraction 技术报告 doi:10.21236/ada538482','中文文献的英文译名与另一篇英文文献同名，核验错配了记录。',sub='wrong_record_match')
+L('78f9d54e3d','false_alarm','db_record_error','OpenAlex W2129842875 作者列表缺 Mausam；ACL Anthology D12-1048 作者为 Mausam, Schmitz, Bart, Soderland, Etzioni','单名作者 Mausam 在 OpenAlex 记录中丢失，稿件著录正确。')
+L('98c30d078a','debatable','name_or_title_normalization','ACL Anthology W12-3010：Alan Akbik, Alexander Löser. KrakeN: N-ary Facts in Open Information Extraction, AKBC-WEKEX 2012','文献真实存在，报不存在是误报；但稿件把作者名写成 Alan A、Alexander L，确有著录错误，值得作者核对。',sev=False)
+L('3c14f1f6a7','true_issue','real_metadata_error','Computational Linguistics 21(2):203-225 作者顺序为 Grosz, Joshi, Weinstein；稿件写作 Grosz B J, Weinstein S, Joshi A K','稿件作者顺序与原刊不符，属真实著录错误，影响轻微。')
+L('8dbfa5e5ca','true_issue','real_metadata_error','Computational Linguistics 20(4):535-561 作者为 Shalom Lappin, Herbert J. Leass；稿件写作 Lappin S, Shalom H J','稿件把第二作者误写为 Shalom H J，属真实著录错误。')
+L('a381521c0f','false_alarm','grey_literature','MUC-7 会议录 1998 由 LDC/NIST 发布，无 DOI，Crossref 与 OpenAlex 收录不全','MUC-7 任务定义文档真实存在，属灰色文献。')
+L('6107f4b7bc','false_alarm','db_record_error','W3C RDB2RDF XG 报告 2009 作者 Sahoo, Halb, Hellmann, Idehen, Thibodeau, Auer, Sequeda, Ezzat；OpenAlex 记录只列 3 位','数据库记录作者不全，稿件著录正确。')
+L('42e6ce3509','false_alarm','grey_literature','XLore 发表于 ISWC 2013 Posters & Demos，CEUR-WS Vol-1035','真实存在的海报论文，收录于 CEUR，数据库未覆盖。')

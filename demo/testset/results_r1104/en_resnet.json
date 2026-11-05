@@ -1,0 +1,379 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2007，数据库记录为 2011']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": false,
+   "detail": "labels=['partial'] offtopic=0 findings=0",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 8,
+  "fn": 1,
+  "fp_new": 0,
+  "pre_existing": 26,
+  "tn": 133,
+  "excluded": 4,
+  "claims": 113,
+  "refs": 53,
+  "support_definitive": 104
+ },
+ "lenient": [
+  1.0,
+  0.8888888888888888,
+  0.9929577464788732
+ ],
+ "strict": [
+  0.23529411764705882,
+  0.8888888888888888,
+  0.8392857142857143
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c1"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Deepconvolutionalneuralnetworks"
+  },
+  {
+   "unit": [
+    "claim",
+    "c102"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Theclsandreglayersarebothinaper-classfrom,incontrastto"
+  },
+  {
+   "unit": [
+    "claim",
+    "c104"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "revision:typo",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Toavoidnegativesamplesbeingdominate,8anchorsarerandomlysampl"
+  },
+  {
+   "unit": [
+    "claim",
+    "c105"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Following,wefirstperform“oracle”testingusingthegroundtruthcl"
+  },
+  {
+   "unit": [
+    "claim",
+    "c106"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "VGG’spaperreportsacenter-croperrorof33.1%(Table)usinggroundt"
+  },
+  {
+   "unit": [
+    "claim",
+    "c14"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Shortcutconnectionsarethoseskippingoneormorelayers."
+  },
+  {
+   "unit": [
+    "claim",
+    "c23"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Forvectorquantization,encodingresidualvectors"
+  },
+  {
+   "unit": [
+    "claim",
+    "c28"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Practicesandtheoriesthatleadtoshortcutconnections"
+  },
+  {
+   "unit": [
+    "claim",
+    "c29"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Anearlypracticeoftrainingmulti-layerperceptrons(MLPs)istoadd"
+  },
+  {
+   "unit": [
+    "claim",
+    "c33"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "presentshortcutconnectionswithgatingfunctions"
+  },
+  {
+   "unit": [
+    "claim",
+    "c34"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Concurrentwithourwork,“highwaynetworks”presentshortcutconnec"
+  },
+  {
+   "unit": [
+    "claim",
+    "c41"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Theimageisresizedwithitsshortersiderandomlysampledin[256,480"
+  },
+  {
+   "unit": [
+    "claim",
+    "c59"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "IthasfewerparametersthanotherdeepandthinnetworkssuchasFitNet"
+  },
+  {
+   "unit": [
+    "claim",
+    "c60"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "IthasfewerparametersthanotherdeepandthinnetworkssuchasFitNet"
+  },
+  {
+   "unit": [
+    "claim",
+    "c73"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "RoIpoolingisperformedbeforeconv5_1"
+  },
+  {
+   "unit": [
+    "claim",
+    "c78"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "TheMSCOCOdataset"
+  },
+  {
+   "unit": [
+    "claim",
+    "c8"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "Manyothernontrivialvisualrecognitiontasks"
+  },
+  {
+   "unit": [
+    "claim",
+    "c92"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "TheresultonPASCALVOC2012is10pointshigherthanthepreviousstate"
+  },
+  {
+   "unit": [
+    "claim",
+    "c95"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Inthecolumnof“LOCerroronGTclass”"
+  },
+  {
+   "unit": [
+    "claim",
+    "c98"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Weadoptthe“per-classregression”(PCR)strategy"
+  },
+  {
+   "unit": [
+    "ref",
+    "r3"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "W.L.Briggs,S.F.McCormick,etal.AMultigridTutorial.Siam,2000."
+  },
+  {
+   "unit": [
+    "ref",
+    "r48"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "A.VedaldiandB.Fulkerson.VLFeat:Anopenandportablelibraryofcom"
+  },
+  {
+   "unit": [
+    "span",
+    "p108",
+    83,
+    238
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thebaselinearchitecturesarethesameastheaboveplainnets,expect"
+  },
+  {
+   "unit": [
+    "span",
+    "p498",
+    92,
+    184
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thesystem“baseline+++”includeboxrefinement,context,andmulti-"
+  },
+  {
+   "unit": [
+    "span",
+    "p595",
+    177,
+    269
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thesystem“baseline+++”includeboxrefinement,context,andmulti-"
+  },
+  {
+   "unit": [
+    "span",
+    "p674",
+    176,
+    368
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Butwenoticethatonthisdataset,oneimageusuallycontainsasingled"
+  }
+ ]
+}

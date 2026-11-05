@@ -8,6 +8,7 @@ call counting live here. No business module imports openai/mlx directly.
 from __future__ import annotations
 
 import asyncio
+import time
 import heapq
 import json
 import logging
@@ -164,7 +165,7 @@ def _record_usage(model: str, usage: Any) -> None:
 
 def _provider_for(route: str) -> str:
     if route == "local":
-        return "mlx-local"
+        return local.provider()
     host = urlparse(get_settings().llm.cloud.base_url).hostname or "cloud"
     # Qwen endpoints (official DashScope or a qianwen-branded gateway) all
     # bill as Alibaba Bailian in the usage view
@@ -261,21 +262,44 @@ def _ensure_json_word(messages: list[dict]) -> list[dict]:
     return [{"role": "system", "content": "只输出 JSON。"}] + messages
 
 
+def _transient(e: Exception) -> bool:
+    """Errors worth waiting out: the network, a timeout, rate limiting or
+    a server-side failure. Bad requests and auth errors are not."""
+    import openai
+    if isinstance(e, (openai.APIConnectionError, openai.APITimeoutError,
+                      openai.RateLimitError, openai.InternalServerError)):
+        return True
+    status = getattr(e, "status_code", None)
+    return isinstance(status, int) and status >= 500
+
+
 async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
     client, sem = _get_cloud()
     settings = get_settings()
-    try:
-        async with sem.slot(_PRIORITY.get(task, 2)):
-            resp = await client.chat.completions.create(
-                model=model,
-                messages=_ensure_json_word(messages),
-                temperature=settings.llm.temperature,
-                response_format={"type": "json_object"},
-                extra_body={"enable_thinking": False},
-            )
-    except Exception as e:
-        log.warning("cloud call failed model=%s: %s", model, _err_desc(e))
-        raise
+    budget = settings.llm.cloud.retry_seconds
+    started = time.monotonic()
+    delay = 2.0
+    while True:
+        try:
+            async with sem.slot(_PRIORITY.get(task, 2)):
+                resp = await client.chat.completions.create(
+                    model=model,
+                    messages=_ensure_json_word(messages),
+                    temperature=settings.llm.temperature,
+                    response_format={"type": "json_object"},
+                    extra_body={"enable_thinking": False},
+                )
+            break
+        except Exception as e:
+            waited = time.monotonic() - started
+            if not _transient(e) or waited + delay > budget:
+                log.warning("cloud call failed model=%s: %s", model, _err_desc(e))
+                raise
+            # back off outside the semaphore: a waiting call holds no slot
+            log.info("cloud call retry in %.0fs model=%s: %s",
+                     delay, model, _err_desc(e))
+            await asyncio.sleep(delay)
+            delay = min(delay * 2, 60.0)
     _record_usage(model, resp.usage)
     _log_usage(
         "cloud", task, model,

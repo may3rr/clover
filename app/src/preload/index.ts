@@ -24,6 +24,24 @@ export interface CitecheckApi {
   rendererReady(): void
   /** Menu enablement, e.g. 导出到 Word only on the report screen. */
   setMenuState(s: { exportEnabled: boolean; exportLabel?: string }): void
+  /** Bottom-right progress toast (main process decides when it shows). */
+  setToast(s: {
+    visible: boolean
+    file?: string
+    step?: string
+    pct?: number
+    done?: boolean
+  }): void
+  onToast(
+    cb: (s: {
+      visible: boolean
+      file?: string
+      step?: string
+      pct?: number
+      done?: boolean
+    }) => void
+  ): () => void
+  toastClick(): void
   /** Debug hooks — used by shots/E2E modes only. */
   shotsMode: boolean
   /** Built-in sample data instead of the backend (settings usage/config)
@@ -66,6 +84,13 @@ const api: CitecheckApi = {
   },
   rendererReady: () => ipcRenderer.send('citecheck:renderer-ready'),
   setMenuState: (s) => ipcRenderer.send('citecheck:menu-state', s),
+  setToast: (s) => ipcRenderer.send('citecheck:toast-state', s),
+  onToast: (cb) => {
+    const h = (_e: unknown, s: Parameters<typeof cb>[0]) => cb(s)
+    ipcRenderer.on('citecheck:toast', h)
+    return () => ipcRenderer.off('citecheck:toast', h)
+  },
+  toastClick: () => ipcRenderer.send('citecheck:toast-click'),
   shotsMode: !!process.env.CITECHECK_SHOTS,
   sampleData: !!process.env.CITECHECK_SHOTS,
   e2eFile: process.env.CITECHECK_E2E || null,

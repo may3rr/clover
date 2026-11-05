@@ -92,6 +92,22 @@ def test_multi_marker_sentence_skipped():
     assert check_attribution(parsed) == []
 
 
+def test_same_ref_repeated_in_sentence_fires():
+    # ResNet demo author_swap: two markers in one sentence, both [17]
+    text = ("We adopt batch normalization (BN) by Glorot et al.[5] right "
+            "after each convolution, following [5].")
+    p1 = Paragraph(id="p1", section_id="s1", text=text, char_offset=0)
+    marks = [CitationMarker(id=f"m{k}", paragraph_id="p1", start=i,
+                            end=i + 3, raw="[5]", kind="numeric",
+                            ref_ids=["r5"])
+             for k, i in ((1, text.index("[5]")), (2, text.rindex("[5]")))]
+    parsed = SimpleNamespace(
+        paragraphs=[p1], markers=marks,
+        references=[Reference(id="r5", raw="[5] x", authors=["Ioffe S"])])
+    fs = check_attribution(parsed)
+    assert len(fs) == 1 and fs[0].refs == ["r5"]
+
+
 def test_collective_noun_skipped():
     p = _parsed("该方法借鉴了已有方法等人[5]的思路。", ["王大明"])
     assert check_attribution(p) == []

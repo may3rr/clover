@@ -1,0 +1,18 @@
+P='zh_papers/zhaoyangyang_tod/manuscript.pdf'
+L('a8fe8314a9','true_issue','real_miscitation',P+' p24「其中零次学习[36]和单例学习是迁移学习的特例」；参考文献 p27「[36] Chen Y N, Hakkani-Tür D, Tür G, et al. End-to-end memory networks with knowledge carryover for multi-turn spoken language understanding」','零次学习的论断引用了记忆网络论文，原刊引错。')
+L('e7d899bdd9','debatable','co_citation_partial',P+'「例如具有条件随机场层的双向长短记忆网络(Bi-LSTM+ CRF)[37-40]」；[40] Hakkani-Tür et al. 2016 摘要为 bi-directional RNN-LSTM 多领域联合语义框架解析','[40] 是双向 LSTM 序列标注但不含 CRF 层，成组概括不精确。',sev=False)
+L('3f5a9cc747','true_issue','real_miscitation',P+' p6「Chen等人[58]提出知识引导的结构注意网络(K-SAN)」；参考文献 p27「[58] Mihaylov T, Frank A. Knowledgeable reader: Enhancing cloze-style reading comprehension with external commonsense knowledge」','K-SAN 出自 Chen et al. 2016，原刊引成 Knowledgeable Reader，作者归属报警与支持度报警都成立。')
+L('27d2ea7a63','false_alarm','partial_overstrict',P+'「Wang等人[72]和Sun等人[73]随后提出了可以计算整个ASR和NLU的N-Best列表分数的方法」；[73] Sun et al. 2014 generalized rule based tracker 以 SLU N-best 置信度为输入构造规则函数','DSTC 规则跟踪器正是对 N-best 假设打分，综述的转述大体成立，判不支持过严。',sev=False)
+L('69946a5d57','false_alarm','partial_overstrict','同 27d2ea7a63','同上。',sel='被引文献不支持',sev=False)
+L('69946a5d57','false_alarm','conversion_artifact',P+' p7「1996年,Pulman[71]」','空格来自转换。',sel='Pul man')
+L('69946a5d57','debatable','real_wording',P+' p7「Pulman[71]发现出跟踪多个对话状态的好处」','原刊措辞别扭，不是错别字。',sel='「出」')
+for u in ['5e5e9d7617','eca3436c92']:
+    L(u,'true_issue','real_miscitation',P+' p9「网络排序(Web-style Ranking)[76]」；参考文献 p28「[76] DeVault D, Stone M. Managing ambiguities across utterances in dialogue」','Web-style ranking 是 Williams 2014 的工作，原刊引成 DeVault & Stone 2003。',sel='f32')
+    L(u,'debatable','co_citation_partial',P+' p9「如最大熵模型(MEM)[83]」；[83] Williams 2013 Multi-domain learning and generalization in dialog state tracking 摘要只讲多领域学习','摘要未提最大熵，需全文核对该文分类器形式，暂列可商榷。',sel='f31',sev=False)
+    L(u,'true_issue','real_miscitation','同上','支持度标签对应 [76] 或 [83] 的不支持判断。',sel='label:unsupported')
+L('3dcc74625c','false_alarm','conversion_artifact',P+' p9 文本层为「Mrki\'c等人[91]」，印刷为 Mrkšić，变音符号在文本层丢失','作者名变音符号被拆坏，归属规则据此误报。')
+L('9648d3ef70','true_issue','real_miscitation',P+' p12「对话策略采用GP-SARSA算法[116]训练」；参考文献 p29「[116] Graves A, Jaitly N, Mohamed A. Hybrid speech recognition with deep bidirectional LSTM」','GP-SARSA 是 Gašić 等人的强化学习算法，原刊引成语音识别论文。')
+L('cf12c6432a','false_alarm','conversion_artifact',P+' p13 文本层为「Cuayhuitl等人[125]」，印刷体为 Cuayáhuitl','重音字母在文本层丢失，归属比对失败。')
+L('e8b8f5bf3b','false_alarm','parse_error',P+' p14 公式「高斯后验分布N(μi,σi²)」，上标 2 被识别为引用 [2]','公式上标当成引用标记，指向 ELIZA。',sev=False)
+L('ccdd6a6c91','true_issue','real_miscitation',P+' p14「变分信息最大化探索(VIME)[132]的内在奖励」；参考文献 p30「[132] Blundell C, et al. Weight uncertainty in neural networks」；参考文献表中无 Houthooft et al. VIME','VIME 出自 Houthooft et al. 2016，原刊引成 Bayes by Backprop。')
+L('c0d8c724da','false_alarm','conversion_artifact',P+' p17 文本层「Duek等人[163]」，印刷为 Dušek','š 在文本层丢失，归属规则误报。')

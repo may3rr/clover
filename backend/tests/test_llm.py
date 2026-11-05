@@ -177,3 +177,54 @@ def test_priority_semaphore_orders_waiters():
         await asyncio.wait_for(sem.acquire(2), 0.1)
 
     asyncio.run(run())
+
+
+@pytest.mark.asyncio
+async def test_cloud_call_retries_transient_errors(monkeypatch):
+    import httpx
+    import openai
+    from types import SimpleNamespace
+    from citecheck.llm import client as cl
+
+    calls = {"n": 0}
+    req = httpx.Request("POST", "https://example.invalid")
+
+    class Completions:
+        async def create(self, **kw):
+            calls["n"] += 1
+            if calls["n"] < 3:
+                raise openai.APIConnectionError(request=req)
+            return SimpleNamespace(
+                usage=None,
+                choices=[SimpleNamespace(message=SimpleNamespace(content="{}"))])
+
+    fake = SimpleNamespace(chat=SimpleNamespace(completions=Completions()))
+    sem = cl.PrioritySemaphore(1)
+    monkeypatch.setattr(cl, "_get_cloud", lambda: (fake, sem))
+    slept = []
+
+    async def no_sleep(s):
+        slept.append(s)
+    monkeypatch.setattr(cl.asyncio, "sleep", no_sleep)
+    assert await cl._cloud_call("m", [{"role": "user", "content": "json"}], "judge") == "{}"
+    assert calls["n"] == 3 and slept == [2.0, 4.0]
+
+
+@pytest.mark.asyncio
+async def test_cloud_call_does_not_retry_bad_request(monkeypatch):
+    import httpx
+    import openai
+    from types import SimpleNamespace
+    from citecheck.llm import client as cl
+
+    req = httpx.Request("POST", "https://example.invalid")
+    resp = httpx.Response(400, request=req)
+
+    class Completions:
+        async def create(self, **kw):
+            raise openai.BadRequestError("bad", response=resp, body=None)
+
+    fake = SimpleNamespace(chat=SimpleNamespace(completions=Completions()))
+    monkeypatch.setattr(cl, "_get_cloud", lambda: (fake, cl.PrioritySemaphore(1)))
+    with pytest.raises(openai.BadRequestError):
+        await cl._cloud_call("m", [{"role": "user", "content": "json"}], "judge")

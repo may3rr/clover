@@ -1,0 +1,1277 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2011，数据库记录为 2015']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=0 findings=2",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 9,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 106,
+  "tn": 358,
+  "excluded": 4,
+  "claims": 198,
+  "refs": 242,
+  "support_definitive": 164
+ },
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.0782608695652174,
+  1.0,
+  0.7758985200845666
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c101"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "revision:typo",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "POMDP等统计模型目前已被实验证明了能比基于人工规则的方法和MDP更有效地应对噪音环境及语言和语言理解等问题，产生具有"
+  },
+  {
+   "unit": [
+    "claim",
+    "c11"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Joachims提出使用SVM解决分类问题，在面对高维空间和过拟合时，具有较强的稳健性，但是其性能的优劣过于依赖对参数和"
+  },
+  {
+   "unit": [
+    "claim",
+    "c124"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Zhou等人采用基于LSTM的编码器-解码器结构来结合问题信息，语义槽值和对话动作类型来生成更具有信息性的答案"
+  },
+  {
+   "unit": [
+    "claim",
+    "c126"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "基于对抗生成网络（GenerativeAdversarialNetwork，GAN）的文本可控的对话生成解决自然文本的离"
+  },
+  {
+   "unit": [
+    "claim",
+    "c128"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "使用神经网络的模板的模型"
+  },
+  {
+   "unit": [
+    "claim",
+    "c129"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "又有不可控的风险"
+  },
+  {
+   "unit": [
+    "claim",
+    "c13"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "文献运用卷积神经网络模型（ConvolutionalNeuralNetworks，CNN）将查询向量表示为分类特征"
+  },
+  {
+   "unit": [
+    "claim",
+    "c130"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "目前工业界的对话系统的常规的方法仍然依赖于全面使用手工制作调整规则模板"
+  },
+  {
+   "unit": [
+    "claim",
+    "c138"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "通常情况下，基于检索的模型无法处理过长的语句，而生成模型可能产生不一致或无意义的回复"
+  },
+  {
+   "unit": [
+    "claim",
+    "c145"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "用于对话生成的神经模型"
+  },
+  {
+   "unit": [
+    "claim",
+    "c153"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "语义槽和特征也可能发生相应改变，而这个过程需要耗费大量的人力"
+  },
+  {
+   "unit": [
+    "claim",
+    "c157"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Wen等人认为面向特定域的对话系统一直难以应用Seq2Seq模型解决方案的关键点在于无法将大量的领域信息建模到模型中，这"
+  },
+  {
+   "unit": [
+    "claim",
+    "c162"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "先前的在进行对话时，要对对话状态进行表方法"
+  },
+  {
+   "unit": [
+    "claim",
+    "c163"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "虽然已有使用Seq2Seq的模型来研究构建面向任务的对话系，但他们的方法还在初步阶段，在任务完成统或响应生成方面表现不佳"
+  },
+  {
+   "unit": [
+    "claim",
+    "c165"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "与先前的方法相比，TSCP参数更少且训练速度更快，在大规模数据训练的基础上其任务完成度、语言质量和效率都显著优于最先进的"
+  },
+  {
+   "unit": [
+    "claim",
+    "c17"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "线性统计方法主要依靠手工制定任务资源，开发成本高"
+  },
+  {
+   "unit": [
+    "claim",
+    "c171"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "William等人提出混合编码网络（HybridCodeNetworks，HCN），通过使用LSTM来避免状态跟踪的繁琐"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "revision:typo",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "相比之下，RNN模型及其变体，如长短期记忆网络（LongShort-TeamMemory，LSTM）、门控制循环单元（G"
+  },
+  {
+   "unit": [
+    "claim",
+    "c181"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "revision:typo",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "目前任务型对话系统常用的评估方法包括基于语料库的方题的对话（例如，购买正确的电影票、找到合适的餐馆等）"
+  },
+  {
+   "unit": [
+    "claim",
+    "c182"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "和对话产生的成本，即对话的轮次"
+  },
+  {
+   "unit": [
+    "claim",
+    "c183"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "revision:typo",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "大量实践表，训练语料的质量和对话系统生成内容的明质量紧密相关"
+  },
+  {
+   "unit": [
+    "claim",
+    "c186"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Dhingra等人在实践中经常观察到，在为真实用户提供服务时，用户模拟器由于过拟合不能达到很好的效果．"
+  },
+  {
+   "unit": [
+    "claim",
+    "c187"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "由于模拟用户与人类用户之间存在差异，因此通常需要人类用户对对话系统进行测试，以便更加可靠地评估其指标"
+  },
+  {
+   "unit": [
+    "claim",
+    "c191"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "可以利用目前不足量的数据产生更多具有同等价值的数据弥补训练数据的不足和利用非对话语料数据来增加训练数据"
+  },
+  {
+   "unit": [
+    "claim",
+    "c192"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "数据增强技术可以利用目前不足量的数据产生更多具有同等价值的数据弥补训练数据的不足和利用非对话语料数据来增加训练数据．"
+  },
+  {
+   "unit": [
+    "claim",
+    "c194"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "迁移学习通过利用源领域中的可复用的知识，并将其移植到目标领域作为目标领域训练数据的一部分来帮助学习和训练目标领域．"
+  },
+  {
+   "unit": [
+    "claim",
+    "c195"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "其中零次学习和单例学习是迁移学习的特例，也被经常用于多领域之间的快速迁移任务．"
+  },
+  {
+   "unit": [
+    "claim",
+    "c23"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "例如具有条件随机场层的双向长短记忆网络（Bi-LSTM+CRF）"
+  },
+  {
+   "unit": [
+    "claim",
+    "c29"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为避免这些问题，一种常用的方法是利用N最优假设列表（N-besthypotheselist）来输出最有可能的N个当前的用"
+  },
+  {
+   "unit": [
+    "claim",
+    "c33"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "0数据集而言处理更加困难，主要表现在它的标准答案不再是依赖于篇章的某个连续片段，且多轮对话的指代消解问题是另一项新挑战"
+  },
+  {
+   "unit": [
+    "claim",
+    "c37"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:正文作者归属与文献作者不一致，可能引错了文献",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Chen等人提出知识引导的结构注意网络（K-SAN）方法来避免该问题，利用先验知识作为指导，以结合非平面拓扑结构，并为不"
+  },
+  {
+   "unit": [
+    "claim",
+    "c40"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "谷歌AI团队提出BERT（BidirectionalEncoderRepresentationfromTransform"
+  },
+  {
+   "unit": [
+    "claim",
+    "c45"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "1996年，Pulman发现出跟踪多个对话状态的好处"
+  },
+  {
+   "unit": [
+    "claim",
+    "c46"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Sun等人随后提出了可以计算整个ASR和NLU的N-Best列表分数的方法"
+  },
+  {
+   "unit": [
+    "claim",
+    "c47"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "1996年，Pulman发现出跟踪多个对话状态的好处，Wang等人和Sun等人随后提出了可以计算整个ASR和NLU的N-"
+  },
+  {
+   "unit": [
+    "claim",
+    "c51"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "目前，基于判别式模型展现出更为有利的优势，它把DST当作分类任务，结合深度学习等方法进行自动特征提取，从而对对话状态进行"
+  },
+  {
+   "unit": [
+    "claim",
+    "c53"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "还可以结合深度学习例如深度神经网络"
+  },
+  {
+   "unit": [
+    "claim",
+    "c54"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "除了手写规则定义对话状态，还可以结合深度学习例如深度神经网络将对话历史信息抽象成一个固定维的特征向量用于训练分类器，如最"
+  },
+  {
+   "unit": [
+    "claim",
+    "c55"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "除此之外，将马尔可夫模型（MarkovModel，MM）、CRF、RNN模型将提取的特征用于序列建模．"
+  },
+  {
+   "unit": [
+    "claim",
+    "c58"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "2017年，Mrki'c等人提出了神经信念跟踪模型（NeuralBeliefTracker，NBT），通过建立代表性学"
+  },
+  {
+   "unit": [
+    "claim",
+    "c63"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Kim等人提出了APID算法来解决该问题"
+  },
+  {
+   "unit": [
+    "claim",
+    "c64"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "AggreVATe算法也可以最小化专家成本"
+  },
+  {
+   "unit": [
+    "claim",
+    "c67"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为此，Deepmind提出的DQN结合了Q学习的价值估计方法和深度模型较强的拟合效果，同时结合了记忆重播（MemoryR"
+  },
+  {
+   "unit": [
+    "claim",
+    "c75"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为此，受Dyna-Q框架和深度Dyna-Q（DeepDyna-Q，DDQ）框架（该方法对应于图2（c））的启发，Su等人"
+  },
+  {
+   "unit": [
+    "claim",
+    "c78"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "编码器是一个双向长短期记忆网络（Bi-directionalLongShort-TermMemoryNetwork，Bi"
+  },
+  {
+   "unit": [
+    "claim",
+    "c79"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "对话策略采用GP-SARSA算法"
+  },
+  {
+   "unit": [
+    "claim",
+    "c81"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为了解决上述问题，Peng等人、Cuayhuitl等人和Budzianowski等人都使用分层强化学习（Hierarc"
+  },
+  {
+   "unit": [
+    "claim",
+    "c84"
+   ],
+   "alarms": [
+    "norms:正文引用找不到对应的参考文献条目"
+   ],
+   "text": "q=γt-t0rte+γt-tmaxg′∈#Q（st1，g′；θe）（19）"
+  },
+  {
+   "unit": [
+    "claim",
+    "c89"
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "Cuayhuitl等人提出了另一种多域对话策略学习方法，称为NDQN（NetworkofDQN，NDQN）．"
+  },
+  {
+   "unit": [
+    "claim",
+    "c91"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Lipton等人提出了BBQ网络（Bayesian-By-BackpropNetworks），BBQ网络是DQN的一种变"
+  },
+  {
+   "unit": [
+    "claim",
+    "c92"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "每个权重ωi从一个高斯后验分布$（i，σi"
+  },
+  {
+   "unit": [
+    "claim",
+    "c96"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "变分信息最大化探索（VariationalInformationMaximizingExploration，VIME）"
+  },
+  {
+   "unit": [
+    "ref",
+    "r107"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[107]LakshminarayananAS,SharmaS,RavindranB.Dynamicframeskipd"
+  },
+  {
+   "unit": [
+    "ref",
+    "r13"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[13]WeinbergerKQ,BlitzerJ,SaulLK.Distancemetriclearningforla"
+  },
+  {
+   "unit": [
+    "ref",
+    "r156"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[156]MairesseF,Gaic'M,JurˇcekF,etal.Phrase-basedstatistical"
+  },
+  {
+   "unit": [
+    "ref",
+    "r176"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[176]RusV,CaiZ,GraesserAC.Evaluationinnaturallanguagegenerat"
+  },
+  {
+   "unit": [
+    "ref",
+    "r179"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[179]SerbanIV,LoweR,HendersonP,etal.Asurveyofavailablecorpor"
+  },
+  {
+   "unit": [
+    "ref",
+    "r18"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[18]HashemiHB,AsiaeeA,KraftR.Queryintentdetectionusingconvol"
+  },
+  {
+   "unit": [
+    "ref",
+    "r189"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[189]MinskyM.Societyofmind:Aresponsetofourreviews.Artificial"
+  },
+  {
+   "unit": [
+    "ref",
+    "r224"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[224]WatanabeT,ArakiM,DoshitaS.Evaluatingdialoguestrategiesu"
+  },
+  {
+   "unit": [
+    "ref",
+    "r230"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[230]SinghS,LitmanD,KearnsM,etal.Optimizingdialoguemanagemen"
+  },
+  {
+   "unit": [
+    "ref",
+    "r237"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[237]LiptonZ,LiX,GaoJ,etal.BBQ-networks:Efficientexploration"
+  },
+  {
+   "unit": [
+    "ref",
+    "r239"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[239]RoemmeleM,BejanCA,GordonAS.Choiceofplausiblealternative"
+  },
+  {
+   "unit": [
+    "ref",
+    "r25"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[25]LaffertyJD,MccallumA,PereiraFCN.Conditionalrandomfields:"
+  },
+  {
+   "unit": [
+    "ref",
+    "r72"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[72]WangZ,LemonO.Asimpleandgenericbelieftrackingmechanismfor"
+  },
+  {
+   "unit": [
+    "ref",
+    "r77"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[77]YoungS,Gaic'M,KeizerS,etal.Thehiddeninformationstatemod"
+  },
+  {
+   "unit": [
+    "ref",
+    "r80"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[80]HendersonM.Machinelearningfordialogstatetracking:Areview"
+  },
+  {
+   "unit": [
+    "ref",
+    "r81"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[81]BohusD,RudnickyA.Ak-hypotheses+otherbeliefupdatingmodel/"
+  },
+  {
+   "unit": [
+    "ref",
+    "r86"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[86]LeeS,EskenaziM.Recipeforbuildingrobustspokendialogstatet"
+  },
+  {
+   "unit": [
+    "ref",
+    "r95"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[95]RossS,BagnellD.Efficientreductionsforimitationlearning//"
+  },
+  {
+   "unit": [
+    "ref",
+    "r96"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "[96]RossS,GordonGJ,BagnellJA.No-regretreductionsforimitation"
+  },
+  {
+   "unit": [
+    "span",
+    "p115",
+    0,
+    27
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "训练时间快意图识别和槽填充联合建模，简化了NLU模块；"
+  },
+  {
+   "unit": [
+    "span",
+    "p116",
+    44,
+    69
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "不能记忆太前或者太后的内容，因为存在梯度爆炸或消失"
+  },
+  {
+   "unit": [
+    "span",
+    "p134",
+    132,
+    183
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "为此，一些基于常识知识图谱的对话模型被陆续提出[48-50]来帮助机器理解比字面上含义更深层次的理解．"
+  },
+  {
+   "unit": [
+    "span",
+    "p139",
+    387,
+    518
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "最近，百度提出了知识增强的语义表示模型ERNIE（EnhancedRepresentationfromKnowledge"
+  },
+  {
+   "unit": [
+    "span",
+    "p144",
+    53,
+    105
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "DST以当前的动作un、前n-1轮的对话状态和相应的系统动作作为输入，输出其对当前对话状态St的估计．"
+  },
+  {
+   "unit": [
+    "span",
+    "p16",
+    381,
+    447
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "本文对任务型对话系统进行了更全面地调研，将最新的研究进展和热点进行归纳和梳理，希望对对话系统的进一步研究具有指导意义，具"
+  },
+  {
+   "unit": [
+    "span",
+    "p171",
+    0,
+    38
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "相关参数需要人工编写制定，无法根数据分布进行学习仅仅可以建模简单的依赖关系；"
+  },
+  {
+   "unit": [
+    "span",
+    "p191",
+    0,
+    44
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "需要精确建模所有特征之间的依赖系，而完整的建模和优化计算代价巨大需要大量的标注训练数据；"
+  },
+  {
+   "unit": [
+    "span",
+    "p191",
+    44,
+    66
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "由于可能存在梯度消失或梯度爆炸题，很难去训练"
+  },
+  {
+   "unit": [
+    "span",
+    "p282",
+    42,
+    76
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "在DDQ的基础上，利用判别器区控制模拟数据的质量，这使得对话策略能进"
+  },
+  {
+   "unit": [
+    "span",
+    "p320",
+    345,
+    377
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "最后上下文建模和语义解码向量经过softmax层产生最终预测．"
+  },
+  {
+   "unit": [
+    "span",
+    "p332",
+    218,
+    248
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "RL=（Si，Ai）in=1分别对应一个专家示例集合!E"
+  },
+  {
+   "unit": [
+    "span",
+    "p348",
+    27,
+    68
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "因此，强化学习智能体（agent）①通过与未知环境交互在线学习策略成为一种常用方．"
+  },
+  {
+   "unit": [
+    "span",
+    "p379",
+    0,
+    52
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "奖励模型R（·）被描述为一个高斯过程，对每一个输入点，估计任务成功率和不确定性p（y|d，!），其中!"
+  },
+  {
+   "unit": [
+    "span",
+    "p384",
+    0,
+    14
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Lm（s0：t）=烅（17）"
+  },
+  {
+   "unit": [
+    "span",
+    "p386",
+    25,
+    115
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "作者采用分层强化学习方法学习了两个Q函数，分别θe和θi由参数化：在子目标中进行选择的高级Q*（s，g；θe）函数和选择"
+  },
+  {
+   "unit": [
+    "span",
+    "p404",
+    0,
+    88
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "θ={（μi，ρi）}id=1（23）每个权重ωi从一个高斯后验分布$（i，σi[2]）中抽样，μ为了保证所有的σi保留"
+  },
+  {
+   "unit": [
+    "span",
+    "p405",
+    0,
+    34
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "σi=log（1+exp（ρi））（24）将σi参数化，并给!维"
+  },
+  {
+   "unit": [
+    "span",
+    "p406",
+    0,
+    29
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "θ*=argminθKL[q（ω|θ）‖p（ω|!）]"
+  },
+  {
+   "unit": [
+    "span",
+    "p414",
+    11,
+    92
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "在对话系统中，虽然用户可能对于对话系统所在的垂直领域比较熟悉，一些超出领域（Out-Of-Domian，OOD）的话语，"
+  },
+  {
+   "unit": [
+    "span",
+    "p417",
+    11,
+    74
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "目前的人机对话系统，例如googleNow、Alexas、思必驰、出门问问等，都存在一个普遍的缺点：人机对话总是仅仅关注"
+  },
+  {
+   "unit": [
+    "span",
+    "p425",
+    121,
+    153
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "对于表面实现模块，使用n-gram语言模型随机生成每一个对话．"
+  },
+  {
+   "unit": [
+    "span",
+    "p426",
+    276,
+    350
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "将该模型应用于IT解答数据集和含有大量噪音的电影字幕数据集上，能够克服一些一般大型数据集的噪声，并从中提取知识和特征，可"
+  },
+  {
+   "unit": [
+    "span",
+    "p426",
+    494,
+    568
+   ],
+   "alarms": [
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "Duek等人[163]发现，在对话中，说话者受对方之前话语的影响，并倾向于对方的说话方式、重用词汇以及句法结构，这种潜"
+  },
+  {
+   "unit": [
+    "span",
+    "p466",
+    0,
+    25
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "需要很多语义对齐处理，拓展性差需要大量的语料支持；"
+  },
+  {
+   "unit": [
+    "span",
+    "p466",
+    25,
+    54
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "不能考虑上下文信息，导致回复上下文无关需要大量的语料支持；"
+  },
+  {
+   "unit": [
+    "span",
+    "p518",
+    169,
+    210
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "如果模型可以访问并利用大规模的知识常识和背景知识就可以理解对话，从而更恰当地响应．"
+  },
+  {
+   "unit": [
+    "span",
+    "p533",
+    28,
+    36
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "难以集合知识库；"
+  },
+  {
+   "unit": [
+    "span",
+    "p596",
+    323,
+    381
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "RNN之后经过密连接层和softmax层，将输出的动作模板的数量与动作掩码点乘并进行规范化，就得到了下一步的动作．"
+  },
+  {
+   "unit": [
+    "span",
+    "p598",
+    594,
+    695
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "由于常识数量巨大，非任务型对话系统已有利用外部存储，模块来帮助系统更接近地模仿人类对话的模型[49]但目前进行实验的问题"
+  },
+  {
+   "unit": [
+    "span",
+    "p7",
+    1229,
+    1400
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thereareusedintheopenfieldscenariosandcanhandleawidevarietyo"
+  },
+  {
+   "unit": [
+    "span",
+    "p8",
+    0,
+    10
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "roblemsWe"
+  },
+  {
+   "unit": [
+    "span",
+    "p9",
+    253,
+    474
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Andwenotonlyanalyzeandcomparetherepresentativealgorithmsford"
+  },
+  {
+   "unit": [
+    "span",
+    "p95",
+    6,
+    57
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "局部提取特征能力强结合了单词之间的上下文信息，可以更好的得到文本中的长依赖关系可以容纳任意上下文信息；"
+  },
+  {
+   "unit": [
+    "span",
+    "p981",
+    499,
+    572
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "高效地融合领域知识不但要克服上述的挑战，而且还要一整套知识工程的方法，因此如何引入领域知识和构建高质量的知识图谱是未来对"
+  }
+ ]
+}

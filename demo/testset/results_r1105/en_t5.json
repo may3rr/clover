@@ -1,0 +1,622 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2009，数据库记录为 2013']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 8,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 48,
+  "tn": 237,
+  "excluded": 3,
+  "claims": 157,
+  "refs": 135,
+  "support_definitive": 135
+ },
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.14285714285714285,
+  1.0,
+  0.8361774744027304
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c107"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "forsurveysofthisfieldseee.g."
+  },
+  {
+   "unit": [
+    "claim",
+    "c110"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Earlyresultsontransferlearningfortextclassificationtasksadvo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c113"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "suggestedfine-tuninganadditionallayeraftereachepochoftrainin"
+  },
+  {
+   "unit": [
+    "claim",
+    "c119"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Thefindingthatamulti-taskmodelisoutperformedbyseparatemodels"
+  },
+  {
+   "unit": [
+    "claim",
+    "c123"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "The“bitterlesson”ofmachinelearningresearcharguesthatgeneralm"
+  },
+  {
+   "unit": [
+    "claim",
+    "c13"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "TheprimarybuildingblockoftheTransformerisself-attention"
+  },
+  {
+   "unit": [
+    "claim",
+    "c132"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Fortaskswithlongoutputsequences,wefoundimprovedperformancefr"
+  },
+  {
+   "unit": [
+    "claim",
+    "c136"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "thebest-performingvariantofALBERT"
+  },
+  {
+   "unit": [
+    "claim",
+    "c139"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "HumanperformanceonSQuADisestimatedat82.30and91.22fortheExact"
+  },
+  {
+   "unit": [
+    "claim",
+    "c14"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Self-attentionisavariantofattention"
+  },
+  {
+   "unit": [
+    "claim",
+    "c15"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "TheoriginalTransformerconsistedofanencoder-decoderarchitectu"
+  },
+  {
+   "unit": [
+    "claim",
+    "c16"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "IthasrecentlyalsobecomecommontousemodelsconsistingofasingleT"
+  },
+  {
+   "unit": [
+    "claim",
+    "c17"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "IthasrecentlyalsobecomecommontousemodelsconsistingofasingleT"
+  },
+  {
+   "unit": [
+    "claim",
+    "c25"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "foreaseofimplementationofbothmodelparallelismanddataparallel"
+  },
+  {
+   "unit": [
+    "claim",
+    "c36"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Sentenceacceptabilityjudgment(CoLA)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c37"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Sentimentanalysis(SST-2)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c38"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Paraphrasing/sentencesimilarity(MRPC"
+  },
+  {
+   "unit": [
+    "claim",
+    "c39"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Naturallanguageinference(MNLI"
+  },
+  {
+   "unit": [
+    "claim",
+    "c4"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Thisapproachhasrecentlybeenusedtoobtainstate-of-the-artresul"
+  },
+  {
+   "unit": [
+    "claim",
+    "c40"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Coreferenceresolution(WNLIandWSC)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c41"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Wordsensedisambiguation(WIC)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c42"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "GLUEandSuperGLUEeachcompriseacollectionoftextclassificationt"
+  },
+  {
+   "unit": [
+    "claim",
+    "c49"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "weusethesametrainingdataas(i.e.NewsCommentaryv13,CommonCrawl"
+  },
+  {
+   "unit": [
+    "claim",
+    "c5"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "neuralnetworks,whichhavebeenshowntoexhibitremarkablescalabil"
+  },
+  {
+   "unit": [
+    "claim",
+    "c53"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Specifically,themodelistrainedwithamaximumlikelihoodobjectiv"
+  },
+  {
+   "unit": [
+    "claim",
+    "c6"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Thissynergyhasresultedinagreatdealofrecentworkdevelopingtran"
+  },
+  {
+   "unit": [
+    "claim",
+    "c62"
+   ],
+   "alarms": [
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "classificationandspanprediction"
+  },
+  {
+   "unit": [
+    "claim",
+    "c63"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "WhilemanymodernapproachestotransferlearningforNLPuseaTransfo"
+  },
+  {
+   "unit": [
+    "claim",
+    "c69"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "WeuseSentencePiecetoencodetextasWordPiecetokens"
+  },
+  {
+   "unit": [
+    "claim",
+    "c70"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Preliminaryworkthatappliedthetransferlearningparadigmofpre-t"
+  },
+  {
+   "unit": [
+    "claim",
+    "c71"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "However,ithasrecentlybeenshownthat“denoising”objectives(also"
+  },
+  {
+   "unit": [
+    "claim",
+    "c72"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "BERT’s“maskedlanguagemodeling”objectiveandthe“worddropout”re"
+  },
+  {
+   "unit": [
+    "claim",
+    "c75"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "ForCNN/DailyMail,wefindtheperformanceofmodelsontheROUGE-1-F,"
+  },
+  {
+   "unit": [
+    "claim",
+    "c87"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献"
+   ],
+   "text": "itshistoricuseasapre-trainingobjective"
+  },
+  {
+   "unit": [
+    "claim",
+    "c89"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "thesharedencoder-decoderapproachwithadenoisingobjective"
+  },
+  {
+   "unit": [
+    "claim",
+    "c91"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Thishasledtothedevelopmentofawidevarietyofpre-trainingobject"
+  },
+  {
+   "unit": [
+    "claim",
+    "c93"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Finally,wealsoconsiderabasicdeshufflingobjectiveasusede.g.in"
+  },
+  {
+   "unit": [
+    "ref",
+    "r10"
+   ],
+   "alarms": [
+    "norms:这条参考文献与前面的条目重复"
+   ],
+   "text": "Bojar,Ondřej,Chatterjee,Rajen,Federmann,Christian,Haddow,Bar"
+  },
+  {
+   "unit": [
+    "ref",
+    "r2"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "Anil,Rohan,Gupta,Vineet,Koren,Tomer,Singer,Yoram.Memory-Effi"
+  },
+  {
+   "unit": [
+    "ref",
+    "r42"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "Huang,Yanping,Cheng,Yonglong,Chen,Dehao,Lee,HyoukJoong,Ngiam"
+  },
+  {
+   "unit": [
+    "ref",
+    "r86"
+   ],
+   "alarms": [
+    "authenticity:文献信息与本地原文不一致",
+    "status:mismatch"
+   ],
+   "text": "Pilehvar,MohammadTaher,Camacho-Collados,Jose.WIC:10,000examp"
+  },
+  {
+   "unit": [
+    "span",
+    "p112",
+    1551,
+    1845
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Further,forthemodelsizesweconsider,thenumberofparametersinth"
+  },
+  {
+   "unit": [
+    "span",
+    "p1289",
+    0,
+    151
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Originalinput:Sentence:itconfirmsfincher’sstatusasafilmmaker"
+  },
+  {
+   "unit": [
+    "span",
+    "p1298",
+    86,
+    135
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Choice1:Manycitizensrelocatedtothecapitol."
+  },
+  {
+   "unit": [
+    "span",
+    "p269",
+    1151,
+    1265
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Thisapproachtakesasequenceoftokens,shufflesit,andthenusesthe"
+  },
+  {
+   "unit": [
+    "span",
+    "p523",
+    540,
+    648
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Weinvestigateatwhatpointusingasmallerpre-trainingdatasetspos"
+  },
+  {
+   "unit": [
+    "span",
+    "p652",
+    0,
+    124
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Examples-proportionalmixingAmajorfactorinhowquicklyamodelwil"
+  },
+  {
+   "unit": [
+    "span",
+    "p95",
+    766,
+    986
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Sinceweperformearlystoppingbyselectingthebest-performingchec"
+  }
+ ]
+}

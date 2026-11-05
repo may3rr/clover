@@ -1,0 +1,415 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 1996，数据库记录为 2000']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=2",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 9,
+  "fn": 0,
+  "fp_new": 2,
+  "pre_existing": 27,
+  "tn": 142,
+  "excluded": 4,
+  "claims": 92,
+  "refs": 85,
+  "support_definitive": 51
+ },
+ "lenient": [
+  0.8181818181818182,
+  1.0,
+  0.9869281045751634
+ ],
+ "strict": [
+  0.23684210526315788,
+  1.0,
+  0.8388888888888889
+ ],
+ "fp_units": [
+  {
+   "unit": [
+    "ref",
+    "r10"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[10]LingXiao,WeldD.S.Fine-grainedentityrecognition[C]??Proco"
+  },
+  {
+   "unit": [
+    "ref",
+    "r68"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[68]LaoNi,MitchellT,CohenWW.Randomwalkinferenceandlearningin"
+  }
+ ],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c17"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Carlson等人提出了一种基于Bootstrap算法的半监督学习方法，能够自动进行实体关系建模"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "陈立玮等人针对弱监督学习中标注数据不完全可靠的问题，基于Bootstrapping算法设计思想，提出了一种协同训练方法，"
+  },
+  {
+   "unit": [
+    "claim",
+    "c23"
+   ],
+   "alarms": [
+    "revision:typo",
+    "support:正文作者归属与文献作者不一致，可能引错了文献"
+   ],
+   "text": "Mausam等人针对上述系统均无法识别非动词性关系的局限，通过引入上下文分析技术，提出了一个支持非动词性关系抽取的OIL"
+  },
+  {
+   "unit": [
+    "claim",
+    "c24"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Banko等人提出了一种基于条件随机场的关系抽取模型（H-CRF），当目标数据集中拥有的关系数量不大，而且有预先定义好的"
+  },
+  {
+   "unit": [
+    "claim",
+    "c27"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "McCallum提出采用后期关系推理的方法，提高OIE系统对隐含实体关系的发现能力"
+  },
+  {
+   "unit": [
+    "claim",
+    "c41"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Shen等人提出的Linden模型则同时考虑到了文本相似性和主题一致性，基于维基百科和Wordnet知识库，取得了当前最"
+  },
+  {
+   "unit": [
+    "claim",
+    "c43"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Ratinov等人通过统计维基百科中的实体出现的频率以此作为实体推荐时排序的依据"
+  },
+  {
+   "unit": [
+    "claim",
+    "c52"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Pantel等人基于Harris提出的分布相似性模型，提出了一个新的实体相似性测度模型，称为术语相似度（termsimi"
+  },
+  {
+   "unit": [
+    "claim",
+    "c68"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "为了解决主题模型不适用于短文本的问题，提出了一个基于单词共现网络（termco-occurrencenetwork）的主"
+  },
+  {
+   "unit": [
+    "claim",
+    "c70"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "借助这2个工具，可以将基于描述逻辑的推理最终归结为ABox的一致性检验问题，从而简化并最终实现关系推理"
+  },
+  {
+   "unit": [
+    "claim",
+    "c71"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Lu等人借助SWRL规则向本体库添加实体隐含关系推理规则，据此实现了网络服务的匹配机制"
+  },
+  {
+   "unit": [
+    "claim",
+    "c83"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "revision:typo",
+    "support:正文作者归属与文献作者不一致，可能引错了文献",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Nguye等人采用基于翻译的跨语言知识抽取模型，该模型首先通过跨语言知识链接和属性对齐的方式将目标语种的相关内容映射到源"
+  },
+  {
+   "unit": [
+    "claim",
+    "c89"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Berant等人基于Freebase知识库，将给定问题转化为多个逻辑形式（logicform）"
+  },
+  {
+   "unit": [
+    "ref",
+    "r11"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[11]ZhaoJun,Liukang,ZhouGuangyou,etal.Openinformationextract"
+  },
+  {
+   "unit": [
+    "ref",
+    "r22"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[22]Mausam,SchmitzM,BartR,etal.Openlanguagelearningforinform"
+  },
+  {
+   "unit": [
+    "ref",
+    "r25"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[25]AlanA,AlexanderL.KrakeN:N-aryfactsinopeninformationextra"
+  },
+  {
+   "unit": [
+    "ref",
+    "r44"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[44]GroszBJ,WeinsteinS,JoshiAK.Centering:Aframeworkformodeli"
+  },
+  {
+   "unit": [
+    "ref",
+    "r45"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[45]LappinS,ShalomHJ.Analgorithmforpronominalanaphoraresolut"
+  },
+  {
+   "unit": [
+    "ref",
+    "r5"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[5]ChinchorN,MarshE.Muc-7informationextractiontaskdefinition"
+  },
+  {
+   "unit": [
+    "ref",
+    "r54"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[54]SahooSS,HalbW,HellmannS,etal.Asurveyofcurrentapproachesf"
+  },
+  {
+   "unit": [
+    "ref",
+    "r73"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[73]WangZhigang,LiJuanzi,WangZhichun,etal.XLore:Alarge-scale"
+  },
+  {
+   "unit": [
+    "span",
+    "p10",
+    60,
+    141
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "该项目始于2010年谷歌收购Metaweb公司，并籍此获得了该公司的语义搜索核心技术，其中的关键技术包括从互联网的网页中"
+  },
+  {
+   "unit": [
+    "span",
+    "p118",
+    49,
+    156
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "例如在一篇新闻稿中，“BarackObama”，“presidentObama”，“thepresident”等指称项可"
+  },
+  {
+   "unit": [
+    "span",
+    "p138",
+    235,
+    372
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "例如Probase在处理“domesticanimalsotherthandogssuchascats”这样的句子时，可"
+  },
+  {
+   "unit": [
+    "span",
+    "p5",
+    0,
+    119
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "（SchoolofInformationandSoftwareEngineering，UniversityofElect"
+  },
+  {
+   "unit": [
+    "span",
+    "p6",
+    0,
+    100
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "AbstractGooglesknowledgegraphtechnologyhasdrawnalotofresear"
+  },
+  {
+   "unit": [
+    "span",
+    "p70",
+    103,
+    180
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "如果以“实体-关系-实体”或者“实体-属性-性值”三元组作为事实的基本表达方式，则存储在图数据库中的所有数据将构成庞大的"
+  }
+ ]
+}

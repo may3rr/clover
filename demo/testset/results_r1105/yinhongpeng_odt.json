@@ -1,0 +1,775 @@
+{
+ "detection": [
+  {
+   "id": "fake1",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "fake2",
+   "kind": "fake_ref",
+   "detected": true,
+   "detail": "status=not_found",
+   "located": true
+  },
+  {
+   "id": "uncited",
+   "kind": "uncited",
+   "detected": true,
+   "detail": "ref=found",
+   "located": true
+  },
+  {
+   "id": "wrongyear",
+   "kind": "wrong_year",
+   "detected": true,
+   "detail": "status=mismatch issues=['年份不一致：文中写 2004，数据库记录为 2008']",
+   "located": true
+  },
+  {
+   "id": "misattr1",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "misattr2",
+   "kind": "misattribution",
+   "detected": true,
+   "detail": "labels=['unsupported'] offtopic=1 findings=1",
+   "located": true
+  },
+  {
+   "id": "stacking",
+   "kind": "stacking",
+   "detected": true,
+   "detail": "findings=1",
+   "located": true
+  },
+  {
+   "id": "typo1",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  },
+  {
+   "id": "typo2",
+   "kind": "typo",
+   "detected": true,
+   "detail": "revisions=1",
+   "located": true
+  }
+ ],
+ "counts": {
+  "tp": 9,
+  "fn": 0,
+  "fp_new": 0,
+  "pre_existing": 62,
+  "tn": 337,
+  "excluded": 4,
+  "claims": 172,
+  "refs": 230,
+  "support_definitive": 99
+ },
+ "lenient": [
+  1.0,
+  1.0,
+  1.0
+ ],
+ "strict": [
+  0.1267605633802817,
+  1.0,
+  0.8480392156862745
+ ],
+ "fp_units": [],
+ "pre_existing_units": [
+  {
+   "unit": [
+    "claim",
+    "c116"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Jia等将跟踪目标进行局部分块处理,采用局部稀疏表示与对齐池化对目标表观建模,其跟踪结果对局部遮挡和光照变化具有较好的鲁"
+  },
+  {
+   "unit": [
+    "claim",
+    "c119"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Zhang等认为大多数基于稀疏表示的跟踪方法,仅考虑了多特征融合或局部表观建模,而忽略了候选目标的内在结构."
+  },
+  {
+   "unit": [
+    "claim",
+    "c12"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "部分文献在总结时,对目标检测与跟踪部分只进行了简要概述,如文献分别综述了行为理解和智能监控的研究进展,在其底层部分简要地"
+  },
+  {
+   "unit": [
+    "claim",
+    "c127"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "由于该类方法具有较强的判别学习能力,因此其已广泛地应用于目标跟踪任务中"
+  },
+  {
+   "unit": [
+    "claim",
+    "c129"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Avidan通过对弱分类器的特征加权,重新整合弱分类器对像素进行分类"
+  },
+  {
+   "unit": [
+    "claim",
+    "c13"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "也有一些学者对运动目标检测与跟踪进行了较为全面的阐述、分析与整理,如文献"
+  },
+  {
+   "unit": [
+    "claim",
+    "c144"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Zhang等结合压缩感知理论与增量LS-SVM,有效地获取了上下文信息,提高了跟踪精度"
+  },
+  {
+   "unit": [
+    "claim",
+    "c148"
+   ],
+   "alarms": [
+    "support:被引文献的研究内容与这条论断无关，可能引错了文献"
+   ],
+   "text": "在UCI数据集上进行实验取得了鲁棒的实验结果"
+  },
+  {
+   "unit": [
+    "claim",
+    "c151"
+   ],
+   "alarms": [
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Lin等将目标与背景分别看作高斯分布"
+  },
+  {
+   "unit": [
+    "claim",
+    "c152"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "提出了一种基于增量Fisher的线性判别分析的表观建模方法,能较好地自适应目标外观及背景的变化"
+  },
+  {
+   "unit": [
+    "claim",
+    "c153"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "线性判别分析是较简单、使用也较广泛的一种方法,Lin等将目标与背景分别看作高斯分布,https://archive.ic"
+  },
+  {
+   "unit": [
+    "claim",
+    "c155"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Li等将二维线性判别分析引入了跟踪目标的表观建模中,并采用了矩阵形式进行计算,极大地提高了跟踪效率"
+  },
+  {
+   "unit": [
+    "claim",
+    "c16"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "随着对背景建模研究工作的推进,又出现了统计模型、聚类模型、神经网络模型、估计模型、]模糊模型、鲁棒子空间模型、稀疏模型、"
+  },
+  {
+   "unit": [
+    "claim",
+    "c161"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "目前,能用于目标跟踪评测的公开视频序列比较多"
+  },
+  {
+   "unit": [
+    "claim",
+    "c163"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "http://www.computervisiononline.com/datasets"
+  },
+  {
+   "unit": [
+    "claim",
+    "c164"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "TAG363http://www.computervisiononline.com/datasetshttp://rie"
+  },
+  {
+   "unit": [
+    "claim",
+    "c167"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "从评测结果可以明显看到,MDNet、Deep-SRDCF跟踪器在跟踪准确度、平均失败数以及重叠指标三个跟踪精度指标上,分"
+  },
+  {
+   "unit": [
+    "claim",
+    "c168"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "基于卷积神经网络的特征表达方法效果尤为突出,近年来取得了显著的检测效果"
+  },
+  {
+   "unit": [
+    "claim",
+    "c169"
+   ],
+   "alarms": [
+    "distribution:这句话同时引用了 N 篇文献",
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "深度学习框架相继开源"
+  },
+  {
+   "unit": [
+    "claim",
+    "c17"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "Bouwmans等分别在换域模型2010年、2011年和2014年对背景建模进行了综述工作,对背景建模方法进行了详细的分"
+  },
+  {
+   "unit": [
+    "claim",
+    "c170"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "尽管目前已经,但对于不同分开展了相当一部分的工作"
+  },
+  {
+   "unit": [
+    "claim",
+    "c18"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "背景模型中,高斯模型和支持向量模型通常用于处理动态背景"
+  },
+  {
+   "unit": [
+    "claim",
+    "c25"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "Net数据集上取得领先的检测结果"
+  },
+  {
+   "unit": [
+    "claim",
+    "c42"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "稀疏表示目标描述(Sparselets)"
+  },
+  {
+   "unit": [
+    "claim",
+    "c44"
+   ],
+   "alarms": [
+    "support:被引文献与这条论断说的不是同一项工作，可能引错了文献"
+   ],
+   "text": "此外,比较常用的模式特征还有Haar-like、统计变换直方图(Censustransformhistogram,CEN"
+  },
+  {
+   "unit": [
+    "claim",
+    "c53"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "颜色特征是通过计算局部的图像属性(如灰度、颜色等)的概率分布而得到一种特征描述,该类特征主要包括了颜色SIFT特征、颜色"
+  },
+  {
+   "unit": [
+    "claim",
+    "c70"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "受Lee等的启发,Nair等将生成式梯度与判别式梯度相结合,提出一种3阶RBM的高层模型,用于对3D目标的识别中"
+  },
+  {
+   "unit": [
+    "claim",
+    "c89"
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "常用的核函数主要有Linear、Sigmoid、RBF、GussianRBF等"
+  },
+  {
+   "unit": [
+    "claim",
+    "c93"
+   ],
+   "alarms": [
+    "label:unsupported",
+    "support:被引文献不支持这条论断"
+   ],
+   "text": "稀疏编码对特征变化非常敏感"
+  },
+  {
+   "unit": [
+    "ref",
+    "r132"
+   ],
+   "alarms": [
+    "authenticity:文献信息与数据库记录不一致",
+    "status:mismatch"
+   ],
+   "text": "[132]Sch¨olkopfB,SmolaAJ.LearningwithKernels:SupportVectorMa"
+  },
+  {
+   "unit": [
+    "ref",
+    "r140"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[140]WuB,NevatiaR.Detectionofmultiple,partiallyoccludedhuman"
+  },
+  {
+   "unit": [
+    "ref",
+    "r141"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[141]WuB,NevatiaR.Clusterboostedtreeclassiﬁerformulti-view,m"
+  },
+  {
+   "unit": [
+    "ref",
+    "r146"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[146]SeberGAF,LeeAJ.LinearRegressionAnalysis(SecondEdition)."
+  },
+  {
+   "unit": [
+    "ref",
+    "r149"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[149]AliNH,HassanGM.Kalmanﬁltertracking.InternationalJournal"
+  },
+  {
+   "unit": [
+    "ref",
+    "r152"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[152]RahmatiH,AamoOM,StavdahlØ,AddeL.Kernel-basedobjecttrack"
+  },
+  {
+   "unit": [
+    "ref",
+    "r167"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[167]MeiX,LingHB.Robustvisualtrackingusingl1minimiza-tion.In"
+  },
+  {
+   "unit": [
+    "ref",
+    "r209"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[209]WuY,LimJ,YangMH.Onlineobjecttracking:abench-mark.In:Pro"
+  },
+  {
+   "unit": [
+    "ref",
+    "r210"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[210]WuY,LimJ,YangMH.Objecttrackingbenchmark.IEEETransaction"
+  },
+  {
+   "unit": [
+    "ref",
+    "r211"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[211]CollinsR,ZhouXH,TehSK.Anopensourcetrackingtestbedandeva"
+  },
+  {
+   "unit": [
+    "ref",
+    "r212"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[212]FisherRB.ThePETS04surveillanceground-truthdatasets.In:P"
+  },
+  {
+   "unit": [
+    "ref",
+    "r23"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[23]GutchessD,TrajkovicsM,Cohen-SolalE,LyonsD,JainAK.Abackgr"
+  },
+  {
+   "unit": [
+    "ref",
+    "r24"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[24]WangHZ,SuterD.Anovelrobuststatisticalmethodforbackground"
+  },
+  {
+   "unit": [
+    "ref",
+    "r25"
+   ],
+   "alarms": [
+    "norms:这篇参考文献在正文中没有被引用"
+   ],
+   "text": "[25]ColombariA,FusielloA.Patch-basedbackgroundinitializa-tio"
+  },
+  {
+   "unit": [
+    "ref",
+    "r26"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[26]LeeB,HedleyM.Backgroundestimationforvideosurveil-lance.I"
+  },
+  {
+   "unit": [
+    "ref",
+    "r35"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[35]RidderC,MunkeltO,KirchnerH.Adaptivebackgroundes-timation"
+  },
+  {
+   "unit": [
+    "ref",
+    "r39"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[39]WrenCR,PorikliF.Waviz:spectralsimilarityforob-jectdetect"
+  },
+  {
+   "unit": [
+    "ref",
+    "r75"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[75]DhankharP,SahuN.Areviewandresearchofedgedetec-tiontechni"
+  },
+  {
+   "unit": [
+    "ref",
+    "r94"
+   ],
+   "alarms": [
+    "authenticity:未能在数据库中找到这篇文献",
+    "status:not_found"
+   ],
+   "text": "[94]CollobertR,KavukcuogluK,FarabetC.Torch7:aMatlab-likeenvi"
+  },
+  {
+   "unit": [
+    "span",
+    "p131",
+    0,
+    69
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Fig.1Generalframeworkofvision-basedobjectdetectionandtrackin"
+  },
+  {
+   "unit": [
+    "span",
+    "p151",
+    0,
+    61
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Fig.3Flowchartofobjectdetectionbasedonobjectmodeling"
+  },
+  {
+   "unit": [
+    "span",
+    "p156",
+    0,
+    61
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Table3Human-engineering-basedfeaturerepresentationmethods"
+  },
+  {
+   "unit": [
+    "span",
+    "p226",
+    246,
+    481
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Google在第一代深度学习系统(DistBelief)[92]的基础上对网络架构等进行优化,推出了第二代深度学习系统("
+  },
+  {
+   "unit": [
+    "span",
+    "p254",
+    0,
+    52
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Table4Learning-basedfeaturerepresentationmethods"
+  },
+  {
+   "unit": [
+    "span",
+    "p263",
+    70,
+    207
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "其中,基于背景建模的检测方法一般具有实现简单、运算效率较高等优点,但其适用范围比较狭小,通常只能用在固定摄像机拍摄的场景"
+  },
+  {
+   "unit": [
+    "span",
+    "p264",
+    0,
+    87
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "基于目标建模的检测方法克服了基于背景建模的方法固定场景的缺点,可以用于动态环境(如车载摄像头等)的目标检测,且一般检测出"
+  },
+  {
+   "unit": [
+    "span",
+    "p269",
+    0,
+    45
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Table5Typicaldatasetsforobjectdetection"
+  },
+  {
+   "unit": [
+    "span",
+    "p385",
+    0,
+    44
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Table6Typicaldatasetsforobjecttracking"
+  },
+  {
+   "unit": [
+    "span",
+    "p412",
+    0,
+    73
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "包含行走、会面、进出场景等行为rbf/CAVIARDATA1/主要任务为鸟瞰视角下的行人跟http://www.visi"
+  },
+  {
+   "unit": [
+    "span",
+    "p451",
+    0,
+    60
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Table7Performancecomparisonoftypicaltrackingalgorithms"
+  },
+  {
+   "unit": [
+    "span",
+    "p51",
+    0,
+    73
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "andexperimentalcomparisonAsurveyofappearancemodelsinvisualob"
+  },
+  {
+   "unit": [
+    "span",
+    "p606",
+    81,
+    168
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "然而,目前大多算法还只是对单一时间、单一空间的多尺度信息进行融合,研究者可以考虑从时间、推理等不同维度,对特征、决策等不"
+  },
+  {
+   "unit": [
+    "span",
+    "p9",
+    0,
+    65
+   ],
+   "alarms": [
+    "revision:typo"
+   ],
+   "text": "Table1Applicationsofvision-basedobjectdetectionandtracking"
+  }
+ ]
+}

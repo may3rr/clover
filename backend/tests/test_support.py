@@ -949,3 +949,48 @@ def test_no_source_notes_merge_into_one():
     assert note.anchor is None and note.refs == ["r1", "r2", "r3"]
     assert "[1]、[2]、[3]" in note.detail
     assert "3 篇" in note.title and "3 条论断" in note.title
+
+
+@pytest.mark.asyncio
+async def test_extract_locates_claim_across_removed_marker(monkeypatch):
+    # the model writes "R-CNN, which" while the marker-free sentence reads
+    # "R-CNN , which": spaces are ignored when locating the claim
+    text = ("We adopt Faster R-CNN [34], which runs at 50 frames per second "
+            "on a GPU, as the detection method.")
+    para = Paragraph(id="p0", section_id="s0", text=text, char_offset=0)
+    s = text.index("[34]")
+    marker = CitationMarker(id="m0", paragraph_id="p0", start=s, end=s + 4,
+                            raw="[34]", ref_ids=["r34"])
+
+    async def fake(task, messages, schema, **kw):
+        assert "不要只截到被引工作的名称为止" in messages[0]["content"]
+        return llm.LLMResult(value=schema(claims=[
+            {"text": "We adopt Faster R-CNN, which runs at 50 frames per "
+                     "second on a GPU", "marker_ids": ["m1"]}]),
+            route="local")
+
+    monkeypatch.setattr(claims_mod, "chat_json", fake)
+    (c,) = await extract_claims(para, [marker])
+    assert c.text == ("We adopt Faster R-CNN, which runs at 50 frames per "
+                      "second on a GPU")
+    assert text[c.start:c.end].endswith("on a GPU")
+    assert c.start == 0
+
+
+def test_focus_sentence_tags_each_citation():
+    from citecheck.support.layer import focus_sentence
+    text = ("Intro. Strong regularization such as maxout [11] or dropout "
+            "[15] is applied.")
+    sent = text[7:]
+
+    def mk(i, raw, rid):
+        s = text.index(raw)
+        return CitationMarker(id=f"m{i}", paragraph_id="p", start=s,
+                              end=s + len(raw), raw=raw, ref_ids=[rid])
+    ms = [mk(0, "[11]", "r11"), mk(1, "[15]", "r15")]
+    out = focus_sentence(text, sent, text.index("Strong"), ms, "r11")
+    assert out == ("Strong regularization such as maxout [11]⟦本条文献⟧ or "
+                   "dropout [15]⟦其他文献⟧ is applied.")
+    # a sentence citing only this work is passed through unchanged
+    one = [mk(0, "[11]", "r11")]
+    assert focus_sentence(text, sent, 7, one, "r11") == sent

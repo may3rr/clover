@@ -26,6 +26,8 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest", "pytest-asyncio", "reportlab"]  # reportlab: synthetic PDFs in tests
 local = ["mlx-lm"]
+# Intel NPU/GPU/CPU on-device models (llm/ov.py); the finals require local AI
+intel = ["openvino-genai>=2026.4"]
 
 [tool.setuptools.packages.find]
 include = ["citecheck*"]

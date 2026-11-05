@@ -10,6 +10,7 @@ import {
 } from 'react'
 import { flushSync } from 'react-dom'
 import type { Paragraph, Report } from '../types/report'
+import { keys } from '../lib/platform'
 import {
   buildItems,
   firstLine,
@@ -560,7 +561,7 @@ export default function ReportScreen({
             <button
               className="icon-btn"
               aria-label="收起侧栏"
-              title="收起侧栏 ⌘\"
+              title={`收起侧栏 ${keys('⌘\\')}`}
               onClick={toggleLeftPane}
             >
               <SidebarLeadingIcon size={15} />
@@ -673,7 +674,7 @@ export default function ReportScreen({
               <button
                 className="icon-btn"
                 aria-label="展开侧栏"
-                title="展开侧栏 ⌘\"
+                title={`展开侧栏 ${keys('⌘\\')}`}
                 onClick={toggleLeftPane}
               >
                 <SidebarLeadingIcon size={15} />
@@ -694,7 +695,7 @@ export default function ReportScreen({
               <button
                 className="icon-btn"
                 aria-label="在正文中查找"
-                title="在正文中查找 ⌘F"
+                title={`在正文中查找 ${keys('⌘F')}`}
                 onClick={() => {
                   setSearchOpen(true)
                   setSearchTick((t) => t + 1)
@@ -707,7 +708,7 @@ export default function ReportScreen({
               <button
                 className="icon-btn"
                 aria-label="展开检查器"
-                title="展开检查器 ⌘⇧\"
+                title={`展开检查器 ${keys('⌘⇧\\')}`}
                 onClick={toggleRightPane}
               >
                 <SidebarTrailingIcon size={15} />
@@ -1417,7 +1418,7 @@ function InspectorList({
         <button
           className="icon-btn"
           aria-label="收起检查器"
-          title="收起检查器 ⌘⇧\"
+          title={`收起检查器 ${keys('⌘⇧\\')}`}
           onClick={onCollapse}
         >
           <SidebarTrailingIcon size={15} />

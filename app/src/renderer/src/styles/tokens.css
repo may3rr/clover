@@ -43,6 +43,9 @@
 
   /* 品牌色：设置页供应商图标（LobeHub lobe-icons 品牌色） */
   --brand-qwen: #082dff;
+  /* 英特尔 logo 的两种蓝：方点与字母（千问 → 英特尔变形动画） */
+  --brand-intel: #0068b5;
+  --brand-intel-dot: #04c7fd;
   --on-brand: #ffffff;       /* 品牌色块上的白色 glyph */
   --switch-off: rgba(55, 53, 47, 0.2);   /* 开关关闭时的轨道 */
   --switch-knob: #ffffff;
@@ -138,6 +141,8 @@
 
     /* 品牌色在 dark 下保持原色，白字不变 */
     --brand-qwen: #082dff;
+    --brand-intel: #0068b5;
+    --brand-intel-dot: #04c7fd;
     --on-brand: #ffffff;
     --switch-off: rgba(255, 255, 255, 0.22);
     --switch-knob: #ffffff;
