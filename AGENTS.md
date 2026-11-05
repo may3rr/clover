@@ -140,6 +140,29 @@ class Report:         document, sections, paragraphs, markers, references,
 - 网络请求一律设置超时与重试，并遵守各 API 的礼貌访问要求（Crossref 带 `mailto`，arXiv 请求间隔至少 3 秒）。
 - 不要引入本文件未列出的大型依赖。确有必要时，先在任务说明里说明理由。
 
+### 5.5 两台电脑的同步
+
+两台电脑，两个远端：`origin` = GitHub（https://github.com/may3rr/clover.git），`cn` = GitCode（https://gitcode.com/may3rr/clover.git）。GitCode 是两台电脑之间的中转站，GitHub 只由 Mac 推送。
+
+| 电脑 | 角色 | 拉取 | 推送 |
+| --- | --- | --- | --- |
+| Mac（主开发机） | 主要开发，合并 Intel 分支 | `cn`、`origin` | `master` 推到 `cn` 和 `origin` |
+| Intel Windows 笔记本（决赛机） | 本地模型测试与 Intel 适配 | 只能 `cn` | 只推 `intel` 分支到 `cn` |
+
+**Mac 上：**
+- 开始工作前执行 `git fetch cn`，看 `cn/intel` 是否有新提交。
+- 收到"把 Intel 那边拉下来"的指令时：`git fetch cn`，然后 `git merge cn/intel`（冲突时停下来报告，不要自动选一边），跑验收测试，再推送。
+- 推送时两个远端都推：`git push origin master && git push cn master`。只推了一个就算没做完。
+- 推送前先确认 `cn/master` 没有 Mac 之外的提交；如果有，先合并，绝不 `--force`。
+
+**Intel Windows 笔记本上：**
+- 只在 `intel` 分支上提交，不直接提交 `master`。第一次执行 `git checkout -b intel cn/master`（或 `git checkout intel`）。
+- 开始工作前执行 `git fetch cn && git merge cn/master`，拿到 Mac 推送的最新代码。
+- 完成一段工作就提交，并执行 `git push cn intel`。不要推 `master`，不要 `--force`。
+- 本机路径、模型目录、API Key 不提交：`config.toml`、`.env` 已被忽略；模型放在仓库外（`C:\clover-models`）。
+- 测试结果与脚本放在 `demo/intel/` 下，大于 10MB 的文件不提交。
+- 换行统一为 LF（见 `.gitattributes`），不要提交整文件换行变化。
+
 ## 6. 设计规范（必须严格执行）
 
 气质参考：Notion 的内容区 + macOS 26 的窗口壳——通高系统侧栏（原生 vibrancy）、透明底侧栏图标（Finder / Notion 风格）、安静的排版。克制、留白充足，一屏只做一件事。
