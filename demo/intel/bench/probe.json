@@ -1,0 +1,181 @@
+{
+ "machine": "Windows-10-10.0.26200-SP0",
+ "processor": "Intel64 Family 6 Model 204 Stepping 2, GenuineIntel",
+ "python": "3.11.18",
+ "openvino": "2026.4.1-22982-e213a147257-releases/2026/4",
+ "openvino_genai": "2026.4.1.0-3408-ab01d1771e4",
+ "devices": {
+  "CPU": "Intel(R) Core(TM) Ultra 5 338H",
+  "GPU": "Intel(R) Arc(TM) B370 GPU (iGPU)",
+  "NPU": "Intel(R) AI Boost"
+ },
+ "results": {
+  "embed": [
+   {
+    "device": "CPU",
+    "load_cold_s": 2.942967499999213,
+    "load_warm_s": 0.8448914999971748,
+    "embed_24_windows_s": 1.2372574000000895,
+    "embed_3_queries_s": 0.149814399999741,
+    "top1": [
+     0,
+     3,
+     2
+    ],
+    "top1_expected": [
+     0,
+     3,
+     2
+    ],
+    "ok": true,
+    "wall_s": 5.7
+   },
+   {
+    "device": "GPU",
+    "load_cold_s": 8.800421399999323,
+    "load_warm_s": 1.0581418000001577,
+    "embed_24_windows_s": 0.9550271000007342,
+    "embed_3_queries_s": 0.4491493999994418,
+    "top1": [
+     0,
+     3,
+     2
+    ],
+    "top1_expected": [
+     0,
+     3,
+     2
+    ],
+    "ok": true,
+    "wall_s": 11.8
+   },
+   {
+    "device": "NPU",
+    "load_cold_s": 101.02144680000129,
+    "load_warm_s": 0.8729585000000952,
+    "embed_24_windows_s": 1.5812646999984281,
+    "embed_3_queries_s": 0.18302160000166623,
+    "top1": [
+     0,
+     3,
+     2
+    ],
+    "top1_expected": [
+     0,
+     3,
+     2
+    ],
+    "ok": true,
+    "wall_s": 104.1
+   }
+  ],
+  "rerank": [
+   {
+    "device": "CPU",
+    "load_cold_s": 3.1511637000003248,
+    "qwen3_template": true,
+    "rerank_6_s": 1.6214115000002494,
+    "scores": [
+     0.9996,
+     0.6039,
+     0.0804,
+     0.7695,
+     0.0012,
+     0.0005
+    ],
+    "rerank_24_s": 5.930027799997333,
+    "ok": true,
+    "wall_s": 11.4
+   },
+   {
+    "device": "GPU",
+    "load_cold_s": 9.571886100002303,
+    "qwen3_template": true,
+    "rerank_6_s": 0.2232707000002847,
+    "scores": [
+     0.999,
+     0.6655,
+     0.0584,
+     0.7788,
+     0.0014,
+     0.0004
+    ],
+    "rerank_24_s": 0.28792649999741116,
+    "ok": true,
+    "wall_s": 10.5
+   },
+   {
+    "device": "NPU",
+    "ok": false,
+    "error": "Command '['C:\\\\clover\\\\backend\\\\.venv\\\\Scripts\\\\python.exe', 'C:\\\\clover\\\\demo\\\\intel\\\\bench\\\\runner.py', '--kind', 'rerank', '--path', 'C:\\\\clover-models\\\\Qwen3-Reranker-0.6B-int8-ov', '--device', 'NPU', '--cache', 'C:\\\\Users\\\\天猫AI\\\\AppData\\\\Local\\\\Temp\\\\ovcache-rerank-NPU-pb30ot9j', '--out', 'C:\\\\Users\\\\天猫AI\\\\AppData\\\\Local\\\\Temp\\\\ovcache-rerank-NPU-pb30ot9j\\\\row.json']' returned non-zero exit status 1.",
+    "wall_s": 2.3
+   }
+  ],
+  "llm": [
+   {
+    "device": "CPU",
+    "load_cold_s": 3.027423600000475,
+    "extract": [
+     {
+      "s": 6.104127899998275,
+      "usage": {
+       "prompt": 191,
+       "completion": 202
+      },
+      "json_ok": true,
+      "out": "{\"claims\": [{\"text\": \"We adopt Faster R-CNN, which runs at 5 frames per second on a GPU, as our detection baseline.\", \"marker_ids\": [\"m1\"]}]}"
+     },
+     {
+      "s": 3.1976222999983293,
+      "usage": {
+       "prompt": 190,
+       "completion": 140
+      },
+      "json_ok": true,
+      "out": "{\"claims\": [{\"text\": \"批归一化和残差连接使得训练上百层的网络成为可能。\", \"marker_ids\": [\"m2\"]}]}"
+     }
+    ],
+    "ok": true,
+    "wall_s": 13.2
+   },
+   {
+    "device": "GPU",
+    "load_cold_s": 10.413911100000405,
+    "extract": [
+     {
+      "s": 3.7134584999985236,
+      "usage": {
+       "prompt": 191,
+       "completion": 212
+      },
+      "json_ok": true,
+      "out": "{\"claims\": [{\"text\": \"We adopt Faster R-CNN as our detection baseline.\", \"marker_ids\": [\"m1\"]}]}"
+     },
+     {
+      "s": 3.1921933999983594,
+      "usage": {
+       "prompt": 190,
+       "completion": 208
+      },
+      "json_ok": true,
+      "out": "{\"claims\": [{\"text\": \"批归一化 ⟦m1⟧ 和残差连接 ⟦m2⟧ 使得训练上百层的网络成为可能。\", \"marker_ids\": [\"m2\"]}]}"
+     }
+    ],
+    "ok": true,
+    "wall_s": 18.1
+   },
+   {
+    "device": "NPU",
+    "ok": false,
+    "error": "timeout after 300s (NPU compilation did not finish)",
+    "wall_s": 300.0
+   }
+  ]
+ },
+ "probe_mode": "probe_timeout.py",
+ "timeouts_s": {
+  "embed": 300,
+  "rerank": 300,
+  "llm": 300
+ }
+}
