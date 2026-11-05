@@ -1,0 +1,35 @@
+{
+ "n": 600,
+ "text_token_range": [
+  231,
+  249
+ ],
+ "solo": [],
+ "split": {
+  "wall_s": 180.9,
+  "windows_s": 3.3,
+  "NPU": {
+   "total_s": 19.2,
+   "windows_s": 15.6
+  },
+  "CPU": {
+   "total_s": 180.9,
+   "windows_s": 1.7
+  }
+ },
+ "busy": {
+  "wall_s": 189.6,
+  "windows_s": 3.2,
+  "gpu_batches": 14,
+  "gpu_tokens": 28672,
+  "gpu_error": null,
+  "NPU": {
+   "total_s": 22.7,
+   "windows_s": 13.2
+  },
+  "CPU": {
+   "total_s": 189.6,
+   "windows_s": 1.6
+  }
+ }
+}

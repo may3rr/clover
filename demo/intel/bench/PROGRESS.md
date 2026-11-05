@@ -48,4 +48,11 @@
   - prefix caching=True（共享 600 token 前缀）→ 157.6 tok/s，RSS 6.99 GB（+29%）。
   - 推荐：cache_size=6、max_num_seqs=16、max_num_batched_tokens=32768、prefix caching=True。
 - Qwen3-4B：sha256 通过，但 CPU/GPU 加载均报 Reshape 动态边界错误（OpenVINO 2026.4.1），无法跑 batch/quality。
-- 向量吞吐脚本 `vector_bench.py` 已写好，待跑。
+- 向量吞吐（窗口 231–249 token）：
+  - GPU 6000 窗口：batch 8/24/64 = 83.7 / 84.8 / 82.8 窗口/s（约 71–72 s）。
+  - CPU 600 窗口采样：1.6 / 1.7 / 1.5 窗口/s；外推 6000 ≈ 59–66 分钟。
+  - NPU 6000 窗口（batch=1）：16.1 窗口/s，373 s；batch 8/24/64 编译器直接 abort（LLVM ERROR）。
+  - NPU+CPU 各半（600 采样）：合计 3.3 窗口/s；CPU 是瓶颈（1.7），NPU 19 s 就做完自己那份（15.6）。
+  - GPU 跑 8B judge（16 并发）同时 NPU+CPU 向量（600 采样）：合计 3.2 窗口/s；GPU 151 tok/s，NPU 13.2，CPU 1.6。
+- 结论：向量瓶颈在 CPU；NPU 足够快（16 窗口/s），分工时应按速度比例分配（NPU 约 9 份、CPU 1 份），GPU 空闲时可承担向量。
+- 向量脚本：`vector_bench.py`（每个组合独立子进程，NPU batch>1 崩溃可隔离）。

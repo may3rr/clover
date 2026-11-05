@@ -388,3 +388,87 @@ Output pattern dim[1] has invalid bounds: -3891109803858067456,-3891109803858067
 
 - 版本：OpenVINO 2026.4.1 / openvino-genai 2026.4.1.0。未升级（等指示）。
 - 因此 4B 的 batch/quality 无法执行，GPU/CPU probe 均记为失败。
+
+## 13. 过夜任务 T0-T2（摘要）
+
+- 同步到 `ee8f4c3`；`uv sync --extra dev --extra intel`（无 uv.lock，解析 71 包，FastAPI 0.162 / Starlette 1.10）。
+- LaTeX 测试失败为 CRLF：临时 `.tex` 由 `write_text()` 写成 CRLF，解析器按原始字节保留 CRLF，测试 `read_text()` 归一化后偏移错位。测试读回改为 `read_bytes().decode("utf-8")`。
+- `test_pipeline` 缺私有 PDF：不存在时用 pypdf 生成空白 PDF。
+- `uv run pytest` 的 console script 不把 backend 根加入 sys.path；`pyproject.toml` 加 `pythonpath = ["."]`。
+- T1：`ov.BatchGenerator` + `OpenVINOEngine` 30 ms 微批；`LocalSettings.batching` 与 batch_* 参数；测试覆盖组批/超时/单条失败隔离。
+- T1 真实冒烟：32 并发 `chat_json("extract")` → 13.98 s，32/32 成功，平均 0.44 s/请求，全部 local。
+- T2：`[llm.local].tasks`（默认 `["extract"]`）、`client._get_local_sem()` 独立并发上限、示例配置注释。
+- 全量 pytest：**506 passed, 8 skipped**。
+
+## 14. T3 judge 准确率（8B / 4B）
+
+- 数据解压到 `C:\clover-data\judge_pairs.json`（508 对，仓库外，未提交）。
+- 8B GPU（批处理 16 并发，variant current）：
+  - injected 27/41，true_issue 24/52，false_alarm 127/415，failed 8，证据降级 120。
+  - 与云端逐条一致 311/500（62.2%）；墙钟 911.6 s，0.557 对/s，200 对约 6.0 min。
+- 4B GPU：引擎加载失败，508/508 失败（Reshape 错误，见第 12 节）。
+- 8B-cw NPU：待跑（逐条，预计约 1 小时）。
+
+## 15. T5 调优与向量
+
+### 15.1 连续批处理
+
+| cache_size | max_num_seqs | 吞吐 | 每请求 | 峰值 RSS |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 16 | 116.4 tok/s | 1.10 s | 7.96 GB |
+| 4 | 16 | 119.5 tok/s | 1.07 s | 7.98 GB |
+| 6 | 16 | 122.4 tok/s | 1.05 s | 8.02 GB |
+| 6 + prefix caching | 16 | 157.6 tok/s | — | 6.99 GB |
+
+推荐：cache_size=6、max_num_seqs=16、max_num_batched_tokens=32768、prefix caching=True。
+
+### 15.2 向量
+
+- NPU TextEmbeddingPipeline 只支持 batch=1；batch=8/24/64 直接 LLVM abort：
+  `LLVM ERROR: Failed to infer result type(s): "IE.Add"(tensor<1x128x512x512xf32>, tensor<1x64x512x512xf32>)`。
+- NPU batch=1：冷加载 240.9 s，6000 窗口 373.0 s，16.1 窗口/s。
+- CPU/GPU 与 NPU+CPU 组合、GPU 忙时数据见 `vector.json`（本文件生成时仍在跑）。
+
+## 16. T6 向量预选
+
+方案见 `EMBED_PREFILTER.md`：BM25 先选 top-K（建议 128）加邻居，再只对候选算向量；预计把 6000 窗口的向量量降到 2–6%，召回需用 item bench 验证。
+
+## 17. T4 端到端（中文稿）
+
+配置 `C:\clover-data\e2e\config.toml`：本地 8B GPU 批处理跑 judge/review/review_fallback/extract/typo/function/structure；Embedding NPU；Rerank GPU；无 API Key。
+
+```powershell
+python demo/intel/bench/e2e_run.py --src "demo/final/演示稿/基于深度学习的目标检测研究综述.docx" --out demo/intel/bench/e2e/zh.json
+python demo/final/check_final.py demo/intel/bench/e2e/zh.json demo/final/injections.json
+```
+
+| 指标 | 结果 |
+| --- | --- |
+| 墙钟 | 533.2 s（8.9 min） |
+| LLM 调用 | local 363，cloud 0 |
+| 问题数 | 53（真实性 22、支持度 17、分布 3、规范 11） |
+| 峰值 RSS | 14.02 GB |
+| 最低可用内存 | 6.4 GB |
+| 注入检出 | 14 / 17 |
+| 各层耗时 | support 533.0 s、authenticity 195.0 s、norms 168.8 s、distribution 42.5 s、parse 0.1 s |
+| 文献源 | crossref 87 次/220.9 s、openalex 87/177.3、s2 74/228.1、arxiv 33/972.9（并发累计） |
+
+- 所有 LLM 任务都走了本地（tasks 列表包含 judge/review/review_fallback/extract/typo/function/structure），云端 0 次。
+- 网络是主要瓶颈：arXiv PDF 多次 20 s 超时，回落到摘要；arXiv API 出现 429。
+- 有 23 条“未能获得被引文献原文，0 条论断无法判断”的低优先级提示，符合无本地 PDF 的情况。
+
+英文 LaTeX 稿（`deep_residual_learning.zip`，7 个 PDF 都是插图，没有参考文献 PDF）：
+
+| 指标 | 结果 |
+| --- | --- |
+| 墙钟 | 736.0 s（12.3 min） |
+| LLM 调用 | local 536，cloud 0 |
+| 问题数 | 89（真实性 19、支持度 46、分布 5、规范 19） |
+| 峰值 RSS | **18.07 GB（超过 16 GB 上限）** |
+| 最低可用内存 | **2.61 GB（低于 3 GB 停止线）** |
+| 注入检出 | 12 / 16 |
+| 各层耗时 | support 730.7 s、authenticity 299.4 s、distribution 274.8 s、norms 224.5 s、parse 0.3 s |
+| 文献源 | crossref 68 次/923.2 s（后期限流跳过）、arxiv 27/837.3、openalex 56/529.0、s2 36/50.8（后期限流跳过） |
+
+- 英文稿的 support 层 46 条问题、536 次本地调用；峰值 18.07 GB 超出任务单的 16 GB 上限，最低可用 2.61 GB 也低于 3 GB 停止线。原因：8B CB（cache_size=6）+ 向量/重排 + 解析同时驻留，且 support 层并发较高。后续需要把 cache_size 降到 2–4，或在 support 层限制并发。
+- 两篇都有“无法核验/无原文”的降级提示，符合无 API Key、无本地 PDF 的条件。

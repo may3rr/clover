@@ -1,0 +1,35 @@
+{
+ "n": 600,
+ "text_token_range": [
+  231,
+  249
+ ],
+ "solo": [
+  {
+   "device": "CPU",
+   "batch": 8,
+   "ok": true,
+   "load_s": 2.2,
+   "total_s": 385.0,
+   "windows_s": 1.6
+  },
+  {
+   "device": "CPU",
+   "batch": 24,
+   "ok": true,
+   "load_s": 2.2,
+   "total_s": 357.0,
+   "windows_s": 1.7
+  },
+  {
+   "device": "CPU",
+   "batch": 64,
+   "ok": true,
+   "load_s": 2.2,
+   "total_s": 389.3,
+   "windows_s": 1.5
+  }
+ ],
+ "split": null,
+ "busy": null
+}

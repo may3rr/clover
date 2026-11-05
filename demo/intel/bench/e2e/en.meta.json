@@ -1,0 +1,68 @@
+{
+ "src": "C:\\clover\\demo\\final\\英文演示稿\\deep_residual_learning.zip",
+ "out": "C:\\clover\\demo\\intel\\bench\\e2e\\en.json",
+ "wall_s": 736.0,
+ "duration_s": 736.0,
+ "llm_calls": {
+  "local": 536,
+  "cloud": 0
+ },
+ "token_usage": {},
+ "timings": {
+  "parse": 0.3,
+  "layers": {
+   "norms": 224.5,
+   "distribution": 274.8,
+   "authenticity": 299.4,
+   "support": 730.7
+  },
+  "overview": 0.0,
+  "sources": {
+   "crossref": {
+    "calls": 68,
+    "seconds": 923.174,
+    "cached": 0
+   },
+   "arxiv": {
+    "calls": 27,
+    "seconds": 837.251,
+    "cached": 0
+   },
+   "openalex": {
+    "calls": 56,
+    "seconds": 529.041,
+    "cached": 0
+   },
+   "s2": {
+    "calls": 36,
+    "seconds": 50.797,
+    "cached": 0
+   }
+  }
+ },
+ "layers": {
+  "authenticity": {
+   "status": "done",
+   "findings": 19,
+   "error": null
+  },
+  "support": {
+   "status": "done",
+   "findings": 46,
+   "error": null
+  },
+  "distribution": {
+   "status": "done",
+   "findings": 5,
+   "error": null
+  },
+  "norms": {
+   "status": "done",
+   "findings": 19,
+   "error": null
+  }
+ },
+ "findings": 89,
+ "peak_rss_gb": 18.07,
+ "min_available_gb": 2.61
+}

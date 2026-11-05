@@ -1,0 +1,68 @@
+{
+ "src": "C:\\clover\\demo\\final\\演示稿\\基于深度学习的目标检测研究综述.docx",
+ "out": "C:\\clover\\demo\\intel\\bench\\e2e\\zh.json",
+ "wall_s": 533.2,
+ "duration_s": 533.2,
+ "llm_calls": {
+  "local": 363,
+  "cloud": 0
+ },
+ "token_usage": {},
+ "timings": {
+  "parse": 0.1,
+  "layers": {
+   "distribution": 42.5,
+   "norms": 168.8,
+   "authenticity": 195.0,
+   "support": 533.0
+  },
+  "overview": 0.0,
+  "sources": {
+   "crossref": {
+    "calls": 87,
+    "seconds": 220.901,
+    "cached": 0
+   },
+   "openalex": {
+    "calls": 87,
+    "seconds": 177.33,
+    "cached": 0
+   },
+   "s2": {
+    "calls": 74,
+    "seconds": 228.133,
+    "cached": 0
+   },
+   "arxiv": {
+    "calls": 33,
+    "seconds": 972.869,
+    "cached": 0
+   }
+  }
+ },
+ "layers": {
+  "authenticity": {
+   "status": "done",
+   "findings": 22,
+   "error": null
+  },
+  "support": {
+   "status": "done",
+   "findings": 17,
+   "error": null
+  },
+  "distribution": {
+   "status": "done",
+   "findings": 3,
+   "error": null
+  },
+  "norms": {
+   "status": "done",
+   "findings": 11,
+   "error": null
+  }
+ },
+ "findings": 53,
+ "peak_rss_gb": 14.02,
+ "min_available_gb": 6.4
+}

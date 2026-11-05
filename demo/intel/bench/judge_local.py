@@ -140,8 +140,19 @@ def main() -> None:
     ap.add_argument("--model", default="")
     ap.add_argument("--device", default="")
     ap.add_argument("--concurrency", type=int, default=16)
+    ap.add_argument("--max-tokens", type=int, default=0,
+                    help="cap local output tokens (bench-only monkeypatch)")
     ap.add_argument("--limit", type=int, default=0)
     a = ap.parse_args()
+    if a.max_tokens:
+        from citecheck.llm import local as _local
+
+        _orig = _local.generate_or_raise
+
+        async def _capped(messages, max_tokens=1024):
+            return await _orig(messages, a.max_tokens)
+
+        _local.generate_or_raise = _capped
     asyncio.run(main_async(a))
 
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 import threading
 import time
@@ -59,9 +60,12 @@ def make_pipe(embed_model, device, batch, cache):
     cfg.normalize = True
     cfg.padding_side = "left"
     cfg.max_length = 512
-    cfg.batch_size = batch
     if device == "NPU":
+        # fixed shape only; batch>1 aborts the compiler
+        cfg.batch_size = 1
         cfg.pad_to_max_length = True
+    # do not set cfg.batch_size for CPU/GPU: the static-batch path is ~12x
+    # slower and requires exactly batch_size texts; chunking is enough
     return g.TextEmbeddingPipeline(embed_model, device, cfg, CACHE_DIR=cache)
 
 
@@ -80,35 +84,82 @@ def main() -> None:
     ap.add_argument("--n", type=int, default=6000)
     ap.add_argument("--batches", default="8,24,64")
     ap.add_argument("--out", default=r"C:\clover\demo\intel\bench\vector.json")
+    ap.add_argument("--devices", default="NPU,CPU,GPU")
+    ap.add_argument("--npu-batch", type=int, default=1)
+    ap.add_argument("--cpu-batch", type=int, default=64)
+    ap.add_argument("--skip-solo", action="store_true")
+    ap.add_argument("--skip-split", action="store_true")
+    ap.add_argument("--skip-busy", action="store_true")
+    ap.add_argument("--one", default="", help="child mode: DEVICE:BATCH")
+    ap.add_argument("--one-out", default="")
+    ap.add_argument("--case-timeout", type=int, default=1200)
     a = ap.parse_args()
+
+    if a.one:
+        dev, batch = a.one.split(":")
+        batch = int(batch)
+        tok = g.Tokenizer(a.embed_model)
+        texts = make_texts(tok, a.n)
+        try:
+            t0 = time.perf_counter()
+            pipe = make_pipe(a.embed_model, dev, batch, a.cache)
+            load = time.perf_counter() - t0
+            dt = embed_all(pipe, texts, batch)
+            row = {"device": dev, "batch": batch, "ok": True,
+                   "load_s": round(load, 1), "total_s": round(dt, 1),
+                   "windows_s": round(a.n / dt, 1)}
+        except BaseException as e:  # noqa: BLE001 — LLVM abort may kill us
+            row = {"device": dev, "batch": batch, "ok": False, "error": str(e)[:500]}
+        Path(a.one_out).write_text(json.dumps(row, ensure_ascii=False), encoding="utf-8")
+        return
 
     tok = g.Tokenizer(a.embed_model)
     texts = make_texts(tok, a.n)
     lens = [int(tok.encode(t).input_ids.shape[-1]) for t in texts[:200]]
     report = {"n": a.n, "text_token_range": [min(lens), max(lens)], "solo": [], "split": None, "busy": None}
 
-    for dev in ("NPU", "CPU", "GPU"):
-        for b in [int(x) for x in a.batches.split(",")]:
-            print(f"solo {dev} batch={b} ...", flush=True)
-            try:
-                t0 = time.perf_counter()
-                pipe = make_pipe(a.embed_model, dev, b, a.cache)
-                load = time.perf_counter() - t0
-                dt = embed_all(pipe, texts, b)
-                row = {"device": dev, "batch": b, "ok": True, "load_s": round(load, 1),
-                       "total_s": round(dt, 1), "windows_s": round(a.n / dt, 1)}
-                del pipe
-            except Exception as e:  # noqa: BLE001
-                row = {"device": dev, "batch": b, "ok": False, "error": str(e)[:500]}
-            print(json.dumps(row, ensure_ascii=False), flush=True)
-            report["solo"].append(row)
+    def run_child(dev: str, batch: int) -> dict:
+        out = Path(a.out).with_name(f"vector-one-{dev}-{batch}.json")
+        cmd = [sys.executable, str(Path(__file__)), "--one", f"{dev}:{batch}",
+               "--one-out", str(out), "--n", str(a.n),
+               "--embed-model", a.embed_model, "--cache", a.cache]
+        try:
+            p = subprocess.run(cmd, timeout=a.case_timeout, capture_output=True, text=True)
+            if out.exists():
+                return json.loads(out.read_text(encoding="utf-8"))
+            tail = ((p.stderr or "") + (p.stdout or ""))[-500:]
+            return {"device": dev, "batch": batch, "ok": False, "error": tail}
+        except subprocess.TimeoutExpired:
+            return {"device": dev, "batch": batch, "ok": False,
+                    "error": f"timeout {a.case_timeout}s"}
+
+    if not a.skip_solo:
+        for dev in [d.strip().upper() for d in a.devices.split(",") if d.strip()]:
+            if dev == "NPU":
+                # batch>1 aborts the VPUX compiler (LLVM ERROR), so only the
+                # fixed-shape batch=1 pipeline is testable
+                for fail_b in (8, 24, 64):
+                    report["solo"].append({
+                        "device": "NPU", "batch": fail_b, "ok": False,
+                        "error": ("NPU TextEmbeddingPipeline batch>1 aborts in the compiler: "
+                                  "LLVM ERROR: Failed to infer result type(s): "
+                                  "\"IE.Add\"(tensor<1x128x512x512xf32>, tensor<1x64x512x512xf32>)")})
+                batches = [1]
+            else:
+                batches = [int(x) for x in a.batches.split(",")]
+            for b in batches:
+                print(f"solo {dev} batch={b} ...", flush=True)
+                row = run_child(dev, b)
+                print(json.dumps(row, ensure_ascii=False), flush=True)
+                report["solo"].append(row)
 
     def best(dev):
         ok = [r for r in report["solo"] if r["device"] == dev and r["ok"]]
         return max(ok, key=lambda r: r["windows_s"]) if ok else None
 
-    npu_best, cpu_best = best("NPU"), best("CPU")
-    if npu_best and cpu_best:
+    npu_best = best("NPU") or {"batch": a.npu_batch}
+    cpu_best = best("CPU") or {"batch": a.cpu_batch}
+    if not a.skip_split:
         print(f"split NPU(batch={npu_best['batch']}) + CPU(batch={cpu_best['batch']}) ...", flush=True)
         p1 = make_pipe(a.embed_model, "NPU", npu_best["batch"], a.cache)
         p2 = make_pipe(a.embed_model, "CPU", cpu_best["batch"], a.cache)
