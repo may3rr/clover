@@ -1,0 +1,28 @@
+{
+ "machine": "Windows-10-10.0.26200-SP0",
+ "processor": "Intel64 Family 6 Model 204 Stepping 2, GenuineIntel",
+ "python": "3.11.18",
+ "openvino": "2026.4.1-22982-e213a147257-releases/2026/4",
+ "openvino_genai": "2026.4.1.0-3408-ab01d1771e4",
+ "devices": {
+  "CPU": "Intel(R) Core(TM) Ultra 5 338H",
+  "GPU": "Intel(R) Arc(TM) B370 GPU (iGPU)",
+  "NPU": "Intel(R) AI Boost"
+ },
+ "results": {
+  "llm": [
+   {
+    "device": "GPU",
+    "ok": false,
+    "error": "Command '['C:\\\\clover\\\\backend\\\\.venv\\\\Scripts\\\\python.exe', 'C:\\\\clover\\\\demo\\\\intel\\\\bench\\\\runner.py', '--kind', 'llm', '--path', 'C:\\\\clover-models\\\\Qwen3-4B-int4-ov', '--device', 'GPU', '--cache', 'C:\\\\Users\\\\天猫AI\\\\AppData\\\\Local\\\\Temp\\\\ovcache-llm-GPU-g42b1rk6', '--out', 'C:\\\\Users\\\\天猫AI\\\\AppData\\\\Local\\\\Temp\\\\ovcache-llm-GPU-g42b1rk6\\\\row.json']' returned non-zero exit status 1.",
+    "wall_s": 0.9
+   }
+  ]
+ },
+ "probe_mode": "probe_timeout.py",
+ "timeouts_s": {
+  "embed": 300,
+  "rerank": 300,
+  "llm": 300
+ }
+}

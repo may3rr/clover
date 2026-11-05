@@ -307,3 +307,84 @@ cd C:\clover\backend
 - 无热降频迹象：judge 前/后半段 0.165 / 0.164 次/s，extract 0.077 / 0.077 次/s。
 - 说明：组合脚本里的「solo embed」段被已加载的 NPU 8B-cw 拖慢（平均 67 s/批），不是干净基线；干净基线用 `embed_solo_test.py` 单独测得 1.55 s/批（10 次 1.48–1.78 s）。上表的 3.26× 用干净基线计算。
 - 结论：NPU 上 extract 与向量互相抢设备，各慢约 3 倍；GPU judge 只慢 42%。如果按推荐分工（GPU judge + NPU extract/向量），需要接受 NPU 内部两项的互相拖慢。
+
+## 10. 同步 master 与 FastAPI lifespan
+
+```powershell
+git fetch cn
+git merge cn/master        # fast-forward 到 2f39c40
+cd backend
+uv sync --extra dev --extra intel
+uv pip install psutil huggingface_hub   # 基准脚本需要
+```
+
+- master 变更：`server.py` 的 startup 改为 lifespan；`Onboarding.tsx` 的平台文案。
+- 仓库没有 `uv.lock`，`uv sync` 直接解析 71 个包：FastAPI 0.162.0、Starlette 1.10.0。
+- 移除之前 venv 里的 `fastapi<0.116` 固定。
+- pytest：**500 passed, 2 failed, 8 skipped in 300.59s**（FastAPI 的收集错误已消失）。
+  - 仍失败：`test_parse_latex.py::test_tables_become_cell_paragraphs`、`test_pipeline.py::test_library_scan_reports_stages`（缺 PDF）。
+
+## 11. LaTeX 测试失败的根因：CRLF
+
+```powershell
+.venv\Scripts\python -m pytest tests/test_parse_latex.py::test_tables_become_cell_paragraphs -vv
+```
+
+失败断言：
+
+```text
+lm = d.latex
+big = next(p for p in d.paragraphs if p.text == "EN-FR")
+f, off, exact = lm.locate(big.id, 0)
+src = (tmp_path / "main.tex").read_text()
+assert exact and src[off:off + 5] == "EN-FR"
+E   AssertionError: assert (True and '\\midr' == 'EN-FR')
+```
+
+`git ls-files --eol backend/tests/fixtures` 中 LaTeX 相关行全部是 `i/lf w/lf`：
+
+```text
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_authoryear.tex
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_numeric/main.tex
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_numeric/method.tex
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_numeric/refs.bib
+```
+
+对照实验（`diag_latex_eol.py`，同一段 TeX）：
+
+```text
+LF (newline='')  bytes_has_CRLF=False  off=227  slice='EN-FR'  exact=True
+CRLF (default)   bytes_has_CRLF=True   off=236  slice='\\midr'  exact=True
+```
+
+- 测试用 `Path.write_text()` 写临时 `main.tex`，Windows 默认把 `\n` 转成 `\r\n`。
+- 解析器的 `tex.read_text()` 是 `path.read_bytes().decode()`，**保留 CRLF**，偏移按 2 字节换行计算。
+- 测试随后用 `Path.read_text()` 读回，通用换行把 CRLF 归一成 LF，字符串变短，`off` 就落到后面的 `\midrule` 上。
+- 偏移差 9，正好等于该位置之前的换行数。Mac 上 `os.linesep` 是 `\n`，所以通过。
+- 未改产品代码；修法应是测试写入时 `newline=""`，或解析器/测试统一换行归一。
+
+## 12. Qwen3.5 放弃与 Qwen3-4B 加载失败
+
+### Qwen3.5
+
+- `Qwen3.5-9B-int4-ov` 是 `Qwen3_5ForConditionalGeneration`（VLM）复合 IR：language_model + text_embeddings + vision_embeddings + mtp。
+- `LLMPipeline` 加载后生成报：
+  `RuntimeError: ... Port for tensor name input_ids was not found.`
+- `VLMPipeline` 能加载（GPU 30.7 s），`generate(prompt, [], cfg)` 能出文本，但输出带 `Thinking Process:`，没有可用的关闭 thinking 路径。
+- 按要求放弃 Qwen3.5；停止 Qwen3.5-4B 下载；9B 文件保留在磁盘，不再参与测试。
+
+### Qwen3-4B
+
+- 下载完成，sha256 与 HF LFS 一致（`openvino_model.bin` 2158.8 MB、`openvino_tokenizer.bin` 5.3 MB）。
+- GPU 和 CPU 加载都失败，错误相同：
+
+```text
+Check 'false' failed at src/core/shape_inference/include/reshape_shape_inference.hpp:210:
+While validating node 'opset1::Reshape Reshape_295
+(opset1::Multiply self.model.layers.0.mlp.down_proj.weight/fq_weights_1[0]:f16[2560,76,128],
+ opset1::Constant Constant_209892[0]:i64[2]) -> ()' with friendly_name 'Reshape_295':
+Output pattern dim[1] has invalid bounds: -3891109803858067456,-3891109803858067456
+```
+
+- 版本：OpenVINO 2026.4.1 / openvino-genai 2026.4.1.0。未升级（等指示）。
+- 因此 4B 的 batch/quality 无法执行，GPU/CPU probe 均记为失败。

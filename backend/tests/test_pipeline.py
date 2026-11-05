@@ -348,7 +348,16 @@ async def test_library_scan_reports_stages(app_client, tmp_path):
         (FIXTURES / "numeric_unordered_en.docx").read_bytes())
     # 文件夹里至少要有一个 PDF 才算文献文件夹
     pdf = Path("../demo/testset/zh_pdfs/aas_yinhongpeng_2016.pdf")
-    (folder / "ref" / "a.pdf").write_bytes(pdf.read_bytes())
+    if pdf.exists():
+        (folder / "ref" / "a.pdf").write_bytes(pdf.read_bytes())
+    else:
+        # the corpus PDF is a private fixture; any valid PDF exercises the
+        # "folder has at least one reference PDF" branch
+        from pypdf import PdfWriter
+        w = PdfWriter()
+        w.add_blank_page(width=612, height=792)
+        with open(folder / "ref" / "a.pdf", "wb") as fh:
+            w.write(fh)
     r = await client.post("/library/scan",
                           data={"path": str(folder), "scan_id": "s1"})
     assert r.status_code == 200, r.text

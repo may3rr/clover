@@ -37,6 +37,22 @@ model = "mlx-community/Qwen2.5-3B-Instruct-4bit"
 hf_endpoint = "https://hf-mirror.com"
 timeout = 20
 # device = "NPU,GPU,CPU"
+# Continuous batching (Intel GPU): queued requests are grouped and served
+# by one ContinuousBatchingPipeline. Measured on Arc B370 with 8B-int4:
+# 16 concurrent / 1315 prompt tokens -> 122 tok/s, ~1.05 s/request, ~8 GB
+# RSS; prefix caching on shared prompts raises it to ~158 tok/s. Keep
+# cache_size <= 6 so Electron + the backend still fit.
+batching = false
+batch_max_num_seqs = 16
+batch_cache_size = 6.0
+batch_max_num_batched_tokens = 32768
+batch_prefix_caching = true
+batch_wait_ms = 30
+# Tasks tried locally first, then cloud. Start with extract; on the Intel
+# machine judge/typo/function can be added once local quality is checked.
+tasks = ["extract"]
+# Local concurrency is separate from [llm.cloud].max_concurrency.
+max_concurrency = 8
 
 [llm.embedding]
 # Bailian text-embedding-v4 (Qwen3-based) fused with BM25 when ranking

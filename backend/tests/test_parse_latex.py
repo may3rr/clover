@@ -491,7 +491,9 @@ After the table.
     lm = d.latex
     big = next(p for p in d.paragraphs if p.text == "EN-FR")
     f, off, exact = lm.locate(big.id, 0)
-    src = (tmp_path / "main.tex").read_text()
+    # read bytes, not read_text(): universal newlines would collapse CRLF on
+    # Windows and shift the offsets that the parser reports on the raw file
+    src = (tmp_path / "main.tex").read_bytes().decode("utf-8")
     assert exact and src[off:off + 5] == "EN-FR"
 
 

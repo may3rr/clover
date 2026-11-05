@@ -116,6 +116,19 @@ class LocalSettings(BaseModel):
     min_response_len: int = 256
     # compiled-blob cache; empty = the platform cache folder
     ov_cache_dir: str = ""
+    # continuous batching (OpenVINO GPU): requests are grouped by the local
+    # engine and served by one ContinuousBatchingPipeline. Off by default;
+    # the defaults below are the measured sweet spot on Arc B370.
+    batching: bool = False
+    batch_max_num_seqs: int = 16
+    batch_cache_size: float = 6.0
+    batch_max_num_batched_tokens: int = 32768
+    batch_prefix_caching: bool = True
+    batch_wait_ms: int = 30
+    # tasks served locally first when enabled; anything else stays cloud
+    tasks: list[str] = ["extract"]
+    # local concurrency is independent from llm.cloud.max_concurrency
+    max_concurrency: int = 8
 
 
 class EmbeddingSettings(BaseModel):
