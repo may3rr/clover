@@ -39,7 +39,7 @@ export default function ExportDone({
     window.clearTimeout(leaveTimer.current)
     leaveTimer.current = window.setTimeout(onClose, 140)
   }, [onClose])
-  const parts = path.split('/')
+  const parts = path.split(/[\\/]/)
   const name = parts.pop() ?? path
   const raw = parts.pop() ?? ''
   const folder = FOLDER_ZH[raw] ?? raw

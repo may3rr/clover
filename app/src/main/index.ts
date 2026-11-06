@@ -159,8 +159,9 @@ ipcMain.handle('citecheck:info', () => ({
 ipcMain.handle('citecheck:open-docx', async () => {
   if (!win) return null
   const r = await dialog.showOpenDialog(win, {
-    // LaTeX 稿件可以是压缩包、文件夹或主 .tex：允许同时选文件或目录
-    properties: ['openFile', 'openDirectory'],
+    // LaTeX 稿件可以是压缩包、文件夹或主 .tex：macOS 允许同时选文件或目录。
+    // Windows 的对话框两者同开时只能选文件夹，只开文件；LaTeX 文件夹靠拖入
+    properties: IS_MAC ? ['openFile', 'openDirectory'] : ['openFile'],
     filters: [
       { name: '论文', extensions: ['docx', 'zip', 'gz', 'tgz', 'tex'] },
     ],

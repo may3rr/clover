@@ -183,6 +183,7 @@ export function docLabel(d: LibraryDoc): string {
   return bits.join('，')
 }
 
+/** Last path segment; Windows paths use backslashes. */
 export function baseName(p: string): string {
-  return p.replace(/\/+$/, '').split('/').pop() ?? p
+  return p.replace(/[\\/]+$/, '').split(/[\\/]/).pop() ?? p
 }
