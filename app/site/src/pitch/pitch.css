@@ -531,3 +531,138 @@ body {
   font-size: 24px;
   color: var(--silver-text);
 }
+
+/* ---------------- 3 真实错引 ---------------- */
+.gt-stat {
+  position: absolute;
+  left: 192px;
+  top: 270px;
+  width: 400px;
+}
+.gt-num {
+  font-size: 160px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--tmall-red);
+}
+.gt-label {
+  margin-top: 16px;
+  font-size: 34px;
+  font-weight: 500;
+}
+.gt-note {
+  margin-top: 24px;
+  font-size: 26px;
+  line-height: 40px;
+  color: var(--silver-text);
+}
+.gt-pair {
+  position: absolute;
+  left: 660px;
+  top: 270px;
+  width: 1070px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+/* 白色卡片里是论文本身：用 Clover 窗口里的字体与颜色 */
+.doc-card {
+  background: #ffffff;
+  color: #37352f;
+  border-radius: 12px;
+  padding: 24px 32px;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+}
+.doc-src {
+  font-size: 20px;
+  line-height: 28px;
+  color: rgba(55, 53, 47, 0.65);
+}
+.doc-text {
+  margin: 12px 0 0;
+  font-size: 30px;
+  line-height: 48px;
+}
+.doc-text sup {
+  font-size: 18px;
+  color: rgba(55, 53, 47, 0.65);
+}
+mark {
+  padding: 0 4px;
+  border-radius: 4px;
+  color: inherit;
+  font-weight: 600;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+mark.bad { background: rgba(255, 95, 87, 0.28); }
+mark.ok { background: rgba(40, 200, 64, 0.24); }
+.abl {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 28px;
+  line-height: 40px;
+}
+.abl-row {
+  display: flex;
+  justify-content: space-between;
+  max-width: 640px;
+}
+.abl-row b {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.abl-diff {
+  margin-top: 4px;
+  font-weight: 600;
+}
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-left: 8px;
+  font-size: 30px;
+  font-weight: 700;
+}
+.verdict svg {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+.verdict circle { fill: #ff5f57; }
+.verdict path {
+  stroke: #ffffff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+.verdict-src {
+  margin-left: 12px;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--silver-text);
+}
+/* 分步出现：先论文原句，再被引原文与判断 */
+.gt-source,
+.verdict {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+.slide.step-1 .gt-source,
+.slide.step-1 .verdict {
+  opacity: 1;
+  transform: none;
+}
+.slide.step-1 .verdict {
+  transition-delay: 450ms;
+}
+.slide.on .gt-stat,
+.slide.on .gt-claim {
+  animation: rise 700ms var(--ease-out) both;
+}
+.slide.on .gt-claim {
+  animation-delay: 150ms;
+}
