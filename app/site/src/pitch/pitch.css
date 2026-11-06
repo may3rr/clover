@@ -803,3 +803,236 @@ mark.ok { background: rgba(40, 200, 64, 0.24); }
   line-height: 34px;
   color: var(--silver-text);
 }
+
+/* ---------------- 6 凭什么可靠 ---------------- */
+.proof {
+  position: absolute;
+  left: 192px;
+  top: 260px;
+  width: 1536px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 72px;
+}
+.pf {
+  opacity: 0.25;
+  transition: opacity 500ms var(--ease-out);
+}
+.slide.on .pf:nth-child(1),
+.slide.step-1 .pf:nth-child(2),
+.slide.step-2 .pf:nth-child(3) {
+  opacity: 1;
+}
+.pf-label {
+  font-size: 30px;
+  font-weight: 500;
+}
+.pf-num {
+  margin-top: 24px;
+  height: 176px;
+  font-size: 150px;
+  line-height: 176px;
+  font-weight: 700;
+  color: var(--tmall-red);
+}
+.pf-num small {
+  font-size: 56px;
+  color: var(--silver-text);
+}
+.pf-bars {
+  margin-top: 24px;
+  height: 176px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+}
+.pb {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  align-items: center;
+}
+.pb span {
+  grid-row: span 2;
+  font-size: 24px;
+}
+.pb i {
+  display: block;
+  height: 28px;
+  /* F1 的满格按 0.30 画；花费的满格是 GPT-4 */
+  width: calc(var(--w) / 0.3 * 100%);
+  min-width: 4px;
+  border-radius: 4px;
+  background: var(--tmall-red);
+  transform-origin: left;
+  transform: scaleX(0);
+  transition: transform 700ms var(--ease-out) 200ms;
+}
+.pf-bars.cost .pb i {
+  width: calc(var(--w) * 100%);
+}
+.pb b {
+  margin-top: 8px;
+  font-size: 30px;
+  font-weight: 700;
+}
+.pb.dim i {
+  background: var(--silver);
+}
+.pb.dim b,
+.pb.dim span {
+  color: var(--silver-text);
+}
+.slide.step-1 .pf:nth-child(2) .pb i,
+.slide.step-2 .pf:nth-child(3) .pb i {
+  transform: none;
+}
+.pf-note {
+  margin-top: 32px;
+  font-size: 22px;
+  line-height: 34px;
+  color: var(--silver-text);
+}
+.proof-rule {
+  position: absolute;
+  left: 192px;
+  top: 740px;
+  font-size: 28px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out) 400ms;
+}
+.slide.step-2 .proof-rule {
+  opacity: 1;
+}
+
+/* ---------------- 8 隐私 ---------------- */
+.priv {
+  position: absolute;
+  left: 192px;
+  top: 250px;
+  width: 640px;
+}
+.priv-num {
+  font-size: 140px;
+  line-height: 1;
+  font-weight: 700;
+  color: var(--tmall-red);
+}
+.priv-num small {
+  margin-left: 16px;
+  font-size: 40px;
+  color: var(--silver-text);
+}
+.priv-label {
+  margin-top: 24px;
+  font-size: 30px;
+  line-height: 44px;
+  font-weight: 500;
+}
+.priv-zero {
+  margin-top: 48px;
+  display: flex;
+  gap: 48px;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+.slide.step-1 .priv-zero {
+  opacity: 1;
+  transform: none;
+}
+.priv-zero div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.priv-zero b {
+  font-size: 72px;
+  line-height: 1;
+  font-weight: 700;
+}
+.priv-zero span {
+  font-size: 24px;
+  color: var(--silver-text);
+}
+.priv-note {
+  margin-top: 48px;
+  font-size: 22px;
+  line-height: 34px;
+  color: var(--silver-text);
+}
+.priv-shots {
+  position: absolute;
+  left: 900px;
+  top: 250px;
+  width: 830px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.priv-shots img {
+  display: block;
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.slide.on .priv-shots img {
+  animation: rise 700ms var(--ease-out) both;
+}
+.slide.on .priv-shots img + img {
+  animation-delay: 160ms;
+}
+
+/* ---------------- 9 THANKS ---------------- */
+.slide.thanks {
+  background-image: url('./assets/tpl/image4.jpg');
+}
+.thanks-art {
+  position: absolute;
+  left: 82px;
+  top: 115px;
+  width: 933px;
+}
+.thanks-word {
+  position: absolute;
+  left: 75px;
+  top: 520px;
+  font-size: 164px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+.thanks-sign {
+  position: absolute;
+  left: 86px;
+  top: 770px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.thanks-sign img {
+  width: 64px;
+  height: 64px;
+}
+.thanks-team {
+  margin-left: 16px;
+  font-size: 26px;
+  color: var(--silver-text);
+}
+.thanks-date {
+  position: absolute;
+  left: 79px;
+  top: 905px;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 34px;
+  font-weight: 500;
+}
+.slide.on .thanks-word,
+.slide.on .thanks-sign {
+  animation: rise 800ms var(--ease-out) both;
+}
+.slide.on .thanks-sign {
+  animation-delay: 200ms;
+}

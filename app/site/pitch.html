@@ -165,6 +165,35 @@
         </div>
       </section>
 
+      <!-- ============ 6 凭什么可靠 ============ -->
+      <section class="slide framed" data-title="凭什么可靠" data-steps="3">
+        <div class="bar-title">这些判断，凭什么可靠</div>
+        <div class="proof">
+          <div class="pf">
+            <div class="pf-label">人为注入的引用错误</div>
+            <div class="pf-num">84<small>/86</small></div>
+            <div class="pf-note">在测试稿件里注入编造文献、张冠李戴、改写数字，Clover 找出 84 处</div>
+          </div>
+          <div class="pf">
+            <div class="pf-label">识别不准确引用，F1</div>
+            <div class="pf-bars">
+              <div class="pb"><span>Clover</span><i style="--w: 0.25"></i><b>0.25 至 0.30</b></div>
+              <div class="pb dim"><span>GPT-4</span><i style="--w: 0.09"></i><b>0.09</b></div>
+            </div>
+            <div class="pf-note">公开数据集 Citation-Integrity，606 条人工标注的真实引用，GPT-4 结果取自原论文</div>
+          </div>
+          <div class="pf">
+            <div class="pf-label">体检一篇论文的花费</div>
+            <div class="pf-bars cost">
+              <div class="pb"><span>Clover</span><i style="--w: 0.0044"></i><b>0.40 元</b></div>
+              <div class="pb dim"><span>GPT-4</span><i style="--w: 1"></i><b>约 90 元</b></div>
+            </div>
+            <div class="pf-note">同一篇中文稿件，同样的对话用量按 GPT-4 官方价格折算</div>
+          </div>
+        </div>
+        <div class="proof-rule">每一条判断都附被引原文，原文里逐字找不到就标为无法判断</div>
+      </section>
+
       <!-- ============ 7 Intel 本地 AI 应用挑战（必填页） ============ -->
       <section class="slide framed" data-title="Intel 本地 AI" data-steps="2">
         <div class="bar-title">Intel 本地 AI 应用挑战</div>
@@ -198,6 +227,38 @@
           </figure>
         </div>
         <div class="shots-note">决赛机 HP OmniBook 7 实拍，任务管理器性能页，11 月 6 日</div>
+      </section>
+
+      <!-- ============ 8 隐私 ============ -->
+      <section class="slide framed" data-title="隐私" data-steps="2">
+        <div class="bar-title">稿件留在本机</div>
+        <div class="priv">
+          <div class="priv-num">5,910<small>/ 11,700 字</small></div>
+          <div class="priv-label">隐私模式下发往云端的稿件文字，只有带引用的论断句</div>
+          <div class="priv-zero">
+            <div><b>0</b><span>题目</span></div>
+            <div><b>0</b><span>摘要</span></div>
+            <div><b>0</b><span>章节标题</span></div>
+            <div><b>0</b><span>图表题注</span></div>
+          </div>
+          <div class="priv-note">每一次发往云端的请求都记进发送清单，报告里逐条可查</div>
+        </div>
+        <div class="priv-shots">
+          <img class="ps-list" src="./src/pitch/assets/intel/send-list-crop.png" alt="报告里的发送清单" />
+          <img class="ps-toggle" src="./src/pitch/assets/intel/privacy-toggle-crop.png" alt="设置页的隐私模式开关" />
+        </div>
+      </section>
+
+      <!-- ============ 9 THANKS ============ -->
+      <section class="slide thanks" data-title="THANKS">
+        <img class="thanks-art" src="./src/pitch/assets/tpl/image5.png" alt="天猫 AI 黑客松，高校挑战赛" />
+        <div class="thanks-word">THANKS</div>
+        <div class="thanks-sign">
+          <img src="./src/pitch/assets/logo.svg" alt="" />
+          <span class="foot-mark">Clover</span>
+          <span class="thanks-team">我要发顶刊　天津师范大学　吕浩博</span>
+        </div>
+        <div class="thanks-date">2026/09/08-11/08</div>
       </section>
     </div>
     <div id="hud"></div>
