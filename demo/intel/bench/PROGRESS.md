@@ -62,6 +62,16 @@
 2. **首页“选择文件”在 Windows 打开的是“选择文件夹”对话框**：主进程的 `showOpenDialog` 同时带 `openFile` 和 `openDirectory`，Windows 变成文件夹模式。在“文件夹:”框里输入 `.docx` 报“文件夹名无效”，进入含 3 个 docx 的目录后列表仍显示“没有与搜索条件匹配的项”，即单篇 docx 无法通过该按钮选择。拖入和命令行打开不受影响。建议 Windows 上拆成“选择文件 / 选择文件夹”两个入口。
 3. 运行页截图用的是内置 `CITECHECK_E2E` 入口（直接调 `analyze`）。正常拖入传的也是 Windows 路径，所以第 1 条在真实拖入下同样会出现；动画本身与拖入走同一套 UI。
 
+### ff056a3 四项确认（重启后实测）
+
+- `intel`（`943d8c0`）合并 `cn/master` `ff056a3`，生成 `d11d499`，无冲突。
+- **1 ✅ 文件对话框**：首页“选择文件”现在弹出 Windows“打开”对话框，有 `文件名(N):` 和 `论文` 类型；输入 `C:\clover\app\site\public\samples\clover-sample.docx` 后能直接选中并开始解析。截图 `17-light-file-dialog.png`。代码按平台分叉：Windows 只开 `openFile`，macOS 仍允许文件或目录。
+- **2 ✅ 运行页标题**：只显示 `clover-sample.docx`，不再带路径。截图 `14-light-running-filename.png`。`baseName()` 已按 `[\\/]` 分割，`accept` / `library` / `ExportDone` 都统一用它。
+- **3 ✅ 展开按钮位置**：收起检查器后，导出胶囊实际像素 `x=965..1098`，展开图标 `x=1119..1128`，三者窗口按钮字形分别在 `x=1160..1169 / 1206..1215 / 1252..1261`；`--win-caption: 144px` 把按钮盒右缘限制在约 1136，未进入 1142 起的 caption 区。点击 `(1124,27)` 能重新展开检查器。截图 `15-light-report-expand-button.png`。
+- **4 ✅ 导出提示**：显示 `clover-sample（Clover）.docx`、`保存在「samples」文件夹，共 18 条批注`，文件夹名正常，没有反斜杠或完整路径。截图 `16-light-export-done.png`。鼠标点击导出胶囊中心 `(808,26)` 也能触发，不必用 `Ctrl+E`。
+- **仍遗留（小）**：导出提示的第二个按钮写死为「在访达中显示」（`ExportDone.tsx:95/107`），Windows 上应为「在资源管理器中显示」。不影响本次四项。
+- 清理：导出产生的 `clover-sample（Clover）.docx` 已被 `.gitignore` 忽略，测试后删除；应用与后端进程已退出。
+
 收尾：`prefs.onboarded` 已恢复为 true；Electron 与后端进程已退出。
 
 ## T0
