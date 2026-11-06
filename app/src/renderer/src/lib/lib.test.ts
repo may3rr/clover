@@ -534,3 +534,31 @@ describe('inline diff edits', () => {
     expect(editFor(seg, edits)).toBeNull()
   })
 })
+
+describe('buildItems section-distribution collapse', () => {
+  const dist = (id: string, pid: string, metrics: string[]) => ({
+    id, layer: 'distribution', severity: 'low', anchor: { paragraph_id: pid, start: 0, end: 2 },
+    title: id, detail: id, refs: [], metrics,
+  })
+  const report = {
+    sections: [
+      { id: 's1', heading_paragraph_id: 'h1' },
+      { id: 's2', heading_paragraph_id: 'h2' },
+      { id: 's3', heading_paragraph_id: 'h3' },
+    ],
+    paragraphs: [{ id: 'h1', text: '引言' }, { id: 'h2', text: '结论' }, { id: 'h3', text: '参考文献' }],
+    findings: [
+      dist('intro', 'h1', ['share:intro']),
+      dist('concl', 'h2', ['share:conclusion', 'density:conclusion']),
+      dist('refs', 'h3', ['recent_share', 'ref_age']),
+    ],
+    revisions: [],
+  } as unknown as Report
+
+  it('groups section findings but keeps a venue metric on a heading separate', () => {
+    const items = buildItems(report)
+    const group = items.find((i) => i.id === 'dist-group')
+    expect(group?.title).toBe('2 个章节的引用分布偏离该领域常见范围')
+    expect(items.some((i) => i.id === 'refs')).toBe(true)
+  })
+})

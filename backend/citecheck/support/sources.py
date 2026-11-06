@@ -146,12 +146,14 @@ async def _fetch_pdf_uncached(
 
         from pypdf import PdfReader
 
+        from ..pdftext import page_text
+
         reader = PdfReader(io.BytesIO(data))
         # pypdf is CPU-bound — run it in a thread so PDF parsing a big
         # paper doesn't stall the event loop for every other layer
         text = await asyncio.to_thread(
             lambda: "\n".join(
-                (p.extract_text() or "") for p in reader.pages))
+                page_text(p) for p in reader.pages))
     except Exception as e:  # noqa: BLE001
         log.warning("pdf parse failed %s: %s", url, e)
         return ""

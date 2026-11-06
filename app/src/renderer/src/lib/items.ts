@@ -42,8 +42,14 @@ export function buildItems(report: Report): ListItem[] {
   const headingIds = new Set(
     (report.sections ?? []).map((s) => s.heading_paragraph_id).filter(Boolean)
   )
+  // per-section citation share/density findings sit on section headings;
+  // venue metrics anchored on a heading (参考文献构成 on the reference
+  // list) are findings of their own
   const sectionDist = (report.findings ?? []).filter(
-    (f) => f.layer === 'distribution' && headingIds.has(f.anchor?.paragraph_id)
+    (f) =>
+      f.layer === 'distribution' &&
+      headingIds.has(f.anchor?.paragraph_id) &&
+      (f.metrics ?? []).every((m) => /^(share|density):/.test(m))
   )
   const collapseDist = sectionDist.length >= 2
 

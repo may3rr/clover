@@ -180,3 +180,36 @@ def test_arxiv_margin_stamp_is_not_a_title():
     assert is_arxiv_stamp("arXiv:1711.01731v3 [cs.CL] 11 Jan 2018")
     assert is_arxiv_stamp("arXiv:1408.5882 [cs.CL]")
     assert not is_arxiv_stamp("A Survey on Dialogue Systems: Recent Advances and New Frontiers")
+
+
+def test_indirect_font_widths(tmp_path):
+    """Font width arrays holding indirect objects (CNKI journal PDFs)
+    used to make pypdf fail on every page, and the file was unreadable."""
+    pytest.importorskip("reportlab")
+    from pypdf import PdfReader, PdfWriter
+    from pypdf.generic import ArrayObject, IndirectObject, NameObject, NumberObject
+    from reportlab.pdfgen import canvas
+
+    from citecheck.library.scan import _read
+
+    src = tmp_path / "src.pdf"
+    c = canvas.Canvas(str(src))
+    c.setFont("Helvetica", 12)
+    c.drawString(72, 720, "Widths stored as indirect objects")
+    c.save()
+
+    w = PdfWriter(clone_from=str(src))
+    font = w.pages[0]["/Resources"]["/Font"]
+    font = font[next(iter(font))].get_object()
+    font[NameObject("/FirstChar")] = NumberObject(32)
+    font[NameObject("/LastChar")] = NumberObject(126)
+    font[NameObject("/Widths")] = ArrayObject(
+        w._add_object(NumberObject(500)) for _ in range(95))
+    out = tmp_path / "indirect.pdf"
+    w.write(out)
+    widths = PdfReader(out).pages[0]["/Resources"]["/Font"]
+    widths = widths[next(iter(widths))].get_object()["/Widths"]
+    assert isinstance(widths[0], IndirectObject)
+
+    pages, *_ = _read(out)
+    assert "indirect objects" in pages[0]

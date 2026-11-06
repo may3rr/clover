@@ -176,9 +176,11 @@ def _lines(pdf: LocalPdf) -> list[tuple[str, int]]:
     """(line, 1-based page in the PDF) for the paper without its cover."""
     from pypdf import PdfReader
 
+    from ..pdftext import page_text
+
     logging.getLogger("pypdf").setLevel(logging.ERROR)
     reader = PdfReader(str(pdf.path))
-    return _page_lines([p.extract_text() or "" for p in reader.pages], pdf.cover_pages)
+    return _page_lines([page_text(p) for p in reader.pages], pdf.cover_pages)
 
 
 def _cites(text: str, author_year: bool) -> list[tuple[int, int]]:
@@ -418,10 +420,12 @@ def load_profiles(exemplars: list[ExemplarSource | LocalPdf], cache: Cache | Non
             try:
                 prof = profile_source(src) or {}
             except Exception as e:  # noqa: BLE001 — one bad PDF is skipped
+                # not cached: a reader fix or a retry may read it next time
                 log.warning("venue profile failed for %s: %s", src.filename or src.url, e)
                 prof = {}
-            if cache:
-                cache.set(key, prof)
+            else:
+                if cache:
+                    cache.set(key, prof)
         out.append((src, prof or None))
     return out
 
