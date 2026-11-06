@@ -1,0 +1,596 @@
+{
+ "zh": {
+  "report": "demo/final/runs/zh_v7_r1105.json",
+  "check_final": "✓ fake_en          真实性  完全编造的英文文献（作者、标题、期刊卷期都像真的）                  status=not_found\n✓ chimera          真实性  真实作者配编造标题（大模型幻觉文献的典型样子）                    status=not_found\n✓ wrong_year       真实性  真实文献年份写错（2016 写成 2012）                     年份不一致：文中写 2012，数据库记录为 2016; 本地原文年份为 2015，文中写 2012\n✓ author_swap      支持度  正文写的作者与被引文献作者对不上（Fast R-CNN 写成 He 等人）      正文作者归属与文献作者不一致，可能引错了文献\n✓ misattr_topic    支持度  张冠李戴：关键点检测的思想引成了 Transformer               被引文献与这条论断说的不是同一项工作，可能引错了文献 labels=['unsupported']\n✓ misattr_dataset  支持度  张冠李戴：介绍 MS COCO 却引了 ImageNet 的论文           被引文献与这条论断说的不是同一项工作，可能引错了文献 labels=['unsupported']\n✓ number_rcnn      支持度  数字与原文不符：R-CNN 在 VOC2007 上 58.5% 写成 78.5%   被引文献不支持这条论断 labels=['unsupported']\n✓ number_spp       支持度  数字放大十倍：SPP-Net 比 R-CNN 快 24–102 倍写成 240–   被引文献不支持这条论断 labels=['supported', 'unsupported']\n✓ overclaim        支持度  夸大效果：Soft-NMS 在 COCO 上约提升 1–2 个点，写成 10 个   被引文献不支持这条论断 labels=['unsupported']\n✓ stacking         分布   一句话堆了 7 篇文献，没说各自的贡献                        stacking\n✓ duplicate        规范   同一篇 SSD 在列表里出现两次（[43] 与 [72]）              duplicate\n✓ uncited          规范   列表里的 DETR 正文从未引用                           uncited\n✓ dangling         规范   正文引了 [74]，列表里没有这一条（本想引 [73]，编号错位）          dangling\n✓ typo_1           规范   错别字：侯选                                     侯 -> 候\n✓ typo_2           规范   错别字：制信                                     制 -> 置\n✓ typo_3           规范   错别字：Netwrok                                Netwrok -> Network\n✓ reorder          规范   列表里 [68] 与 [69] 顺序颠倒，正文先引 [69]，需要按首次引用顺序   6 处修订\n\n检出 17/17",
+  "injections": [
+   {
+    "id": "fake_en",
+    "layer": "真实性",
+    "ref_id": "r70",
+    "ref_check": {
+     "status": "not_found",
+     "issues": [
+      "Crossref、OpenAlex、arXiv均未检索到相符文献"
+     ],
+     "matched_source": null
+    }
+   },
+   {
+    "id": "chimera",
+    "layer": "真实性",
+    "ref_id": "r71",
+    "ref_check": {
+     "status": "not_found",
+     "issues": [
+      "Crossref、OpenAlex、arXiv均未检索到相符文献"
+     ],
+     "matched_source": null
+    }
+   },
+   {
+    "id": "wrong_year",
+    "layer": "真实性",
+    "ref_id": "r55",
+    "ref_check": {
+     "status": "mismatch",
+     "issues": [
+      "年份不一致：文中写 2012，数据库记录为 2016",
+      "本地原文年份为 2015，文中写 2012"
+     ],
+     "matched_source": "crossref"
+    }
+   },
+   {
+    "id": "author_swap",
+    "layer": "支持度",
+    "ref_id": "r21",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "被引文献确实是Fast R-CNN论文。论断中提到的“受SPP-Net启发”、“将SPP层简化为单尺度ROI Pooling”以及“提出多任务损失函数”均在原文片段中有明确对应描述（如提到SPPnet、RoI pooling layer extracts a fixed-length feature vector、trained end-to-end with a multi-task loss），内容完全支持。"
+     }
+    ]
+   },
+   {
+    "id": "misattr_topic",
+    "layer": "支持度",
+    "ref_id": "r40",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "openalex"
+    },
+    "support": [
+     {
+      "label": "unsupported",
+      "source_kind": "abstract",
+      "rationale": "论断声称文献[40]的思想被用于“对不同目标间的关系进行建模”，但文献[40]（Attention Is All You Need）提出的Transformer架构核心是处理序列数据中的依赖关系（如机器翻译中的词与词），其原文片段主要强调注意力机制在序列转换任务中的应用及并行化优势，并未提及“不同目标间关系”这一特定概念或应用场景。虽然注意力机制本身可用于建模关系，但将文献的核心思想直接归结为“对不同目标间的关系进行建模”属于过度引申或误读，且片段中无相关证据支持该具体表述。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "abstract",
+      "rationale": "被引文献[40]是《Attention Is All You Need》，主要提出Transformer架构用于序列转换任务（如机器翻译），并未涉及关键点检测或目标检测中的CornerNet思想。论断声称CornerNet借鉴了该文献对关键点检测的思想，这与文献实际内容完全不符，属于张冠李戴。"
+     }
+    ]
+   },
+   {
+    "id": "misattr_dataset",
+    "layer": "支持度",
+    "ref_id": "r45",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中引用[45]是为了指代“ImageNet分类数据集”。被引文献确实是介绍ImageNet数据集及其大规模视觉识别挑战的论文，且片段明确提到ImageNet用于“object category classification”（目标类别分类），这与论断中将其称为“ImageNet分类数据集”的描述一致。虽然论断提到的WordTree方法和YOLOv2的具体训练策略并非该文献内容，但根据规则，⟦本条文献⟧仅负责紧挨其前的“ImageNet分类数据集”这一实体定义，因此支持。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中由[45]负责的内容是“ImageNet”作为当前通用目标检测任务中流行的数据集。被引文献标题为《ImageNet Large Scale Visual Recognition Challenge》，摘要和正文片段明确指出该挑战包含“object category classification and detection”（物体类别分类与检测），且专门描述了“Object detection dataset statistics”（物体检测数据集统计信息），证实了ImageNet确实是一个用于目标检测的数据集，支持论断。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称MS COCO数据集用于多种任务且是目标检测最具挑战性的数据集之一，并引用了文献[45]。然而，文献[45]的标题和摘要明确指出其介绍的是ImageNet Large Scale Visual Recognition Challenge (ILSVRC)，而非MS COCO数据集。虽然片段中提到了COCO作为对比（'It has fewer object categories than ILSVRC...'），但该文献的主体工作是ImageNet，并非提出或定义MS COCO数据集。因此，该文献不能支持关于MS COCO数据集性质和用途的论断，属于引用错误（off_topic）。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "被引文献是ImageNet数据集的官方论文，片段中明确提到ImageNet包含14,197,122张标注图片（约1420万），且摘要和表格指出其用于对象分类、检测等任务，与论断内容一致。"
+     }
+    ]
+   },
+   {
+    "id": "number_rcnn",
+    "layer": "支持度",
+    "ref_id": "r15",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "被引文献[15]即为Girshick等人提出的R-CNN论文。论断中关于R-CNN算法流程的描述（使用选择性搜索提取约2000个候选区域、通过CNN提取特征、使用SVM分类）在原文片段中有明确且一致的对应描述。虽然论断提到的“归一化”和“区域回归”在提供的片段中未详细展开，但片段已支持论断的核心内容（步骤分解、候选区域数量、CNN+SVM架构），且无矛盾信息，故判定为支持。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称R-CNN在PASCAL VOC2007上的检测精度为78，但被引文献（R-CNN原始论文）中明确指出的VOC 2012 mAP为53.3%，且文中提到的VOC 2007相关数值（如对比Dean et al.时的59%或OverFeat的31.4%等上下文）均远低于78。文献原文数据与论断数值严重不符。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中由⟦本条文献⟧负责的内容是“R-CNN检测模型”这一基础组件。被引文献[15]正是提出R-CNN算法的原始论文，片段中明确描述了R-CNN系统包含区域生成、CNN特征提取及分类等模块，并定义了IoU阈值用于筛选候选区域（如0.3和0.5），这与论断中提到的使用R-CNN模型及其基于IoU的机制相符。虽然级联结构属于Cascade R-CNN（其他文献），但R-CNN作为被引用的基础模型，其存在和基本定义得到支持。"
+     }
+    ]
+   },
+   {
+    "id": "number_spp",
+    "layer": "支持度",
+    "ref_id": "r20",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "被引文献确实是He等人2014年提出的SPP-Net论文。论断中关于在最后一层卷积和全连接层之间加入SPP层、支持任意尺度输入、以及通过单次CNN运算提取特征从而减少计算量的描述，均能在原文片段中找到直接对应的表述（如'add an SPP layer on top of the last convolutional layer', 'compute the feature maps from the entire image only once', 'avoids repeatedly computing the convolutional features'）。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称SPP-Net比R-CNN快240~1020倍，但被引文献原文明确指出该方法在测试图像处理上比R-CNN快24-102倍（'24-102× faster'），且表格数据也支持这一数量级。论断中的数值范围（240~1020）与原文事实（24~102）存在一个数量级的差异，属于核心数值不一致。"
+     }
+    ]
+   },
+   {
+    "id": "overclaim",
+    "layer": "支持度",
+    "ref_id": "r37",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称Soft NMS使模型在MS COCO数据集上的mAP提升了10个百分点，但被引文献原文明确指出提升幅度为1.3%和1.1%，数值严重不符。"
+     }
+    ]
+   },
+   {
+    "id": "stacking",
+    "layer": "分布",
+    "ref_id": null
+   },
+   {
+    "id": "duplicate",
+    "layer": "规范",
+    "ref_id": "r72",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    }
+   },
+   {
+    "id": "uncited",
+    "layer": "规范",
+    "ref_id": "r73",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    }
+   },
+   {
+    "id": "dangling",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "typo_1",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "typo_2",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "typo_3",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "reorder",
+    "layer": "规范",
+    "ref_id": null
+   }
+  ]
+ },
+ "en": {
+  "report": "demo/final/runs/en_v4_r1105.json",
+  "check_final": "✓ fake_en          真实性  完全编造的文献（作者、标题、期刊卷期都像真的）                    status=not_found\n✓ chimera          真实性  真实作者配编造标题（大模型幻觉文献的典型样子）                    status=not_found\n✓ wrong_year       真实性  真实文献年份写错（LSTM 1997 写成 1993）                年份不一致：文中写 1993，数据库记录为 1997\n✓ author_swap      支持度  正文写的作者与被引文献作者对不上（BN 写成 Glorot 等人）          被引文献与这条论断说的不是同一项工作，可能引错了文献\n✓ misattr_topic    支持度  张冠李戴：ReLU 引成了乘积量化的论文                       被引文献与这条论断说的不是同一项工作，可能引错了文献 labels=['unsupported']\n✓ misattr_dataset  支持度  张冠李戴：介绍 MS COCO 却引了 ImageNet 的论文           被引文献不支持这条论断 labels=['unsupported']\n✓ number_coco      支持度  数字与原文不符：MS COCO 的 80 类写成 180 类             被引文献不支持这条论断 labels=['unsupported']\n✓ overclaim        支持度  夸大效果：Faster R-CNN 原文约 5 fps，写成 50 fps      被引文献不支持这条论断 labels=['unsupported']\n✓ number_bn        支持度  数字放大十倍：BN 用少 14 倍的训练步数写成少 140 倍            被引文献不支持这条论断 labels=['undetermined', 'unsupported']\n✓ stacking         分布   一句话堆了 7 篇文献，没说各自的贡献                        stacking\n✓ duplicate        规范   同一篇 Faster R-CNN 在列表里出现两次                  duplicate\n✓ uncited          规范   列表里的 YOLO 正文从未引用                           uncited\n✓ dangling         规范   正文引了 \\cite{Redmon2015}，列表里没有这个键（列表里是 Red   dangling\n✓ typo_1           规范   错别字：convergance                            convergance -> convergence\n✓ typo_2           规范   错别字：verifed                                verifed -> verified\n✓ typo_3           规范   错别字：effecitve                              effecitve -> effective\n\n检出 16/16",
+  "injections": [
+   {
+    "id": "fake_en",
+    "layer": "真实性",
+    "ref_id": "r52",
+    "ref_check": {
+     "status": "not_found",
+     "issues": [
+      "Crossref、OpenAlex、arXiv均未检索到相符文献"
+     ],
+     "matched_source": null
+    }
+   },
+   {
+    "id": "chimera",
+    "layer": "真实性",
+    "ref_id": "r9",
+    "ref_check": {
+     "status": "not_found",
+     "issues": [
+      "Crossref、OpenAlex、arXiv均未检索到相符文献"
+     ],
+     "matched_source": null
+    }
+   },
+   {
+    "id": "wrong_year",
+    "layer": "真实性",
+    "ref_id": "r16",
+    "ref_check": {
+     "status": "mismatch",
+     "issues": [
+      "年份不一致：文中写 1993，数据库记录为 1997"
+     ],
+     "matched_source": "openalex"
+    }
+   },
+   {
+    "id": "author_swap",
+    "layer": "支持度",
+    "ref_id": "r17",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "openalex"
+    },
+    "support": [
+     {
+      "label": "undetermined",
+      "source_kind": "fulltext",
+      "rationale": "论断中由本条文献（Ioffe & Szegedy, Batch Normalization）负责支持的内容是“leading results ... exploit 'very deep' models”以及深度范围中的上限“thirty”。虽然该文献确实提出了Batch Normalization并展示了在ImageNet上的SOTA结果，但其核心贡献在于加速训练而非单纯强调网络深度本身（深度通常归因于Simonyan/Zisserman或Szegedy的GoogLeNet等）。然而，片段中明确提到“The effect is amplified as the network depth i"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中由⟦本条文献⟧负责的内容是“intermediate normalization layers”（中间归一化层）。被引文献Ioffe & Szegedy (2015)提出了Batch Normalization，这是一种在神经网络中间层（hidden layers）对输入进行归一化的技术。文献摘要和正文均明确指出该方法通过“normalizing layer inputs”来解决训练问题，并提到其能加速深层网络训练。虽然论断后半部分关于SGD收敛的具体描述可能更多依赖于其他引用的初始化方法文献，但就“intermediate normalization layers”这一术语及其作为解决"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称 Batch Normalization (BN) 是由 Glorot et al. 提出的，但被引文献明确显示 BN 是由 Sergey Ioffe 和 Christian Szegedy 在 ICML 2015 提出的。虽然 Glorot 等人（如 Xavier initialization）与深度网络训练相关，但他们并非 BN 的提出者。因此，文献内容与论断中的作者归属严重不符，属于 off_topic。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断将 Batch Normalization (BN) 归属于 Glorot et al.，但被引文献明确显示 BN 是由 Sergey Ioffe 和 Christian Szegedy 提出的（标题及作者栏可见）。Glorot et al. 通常与 Xavier 初始化相关，而非 BN。因此，文献实际内容与论断的归属严重不符，属于 off_topic。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称遵循文献[17]（即Ioffe & Szegedy的Batch Normalization论文）中的实践，具体指不使用dropout。被引文献片段明确指出“often do not require Dropout for regularization”以及“removing Dropout... speeds up training”，证实了该文献确实提出了在Batch Normalization下可以移除Dropout的做法，支持论断中关于“following the practice in [17]”的描述。"
+     },
+     {
+      "label": "undetermined",
+      "source_kind": "fulltext",
+      "rationale": "论断声称BN确保前向传播信号具有非零方差。虽然被引文献是Batch Normalization的原始论文，但提供的片段主要描述了BN通过归一化（减去均值、除以标准差）来减少内部协变量偏移，并指出在推理阶段均值和方差是固定的。片段中并未提及BN能“确保”信号具有“非零方差”这一具体性质（实际上，如果输入方差为0，BN公式中的epsilon用于数值稳定性，而非保证方差非零；且BN的主要目的是标准化分布，而非防止方差为零）。因此，片段内容无法支持该具体论断。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称BN以140倍更少的训练步骤匹配原模型精度，但被引文献原文中明确提到的最大加速比是“7%的训练步骤”（即约14.3倍），并未提及140倍这一数值。虽然文献确实讨论了BN加速训练并匹配精度的能力，但核心数值与原文不符。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中由⟦本条文献⟧负责的内容是“adopt the weight initialization in ... and BN”，即采用Batch Normalization（BN）。被引文献Ioffe & Szegedy (2015)正是提出Batch Normalization的论文，且片段中明确提到了BN的作用及与Dropout的关系（如'Removing Dropout from Modified BN-Inception...'），支持在模型中使用BN这一做法。虽然论断还提到'no dropout'，但这是作者基于BN特性做出的具体实验设置选择，而非对文献内容的直接引用或归属，因此只要"
+     }
+    ]
+   },
+   {
+    "id": "misattr_topic",
+    "layer": "支持度",
+    "ref_id": "r18",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "undetermined",
+      "source_kind": "abstract",
+      "rationale": "论断声称该文献证明了“编码残差向量比编码原始向量更有效”，但提供的文献片段仅介绍了乘积量化（Product Quantization）及其在近似最近邻搜索中的应用，并未提及“残差向量”与“原始向量”的对比实验或结论。虽然乘积量化内部可能涉及残差计算，但片段中缺乏支持该具体比较结论的证据。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "abstract",
+      "rationale": "论断中引用[18]是为了支持“σ denotes ReLU”这一事实，即声称ReLU激活函数出自该文献。然而，被引文献《Product Quantization for Nearest Neighbor Search》是关于乘积量化和最近邻搜索的算法论文，与神经网络中的ReLU激活函数完全无关。这属于将不相关的工作归属给引用，因此判定为离题且不支持。"
+     }
+    ]
+   },
+   {
+    "id": "misattr_dataset",
+    "layer": "支持度",
+    "ref_id": "r39",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "arxiv"
+    },
+    "support": [
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中“challenging ImageNet dataset”这一描述由文献[39]支持。被引文献是ImageNet数据集的官方论文（ILSVRC），其摘要和正文多次强调该数据集规模巨大、类别多样，且明确指出标注任务对未经训练的标注者来说是“extremely challenging”，并讨论了细粒度识别的难度。因此，文献内容直接支持了将ImageNet描述为“具有挑战性的数据集”这一论断。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中引用[39]是为了指明实验所使用的数据集为ImageNet。被引文献是ImageNet Large Scale Visual Recognition Challenge (ILSVRC) 的官方论文，确实定义并提供了ImageNet数据集及基准测试。虽然论断后半部分关于“展示退化问题”和“评估我们的方法”属于作者自己的实验内容，不需要该文献支持，但就引用位置而言，该文献正确支持了“ImageNet”这一数据集来源。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断指出在ImageNet分类数据集上取得了优异结果，并引用了[39]。被引文献是ImageNet Large Scale Visual Recognition Challenge (ILSVRC) 的官方论文，该文献定义并提供了ImageNet数据集及其分类基准。虽然文献本身主要介绍数据集而非特定深度残差网络的结果，但作为数据集的来源引用，它支持“On the ImageNet classification dataset”这一语境设定（即指明实验所用的数据集）。根据规则，引用工具或数据集时，只要文献确实提出或提供了它，即为supported。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称ImageNet 2012分类数据集包含1000个类别。被引文献是ILSVRC挑战赛论文，片段中明确提到“ILSVRC classification task (1000 categories...)”以及标注界面涉及“1000 ILSVRC categories”，支持了该数据集在相关挑战中使用1000个类别这一事实。虽然片段未显式写出“2012”年份，但ILSVRC 2012是该系列中最著名的基准，且文献核心内容即为定义该1000类任务，故视为支持。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称该文献（[39]）展示了COCO数据集上的目标检测基线结果。然而，被引文献是ImageNet Large Scale Visual Recognition Challenge (ILSVRC) 的论文，其内容主要涉及PASCAL VOC和ILSVRC-DET数据集，并未包含COCO数据集的结果或相关讨论。因此，该文献不支持论断中关于COCO的部分。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称ImageNet Localization (LOC)任务需要分类和定位物体。被引文献是ImageNet大规模视觉识别挑战赛（ILSVRC）的论文，其中明确提到了“single-object localization”（单目标定位）任务，并指出该任务的类别与图像分类任务相同，且要求提供边界框（bounding box），这隐含了分类（确定类别）和定位（确定位置）两个步骤。虽然文献中主要使用术语“single-object localization”，但这是ILSVRC中对应LOC任务的标准描述，且内容支持论断关于任务性质的描述。"
+     }
+    ]
+   },
+   {
+    "id": "number_coco",
+    "layer": "支持度",
+    "ref_id": "r27",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    },
+    "support": [
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称 MS COCO 数据集包含 180 个物体类别，但被引文献原文明确指出该数据集包含 91 个常见物体类别（'contains 91 common object categories'）。数值存在显著差异，核心事实与原文不符。"
+     }
+    ]
+   },
+   {
+    "id": "overclaim",
+    "layer": "支持度",
+    "ref_id": "r34",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "openalex"
+    },
+    "support": [
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称许多非平凡的视觉识别任务（如目标检测）从非常深的模型中受益。被引文献 Faster R-CNN 是一篇关于目标检测的工作，其原文片段明确提到使用更深的模型（如 ResNet-101）显著提升了检测性能（mAP），并指出该方法能从更深、更具表现力的特征中获益。这与论断中“视觉识别任务受益于深度模型”的观点一致。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称 Faster R-CNN 在 GPU 上运行速度为 50 fps，但被引文献（Faster R-CNN 原始论文）中明确指出的最高帧率为 17 fps（使用 ZF net），且文中提到使用 VGG-16 时约为 5 fps。文献原文数据与论断中的数值严重不符，属于核心内容不一致。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称引用文献[34]是“baseline Faster R-CNN”。被引文献标题为《Faster R-CNN: Towards Real-Time Object Detection with Region Proposal Networks》，原文片段明确介绍了名为“Faster R-CNN”的对象检测系统，并指出其由RPN和Fast R-CNN组成。虽然论断中使用了“baseline”一词来描述该模型在作者实验中的角色（作为基线），但这属于作者对引用文献的使用方式，而非对文献本身内容的错误归属。文献确实提出了Faster R-CNN这一方法，因此支持论断中关于该方法名称的归属。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称文献[34]使用了VGG-16。被引文献确实是Faster R-CNN论文，且片段中明确提到“we use... the public VGG-16 model”，证实了该工作使用VGG-16作为基础网络，与论断描述一致。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "被引文献是 Faster R-CNN 论文，确实提出了区域建议网络（RPN）并与 Fast R-CNN 共享卷积层。论断中提到的“生成300个建议”在原文片段中有明确支持（'using up to 300 proposals'），且该数值通常作为标准配置或上限提及，与论断一致。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称遵循文献[7]（Faster R-CNN）的做法，即使用VOC 2007和2012的trainval图像进行训练。提供的原文片段中明确提到了“training data is 07+12 trainval”，这与论断中的“07+12”设置一致，支持了该文献确实采用了这种数据组合方式。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称训练 Faster R-CNN 的超参数与文献 [34]（即 Ren et al., NIPS 2015）相同。提供的片段中明确列出了该文献中的具体训练超参数（如迭代次数、学习率、锚框设置等），这构成了“超参数”的具体内容，支持了引用该文献作为超参数来源的合理性。虽然片段未直接写出“其他论文使用了这些相同的超参数”这一元陈述，但在学术写作中，引用原始论文以表明遵循其默认或标准配置是常见做法，且片段提供了具体的超参数值供比对，因此视为支持。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称所有结果均通过单尺度训练/测试获得，并引用文献[34]（Faster R-CNN）作为依据。被引文献原文在“Implementation Details”部分明确指出“We train and test both region proposal and object detection networks on images of a single scale”，这与论断中归属给该文献的内容完全一致。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称检测系统基于 Faster R-CNN [34] 并使用 ResNet-101。被引文献确实是 Faster R-CNN 的原始论文，且片段中明确提到了使用 ResNet-101（'replacing VGG-16 with a 101-layer residual net (ResNet-101)'）能提升性能，证实了该框架支持并包含使用 ResNet-101 作为骨干网络的配置。虽然论断中的 'improvements in Table' 是作者自己的实验细节，但核心归属（Faster R-CNN 和 ResNet-101 的组合）在文献中有直接依据。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称其定位算法基于文献[34]提出的RPN框架。被引文献标题及摘要明确表明该工作提出了Region Proposal Network (RPN)，且片段中详细描述了RPN的结构和功能，证实了文献确实是RPN框架的原始出处，支持论断中的归属关系。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称文献[34]（Faster R-CNN）中的区域提议网络（RPN）是“类别无关的”（category-agnostic）。提供的原文片段中明确提到：“The MultiBox methods... generate region proposals from a network whose last fully-connected layer simultaneously predicts multiple class-agnostic boxes”以及“These class-agnostic boxes are used as proposals for R-CNN”。虽然片段主要"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "被引文献是 Faster R-CNN 论文，论断描述该论文中 RPN 的结构（两个兄弟 1x1 卷积层用于分类和回归）。片段中明确写道 'This architecture is naturally implemented with an n×n convolutional layer followed by two sibling 1× 1 convolutional layers (for reg and cls, respectively)'，与论断完全一致。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称被引文献[34]（Faster R-CNN）中的cls和reg层不是per-class形式，以此作为对比。然而，提供的原文片段明确指出Faster R-CNN的RPN模块中，cls层输出的是2k个分数（object vs not object），reg层输出的是4k个坐标，且文中提到“the cls term... is normalized by the mini-batch size... and the reg term is normalized by the number of anchor locations”，并说明这是针对每个anchor box（即每个proposal"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称其边界框回归参考了多个平移不变的“锚”框，并引用文献[34]（Faster R-CNN）。被引文献片段明确介绍了该工作提出的“anchor” boxes概念，指出这些锚框在滑动位置上是平移不变的（translation-invariant），且用于边界框回归的参考。这与论断中归属给该文献的内容完全一致。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称引用文献[34]（Faster R-CNN）中每个图像随机采样8个anchor，正负比例为1:1。然而，被引文献原文明确指出是“randomly sample 256 anchors”（随机采样256个anchor），且比例描述为“ratio of up to 1:1”。论断中的数值“8”与原文的“256”严重不符，属于核心事实错误。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断指出结果仅基于Faster R-CNN中的RPN，并引用了Ren等人提出的Faster R-CNN论文。被引文献确实是提出Faster R-CNN及其核心组件Region Proposal Network (RPN)的工作。虽然提供的片段主要介绍RPN的定义和结构，未直接包含“结果仅基于RPN”这一具体实验结论的原文（这通常出现在论文的消融实验部分），但文献主题与论断归属的方法完全一致，且片段证实了RPN是该工作的核心组成部分。根据规则，当文献是论断所述工作本身时，若片段未明确写出该具体细节但不矛盾，且属于同一工作范畴，通常视为支持或需结合上下文判断。然而，严格依据“片段没写到的内容不算不"
+     }
+    ]
+   },
+   {
+    "id": "number_bn",
+    "layer": "支持度",
+    "ref_id": "r17",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "openalex"
+    },
+    "support": [
+     {
+      "label": "undetermined",
+      "source_kind": "fulltext",
+      "rationale": "论断中由本条文献（Ioffe & Szegedy, Batch Normalization）负责支持的内容是“leading results ... exploit 'very deep' models”以及深度范围中的上限“thirty”。虽然该文献确实提出了Batch Normalization并展示了在ImageNet上的SOTA结果，但其核心贡献在于加速训练而非单纯强调网络深度本身（深度通常归因于Simonyan/Zisserman或Szegedy的GoogLeNet等）。然而，片段中明确提到“The effect is amplified as the network depth i"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中由⟦本条文献⟧负责的内容是“intermediate normalization layers”（中间归一化层）。被引文献Ioffe & Szegedy (2015)提出了Batch Normalization，这是一种在神经网络中间层（hidden layers）对输入进行归一化的技术。文献摘要和正文均明确指出该方法通过“normalizing layer inputs”来解决训练问题，并提到其能加速深层网络训练。虽然论断后半部分关于SGD收敛的具体描述可能更多依赖于其他引用的初始化方法文献，但就“intermediate normalization layers”这一术语及其作为解决"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称 Batch Normalization (BN) 是由 Glorot et al. 提出的，但被引文献明确显示 BN 是由 Sergey Ioffe 和 Christian Szegedy 在 ICML 2015 提出的。虽然 Glorot 等人（如 Xavier initialization）与深度网络训练相关，但他们并非 BN 的提出者。因此，文献内容与论断中的作者归属严重不符，属于 off_topic。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断将 Batch Normalization (BN) 归属于 Glorot et al.，但被引文献明确显示 BN 是由 Sergey Ioffe 和 Christian Szegedy 提出的（标题及作者栏可见）。Glorot et al. 通常与 Xavier 初始化相关，而非 BN。因此，文献实际内容与论断的归属严重不符，属于 off_topic。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称遵循文献[17]（即Ioffe & Szegedy的Batch Normalization论文）中的实践，具体指不使用dropout。被引文献片段明确指出“often do not require Dropout for regularization”以及“removing Dropout... speeds up training”，证实了该文献确实提出了在Batch Normalization下可以移除Dropout的做法，支持论断中关于“following the practice in [17]”的描述。"
+     },
+     {
+      "label": "undetermined",
+      "source_kind": "fulltext",
+      "rationale": "论断声称BN确保前向传播信号具有非零方差。虽然被引文献是Batch Normalization的原始论文，但提供的片段主要描述了BN通过归一化（减去均值、除以标准差）来减少内部协变量偏移，并指出在推理阶段均值和方差是固定的。片段中并未提及BN能“确保”信号具有“非零方差”这一具体性质（实际上，如果输入方差为0，BN公式中的epsilon用于数值稳定性，而非保证方差非零；且BN的主要目的是标准化分布，而非防止方差为零）。因此，片段内容无法支持该具体论断。"
+     },
+     {
+      "label": "unsupported",
+      "source_kind": "fulltext",
+      "rationale": "论断声称BN以140倍更少的训练步骤匹配原模型精度，但被引文献原文中明确提到的最大加速比是“7%的训练步骤”（即约14.3倍），并未提及140倍这一数值。虽然文献确实讨论了BN加速训练并匹配精度的能力，但核心数值与原文不符。"
+     },
+     {
+      "label": "supported",
+      "source_kind": "fulltext",
+      "rationale": "论断中由⟦本条文献⟧负责的内容是“adopt the weight initialization in ... and BN”，即采用Batch Normalization（BN）。被引文献Ioffe & Szegedy (2015)正是提出Batch Normalization的论文，且片段中明确提到了BN的作用及与Dropout的关系（如'Removing Dropout from Modified BN-Inception...'），支持在模型中使用BN这一做法。虽然论断还提到'no dropout'，但这是作者基于BN特性做出的具体实验设置选择，而非对文献内容的直接引用或归属，因此只要"
+     }
+    ]
+   },
+   {
+    "id": "stacking",
+    "layer": "分布",
+    "ref_id": null
+   },
+   {
+    "id": "duplicate",
+    "layer": "规范",
+    "ref_id": "r36",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "openalex"
+    }
+   },
+   {
+    "id": "uncited",
+    "layer": "规范",
+    "ref_id": "r33",
+    "ref_check": {
+     "status": "verified",
+     "issues": [],
+     "matched_source": "crossref"
+    }
+   },
+   {
+    "id": "dangling",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "typo_1",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "typo_2",
+    "layer": "规范",
+    "ref_id": null
+   },
+   {
+    "id": "typo_3",
+    "layer": "规范",
+    "ref_id": null
+   }
+  ]
+ }
+}
