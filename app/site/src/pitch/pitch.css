@@ -564,7 +564,6 @@ body {
   color: #37352f;
   border-radius: 12px;
   padding: 24px 32px;
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'PingFang SC', 'Segoe UI', 'Microsoft YaHei', sans-serif;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
 }
 .doc-src {
@@ -971,7 +970,6 @@ mark.ok { background: rgba(40, 200, 64, 0.24); }
   background: #ffffff;
   color: #37352f;
   padding: 24px 32px;
-  font-family: 'Segoe UI', 'Microsoft YaHei', -apple-system, 'PingFang SC', sans-serif;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
 }
 .pcard p {
@@ -1027,8 +1025,7 @@ mark.ok { background: rgba(40, 200, 64, 0.24); }
   border-radius: 980px;
   background: #0068b5;
 }
-.pc-switch::after {
-  content: '';
+.pc-switch > i {
   position: absolute;
   right: 3px;
   top: 3px;
