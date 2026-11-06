@@ -83,6 +83,20 @@ const hooks: Record<string, Hook> = {
     },
   },
 
+  四类问题: {
+    async enter(el, id) {
+      const frame = el.querySelector('.app-frame') as HTMLIFrameElement
+      markLeaf(el, 0)
+      await loadApp(frame, 'report', id)
+      await sleep(900, id)
+      await openFinding(frame, FINDINGS[0], id)
+    },
+    async step(el, n, id) {
+      const frame = el.querySelector('.app-frame') as HTMLIFrameElement
+      markLeaf(el, n)
+      await openFinding(frame, FINDINGS[n], id)
+    },
+  },
   拖入论文: {
     async enter(el, id) {
       const frame = el.querySelector('.app-frame') as HTMLIFrameElement
@@ -120,6 +134,37 @@ const hooks: Record<string, Hook> = {
       el.querySelector('.checks')?.classList.add('show')
     },
   },
+}
+
+// ---------------------------------------------------------------- findings
+
+/** One real finding per check in the Chinese demo report: the inspector
+ *  row whose title and reference match is opened in the app. */
+const FINDINGS = [
+  { title: '未能在数据库中找到这篇文献', ref: '[70]' },
+  { title: '被引文献与这条论断说的不是同一项工作', ref: '[40]' },
+  { title: '这条参考文献与前面的条目重复', ref: '[43]' },
+  { title: '这句话同时引用了 7 篇文献', ref: '' },
+]
+
+function markLeaf(el: HTMLElement, n: number) {
+  el.querySelectorAll('.lv').forEach((lv, k) => lv.classList.toggle('cur', k === n))
+}
+
+async function openFinding(frame: HTMLIFrameElement, f: { title: string; ref: string }, id: number) {
+  const doc = frame.contentDocument
+  if (!doc) return
+  // back to the list first when a detail is open
+  const back = doc.querySelector<HTMLElement>('.detail-in .link-accent')
+  if (back) {
+    back.click()
+    await sleep(500, id)
+  }
+  const rows = Array.from(doc.querySelectorAll<HTMLElement>('.list-row'))
+  const row = rows.find((r) => r.textContent?.includes(f.title) && r.textContent.includes(f.ref))
+  row?.scrollIntoView({ block: 'center' })
+  await sleep(250, id)
+  row?.click()
 }
 
 // ---------------------------------------------------------------- app frame
