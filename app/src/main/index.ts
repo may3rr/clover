@@ -348,8 +348,12 @@ ipcMain.on(
 )
 
 // sample report + shot capture (only used under CITECHECK_SHOTS)
+// CITECHECK_SHOTS_REPORT: another report JSON, e.g. the pitch deck's
+// app/site/public/data/pitch_zh.json (its figures ride along in _assets)
 ipcMain.handle('citecheck:sample-report', () => {
-  const p = path.resolve(app.getAppPath(), 'fixtures/report.sample.json')
+  const p = process.env.CITECHECK_SHOTS_REPORT
+    ? path.resolve(process.env.CITECHECK_SHOTS_REPORT)
+    : path.resolve(app.getAppPath(), 'fixtures/report.sample.json')
   return JSON.parse(fs.readFileSync(p, 'utf-8'))
 })
 // journal benchmarking shots: a confirmation scan + exemplar measures
@@ -362,7 +366,9 @@ ipcMain.on('citecheck:e2e-done', (_e, info: unknown) => {
   app.quit()
 })
 
-const SHOT_STATES = [
+// CITECHECK_SHOTS_STATES (comma-separated, e.g. "report,item:f40") and
+// CITECHECK_SHOTS_THEMES ("light") narrow a run to the shots needed
+const SHOT_STATES_ALL = [
   'onboarding-intro',
   'onboarding-model',
   'onboarding-profile',
@@ -393,6 +399,13 @@ const SHOT_STATES = [
   'settings-usage',
   'settings-about',
 ]
+const SHOT_STATES = process.env.CITECHECK_SHOTS_STATES
+  ? process.env.CITECHECK_SHOTS_STATES.split(',').map((x) => x.trim()).filter(Boolean)
+  : SHOT_STATES_ALL
+const SHOT_THEMES = (process.env.CITECHECK_SHOTS_THEMES ?? 'light,dark')
+  .split(',')
+  .map((x) => x.trim())
+  .filter((x): x is 'light' | 'dark' => x === 'light' || x === 'dark')
 
 function shotReady(): Promise<void> {
   return new Promise((resolve) => {
@@ -459,7 +472,7 @@ async function runShots() {
   await sleep(600) // renderer mounts, subscribes, sends renderer-ready
   fs.mkdirSync(SHOTS_DIR, { recursive: true })
   let method: 'window' | 'page' | null = null
-  for (const theme of ['light', 'dark'] as const) {
+  for (const theme of SHOT_THEMES) {
     nativeTheme.themeSource = theme
     await sleep(400)
     for (const state of SHOT_STATES) {
@@ -467,9 +480,14 @@ async function runShots() {
       win.webContents.send('citecheck:shot-state', state)
       await ready
       await sleep(300) // let the 200ms detail/list transitions finish
-      const p = path.join(SHOTS_DIR, `${theme}-${state}.png`)
+      const p = path.join(SHOTS_DIR, `${theme}-${state.replace(/[^\w-]/g, '-')}.png`)
       method = await captureWindow(p)
       console.log(`shot saved (${method}): ${p}`)
+      // which detail is open, so a run can be checked against the plan
+      const open = await win.webContents.executeJavaScript(
+        "(document.querySelector('.detail-in')?.innerText ?? '').split('\\n').filter(Boolean).slice(0, 2).join(' | ')"
+      )
+      console.log(`SHOT_CHECK ${state} => ${open || '(no detail open)'}`)
     }
   }
   console.log(`SHOTS_METHOD ${method}`)
