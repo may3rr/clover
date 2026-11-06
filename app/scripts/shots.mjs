@@ -11,5 +11,6 @@ const child = spawn('npx', ['electron-vite', 'dev'], {
   cwd: appDir,
   env: { ...process.env, CITECHECK_SHOTS: dir },
   stdio: 'inherit',
+  shell: process.platform === 'win32', // npx is npx.cmd on Windows
 })
 child.on('exit', (code) => process.exit(code ?? 0))
