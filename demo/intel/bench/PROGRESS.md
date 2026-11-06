@@ -1,6 +1,6 @@
 # 过夜任务进度
 
-更新时间：2026-11-05 深夜（无人值守）
+更新时间：2026-11-06（Mac 新代码 Windows 回归）
 
 | 任务 | 状态 | 摘要 |
 | --- | --- | --- |
@@ -13,6 +13,56 @@
 | T6 向量预选方案 | 完成 | `EMBED_PREFILTER.md` |
 | T7 Windows 前端截断 | 完成（分析） | 字体回落 + 固定栏宽；方案写入晨报，未改代码 |
 | 收尾 MORNING_REPORT | 未开始 | |
+
+## 11-06 Mac 新代码回归（Windows）
+
+### 同步与依赖
+
+- `intel` 从 `296a34b` fast-forward 到 `a4cb665`，无冲突。本地未跟踪的 `backend/uv.lock` 先移到 `%TEMP%\uv.lock.bak`，合并后改用仓库里的锁文件。
+- `uv sync --extra dev --extra intel --frozen` 通过。锁文件把依赖固定到 FastAPI 0.142.2 / Starlette 1.7.0 / pydantic 2.13.5；`citecheck.server` 可导入，`/health` 返回 `{"ok":true}`，lifespan 写法在 0.142.2 下正常。
+- 注意：本机 uv 配置了清华源，`uv run pytest` 会按源重写 `uv.lock` 里的包 URL（版本不变，revision 从 3 变 5）。提交前已 `git checkout -- backend/uv.lock` 还原；以后在本机跑测试用 `uv run --frozen pytest`。
+- `uv run pytest -q`：**508 passed, 8 skipped**，用时 5:00。
+  - 与 Mac 的 513/3 差 5 条：`tests/test_export.py:241` 有 5 条因本机没有 LibreOffice 跳过。
+  - 另外 3 条 `test_real_zh.py` 因 `CLOVER_ZH_PAPER` / `CLOVER_ZH_LIBRARY` 未设跳过。总数 516 与 Mac 一致。
+
+### 配置核对
+
+- 本机没有 `backend/config.toml`，也没有 `%APPDATA%\Clover\config.toml`，应用回退到 `backend/config.example.toml`。example 里已经是 `batch_cache_size = 4.0`、`batch_timeout = 120`、`tasks = ["extract"]`，没有 judge / review / review_fallback。
+- 仓库外 `C:\clover-data\e2e\config.toml` 原来写死 `batch_cache_size = 6.0`，且 tasks 含 judge / review / review_fallback；已改成 4.0 并移除这三项，补 `batch_timeout = 120`。
+- 代码核对：开批处理时 `OpenVINOEngine.timeout = settings.batch_timeout`（`local.py`）；本地并发取 `max(max_concurrency, batch_max_num_seqs)`（`config.py` 的 `effective_concurrency()`）；`tests/test_ov.py` 覆盖超时、并发和按请求用量。
+
+### 界面检查
+
+截图在 `demo/intel/shots-1106/`。右上角颜色用 PowerShell `System.Drawing` 取像素。
+
+| 状态 | 截图 | 右上角像素 | 期望 | 结果 |
+| --- | --- | --- | --- | --- |
+| 报告页，检查器展开，浅色 | `01-light-report-inspector-open.png` | `#f7f7f5` | 等于检查器底色 | ✅ |
+| 报告页，检查器收起，浅色 | `02-light-report-inspector-closed.png` | `#ffffff` | 白色 | ✅ |
+| 报告页，左侧栏收起，浅色 | `03-light-report-left-collapsed.png` | `#ffffff` | 白色 | ✅ |
+| 首页，浅色 | `04-light-home.png` | `#f7f7f5` | 白色 | ❌ |
+| 设置页，浅色 | `05-light-settings.png` | `#ffffff` | 白色 | ✅ |
+| 运行页，浅色 | `06-light-running.png` | `#ffffff` | 白色 | ✅ |
+| 引导页，浅色 | `07-light-onboarding.png` | `#ffffff` | 白色 | ✅ |
+| 引导页，深色 | `08-dark-onboarding.png` | `#191919` | `--bg` | ✅ |
+| 首页，深色 | `09-dark-home.png` | `#202020` | `--bg`（#191919） | ❌ |
+| 报告页，检查器展开，深色 | `10-dark-report-inspector-open.png` | `#202020` | 等于检查器 `--bg-subtle` | ✅ |
+| 报告页，检查器收起，深色 | `11-dark-report-inspector-closed.png` | `#191919` | `--bg` | ✅ |
+| 设置页，深色 | `12-dark-settings.png` | `#191919` | `--bg` | ✅ |
+| 运行页，深色 | `13-dark-running.png` | `#191919` | `--bg` | ✅ |
+
+- **首页（空态）不达标**：右上角跟随的是右侧 inspector 占位栏的 `--bg-subtle`（浅色 `#f7f7f5`、深色 `#202020`），不是 `--bg`。要按预期变成白/`#191919`，需要让空态 inspector 顶部 52px 用 `--bg`，或让 caption 探测跳过空态 inspector。其余页面和深浅色切换都即时生效。
+- **侧栏收起按钮**：`01`（左侧栏展开）和 `03`（收起后）里按钮字形 bbox 都是 `x=33..41, y=22..29`，位置完全一致；win32 下 `.side-head` 的 `padding-left: 24px` 生效，不再给红绿灯留 84px。
+- **运行页动画**：标题左侧 48px 的 Qwen→Intel 动画正常；两帧对比 logo 区域有 1713 个像素不同（进度 71%→75%），确认在循环播放。`13` 是深色下的同一动画。
+- **引导页大标题 150%**：浅色 `07`、深色 `08` 都完整显示 “the last mile of the paper”，没有截断；上次 `screenshots/01-home.png` 的截断这次没有复现。
+
+### 新发现（不在清单里）
+
+1. **运行页标题在 Windows 显示完整路径**：`App.tsx` 用 `path.split('/').pop()` 取文件名，Windows 反斜杠不分割。`06`/`13` 里标题是 `C:\clover\app\site\public\samples\clover-sample.docx`；真实拖入同样是 Windows 路径，也会显示全路径。改成 `split(/[\\/]/)` 即可。
+2. **首页“选择文件”在 Windows 打开的是“选择文件夹”对话框**：主进程的 `showOpenDialog` 同时带 `openFile` 和 `openDirectory`，Windows 变成文件夹模式。在“文件夹:”框里输入 `.docx` 报“文件夹名无效”，进入含 3 个 docx 的目录后列表仍显示“没有与搜索条件匹配的项”，即单篇 docx 无法通过该按钮选择。拖入和命令行打开不受影响。建议 Windows 上拆成“选择文件 / 选择文件夹”两个入口。
+3. 运行页截图用的是内置 `CITECHECK_E2E` 入口（直接调 `analyze`）。正常拖入传的也是 Windows 路径，所以第 1 条在真实拖入下同样会出现；动画本身与拖入走同一套 UI。
+
+收尾：`prefs.onboarded` 已恢复为 true；Electron 与后端进程已退出。
 
 ## T0
 
