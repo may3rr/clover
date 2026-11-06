@@ -130,10 +130,12 @@ async def prepare_venue(exemplars: list[ExemplarSource], venue: str, parsed: Par
         from . import venue_model as vm
 
         titles = [h["title"] for e in used for h in e.prof["headings"]]
-        titles += [s.title for s in parsed.sections if s.canonical == "other" and s.title]
+        mine = {s.title for s in parsed.sections if s.canonical == "other" and s.title}
+        titles += sorted(mine)
         parts, ctx.elements_text = vm.manuscript_parts(parsed)
         overrides, ms_elements, *reads = await asyncio.gather(
-            vm.classify_headings(titles), vm.read_elements(parts, ctx.elements_text),
+            vm.classify_headings(titles, mine),
+            vm.read_elements(parts, ctx.elements_text, mine=True),
             *(vm.enrich(e.prof) for e in used), return_exceptions=True)
         ctx.overrides = overrides if isinstance(overrides, dict) else {}
         ctx.elements = ms_elements if isinstance(ms_elements, dict) else None

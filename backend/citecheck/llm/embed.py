@@ -56,11 +56,16 @@ def is_local() -> bool:
 
 
 def enabled() -> bool:
+    """Configured, ready and allowed: privacy mode (llm/privacy.py) keeps
+    only the on-device backend, so an API backend means BM25 alone."""
+    from . import privacy
+
     s = get_settings()
     cfg = s.llm.embedding
     ready = (bool(cfg.local_model) and _local_error is None) if is_local() \
         else bool(s.embedding_api_key)
-    return cfg.enabled and ready and os.environ.get("CITECHECK_EMBED") != "0"
+    return (cfg.enabled and ready and os.environ.get("CITECHECK_EMBED") != "0"
+            and privacy.dense_allowed(is_local()))
 
 
 def model_id() -> str:
@@ -118,10 +123,15 @@ def embed(texts: list[str], *, query: bool = False) -> np.ndarray | None:
         try:
             for i in range(0, len(todo), cfg.batch):
                 chunk = todo[i:i + cfg.batch]
-                vecs, tokens = _request([text_of[k] for k in chunk])
+                sent = [text_of[k] for k in chunk]
+                try:
+                    vecs, tokens = _request(sent)
+                except Exception:
+                    _log(cache, "embedding", cfg.model, "cloud", sent, query)
+                    raise
                 for k, v in zip(chunk, vecs):
                     fresh[k] = v.astype(np.float16).tobytes()
-                cache.record_usage("embedding", cfg.model, "embed", prompt_tokens=tokens)
+                _log(cache, "embedding", cfg.model, "cloud", sent, query, tokens)
         except (httpx.HTTPError, KeyError, ValueError) as e:
             log.warning("embedding failed (%s); ranking with BM25 only", e)
             _down_until = time.monotonic() + 60
@@ -131,6 +141,19 @@ def embed(texts: list[str], *, query: bool = False) -> np.ndarray | None:
         cache.set_vectors(fresh)
         have.update(fresh)
     return _stack(keys, have)
+
+
+def _log(cache, provider: str, model: str, route: str, sent: list[str],
+         query: bool = False, tokens: int = 0) -> None:
+    """Send list row: the windows of cited works are excerpts, a query is
+    the claim (instruction prefix stripped from the stored text)."""
+    from . import sendlog
+
+    cat = "claim" if query else "excerpt"
+    parts = sendlog.pack([(cat, t[len(_INSTRUCT):] if query else t) for t in sent])
+    sendlog.record(cache, provider=provider, model=model, task="embed",
+                   route=route, prompt=tokens, chars=sum(map(len, sent)),
+                   parts=parts if route == "cloud" else None)
 
 
 def _stack(keys: list[str], have: dict[str, bytes]) -> np.ndarray:
@@ -148,7 +171,7 @@ def _embed_local(keys, todo, text_of, have, cache) -> np.ndarray | None:
         return None
     fresh = {k: v.astype(np.float16).tobytes() for k, v in zip(todo, vecs)}
     cache.set_vectors(fresh)
-    cache.record_usage("openvino-local", model_id(), "embed")
+    _log(cache, "openvino-local", model_id(), "local", [text_of[k] for k in todo])
     have.update(fresh)
     return _stack(keys, have)
 

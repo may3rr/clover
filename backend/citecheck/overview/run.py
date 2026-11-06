@@ -94,7 +94,7 @@ async def prepare(parsed: ParsedDocument, venue_id: str, venue_name: str, ctx,
         )
 
     mine, *theirs = await asyncio.gather(
-        read_shape(excerpt), *(read_one(e) for e in picked))
+        read_shape(excerpt, mine=True), *(read_one(e) for e in picked))
     stats.update(mine.model_dump())
     exemplars = [e for e in theirs if e is not None]
     return Prepared(venue_id, venue_name, stats, exemplars,
@@ -162,7 +162,7 @@ async def critique(prep: Prepared, findings: list[Finding]) -> Overview:
     r = await chat_json("overview", [
         {"role": "system", "content": _CRITIC_PROMPT.format(venue=name)},
         {"role": "user", "content": json.dumps(payload, ensure_ascii=False)},
-    ], _Verdict)
+    ], _Verdict, parts=[("other", json.dumps(payload, ensure_ascii=False))])
     v = r.value
     if v is None:
         base.status = "unavailable"

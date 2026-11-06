@@ -85,6 +85,7 @@ async def guess_bibliography_start(parsed: ParsedDocument) -> int | None:
         "extract",
         [{"role": "user", "content": _PROMPT.format(index=index)}],
         _BibOut,
+        parts=[("manuscript", index)],
     )
     if res.value is None or res.value.start is None:
         return None

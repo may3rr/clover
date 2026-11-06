@@ -248,6 +248,15 @@ async def run_distribution(
     # ---- citation function classification -------------------------------
     functions: dict[str, int] | None = None
     marker_functions: dict[str, str] = {}
+    from ..llm import privacy
+
+    if classify and markers_by_para and not privacy.allowed_routes("function", ["cloud"]):
+        # privacy mode without a local model: no function shares at all,
+        # rather than all-zero shares compared against the benchmark
+        from ..llm.client import note_skipped
+
+        note_skipped("function")
+        classify = False
     if classify:
         functions = {f: 0 for f in _FUNCS}
 
@@ -272,6 +281,7 @@ async def run_distribution(
                 [{"role": "user",
                   "content": _FUNC_PROMPT.replace("{text}", tagged)}],
                 _FuncOut, route=route,
+                parts=[("manuscript", para_by_id[pid].text)],
             )
             if res.value is None:
                 return

@@ -239,7 +239,7 @@ async def test_uncited_claim_negative_guards(tmp_path):
 
 @pytest.mark.asyncio
 async def test_function_classification_fake_llm(tmp_path, monkeypatch):
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         assert task == "function"
         return LLMResult(value=schema.model_validate({
             # the model sees paragraph-local tags (m1 …), mapped back to

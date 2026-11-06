@@ -215,6 +215,7 @@ async def check_typos(
             [{"role": "user", "content": _PROMPT.replace("{text}", p.text)}],
             _TypoOut,
             route=route,
+            parts=[("manuscript", p.text)],
         )
         findings: list[Finding] = []
         revs: list[Revision] = []

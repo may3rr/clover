@@ -283,6 +283,7 @@ async def complete_reference_fields(raw: str) -> dict[str, Any]:
         "structure",
         [{"role": "user", "content": _PROMPT.format(raw=raw)}],
         RefCompletion,
+        parts=[("reference", raw)],
     )
     if res.value is None:
         return {}
@@ -375,6 +376,7 @@ async def structure_references(refs: list, progress=None) -> int:
             "structure",
             [{"role": "user", "content": _BATCH_PROMPT.format(entries=entries)}],
             _Batch,
+            parts=[("reference", r.raw) for r in chunk],
         )
         if res.value is None:
             return 0

@@ -41,11 +41,14 @@ _SHAPE_PROMPT = """你在统计一篇论文的实验规模。根据给出的文�
 只输出 JSON：{"n_datasets": int|null, "n_baselines": int|null, "has_ablation": bool|null, "has_human_eval": bool|null, "has_error_analysis": bool|null}"""
 
 
-async def read_shape(text: str) -> Shape:
+async def read_shape(text: str, *, mine: bool = False) -> Shape:
+    """``mine``: the manuscript's excerpt (send list: manuscript text),
+    otherwise an exemplar's full text. Privacy mode keeps the task local
+    (llm/privacy.py)."""
     r = await chat_json("profile", [
         {"role": "system", "content": _SHAPE_PROMPT},
         {"role": "user", "content": text[:16000]},
-    ], Shape)
+    ], Shape, parts=[("manuscript" if mine else "exemplar", text[:16000])])
     return r.value or Shape()
 
 

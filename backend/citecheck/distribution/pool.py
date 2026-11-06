@@ -91,7 +91,8 @@ async def ask_model(name: str, entry: dict | None, names: list[str]) -> set[str]
     aliases = f"（又名 {'、'.join(entry['aliases'][:4])}）" if entry and entry["aliases"] else ""
     lines = "\n".join(f"{i}. {n}" for i, n in enumerate(names, 1))
     res = await client.chat_json("structure", [{"role": "user", "content": _PROMPT.format(
-        name=name, aliases=aliases, lines=lines)}], _Pick)
+        name=name, aliases=aliases, lines=lines)}], _Pick,
+        parts=[("other", name + aliases), ("other", lines)])
     if res.value is None:
         return set()
     return {names[i - 1] for i in res.value.ids if 1 <= i <= len(names)}
