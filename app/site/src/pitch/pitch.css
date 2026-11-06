@@ -1222,7 +1222,7 @@ mark.ok { background: rgba(40, 200, 64, 0.24); }
 }
 .ibadge {
   position: absolute;
-  right: 24px;
+  left: 24px;
   bottom: 18px;
   display: flex;
   align-items: center;
