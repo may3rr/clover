@@ -147,6 +147,40 @@
           </svg>
         </div>
       </section>
+      <!-- ============ 7 Intel 本地 AI 应用挑战（必填页） ============ -->
+      <section class="slide framed" data-title="Intel 本地 AI" data-steps="2">
+        <div class="bar-title">Intel 本地 AI 应用挑战</div>
+        <div class="chips">
+          <div class="chip">
+            <div class="chip-name">Arc B370 核显</div>
+            <div class="chip-model">Qwen3-Embedding，Qwen3-Reranker</div>
+            <div class="chip-job">向量与重排，挑出交给判断的原文段落</div>
+          </div>
+          <div class="chip">
+            <div class="chip-name">NPU</div>
+            <div class="chip-job">隐私模式下低功耗算向量，Qwen3-8B 在核显上跑</div>
+          </div>
+          <div class="chip">
+            <div class="chip-name">CPU</div>
+            <div class="chip-job">解析稿件，关键词检索，证据逐字校验</div>
+          </div>
+          <div class="intel-stats">
+            <div class="stat"><b>0.40</b><span>元一篇，全云端 2.43 元</span></div>
+            <div class="stat"><b>9</b><span>分钟一篇，向量放 NPU 时 35 分钟</span></div>
+          </div>
+        </div>
+        <div class="shots">
+          <figure>
+            <img src="./src/pitch/assets/intel/06-gpu-vector.png" alt="任务管理器：GPU Compute 97%" />
+            <figcaption>推荐配置，核显 Compute 97%</figcaption>
+          </figure>
+          <figure>
+            <img src="./src/pitch/assets/intel/01-taskmanager-active.png" alt="任务管理器：NPU 94%" />
+            <figcaption>隐私模式，NPU 94%</figcaption>
+          </figure>
+        </div>
+        <div class="shots-note">决赛机 HP OmniBook 7 实拍，任务管理器性能页，11 月 6 日</div>
+      </section>
     </div>
     <div id="hud"></div>
     <script type="module" src="./src/pitch/main.ts"></script>
