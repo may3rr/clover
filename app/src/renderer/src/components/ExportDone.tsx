@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { IS_WIN } from '../lib/platform'
+
+const REVEAL_LABEL = IS_WIN ? '在资源管理器中显示' : '在访达中显示'
 
 // Finder shows these folders under their localized names
 const FOLDER_ZH: Record<string, string> = {
@@ -92,7 +95,7 @@ export default function ExportDone({
         {tex ? (
           <>
             <button className="pill-accent" onClick={reveal}>
-              在访达中显示
+              {REVEAL_LABEL}
             </button>
             <button className="pill-quiet" onClick={open}>
               解压到同一文件夹
@@ -104,7 +107,7 @@ export default function ExportDone({
               打开文件
             </button>
             <button className="pill-quiet" onClick={reveal}>
-              在访达中显示
+              {REVEAL_LABEL}
             </button>
           </>
         )}
