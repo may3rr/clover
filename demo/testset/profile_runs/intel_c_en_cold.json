@@ -1,0 +1,124 @@
+{
+ "tag": "intel_c_en",
+ "phase": "cold",
+ "input": "..\\demo\\final\\英文演示稿\\deep_residual_learning.zip",
+ "library": "C:\\clover-data\\refs\\英文演示稿\\ref",
+ "wall_s": 619.8,
+ "duration_s": 619.8,
+ "timings": {
+  "parse": 0.1,
+  "layers": {
+   "norms": 77.9,
+   "distribution": 97.1,
+   "authenticity": 160.7,
+   "support": 619.7
+  },
+  "overview": 0.0,
+  "sources": {
+   "openalex": {
+    "calls": 51,
+    "seconds": 28.918,
+    "cached": 0
+   },
+   "crossref": {
+    "calls": 54,
+    "seconds": 116.479,
+    "cached": 0
+   },
+   "s2": {
+    "calls": 46,
+    "seconds": 75.053,
+    "cached": 0
+   },
+   "arxiv": {
+    "calls": 35,
+    "seconds": 1114.49,
+    "cached": 0
+   }
+  }
+ },
+ "size": {
+  "paragraphs": 678,
+  "references": 54,
+  "markers": 142,
+  "claims": 108,
+  "support_checks": 156,
+  "linked_pdfs": 29
+ },
+ "tasks": {
+  "structure": {
+   "calls": 11,
+   "cached": 0,
+   "prompt": 5282,
+   "completion": 5307,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "extract": {
+   "calls": 96,
+   "cached": 0,
+   "prompt": 19785,
+   "completion": 5504,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "typo": {
+   "calls": 120,
+   "cached": 0,
+   "prompt": 31338,
+   "completion": 7091,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "function": {
+   "calls": 71,
+   "cached": 0,
+   "prompt": 14214,
+   "completion": 3922,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "judge": {
+   "calls": 351,
+   "cached": 22,
+   "prompt": 275777,
+   "completion": 38930,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "embed": {
+   "calls": 226,
+   "cached": 0,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "ov:Qwen3-Embedding-0.6B-int8-ov"
+   ]
+  },
+  "rerank": {
+   "calls": 133,
+   "cached": 0,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "ov:Qwen3-Reranker-0.6B-int8-ov"
+   ]
+  },
+  "review": {
+   "calls": 35,
+   "cached": 1,
+   "prompt": 80946,
+   "completion": 9298,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  }
+ },
+ "findings": 67,
+ "revisions": 10
+}

@@ -1,0 +1,85 @@
+✗ fake_en          真实性  完全编造的文献（作者、标题、期刊卷期都像真的）                    status=unverifiable
+✗ chimera          真实性  真实作者配编造标题（大模型幻觉文献的典型样子）                    status=unverifiable
+✗ wrong_year       真实性  真实文献年份写错（LSTM 1997 写成 1993）                
+✓ author_swap      支持度  正文写的作者与被引文献作者对不上（BN 写成 Glorot 等人）          被引文献不支持这条论断
+✗ misattr_topic    支持度  张冠李戴：ReLU 引成了乘积量化的论文                       
+✓ misattr_dataset  支持度  张冠李戴：介绍 MS COCO 却引了 ImageNet 的论文           被引文献与这条论断说的不是同一项工作，可能引错了文献 labels=['unsupported']
+✓ number_coco      支持度  数字与原文不符：MS COCO 的 80 类写成 180 类             被引文献不支持这条论断 labels=['unsupported']
+✓ overclaim        支持度  夸大效果：Faster R-CNN 原文约 5 fps，写成 50 fps      被引文献不支持这条论断 labels=['unsupported']
+✓ number_bn        支持度  数字放大十倍：BN 用少 14 倍的训练步数写成少 140 倍            被引文献不支持这条论断 labels=['supported', 'unsupported']
+✓ stacking         分布   一句话堆了 7 篇文献，没说各自的贡献                        stacking
+✓ duplicate        规范   同一篇 Faster R-CNN 在列表里出现两次                  duplicate
+✓ uncited          规范   列表里的 YOLO 正文从未引用                           uncited
+✓ dangling         规范   正文引了 \cite{Redmon2015}，列表里没有这个键（列表里是 Red   dangling
+✓ typo_1           规范   错别字：convergance                            convergance -> convergence
+✓ typo_2           规范   错别字：verifed                                verifed -> verified
+✓ typo_3           规范   错别字：effecitve                              effecitve -> effective
+
+检出 12/16
+
+注入以外的报警 56 条：
+  [low   ] support      未能获取 22 篇被引文献的原文，27 条论断无法判断      refs=['r1', 'r3', 'r4', 'r5', 'r9', 'r10', 'r16', 'r18', 'r19', 'r21', 'r22', 'r23', 'r24', 'r31', 'r32', 'r41', 'r42', 'r48', 'r49', 'r51', 'r52', 'r53'] 
+  [low   ] distribution 引言部分的引用分布偏离该领域常见范围               refs=[] Introduction
+  [high  ] support      被引文献不支持这条论断                      refs=['r17'] Deepconvolutionalneuralnetworks[23,22]ha
+  [medium] distribution 这句话同时引用了 5 篇文献                   refs=['r7', 'r8', 'r13', 'r28', 'r34'] Deepconvolutionalneuralnetworks[23,22]ha
+  [high  ] support      被引文献与这条论断说的不是同一项工作，可能引错了文献       refs=['r40'] Drivenbythesignificanceofdepth,aquestion
+  [high  ] support      被引文献与这条论断说的不是同一项工作，可能引错了文献       refs=['r2'] TheformulationofF(x)+xcanberealizedbyfee
+  [high  ] support      被引文献与这条论断说的不是同一项工作，可能引错了文献       refs=['r37'] TheformulationofF(x)+xcanberealizedbyfee
+  [low   ] distribution 相关工作部分的引用分布偏离该领域常见范围             refs=[] RelatedWork
+  [medium] support      正文作者归属与文献作者不一致，可能引错了文献           refs=['r52'] ResidualRepresentations.Inimagerecogniti
+  [high  ] support      被引文献不支持这条论断                      refs=['r50'] Anearlypracticeoftrainingmulti-layerperc
+  [high  ] support      被引文献不支持这条论断                      refs=['r47'] Anearlypracticeoftrainingmulti-layerperc
+  [high  ] support      被引文献不支持这条论断                      refs=['r44'] Itisworthnoticingthatourmodelhasfewerfil
+  [high  ] support      被引文献不支持这条论断                      refs=['r44'] OurimplementationforImageNetfollowsthepr
+  [high  ] support      被引文献不支持这条论断                      refs=['r15'] OurimplementationforImageNetfollowsthepr
+  [high  ] support      被引文献不支持这条论断                      refs=['r14'] Intesting,forcomparisonstudiesweadoptthe
+  [low   ] distribution 实验部分的引用分布偏离该领域常见范围               refs=[] Experiments
+  [low   ] norms        疑似笔误，请确认                         refs=[] Second,comparedtoitsplaincounterpart,the
+  [low   ] norms        疑似笔误，请确认                         refs=[] Last,wealsonotethatthe18-layerplain/resi
+  [low   ] norms        疑似笔误，请确认                         refs=[] Theplain/residualarchitecturesfollowthef
+  [high  ] support      被引文献与这条论断说的不是同一项工作，可能引错了文献       refs=['r25'] Weuseaweightdecayof0.0001andmomentumof0.
+  [high  ] support      被引文献不支持这条论断                      refs=['r26'] Buttherearestillopenproblemsonsuchaggres
+  [high  ] support      被引文献不支持这条论断                      refs=['r25'] Buttherearestillopenproblemsonsuchaggres
+  [low   ] norms        疑似笔误，请确认                         refs=[] ObjectdetectionmAP(%)onthePASCALVOC2007/
+  [low   ] norms        疑似笔误，请确认                         refs=[] ObjectdetectionmAP(%)ontheCOCOvalidation
+  [medium] authenticity 文献信息与数据库记录不一致                    refs=['r2'] C.M.Bishop.Neuralnetworksforpatternrecog
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r3'] W.L.Briggs,S.F.McCormick,etal.AMultigrid
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r4'] K.Chatfield,V.Lempitsky,A.Vedaldi,andA.Z
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r5'] M.Everingham,L.VanGool,C.K.Williams,J.Wi
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r9'] R.GirshickandK.He.Iterativeregionproposa
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r10'] X.GlorotandY.Bengio.Understandingthediff
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r16'] S.HochreiterandJ.Schmidhuber.Longshort-t
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r18'] H.Jegou,M.Douze,andC.Schmid.Productquant
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r19'] H.Jegou,F.Perronnin,M.Douze,J.Sanchez,P.
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r21'] A.Krizhevsky.Learningmultiplelayersoffea
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r22'] A.Krizhevsky,I.Sutskever,andG.Hinton.Ima
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r23'] Y.LeCun,B.Boser,J.S.Denker,D.Henderson,R
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r24'] Y.LeCun,L.Bottou,G.B.Orr,andK.-R.Müller.
+  [medium] norms        这篇参考文献在正文中没有被引用                  refs=['r30'] V.NairandG.E.Hinton.Rectifiedlinearunits
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r30'] V.NairandG.E.Hinton.Rectifiedlinearunits
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r31'] F.PerronninandC.Dance.Fisherkernelsonvis
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r32'] T.Raiko,H.Valpola,andY.LeCun.Deeplearnin
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r41'] N.N.Schraudolph.Acceleratedgradientdesce
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r42'] N.N.Schraudolph.Centeringneuralnetworkgr
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r48'] R.Szeliski.Fastsurfaceinterpolationusing
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r49'] R.Szeliski.Locallyadaptedhierarchicalbas
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r51'] A.VedaldiandB.Fulkerson.VLFeat:Anopenand
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r52'] Z.Wang,L.Chen,andY.Zhang.Adaptivescale-a
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r53'] W.VenablesandB.Ripley.Modernappliedstati
+  [high  ] support      被引文献不支持这条论断                      refs=['r8'] Boxrefinement.Ourboxrefinementpartiallyf
+  [high  ] support      被引文献不支持这条论断                      refs=['r13'] Multi-scaletesting.Intheabove,allresults
+  [high  ] support      被引文献不支持这条论断                      refs=['r7'] Multi-scaletesting.Intheabove,allresults
+  [high  ] support      被引文献不支持这条论断                      refs=['r43'] TheImageNetLocalization(LOC)task[39]requ
+  [high  ] support      被引文献不支持这条论断                      refs=['r34'] AsinourImageNetclassificationtraining(Se
+  [high  ] support      被引文献与这条论断说的不是同一项工作，可能引错了文献       refs=['r44'] Tablecomparesthelocalizationresults.Foll
+  [high  ] support      被引文献不支持这条论断                      refs=['r44'] Tablecomparesthelocalizationresults.Foll
+  [high  ] support      被引文献不支持这条论断                      refs=['r8'] OurR-CNNimplementationisasfollows.Weappl
+
+注入以外的修订 7 条：
+  typo             'expect' -> 'except'
+  typo             'places' -> 'place'
+  typo             'include' -> 'includes'
+  typo             'include' -> 'includes'
+  typo             'from' -> 'form'
+  typo             'dominate' -> 'dominated'
+  typo             'dominate' -> 'dominant'

@@ -1,0 +1,68 @@
+✗ fake_en          真实性  完全编造的英文文献（作者、标题、期刊卷期都像真的）                  status=unverifiable
+✗ chimera          真实性  真实作者配编造标题（大模型幻觉文献的典型样子）                    status=unverifiable
+✓ wrong_year       真实性  真实文献年份写错（2016 写成 2012）                     本地原文年份为 2015，文中写 2012
+✓ author_swap      支持度  正文写的作者与被引文献作者对不上（Fast R-CNN 写成 He 等人）      正文作者归属与文献作者不一致，可能引错了文献
+✗ misattr_topic    支持度  张冠李戴：关键点检测的思想引成了 Transformer               
+✓ misattr_dataset  支持度  张冠李戴：介绍 MS COCO 却引了 ImageNet 的论文           被引文献与这条论断说的不是同一项工作，可能引错了文献 labels=['unsupported']
+✗ number_rcnn      支持度  数字与原文不符：R-CNN 在 VOC2007 上 58.5% 写成 78.5%   
+✓ number_spp       支持度  数字放大十倍：SPP-Net 比 R-CNN 快 24–102 倍写成 240–   被引文献不支持这条论断 labels=['undetermined', 'unsupported']
+✓ overclaim        支持度  夸大效果：Soft-NMS 在 COCO 上约提升 1–2 个点，写成 10 个   被引文献不支持这条论断 labels=['unsupported']
+✓ stacking         分布   一句话堆了 7 篇文献，没说各自的贡献                        stacking
+✓ duplicate        规范   同一篇 SSD 在列表里出现两次（[43] 与 [72]）              duplicate
+✓ uncited          规范   列表里的 DETR 正文从未引用                           uncited
+✓ dangling         规范   正文引了 [74]，列表里没有这一条（本想引 [73]，编号错位）          dangling
+✓ typo_1           规范   错别字：侯选                                     侯 -> 候
+✓ typo_2           规范   错别字：制信                                     制 -> 置
+✓ typo_3           规范   错别字：Netwrok                                Netwrok -> Network
+✓ reorder          规范   列表里 [68] 与 [69] 顺序颠倒，正文先引 [69]，需要按首次引用顺序   6 处修订
+
+检出 13/17
+
+注入以外的报警 41 条：
+  [low   ] support      未能获取 20 篇被引文献的原文，19 条论断无法判断      refs=['r2', 'r3', 'r4', 'r5', 'r6', 'r7', 'r9', 'r17', 'r18', 'r19', 'r23', 'r35', 'r40', 'r57', 'r62', 'r65', 'r66', 'r70', 'r71', 'r72'] 
+  [low   ] distribution 引言部分的引用分布偏离该领域常见范围               refs=[] 1引言
+  [high  ] support      被引文献不支持这条论断                      refs=['r10'] Sharma等人[9,10]仅仅综述了传统的目标检测算法，Chahal等人[11
+  [low   ] norms        疑似笔误，请确认                         refs=[] Sharma等人[9,10]仅仅综述了传统的目标检测算法，Chahal等人[11
+  [low   ] norms        疑似笔误，请确认                         refs=[] Sharma等人[9,10]仅仅综述了传统的目标检测算法，Chahal等人[11
+  [high  ] support      被引文献与这条论断说的不是同一项工作，可能引错了文献       refs=['r22'] 虽然FastR-CNN有效地加快了检测速率，但仍然依赖于选择性搜索算法[18]来
+  [medium] support      正文作者归属与文献作者不一致，可能引错了文献           refs=['r27'] 2018年Bharat等人[27]提出了图像金字塔的尺度归一化方法(ScaleN
+  [high  ] support      被引文献不支持这条论断                      refs=['r31'] 2017年Dai等人[30,31]提出了形变卷积网络(DeformationCo
+  [high  ] support      被引文献不支持这条论断                      refs=['r38'] NMS算法采用单一的IOU阈值会导致漏检情况发生，为了解决这个问题，2017年，
+  [medium] support      正文作者归属与文献作者不一致，可能引错了文献           refs=['r41'] 针对常用的边界框回归损失函数(L1范数或L2范数)与IOU没有强相关性，不能很好
+  [low   ] support      被引文献只部分支持这条论断                    refs=['r47'] 2018年Redmon等人[47]提出了YOLOv3算法，它借鉴残差网络中跳跃连
+  [high  ] support      被引文献不支持这条论断                      refs=['r52'] 2017年Jisoo等人[50]提出了RSSD算法，其在SSD[43]算法的基础
+  [high  ] support      被引文献不支持这条论断                      refs=['r55'] 2018年Liu等人[54]提出了RFB-Net算法，通过模拟人类视觉感受野，设
+  [high  ] support      被引文献不支持这条论断                      refs=['r60'] SSD最新的改进研究[57~61]更加关注于合理和高效的运用FPN结构，提取具有
+  [high  ] support      被引文献不支持这条论断                      refs=['r61'] SSD最新的改进研究[57~61]更加关注于合理和高效的运用FPN结构，提取具有
+  [medium] distribution 这句话同时引用了 5 篇文献                   refs=['r57', 'r58', 'r59', 'r60', 'r61'] SSD最新的改进研究[57~61]更加关注于合理和高效的运用FPN结构，提取具有
+  [medium] support      正文作者归属与文献作者不一致，可能引错了文献           refs=['r58'] SSD最新的改进研究[57~61]更加关注于合理和高效的运用FPN结构，提取具有
+  [high  ] support      被引文献不支持这条论断                      refs=['r67'] 当前通用目标检测任务中流行的数据集有:PAS-CALVOC2007[19]、PA
+  [high  ] support      被引文献不支持这条论断                      refs=['r69'] OpenImages[69]数据集是对图像分类、目标检测、视觉关系检测和实例分割
+  [low   ] norms        疑似笔误，请确认                         refs=[] 目标检测是一个十分重要的研究领域，具有广泛的应用前景．本文将近些年涌现的基于深度
+  [low   ] norms        文献类型标识只写了载体 [OL]                 refs=['r1', 'r11', 'r12', 'r31', 'r38', 'r41', 'r51', 'r65', 'r66', 'r69'] [1]LIULi,OUYANGW,WANGXiao-gang,etal.Deep
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r4'] [4]LIENHARTR,MAYDTJ.Anextendedsetofhaar-
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r5'] [5]SHAWE-TAYLORJ,CRISTIANININ.AnIntroduc
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r6'] [6]FREUNDY,SCHAPIRERE.Experimentswithane
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r7'] [7]LIAWA,WIENERM.Classificationandregres
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r9'] [9]SHARMAKU,THAKURNV.Areviewandanapproac
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r17'] [17]KRIZHEVSKYA,SUTSKEVERI,HINTONGE.Imag
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r18'] [18]UIJLINGDJR,DESandeKE,GEVERST,etal.Se
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r19'] [19]EVERINGHAMM,VANGOOLL,WILLIAMSCK,etal
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r23'] [23]NEUBECKA,VANGOOLL.Efficientnon-maxim
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r35'] [35]CHENZ,HUANGS,TAOD.Contextrefinementf
+  [medium] authenticity 文献信息与本地原文不一致                     refs=['r38'] [38]HEYi-hui,ZHANGXiang-yu,MARIOSS,etal.
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r40'] [40]VASWANIA,SHAZEERN,PARMARN,etal.Atten
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r57'] [57]SUNF,KONGT,HUANGW,etal.Featurepyrami
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r62'] [62]LAWH,DENGJ.Cornernet:detectingobject
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r65'] [65]DUANKai-wen,BAISong,XIELing-xi,etal.
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r66'] [66]TIANZhi,SHENChun-hua,CHENHao,etal.FC
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r70'] [70]WANGZhen,CHENLei,ZHANGYu,etal.Adapti
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r71'] [71]GIRSHICKR,HEK.Iterativeregionproposa
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r72'] [72]LIUW,ANGUELOVD,ERHAND,etal.SSD:Singl
+  [low   ] authenticity 暂时无法核验这篇文献                       refs=['r73'] [73]CARIONN,MASSAF,SYNNAEVEG,etal.End-to
+
+注入以外的修订 4 条：
+  typo             'ConvolutionalNetwork' -> 'Convolutional Network'
+  typo             '的' -> '得'
+  typo             'DarNet' -> 'DarkNet'
+  typo             'ConerNet' -> 'CornerNet'

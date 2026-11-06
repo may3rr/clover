@@ -1,0 +1,124 @@
+{
+ "tag": "intel_c_zh_k128",
+ "phase": "cold",
+ "input": "..\\demo\\final\\演示稿\\基于深度学习的目标检测研究综述.docx",
+ "library": "C:\\clover-data\\refs\\演示稿\\ref",
+ "wall_s": 466.6,
+ "duration_s": 466.6,
+ "timings": {
+  "parse": 0.0,
+  "layers": {
+   "norms": 60.2,
+   "distribution": 72.2,
+   "authenticity": 68.6,
+   "support": 466.5
+  },
+  "overview": 0.0,
+  "sources": {
+   "openalex": {
+    "calls": 97,
+    "seconds": 42.331,
+    "cached": 0
+   },
+   "crossref": {
+    "calls": 98,
+    "seconds": 212.29,
+    "cached": 0
+   },
+   "s2": {
+    "calls": 70,
+    "seconds": 99.257,
+    "cached": 0
+   },
+   "arxiv": {
+    "calls": 79,
+    "seconds": 63.86,
+    "cached": 0
+   }
+  }
+ },
+ "size": {
+  "paragraphs": 149,
+  "references": 73,
+  "markers": 96,
+  "claims": 78,
+  "support_checks": 107,
+  "linked_pdfs": 52
+ },
+ "tasks": {
+  "structure": {
+   "calls": 16,
+   "cached": 0,
+   "prompt": 8413,
+   "completion": 6700,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "extract": {
+   "calls": 65,
+   "cached": 0,
+   "prompt": 15080,
+   "completion": 5943,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "typo": {
+   "calls": 65,
+   "cached": 0,
+   "prompt": 17255,
+   "completion": 1263,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "function": {
+   "calls": 40,
+   "cached": 0,
+   "prompt": 9635,
+   "completion": 2769,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "judge": {
+   "calls": 250,
+   "cached": 15,
+   "prompt": 217222,
+   "completion": 30429,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  },
+  "embed": {
+   "calls": 162,
+   "cached": 0,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "ov:Qwen3-Embedding-0.6B-int8-ov"
+   ]
+  },
+  "rerank": {
+   "calls": 89,
+   "cached": 0,
+   "prompt": 0,
+   "completion": 0,
+   "models": [
+    "ov:Qwen3-Reranker-0.6B-int8-ov"
+   ]
+  },
+  "review": {
+   "calls": 22,
+   "cached": 0,
+   "prompt": 53093,
+   "completion": 4765,
+   "models": [
+    "qwen3.8-flash"
+   ]
+  }
+ },
+ "findings": 50,
+ "revisions": 13
+}

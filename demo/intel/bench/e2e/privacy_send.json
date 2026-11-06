@@ -1,0 +1,1585 @@
+{
+ "run": "54bfb963f73db9ad",
+ "privacy": true,
+ "manuscript_chars": 11700,
+ "requests": 248,
+ "cached_requests": 10,
+ "local_requests": 437,
+ "sent_chars": 701845,
+ "content_chars": 505415,
+ "manuscript_sent_chars": 5910,
+ "categories": [
+  {
+   "category": "claim",
+   "label": "论断",
+   "count": 54,
+   "chars": 5910,
+   "items": [
+    {
+     "text": "2014 年He 等人[20]提出了空间金字塔网络( Spatial Pyramid Pooling Network，SPP-Net) 检测算法，它在CNN最后一层卷积层和全连接层之间加入SPP层(如图2所示)，使得网络能够输入任意尺度的候选区域，从而每张输入图片只需一次CNN运算，就能得到所有候选区域的特征，这使得计",
+     "chars": 167,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2014年，Girshick等人[15]成功将卷积神经网络( Convolutional Neural Networks，CNN[16]) 运用在目标检测领域中，提出了R-CNN算法，它将AlexNet[17]与选择性搜索[18]( selective search) 算法相结合，把目标检测任务分解为若干个独立的步骤(",
+     "chars": 237,
+     "times": 5,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "R-CNN[15]算法在PASCAL VOC2007[19]数据集上的检测精度达到了78.",
+     "chars": 45,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2017 年，Zhao 等人[34]提出了Cascade R-CNN 算法，通过级联三个区域交并比( Intersection Over Union，IOU)阈值递增的R-CNN[15]检测模型，对RPN产生的候选区域进行筛选，留下高IOU值的候选区域，有效提高了模型的检测精度．",
+     "chars": 140,
+     "times": 7,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "2015 年，He 等人[21]提出了Fast R-CNN 算法(如图3所示)，他们受到SPP-Net算法的启发，将SPP层简化成单尺度的ROI Pooling 层以统一候选区域特征的大小，而且进一步提出了多任务损失函数思想，将分类损失和边界框回归损失统一训练学习，使得分类和定位任务不仅可以共享卷积特征，还可以相互促进",
+     "chars": 167,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "SPP-Net的检测速率比R-CNN 快了240 ~1020 倍[20]，并打破了固定尺寸输入的束缚．",
+     "chars": 51,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "RPN 是一种全卷积神经网络( Fully Convolutional Network，FCN[22])结构，它将任意大小的特征图作为输入，经过卷积操作后产生一系列可能包含目标的候选区域，使算法实现了端到端的训练，极大提高了检测速度．",
+     "chars": 117,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "近年来也有大量工作对上述两类方法进行了改进[24,28,36,50,54,56,59]．",
+     "chars": 44,
+     "times": 20,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2016年Kong等人[24]提出了HyperNet算法，通过融合多层卷积层的特征图，得到具有多尺度信息的Hyper特征，该特征结合了卷积层高层的强语义信息、中层的辅助信息以及浅层的几何信息．",
+     "chars": 96,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "在此基础上，Zhu等人[29]提出了Couple-Net算法，设计了由两个分支组成的耦合模块，一个分支采用位置敏感ROI池化获取对象的局部信息，另一分支则使用两个ROI池化分别获取对象的全局信息和上下文信息，然后有效的结合候选区域的局部信息、全局信息和上下文信息进行检测．",
+     "chars": 136,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2017 年Lin 等人[26]提出了特征金字塔网络( Feature Pyramid Netwrok，FPN) ，FPN 构造了一种自顶向下带有横向连接的层次结构，提取多个不同尺度特征用于检测，每个尺度特征都是高层特征与浅层特征融合所得，不仅具有较强的语义信息，还具有较丰富的几何信息．",
+     "chars": 144,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2017 年Dai 等人[30,31]提出了形变卷积网络( Deformation Convolution Network，DCN) ，设计了可形变卷积和可形变ROI池化层．",
+     "chars": 87,
+     "times": 6,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "而2018年Jiang等人[33]进一步改进了ROI Pooling 提出了精准的感兴趣区域池化( Precise ROI Pooling，PrROI Pooling) ．",
+     "chars": 86,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "同年，Jiang等人[33]发现检测结果中存在分类置信度和定位准确度之间不匹配问题，所以提出了IOUguided NMS[33]方法．",
+     "chars": 67,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "针对RPN中的Anchor机制需要人工预先设定尺度大小和长宽比等超参数的问题，2019年，Wang等人[36]提出了Guided-Anchoring方法，通过图像特征来指导Anchor的生成．",
+     "chars": 96,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2018 年，Hu 等人[39]提出目标关系模块( Relation Module，RM)替代了NMS算法来对目标的检测框进行去除冗余操作．",
+     "chars": 70,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "本文将分成两大系列来综述基于回归的目标检测算法: YOLO[42]系列和SSD[43]系列．",
+     "chars": 46,
+     "times": 6,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2017年Jisoo等人[50]提出了RSSD算法，其在SSD[43]算法的基础上，对提取的不同尺度的特征采用了特殊的特征融合方式:对于每个特定的尺度特征，分别将比其大的尺度特征进行池化操作，比其小的尺度特征进行反卷积操作，然后将这些特征进行串接融合形成新的特定尺度特征．",
+     "chars": 136,
+     "times": 7,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "2016年Liu等人[43]提出了SSD算法，在回归思想的基础上，有效结合多尺度检测的思想，提取多个不同尺度的特征图进行检测，遵循较大的特征图用来检测相对较小的目标，较小的特征图检测较大目标的策略，显著提高了对大目标的检测效果，对小目标检测也有一定的提升．",
+     "chars": 128,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "此外，YOLOv2可以采用多种数据集联合优化训练的方式，利用WordTree方法在ImageNet[45]分类数据集和MS COCO[46]检测数据集上同步训练，实现超过9000个目标类别的实时检测任务．",
+     "chars": 102,
+     "times": 5,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2017年Redmon等人[44]提出了YOLOv2算法，对YOLO算法进行了一系列改进，重点解决召回率低和定位精度差的问题．",
+     "chars": 63,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "MS COCO[45]数据集用于目标检测、语义分割、人体关键点检测和字幕生成等任务，对于目标检测任务，它是挑战性最大的数据集之一．",
+     "chars": 65,
+     "times": 3,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "当前通用目标检测任务中流行的数据集有: PAS-CAL VOC2007[19]、PASCAL VOC2012[67]、MS COCO[46] 、ImageNet[45]、Open Images[69]、LIVS[68]等．",
+     "chars": 111,
+     "times": 18,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "ImageNet[45]数据集用于图像分类、目标检测和场景分类等任务，包含约1420 万张图片，2.",
+     "chars": 50,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2018年Redmon等人[47]提出了YOLOv3算法，它借鉴残差网络中跳跃连接的思路，构建了名为DarNet-53的53 层基准网络，该网络只采用3 × 3 和1 × 1 的卷积层，具有与ResNet-152[48]相仿的分类准确率，但大大减少了计算量;",
+     "chars": 129,
+     "times": 6,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "同年，Cheng等人[51]提出了DSSD算法，将VGG16[49]替换为ResNet101[48]，增强了网络特征提取能力，并设计了两个特殊的模块:预测模块和反卷积模块．",
+     "chars": 86,
+     "times": 9,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2018年Liu等人[54]提出了RFB-Net算法，通过模拟人类视觉感受野，设计了感受野模块( Receptive Field Block，RFB)增加网络的特征提取能力．",
+     "chars": 87,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "在此基础上，Lin等人[52]提出了RetinaNet算法，针对SSD算法因密集采样导致的难易样本严重失衡问题，提出了Focal Loss 函数，其是在交叉熵损失函数的基础上添加了两个平衡因子，抑制了简单样本的梯度，将更多的注意力放在难分的样本上．",
+     "chars": 124,
+     "times": 3,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "RFB结构借鉴了Inception[55]的思想，引入三个不同扩张率的3 × 3 卷积层增大感受野，并且将这三个卷积的输出以串接方式进行特征融合．",
+     "chars": 73,
+     "times": 3,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "SSD 最新的改进研究[57~61]更加关注于合理和高效的运用FPN结构，提取具有丰富上下文信息和空间信息的多尺度特征，解决目标尺度变化问题．",
+     "chars": 71,
+     "times": 13,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "此外，Zhang等人[56]提出了RefineDet算法，结合了一阶段和二阶段检测算法的优点，设计了两个模块:物体检测模块和Anchor微调模块，前者对密集的Anchors进行筛选去除一些不包含物体的负样本，同时粗调筛选后的Anchors位置和尺寸，后者对物体检测模块输出的Anchors进一步回归，这使得网络进行了两次",
+     "chars": 199,
+     "times": 4,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "2018 年，Hei Law 等人[62]提出了CornerNet 算法，借鉴了文献[40]对关键点检测的思想，采用Hourglass104网络[63]作为特征提取网络，直接预测物体的左上角点和右下角点来得到检测框，将目标检测问题当作关键点检测问题来解决．",
+     "chars": 128,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "PASCAL VOC[19,67]数据集主要用于图像分类和目标检测任务，主要流行的有PASCAL VOC2007[19]数据集和PASCAL VOC2012[67]数据集．",
+     "chars": 86,
+     "times": 8,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "上述的Anchor-free的方法都是基于人体关键点检测的思想，使用非常庞大的Hourglass-104[63]网络作为特征提取网络，与此不同的是，Zhi等人[66]提出了基于全卷积的一阶段目标检测器( Fully Convolutional One-Stage object detection，FCOS) ，借鉴语义",
+     "chars": 288,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "但是，由于同一类物体的不同实例间可能存在很大的差异性，而不同类物体间可能非常相似，以及不同的成像条件和环境因素会对物体的外观产生巨大的影响[1]，使得目标检测具有很大的挑战性．",
+     "chars": 88,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "LIVS[68]数据集是2019年提出的大型实例分割数据集，包含了1000多个类别，164000张图像，220万个高质量的实例分割掩码，这是即将应用于目标检测领域的全新数据集，而且LIVS数据集中每个对象类别的训练样本很少，旨在用于目标检测在低样本数量条件下的研究．",
+     "chars": 133,
+     "times": 3,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "Sharma等人[9,10]仅仅综述了传统的目标检测算法，Chahal等人[11]对基于深度学习的目标检测算法从算法实现的角度进行了综述，Kemal等人[12]从目标检测算法中不平衡问题的角度进行了综述，Zhao等人[13]从检测框架和检测子任务两个角度进行了综述．",
+     "chars": 133,
+     "times": 13,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "由于传统方法提取的特征存在局限性，产生候选区域的方法需要大量的计算开销，检测的精度和速度远远达不到实际应用的要求，这使得传统目标检测技术研究陷入了瓶颈[8]．",
+     "chars": 79,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "同年，Huang等人[25]采用多尺度思想，在特征提取网络的高层和低层中提取多个不同尺度的特征分别进行预测．",
+     "chars": 54,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2018年Bharat等人[27]提出了图像金字塔的尺度归一化方法( Scale Normalization for Image Pyramids，SNIP)．",
+     "chars": 80,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2016年Dai等人[28]提出了基于区域的全卷积神经网络( Region-based Fully ConvolutionalNetwork，R-FCN)，他们考虑到目标检测任务是由分类任务和定位任务组成，分类任务要求目标特征具有平移不变性，而定位任务要求目标特征具有平移敏感性．",
+     "chars": 140,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "2017 年He 等人[32]提出了Mask R-CNN 算法，为了解决特征图和原始图像上的感兴趣区域出现不对准问题提出了ROI Align 层，并且增加了Mask 预测分支，可以并行实现像素级的语义分割任务．",
+     "chars": 105,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "在此基础上，He等人[38]提出了Softer NMS 算法，不是直接选取分类置信度得分最高的检测框作为最终检测结果，而是将与分类置信度最高的检测框的交并比值大于一定阈值的所有检测框的坐标进行加权平均，作为最终检测结果，从而能够更准确的定位物体．",
+     "chars": 123,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "NMS算法采用单一的IOU阈值会导致漏检情况发生，为了解决这个问题，2017年，Bodla等人[37]提出了Soft NMS 算法，它不是直接去除那些超过IOU 阈值的相邻结果，而是采用线性或者高斯加权的方式衰减它的置信度值，再选取合适的置信度阈值进行检测框去重，使模型在MS COCO数据集上的mAP提升了10个百分点",
+     "chars": 161,
+     "times": 3,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "2015年Redmon等人[42]提出了YOLO算法，将分类、定位、检测功能融合在一个网络当中，输入图像只需要经过一次网络计算，就可以直接得到图像中目标的边界框和类别概率．",
+     "chars": 86,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "如图6所示，SSD网络是基于全卷积网络结构，它将基础网络VGG16[49]的全连接层替换为了卷积层，并在VGG16[49]网络末端添加了几个使特征图尺寸逐渐减小的辅助性卷积层，用于提取不同尺度的特征图，而且直接采用卷积操作对不同尺度的特征图进行检测．",
+     "chars": 125,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "受Focal Loss 的启发，Li 等人[53]提出了梯度协调机制( Gradient Harmonizing Mechanism，GHM) 来解决样本失衡问题，这种机制可以同时嵌入分类和回归损失中来平衡训练样本的梯度，不仅减少了易分样本的关注，而且避免了特别难分样本对模型的负面影响．",
+     "chars": 144,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Ghaisi等人[58]受到神经结构搜索( Neural Architecture Search，NAS)的启发，提出了NAS-FPN算法，该网络模型自动搜索设计最优的FPN结构，实现跨尺度的特征融合，在网络性能上超越了Mask R-CNN，但模型的训练需要大量的GPU支持．",
+     "chars": 138,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "此外，Zhao等人[59]提出了多层特征金字塔网络( Multi-Level Feature Pyramid Network，MLF-PN)，通过级联多个小型的FPN子网络，形成不同层级的不同尺度特征，并对特征进行充分的重利用和融合，使网络性能和小目标检测都有很大的提升．",
+     "chars": 136,
+     "times": 4,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "在此基础上，Zhou等人[64]提出了ExtremeNet算法，在关键点选取和关键点组合方式上做出了创新，通过选取物体上下左右四个极值点和一个中心点作为关键点，更加直接关注物体边缘和内部信息，使得检测更加稳定．",
+     "chars": 105,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Open Images[69]数据集是对图像分类、目标检测、视觉关系检测和实例分割等任务具有统一注释的单个数据集，对于目标检测任务，它总共包含190万张图片和针对600个对象类别的1600万个边界框，是具有对象位置注释的最大现有数据集．",
+     "chars": 118,
+     "times": 9,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "本节主要将近年来基于候选区域的目标检测算法分为五个部分进行综述，首先介绍了Faster R-CNN[14]框架的发展历程，然后综述了对Faster R-CNN 算法的四个重要组成部分( 特征提取网络、ROI Pooling 层、RPN、NMS算法)的改进研究．",
+     "chars": 130,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "因此，2015年Ren 等人[14]提出了Faster R-CNN 算法框架( 结构如图4所示)，设计了辅助生成样本的RPN取代选择性搜索算法．",
+     "chars": 72,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Faster R-CNN[14]算法在检测的精度和速度上都取得了不错的效果．",
+     "chars": 38,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    }
+   ],
+   "truncated": 0
+  },
+  {
+   "category": "excerpt",
+   "label": "被引片段",
+   "count": 98,
+   "chars": 279249,
+   "items": [
+    {
+     "text": "Rich feature hierarchies for accurate object detection and semantic segmentation Tech report (v5) Ross Girshick Jeff Donahue Trevor Darrell Jitendra Malik UC Be",
+     "chars": 2304,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "1 Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun Abstract—Existing deep con",
+     "chars": 2404,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Rich feature hierarchies for accurate object detection and semantic segmentation Tech report (v5) Ross Girshick Jeff Donahue Trevor Darrell Jitendra Malik UC Be",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Rich feature hierarchies for accurate object detection and semantic segmentation Tech report (v5) Ross Girshick Jeff Donahue Trevor Darrell Jitendra Malik UC Be",
+     "chars": 2089,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Fast R-CNN Ross Girshick Microsoft Research rbg@microsoft.com Abstract This paper proposes a Fast Region-based Convolutional Network method (Fast R-CNN) for obj",
+     "chars": 2207,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "1 Spatial Pyramid Pooling in Deep Convolutional Networks for Visual Recognition Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun Abstract—Existing deep con",
+     "chars": 2488,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Fully Convolutional Networks for Semantic Segmentation Jonathan Long∗ Evan Shelhamer∗ Trevor Darrell UC Berkeley {jonlong,shelhamer,trevor}@cs.berkeley.edu Abst",
+     "chars": 2435,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "HyperNet: Towards Accurate Region Proposal Generation and Joint Object Detection Tao Kong1∗ Anbang Yao2 Yurong Chen2 Fuchun Sun1 1State Key Lab. of Intelligent ",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "HyperNet: Towards Accurate Region Proposal Generation and Joint Object Detection Tao Kong1∗ Anbang Yao2 Yurong Chen2 Fuchun Sun1 1State Key Lab. of Intelligent ",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "CoupleNet: Coupling Global Structure with Local Parts for Object Detection Yousong Zhu1,2 Chaoyang Zhao1,2 Jinqiao Wang1,2 Xu Zhao1,2 Yi Wu3,4 Hanqing Lu1,2 1Na",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Feature Pyramid Networks for Object Detection Tsung-Yi Lin1,2, Piotr Doll´ar1, Ross Girshick1, Kaiming He1, Bharath Hariharan1, and Serge Belongie2 1Facebook AI",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Deformable Convolutional Networks Jifeng Dai∗ Haozhi Qi∗,† Yuwen Xiong∗,† Yi Li∗,† Guodong Zhang∗,† Han Hu Yichen Wei Microsoft Research Asia {jifdai,v-haoq,v-y",
+     "chars": 2137,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Acquisition of Localization Conﬁdence for Accurate Object Detection Borui Jiang∗1,3, Ruixuan Luo ∗1,3, Jiayuan Mao ∗2,4, Tete Xiao1,3, and Yuning Jiang 4 1 Scho",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Acquisition of Localization Conﬁdence for Accurate Object Detection Borui Jiang∗1,3, Ruixuan Luo ∗1,3, Jiayuan Mao ∗2,4, Tete Xiao1,3, and Yuning Jiang 4 1 Scho",
+     "chars": 2492,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Region Proposal by Guided Anchoring Jiaqi Wang1∗ Kai Chen1∗ Shuo Yang2 Chen Change Loy3 Dahua Lin1 1CUHK - SenseTime Joint Lab, The Chinese University of Hong K",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Region Proposal by Guided Anchoring Jiaqi Wang1∗ Kai Chen1∗ Shuo Yang2 Chen Change Loy3 Dahua Lin1 1CUHK - SenseTime Joint Lab, The Chinese University of Hong K",
+     "chars": 2215,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Relation Networks for Object Detection Han Hu1∗ Jiayuan Gu2∗† Zheng Zhang1∗ Jifeng Dai1 Yichen Wei1 1Microsoft Research Asia 2Department of Machine Intelligence",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "SSD: Single Shot MultiBox Detector Wei Liu1, Dragomir Anguelov2, Dumitru Erhan3, Christian Szegedy3, Scott Reed4, Cheng-Yang Fu1, Alexander C. Berg1 1UNC Chapel",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "SSD: Single Shot MultiBox Detector Wei Liu1, Dragomir Anguelov2, Dumitru Erhan3, Christian Szegedy3, Scott Reed4, Cheng-Yang Fu1, Alexander C. Berg1 1UNC Chapel",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "YOLO9000: Better, Faster, Stronger Joseph Redmon∗†, Ali Farhadi∗† University of Washington∗, Allen Institute for AI† http://pjreddie.com/yolo9000/ Abstract We i",
+     "chars": 1677,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Noname manuscript No. (will be inserted by the editor) ImageNet Large Scale Visual Recognition Challenge Olga Russakovsky* · Jia Deng* · Hao Su · Jonathan Kraus",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Noname manuscript No. (will be inserted by the editor) ImageNet Large Scale Visual Recognition Challenge Olga Russakovsky* · Jia Deng* · Hao Su · Jonathan Kraus",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Noname manuscript No. (will be inserted by the editor) ImageNet Large Scale Visual Recognition Challenge Olga Russakovsky* · Jia Deng* · Hao Su · Jonathan Kraus",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "1 Microsoft COCO: Common Objects in Context Tsung-Yi Lin Michael Maire Serge Belongie Lubomir Bourdev Ross Girshick James Hays Pietro Perona Deva Ramanan C. Law",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "SSD: Single Shot MultiBox Detector Wei Liu1, Dragomir Anguelov2, Dumitru Erhan3, Christian Szegedy3, Scott Reed4, Cheng-Yang Fu1, Alexander C. Berg1 1UNC Chapel",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Noname manuscript No. (will be inserted by the editor) ImageNet Large Scale Visual Recognition Challenge Olga Russakovsky* · Jia Deng* · Hao Su · Jonathan Kraus",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "1 Microsoft COCO: Common Objects in Context Tsung-Yi Lin Michael Maire Serge Belongie Lubomir Bourdev Ross Girshick James Hays Pietro Perona Deva Ramanan C. Law",
+     "chars": 2259,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "YOLOv3: An Incremental Improvement Joseph Redmon Ali Farhadi University of Washington Abstract We present some updates to YOLO! We made a bunch of little design",
+     "chars": 2061,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Noname manuscript No. (will be inserted by the editor) ImageNet Large Scale Visual Recognition Challenge Olga Russakovsky* · Jia Deng* · Hao Su · Jonathan Kraus",
+     "chars": 6000,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "Deep Residual Learning for Image Recognition Kaiming He Xiangyu Zhang Shaoqing Ren Jian Sun Microsoft Research {kahe, v-xiangz, v-shren, jiansun}@microsoft.com ",
+     "chars": 1866,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "J. JEONG, H. PARK AND N. KW AK: UNDER REVIEW IN BMVC 2017 1 Enhancement of SSD by concatenating feature maps for object detection Jisoo Jeong soo3553@snu.ac.kr ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "J. JEONG, H. PARK AND N. KW AK: UNDER REVIEW IN BMVC 2017 1 Enhancement of SSD by concatenating feature maps for object detection Jisoo Jeong soo3553@snu.ac.kr ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Application of Convolutional Neural Network for Image Classification on Pascal VOC Challenge 2012 dataset Suyash Shetty Manipal Institute of Technology suyash.s",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "LVIS: A Dataset for Large Vocabulary Instance Segmentation Agrim Gupta Piotr Doll ´ar Ross Girshick Facebook AI Research (FAIR) Abstract Progress on object dete",
+     "chars": 2428,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "DSSD : Deconvolutional Single Shot Detector Cheng-Yang Fu1∗, Wei Liu1∗, Ananth Ranga2, Ambrish Tyagi2, Alexander C. Berg1 1UNC Chapel Hill, 2Amazon Inc. {cyfu, ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Receptive Field Block Net for Accurate and Fast Object Detection Songtao Liu, Di Huang ⋆, and Yunhong Wang Beijing Advanced Innovation Center for Big Data and B",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Deep Residual Learning for Image Recognition Kaiming He Xiangyu Zhang Shaoqing Ren Jian Sun Microsoft Research {kahe, v-xiangz, v-shren, jiansun}@microsoft.com ",
+     "chars": 2244,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Focal Loss for Dense Object Detection Tsung-Yi Lin Priya Goyal Ross Girshick Kaiming He Piotr Doll ´ar Facebook AI Research (FAIR) 0 0.2 0.4 0.6 0.8 1 probabili",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Receptive Field Block Net for Accurate and Fast Object Detection Songtao Liu, Di Huang ⋆, and Yunhong Wang Beijing Advanced Innovation Center for Big Data and B",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Single-Shot Reﬁnement Neural Network for Object Detection Shifeng Zhang1,2, Longyin Wen3, Xiao Bian3, Zhen Lei1,2, Stan Z. Li1,2 1 CBSR & NLPR, Institute of Aut",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Rethinking the Inception Architecture for Computer Vision Christian Szegedy Google Inc. szegedy@google.com Vincent Vanhoucke vanhoucke@google.com Sergey Ioffe s",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "软件学报ISSN 1000-9825, CODEN RUXUEW E-mail: jos@iscas.ac.cn Journal of Software ,2019,30(3):738 −758 [doi: 10.13328/j.cnki.jos.005695] http://www.jos.org.cn ©中国科学院",
+     "chars": 1796,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "ASSD: Attentive Single Shot Multibox Detector Jingru Yi, Pengxiang Wu, Dimitris N. Metaxas Department of Computer Science, Rutgers University, Piscataway, NJ 08",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Single-Shot Reﬁnement Neural Network for Object Detection Shifeng Zhang1,2, Longyin Wen3, Xiao Bian3, Zhen Lei1,2, Stan Z. Li1,2 1 CBSR & NLPR, Institute of Aut",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Application of Convolutional Neural Network for Image Classification on Pascal VOC Challenge 2012 dataset Suyash Shetty Manipal Institute of Technology suyash.s",
+     "chars": 5697,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "Rethinking the Inception Architecture for Computer Vision Christian Szegedy Google Inc. szegedy@google.com Vincent Vanhoucke vanhoucke@google.com Sergey Ioffe s",
+     "chars": 5178,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "Stacked Hourglass Networks for Human Pose Estimation Alejandro Newell, Kaiyu Yang, and Jia Deng University of Michigan, Ann Arbor {alnewell,yangky,jiadeng}@umic",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Application of Convolutional Neural Network for Image Classification on Pascal VOC Challenge 2012 dataset Suyash Shetty Manipal Institute of Technology suyash.s",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Stacked Hourglass Networks for Human Pose Estimation Alejandro Newell, Kaiyu Yang, and Jia Deng University of Michigan, Ann Arbor {alnewell,yangky,jiadeng}@umic",
+     "chars": 2500,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Deep Learning for Generic Object Detection: A Survey Li Liu 1,2 · Wanli Ouyang 3 · Xiaogang Wang 4 · Paul Fieguth 5 · Jie Chen 2 · Xinwang Liu 1 · Matti Pietik¨",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Application of Convolutional Neural Network for Image Classification on Pascal VOC Challenge 2012 dataset Suyash Shetty Manipal Institute of Technology suyash.s",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "书书书第40卷第6期2017年6月计算机学报CHINESEJOURNALOFCOMPUTERSVol． 40No． 6June2017收稿日期：2016-07-27； 在线出版日期：2017-01-18． 周飞燕，女，1986年生，博士研究生，主要研究方向为计算机辅助心血管疾病诊断． E-mail：zhfyyf15@1",
+     "chars": 1395,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Deformable ConvNets v2: More Deformable, Better Results Xizhou Zhu1,2∗ Han Hu2 Stephen Lin2 Jifeng Dai2 1University of Science and Technology of China 2Microsof",
+     "chars": 2500,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "LVIS: A Dataset for Large Vocabulary Instance Segmentation Agrim Gupta Piotr Doll ´ar Ross Girshick Facebook AI Research (FAIR) Abstract Progress on object dete",
+     "chars": 4766,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "Focal Loss for Dense Object Detection Tsung-Yi Lin Priya Goyal Ross Girshick Kaiming He Piotr Doll ´ar Facebook AI Research (FAIR) 0 0.2 0.4 0.6 0.8 1 probabili",
+     "chars": 5555,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "THIS PAPER HAS BEEN ACCEPTED BY IEEE TRANSACTIONS ON NEURAL NETWORKS AND LEARNING SYSTEMS FOR PUBLICATION 1 Object Detection with Deep Learning: A Review Zhong-",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "LVIS: A Dataset for Large Vocabulary Instance Segmentation Agrim Gupta Piotr Doll ´ar Ross Girshick Facebook AI Research (FAIR) Abstract Progress on object dete",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "第8期2017年8月电子学报ACTA ELECTRONICA SINICA Vol． 45 No． 8 Aug． 2017收稿日期:2016- 03- 21; 修回日期:2016- 08- 01; 责任编辑:马兰英基金项目:国家自然科学基金(No．51405320); 苏州自然科学基金(N o．SYG201511)基于",
+     "chars": 1365,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "A Survey of Modern Object Detection Literature using Deep Learning Karanbir Chahal 1 and Kuntal Dey 2 Abstract— Object detection is the identiﬁcation of an obje",
+     "chars": 2497,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "电子学报2019年收稿日期: 2018-10-11 ; 修回日期: 2019-01-14 ; 责任编辑:马兰英基金项目:国家自然科学基金( No．61601184，No．61562058 ) ; 河南省高等学校重点科研项目( No．16A520018 )基于深度学习的场景文字检测综述姜维1，张重生2，殷绪成3 ( 1．",
+     "chars": 1971,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "计算机研究与发展DOI：10． 7544? issn1000-1239． 2019． 20170749Journal of Computer Research and Development 56（2）：319-327，2019收稿日期：2017-09-30； 修回日期：2018-04-17基金项目：国家自然科学基金项",
+     "chars": 2114,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "OKSUZ et al.: IMBALANCE PROBLEMS IN OBJECT DETECTION: A REVIEW 1 Imbalance Problems in Object Detection: A Review Kemal Oksuz† , Baris Can Cam , Sinan Kalkan ‡ ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "An Analysis of Scale Invariance in Object Detection – SNIP Bharat Singh Larry S. Davis University of Maryland, College Park {bharat,lsd}@cs.umd.edu Abstract An ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "R-FCN: Object Detection via Region-based Fully Convolutional Networks Jifeng Dai Microsoft Research Asia Yi Li∗ Tsinghua University Kaiming He Microsoft Researc",
+     "chars": 2462,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Single-Shot Reﬁnement Neural Network for Object Detection Shifeng Zhang1,2, Longyin Wen3, Xiao Bian3, Zhen Lei1,2, Stan Z. Li1,2 1 CBSR & NLPR, Institute of Aut",
+     "chars": 6000,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "第8期2017年8月电子学报ACTA ELECTRONICA SINICA Vol． 45 No． 8 Aug． 2017收稿日期:2016- 03- 21; 修回日期:2016- 08- 01; 责任编辑:马兰英基金项目:国家自然科学基金(No．51405320); 苏州自然科学基金(N o．SYG201511)基于",
+     "chars": 3063,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "R-FCN: Object Detection via Region-based Fully Convolutional Networks Jifeng Dai Microsoft Research Asia Yi Li∗ Tsinghua University Kaiming He Microsoft Researc",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "LVIS: A Dataset for Large Vocabulary Instance Segmentation Agrim Gupta Piotr Doll ´ar Ross Girshick Facebook AI Research (FAIR) Abstract Progress on object dete",
+     "chars": 5396,
+     "times": 1,
+     "tasks": [
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "Mask R-CNN Kaiming He Georgia Gkioxari Piotr Doll ´ar Ross Girshick Facebook AI Research (FAIR) Abstract We present a conceptually simple, ﬂexible, and general ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "  Cascade R-CNN: Delving into High Quality Object Detection Zhaowei Cai UC San Diego zwcai@ucsd.edu Nuno V asconcelos UC San Diego nuno@ucsd.edu Abstract In obj",
+     "chars": 2268,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "You Only Look Once: Uniﬁed, Real-Time Object Detection Joseph Redmon∗, Santosh Divvala∗†, Ross Girshick¶, Ali Farhadi∗† University of Washington∗, Allen Institu",
+     "chars": 2182,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Bounding Box Regression with Uncertainty for Accurate Object Detection Yihui He1 Chenchen Zhu1 Jianren Wang1 Marios Savvides1 Xiangyu Zhang2 1Carnegie Mellon Un",
+     "chars": 2237,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Improving Object Detection With One Line of Code Navaneeth Bodla* Bharat Singh* Rama Chellappa Larry S. Davis Center For Automation Research, University of Mary",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "NAS-FPN: Learning Scalable Feature Pyramid Architecture for Object Detection Golnaz Ghaisi Tsung-Yi Lin Ruoming Pang Quoc V . Le Google Brain {golnazg,tsungyi,r",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "You Only Look Once: Uniﬁed, Real-Time Object Detection Joseph Redmon∗, Santosh Divvala∗†, Ross Girshick¶, Ali Farhadi∗† University of Washington∗, Allen Institu",
+     "chars": 2035,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Pre-print accepted to IJCV The Open Images Dataset V4 Uniﬁed image classiﬁcation, object detection, and visual relationship detection at scale Alina Kuznetsova ",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "  Published as a conference paper at ICLR 2015 VERY DEEP CONVOLUTIONAL NETWORKS FOR LARGE -S CALE IMAGE RECOGNITION Karen Simonyan∗ & Andrew Zisserman+ Visual G",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "  Published as a conference paper at ICLR 2015 VERY DEEP CONVOLUTIONAL NETWORKS FOR LARGE -S CALE IMAGE RECOGNITION Karen Simonyan∗ & Andrew Zisserman+ Visual G",
+     "chars": 2500,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "Gradient Harmonized Single-stage Detector Buyu Li∗, Yu Liu∗ and Xiaogang Wang {byli, yuliu, xgwang}@ee.cuhk.edu.hk Multimedia Laboratory, The Chinese University",
+     "chars": 2500,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "NAS-FPN: Learning Scalable Feature Pyramid Architecture for Object Detection Golnaz Ghaisi Tsung-Yi Lin Ruoming Pang Quoc V . Le Google Brain {golnazg,tsungyi,r",
+     "chars": 2315,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    }
+   ],
+   "truncated": 18
+  },
+  {
+   "category": "reference",
+   "label": "参考文献",
+   "count": 55,
+   "chars": 10788,
+   "items": [
+    {
+     "text": "[15] GIRSHICK R,DONAHUE J,DARRELL T,et al.Rich feature hierarchies for accurate object detection and semantic segmentation[A].Computer Vision and Pattern Recogn",
+     "chars": 226,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[16] 周飞燕,金林鹏,董军.卷积神经网络研究综述[J].计算机学报,2017,40( 6) : 1229 -1251. ZHOU Fei-yan,JIN Lin-peng,DONG Jun.Review of convolutional neural network[J].Chinese Journal of Co",
+     "chars": 206,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[18] UIJLINGD J R,DE Sande K E,GEVERS T,et al.Selective search for object recognition[J].International Journal of Computer Vision,2013,104( 2) : 154 -71.",
+     "chars": 153,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[20] HE K,ZHANG X,REN S,et al.Spatial pyramid pooling in deep convolutional networks for visual recognition[A].Proceedings of the European Conference on Compute",
+     "chars": 282,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[19] EVERINGHAM M,VAN GOOL L,WILLIAMS C K,et al.The pascal visual object classes ( VOC) challenge[J]. International Journal of Computer Vision,2010,88 ( 2) : 30",
+     "chars": 166,
+     "times": 10,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[21] GIRSHICK R.Fast R-CNN[A].Proceedings of IEEE International Conference on Computer Vision[C].USA: IEEE,2015.1440 -1448.\nFast R-CNN",
+     "chars": 134,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[22] LONG J,SHELHAMERE,DARRELL T.Fully convolutional networks for semantic segmentation[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2015. 3431 -3440",
+     "chars": 236,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[24] KONG T,YAO A,CHEN Y,et al.Hypernet: towards accurate region proposal generation and joint object detection[A].Computer Vision and Pattern Recognition[C]. U",
+     "chars": 240,
+     "times": 8,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[28] DAI J,LI Y,HE K,et al.R-FCN: object detection via region-based fully convolutional networks[A].Neural Information Processing Systems[C].Spain: NIPS Foundat",
+     "chars": 178,
+     "times": 10,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[36] WANG J,CHEN K,YANG S,et al.Region proposal by guided anchoring[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2019.2965 -2974.",
+     "chars": 140,
+     "times": 10,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[50] JEONG J,PARK H,KWAK N.Enhancement of SSD by concatenating feature maps for object detection[A].British Machine Vision Conference[C].UK: BMVA,2017.",
+     "chars": 151,
+     "times": 10,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[54] LIU S,HUANG D,WANG Y.Receptive field block net for accurate and fast object detection[A].European Conference on computer Vision[C].Germany: IEEE,2018. 404 ",
+     "chars": 165,
+     "times": 10,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[56] ZHANG S,WEN L,BIAN X,et al.Single shot refinement neural network for object detection[A].IEEE Conference on Computer Vision and Pattern Recognition[C].USA:",
+     "chars": 182,
+     "times": 11,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[59] ZHAO Q,SHENG T,WANG Y,et al.M2det: A singleshot object detector based on multi-level feature pyramid network[A].The AAAI Conference on Artificial Intellige",
+     "chars": 193,
+     "times": 19,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[29] ZHU Y,ZHAO C,WANG J,et al.Couplenet: coupling global structure with local parts for object detection[A]. the IEEE International Conference on Computer Visi",
+     "chars": 234,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[26] LIN T Y,DOLLARP,GIRSHICK R,et al.Feature pyramid networks for object detection[A].Proceedings of IEEE Conference on Computer Vision and Pattern Recognition",
+     "chars": 234,
+     "times": 1,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[30] DAI J,QI H,XIONG Y,et al.Deformable convolutional networks[A].International Conference on Computer Vision,Venice[C].Italy: IEEE,2017.764 -773.\nDeformable C",
+     "chars": 181,
+     "times": 3,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[31] ZHU X,HU H,LIN S,et al.Deformable Convnets-v2: More Deformable,Better Results[OL].http: / /dblp.org /abs/1811.11168,2018.",
+     "chars": 126,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[33] JIANG B,LUO R,MAO J,et al.Acquisition of localization condence for accurate object detection[A].European Conference on Computer Vision[C].Germany: IEEE, 20",
+     "chars": 240,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[39] HU H,GU J,ZHANG Z,et al.Relation networks for object detection[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2018.3588 -3597.\nRelation Networks f",
+     "chars": 179,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[43] LIU W,ANGUELOV D,ERHAN D,et al.SSD: single shot multibox detector [A].European Conference on Computer Vision,Amsterdam[C].Netherlands: IEEE, 2016.21 -37.\nS",
+     "chars": 193,
+     "times": 7,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[42] REDMON J,DIVVALA S,GIRSHICK R,et al.You only look once: unified,real-time object detection[A].IEEE Conference on Computer Vision and Pattern Recognition[C]",
+     "chars": 185,
+     "times": 5,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[44] REDMON J,FARHADI A.YOLO9000: Better,faster, stronger[A].Computer Vision and Pattern Recognition, Hawaii[C].USA: IEEE,2017.6517 -6525.\nYOLO9000: Better, Fas",
+     "chars": 173,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[45] RUSSAKOVSKY O,DENG J,SU H,et al.Imagenet large scale visual recognition challenge[J].International journal of computer vision,2015,115( 3) : 211 -52.\nImage",
+     "chars": 204,
+     "times": 13,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[46] LIN T,MAIRE M,BELONGIE S J,et al.Microsoft coco: common objects in context[A].European Conference on Computer Vision [C].Switzerland: IEEE,2014.740-755.",
+     "chars": 157,
+     "times": 5,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[67] SHETTY S.Application of convolutional neural network for image classification on pascal VOC challenge 2012 dataset[A].Computer Vision and Pattern Recogniti",
+     "chars": 181,
+     "times": 11,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[69] KUZNETSOVA A,ROM H,ALLDRIN N,et al.The Open Images Dataset-v4: Unified Image Classification, Object Detection,and Visual Relationship Detection at Scale[OL",
+     "chars": 201,
+     "times": 13,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[68] GUPTA A,DOLLARP,GIRSHICK R.LVIS: a dataset for large vocabulary instance segmentation[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2019. 5356 -5",
+     "chars": 164,
+     "times": 9,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[47] REDMON J,FARHADI A.YOLOV3: An incremental improvement[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2018.3523 -3541.\ninference time (ms)",
+     "chars": 151,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[48] HE K,ZHANG X,REN S,et al.Deep residual learning for image recognition[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2016.770 -778.\nDeep Residual ",
+     "chars": 190,
+     "times": 6,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[51] FU Cheng-yang,LIU Wei,RANGA A,et al.DSSD: Deconvolutional Single Shot Detector[OL].http: / /arxiv. org /abs/1701.06659,2017.",
+     "chars": 129,
+     "times": 4,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[49] SIMONYAN K,ZISSERMAN A.Very deep convolutional networks for large-scale image recognition[A].International Conference on Learning Representations[C].USA: I",
+     "chars": 178,
+     "times": 5,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[52] LIN T-Y,GOYAL P,GIRSHICK R,et al.Focal loss for dense object detection[A].International Conference on Computer Vision[C].USA: IEEE,2017.2999 -3007.\nFocal L",
+     "chars": 190,
+     "times": 2,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[55] SZEGEDY C,VANHOUCKE V,IOFFE S,et al.Rethinking the inception architecture for computer vision[A]. Computer Vision and Pattern Recognition[C].USA: IEEE,2012",
+     "chars": 230,
+     "times": 2,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[60] 裴伟,许晏铭,朱永英,等.改进的SSD航拍目标检测方法[J].软件学报,2019,30( 3) : 738 -758. FEI Wei,XU Yan-ming,ZHU Yong-ying,et al.The target detection method of aerial photography image",
+     "chars": 254,
+     "times": 7,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[57] SUN F,KONG T,HUANG W,et al.Feature pyramid reconfiguration with consistent loss for object detection[J].IEEE Transactions on Image Processing,2019,28 ( 10)",
+     "chars": 174,
+     "times": 7,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[58] GHIASI G,LIN T-Y,LE Q V.NAS-FPN: learning scalable feature pyramid architecture for object detection[A]. Computer Vision and Pattern Recognition[C].USA: IE",
+     "chars": 179,
+     "times": 11,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[61] YI J,WU P,METAXAS D N.ASSD: Attentive single shot multibox detector[J].Computer Vision and Image Understanding,2019,189( 1) : 102827 -102836.",
+     "chars": 146,
+     "times": 7,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[63] NEWELL A,YANG K,DENG J.Stacked hourglass networks for human pose estimation[A].European Conference on Computer Vision[C].Netherlands: IEEE,2016. 483 -499.\n",
+     "chars": 212,
+     "times": 5,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[1] LIU Li,OUYANG W,WANG Xiao-gang,et al.Deep Learning for Generic Object Detection: A Survey[OL]. http: / /dblp.org /abs/ 1809.02165,2018.\nDeep Learning for Ge",
+     "chars": 192,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[13] ZHAO Z-Q,ZHENG P,XU S-T,et al.Object detection with deep learning: A review[J].IEEE Transactions on Neural Networks and Learning Systems,2019,30 ( 11) : 32",
+     "chars": 215,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[10] 毕威,黄伟国,张永萍,等.基于图像显著轮廓的目标检测[J].电子学报,2019,45( 8) : 1902 -1910. BI Wei,HANG Wei-guo,ZHANG Yongping,et al.Object detection based on salient contour of image[J]",
+     "chars": 238,
+     "times": 2,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[9] SHARMA K U,THAKURN V.A review and an approach for object detection in images[J].International Journal of Computational Vision and Robotics,2017,7 ( 1 -2) : ",
+     "chars": 168,
+     "times": 2,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[11] CHAHAL KS,DEY K.A Survey of Modern Object Detection Literature Using Deep Learning [OL].http: / /dblp.org /abs/1808.07265,2018.\nA Survey of Modern Object D",
+     "chars": 199,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[8] 姜维,张重生,殷绪成.基于深度学习的场景文字检测综述[J].电子学报,2019,47( 5) : 1152 -1161. JIANG Wei,ZHANG Chong-sheng,YIN Xu-cheng.Deep learning based scene text detection: A survey[J].",
+     "chars": 239,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[25] 黄继鹏,史颖欢,高阳.面向小目标的多尺度Faster-RC-NN 检测算法[J].计算机研究与发展,2019,56( 2) : 319-327. HUANG Ji-peng,SHI Ying-huan,GAO Yang.Multi-scale faster R-CNN algorithm for small ",
+     "chars": 288,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[12] OKSUZ Kemal,CAM Baris Can,KALKAN S,et al.Imbalance Problems in Object Detection: A Review[OL]. http: / /dblp.org /abs/1909.00169,2019.\nImbalance Problems i",
+     "chars": 188,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[27] SINGH B,DAVIS L S.An analysis of scale invariance in object detection-snip[A].Proceedings of IEEE Conference on Computer Vision and Pattern Recognition[C].",
+     "chars": 246,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[32] HE K,GKIOXARI G,DOLLARP,et al.Mask r-cnn[A].International Conference on Computer Vision[C]. Italy; IEEE,2017.2980 -2988.\nMask R-CNN",
+     "chars": 136,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[34] CAI Z,VASCONCELOS N.Cascade R-CNN: delving into high quality object detection[A].Computer Vision and Pattern Recognition[C].USA: IEEE,2018.\nCascade R-CNN: ",
+     "chars": 202,
+     "times": 3,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[38] HE Yi-hui,ZHANG Xiang-yu,MARIOS S,et al.Softer-NMS: Rethinking Bounding Box Regression for Accurate Object Detection [OL].http: / /dblp.org /abs/1809. 0854",
+     "chars": 238,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[37] BODLA N,SINGH B,CHELLAPPA R,et al.Soft-NMS: improving object detection with one line of code[A].International Conference on Computer Vision[C].Italy: IEEE,",
+     "chars": 196,
+     "times": 2,
+     "tasks": [
+      "支持度判断",
+      "支持度复核"
+     ]
+    },
+    {
+     "text": "[53] LI B,LIU Y,WANG X.Gradient harmonized single-stage detector[A].the AAAI Conference on Artificial Intelligence[C].USA: IEEE,2019.8577 -8584.\nGradient statis",
+     "chars": 205,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[64] ZHOU Xing-yi,ZHUO Jia-cheng,KRAHENBUHL P. Bottom-up object detection by grouping extreme and center points[A].Computer Vision and Pattern Recognition[C].US",
+     "chars": 247,
+     "times": 2,
+     "tasks": [
+      "支持度判断"
+     ]
+    },
+    {
+     "text": "[14] REN S,HE K,GIRSHICK R,et al.Faster R-CNN: towards real-time object detection with region proposal networks[J].IEEE Trans Pattern Anal Mach Intell,2015,39 (",
+     "chars": 254,
+     "times": 7,
+     "tasks": [
+      "支持度判断"
+     ]
+    }
+   ],
+   "truncated": 0
+  }
+ ],
+ "skipped": []
+}
