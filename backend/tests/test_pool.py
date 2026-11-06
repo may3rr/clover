@@ -42,7 +42,7 @@ async def test_rules_read_every_venue_source():
 async def test_model_can_only_pick_listed_names(monkeypatch):
     asked: list[str] = []
 
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         asked.append(messages[0]["content"])
         # 1 = "Chin. J. Comput.", 99 is not on the list
         return LLMResult(value=schema.model_validate({"ids": [1, 99, 0]}), route="cloud")

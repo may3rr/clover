@@ -46,9 +46,14 @@ def is_local() -> bool:
 
 
 def enabled() -> bool:
+    """Configured, ready and allowed: an API reranker stays allowed in
+    privacy mode, not for a claim judged locally only (llm/privacy.py)."""
+    from . import privacy
+
     cfg = get_settings().llm.rerank
     ready = (bool(cfg.local_model) and _local_error is None) if is_local() else bool(_key())
-    return cfg.enabled and ready and os.environ.get("CITECHECK_RERANK") != "0"
+    return (cfg.enabled and ready and os.environ.get("CITECHECK_RERANK") != "0"
+            and privacy.rerank_allowed(is_local()))
 
 
 def model_id() -> str:
@@ -131,6 +136,19 @@ def _request(query: str, docs: list[str]) -> tuple[list[float], int]:
     return scores, int(tokens)
 
 
+def _log(model: str, local: bool, query: str, docs: list[str], tokens: int) -> None:
+    """Send list row: the query is the claim, the candidates are windows
+    of the cited work."""
+    from . import sendlog
+
+    parts = None if local else sendlog.pack(
+        [("claim", query)] + [("excerpt", d) for d in docs])
+    sendlog.record(_cache, provider="openvino-local" if local else "rerank",
+                   model=model, task="rerank",
+                   route="local" if local else "cloud", prompt=tokens,
+                   chars=len(query) + sum(map(len, docs)), parts=parts)
+
+
 def rerank(query: str, docs: list[str]) -> list[float] | None:
     global _cache, _down_until
     if not docs or not enabled() or time.monotonic() < _down_until:
@@ -149,8 +167,9 @@ def rerank(query: str, docs: list[str]) -> list[float] | None:
     except (httpx.HTTPError, KeyError, ValueError, TypeError, RuntimeError) as e:
         log.warning("rerank failed (%s); keeping the fused ranking", e)
         _down_until = time.monotonic() + 60
+        if not local:  # the request may have reached the service
+            _log(model, False, query, docs, 0)
         return None
-    _cache.record_usage("openvino-local" if local else "rerank", model, "rerank",
-                        prompt_tokens=tokens)
+    _log(model, local, query, docs, tokens)
     _cache.set(key, scores)
     return scores

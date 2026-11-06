@@ -81,9 +81,17 @@ class Cache:
         )
         cols = {r[1] for r in self._conn.execute(
             "PRAGMA table_info(llm_usage)")}
-        if "doc" not in cols:
-            self._conn.execute(
-                "ALTER TABLE llm_usage ADD COLUMN doc TEXT")
+        # send list (llm/sendlog.py): the run a row belongs to, the route,
+        # characters sent and the content parts. Older databases gain the
+        # columns empty; their rows simply belong to no run
+        for col, decl in (("doc", "TEXT"), ("run", "TEXT"), ("route", "TEXT"),
+                          ("chars", "INTEGER NOT NULL DEFAULT 0"),
+                          ("category", "TEXT"), ("parts", "TEXT")):
+            if col not in cols:
+                self._conn.execute(
+                    f"ALTER TABLE llm_usage ADD COLUMN {col} {decl}")
+        self._conn.execute(
+            "CREATE INDEX IF NOT EXISTS llm_usage_run ON llm_usage (run)")
         self._conn.execute(
             "CREATE TABLE IF NOT EXISTS reports ("
             "id TEXT PRIMARY KEY, "
@@ -157,18 +165,27 @@ class Cache:
         completion_tokens: int = 0,
         cached: bool = False,
         doc: str | None = None,
+        *,
+        run: str | None = None,
+        route: str | None = None,
+        chars: int = 0,
+        category: str | None = None,
+        parts: str | None = None,
     ) -> None:
         """Append one LLM call to the persistent usage log (llm_usage table).
 
         Cache hits are recorded with cached=1 and zero tokens so the log
         doubles as a call audit; real calls carry the provider-reported
         token counts (or tokenizer estimates for the local route).
+        ``run``/``route``/``chars``/``category``/``parts`` feed the send
+        list (llm/sendlog.py); ``parts`` is a JSON string.
         """
         with self._lock:
             self._conn.execute(
                 "INSERT INTO llm_usage (ts, provider, model, task, "
-                "prompt_tokens, completion_tokens, cached, doc) "
-                "VALUES (?,?,?,?,?,?,?,?)",
+                "prompt_tokens, completion_tokens, cached, doc, run, route, "
+                "chars, category, parts) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     datetime.now().isoformat(timespec="seconds"),
                     provider,
@@ -178,9 +195,24 @@ class Cache:
                     completion_tokens,
                     int(cached),
                     doc,
+                    run,
+                    route,
+                    int(chars),
+                    category,
+                    parts,
                 ),
             )
             self._conn.commit()
+
+    def usage_for_run(self, run: str) -> list[dict]:
+        """Every llm_usage row of one pipeline run, oldest first."""
+        with self._lock:
+            cur = self._conn.execute(
+                "SELECT ts, provider, model, task, prompt_tokens, "
+                "completion_tokens, cached, route, chars, category, parts "
+                "FROM llm_usage WHERE run = ? ORDER BY id", (run,))
+            cols = [c[0] for c in cur.description]
+            return [dict(zip(cols, row)) for row in cur.fetchall()]
 
     def usage_summary(self) -> list[dict]:
         """Aggregate the usage log by day + provider + model."""

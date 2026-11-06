@@ -22,7 +22,7 @@ from pydantic import BaseModel, ValidationError
 
 from ..cache import Cache, make_key
 from ..config import get_settings
-from . import local
+from . import local, privacy, sendlog
 from .router import route_order
 
 log = logging.getLogger(__name__)
@@ -109,26 +109,39 @@ class LLMStats:
         # model -> {"prompt": tokens, "completion": tokens}; real API calls
         # only — cache hits are counted in local/cloud but use no tokens
         self.usage: dict[str, dict[str, int]] = {}
+        # task -> calls privacy mode skipped (no local model; nothing sent)
+        self.skipped: dict[str, int] = {}
 
 
 _current_stats: ContextVar[LLMStats | None] = ContextVar("llm_stats", default=None)
-_current_doc: ContextVar[str | None] = ContextVar("llm_doc", default=None)
+_current_doc = sendlog.current_doc
 
 
 class doc_scope:
     """Stamp llm_usage rows with the document being processed, so usage
-    can be aggregated per paper. Opened by the pipeline per job."""
+    can be aggregated per paper, and with the run (the report's send list
+    reads that run's rows). Opened by the pipeline per job."""
 
-    def __init__(self, doc: str) -> None:
+    def __init__(self, doc: str, run: str | None = None) -> None:
         self.doc = doc
-        self._token = None
+        self.run = run
+        self._tokens: tuple = ()
 
     def __enter__(self) -> None:
-        self._token = _current_doc.set(self.doc)
+        self._tokens = (sendlog.current_doc.set(self.doc),
+                        sendlog.current_run.set(self.run))
         return None
 
     def __exit__(self, *exc: object) -> None:
-        _current_doc.reset(self._token)
+        sendlog.current_doc.reset(self._tokens[0])
+        sendlog.current_run.reset(self._tokens[1])
+
+
+def note_skipped(task: str) -> None:
+    """Count a call privacy mode did not make (shown in the report)."""
+    s = _current_stats.get()
+    if s is not None:
+        s.skipped[task] = s.skipped.get(task, 0) + 1
 
 
 class stats_scope:
@@ -183,16 +196,20 @@ def _model_for(route: str, task_model: str) -> str:
 
 
 def _log_usage(route: str, task: str, model: str, prompt: int, completion: int,
-               cached: bool = False) -> None:
-    """Persist one call (or cache hit) into the llm_usage table. Never
-    allowed to break the request path."""
+               cached: bool = False, chars: int = 0,
+               parts: list[dict] | None = None) -> None:
+    """Persist one call (or cache hit) into the llm_usage table, with the
+    characters and content parts it sent (send list). Never allowed to
+    break the request path."""
     try:
-        _get_cache().record_usage(
-            _provider_for(route), model, task, prompt, completion, cached,
-            doc=_current_doc.get(),
-        )
-    except Exception as e:  # noqa: BLE001 — stats must never break calls
-        log.debug("usage log write failed: %s", e)
+        cache = _get_cache()
+    except Exception as e:  # noqa: BLE001
+        log.debug("usage log open failed: %s", e)
+        return
+    sendlog.record(cache, provider=_provider_for(route), model=model,
+                   task=task, route=route, prompt=prompt,
+                   completion=completion, cached=cached, chars=chars,
+                   parts=parts)
 
 
 def _err_desc(e: BaseException) -> str:
@@ -267,6 +284,8 @@ class LLMResult:
     route: Route
     cached: bool = False
     error: str | None = None  # compact error description when value is None
+    # privacy mode had no allowed route: nothing was generated or sent
+    skipped: bool = False
 
 
 def _ensure_json_word(messages: list[dict]) -> list[dict]:
@@ -288,7 +307,13 @@ def _transient(e: Exception) -> bool:
     return isinstance(status, int) and status >= 500
 
 
+# content parts of the chat_json call in flight (send list); a ContextVar
+# keeps _cloud_call's signature (tests replace it with 3-argument fakes)
+_parts: ContextVar[list[dict] | None] = ContextVar("llm_parts", default=None)
+
+
 async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
+    parts = _parts.get()
     client, sem = _get_cloud()
     settings = get_settings()
     budget = settings.llm.cloud.retry_seconds
@@ -306,6 +331,9 @@ async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
                 )
             break
         except Exception as e:
+            # the request may have reached the provider: it counts as sent
+            _log_usage("cloud", task, model, 0, 0,
+                       chars=sendlog.message_chars(messages), parts=parts)
             waited = time.monotonic() - started
             if not _transient(e) or waited + delay > budget:
                 log.warning("cloud call failed model=%s: %s", model, _err_desc(e))
@@ -320,6 +348,7 @@ async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
         "cloud", task, model,
         getattr(resp.usage, "prompt_tokens", 0) or 0,
         getattr(resp.usage, "completion_tokens", 0) or 0,
+        chars=sendlog.message_chars(messages), parts=parts,
     )
     return resp.choices[0].message.content or ""
 
@@ -332,6 +361,7 @@ async def _local_call(messages: list[dict], task: str) -> str:
     _log_usage(
         "local", task, get_settings().llm.local.model,
         usage.get("prompt", 0), usage.get("completion", 0),
+        chars=sendlog.message_chars(messages),
     )
     return raw
 
@@ -376,9 +406,19 @@ async def chat_json(
     schema: type[T],
     *,
     route: str = "auto",
+    parts: list[sendlog.Part] | None = None,
 ) -> LLMResult:
     """task ∈ judge|review|review_fallback|extract|typo|structure|function
     → configured model.
+
+    ``parts``: the user data in the prompt as (category, text[, key])
+    pieces for the send list (llm/sendlog.py); without them the user
+    messages count as one piece of the task's usual category.
+
+    Privacy mode (llm/privacy.py) narrows the routes: a private task or a
+    call inside ``privacy.local_only`` runs locally or not at all — an
+    empty route list returns LLMResult(value=None, skipped=True) without
+    sending anything.
 
     Returns LLMResult(value=None) when generation or validation fails on
     every available route; callers map that to undetermined.
@@ -400,8 +440,16 @@ async def chat_json(
         return LLMResult(value=value, route=cached_route, cached=True)
 
     order = route_order(task, settings) if route == "auto" else [route]
+    order = privacy.allowed_routes(task, order, settings)
+    if not order:
+        note_skipped(task)
+        return LLMResult(value=None, route="local", error="skipped",
+                         skipped=True)
+    packed = sendlog.pack(parts if parts is not None
+                          else sendlog.default_parts(task, messages))
     last_error: Exception | None = None
     for r in order:
+        token = _parts.set(packed)
         try:
             value, _raw = await _attempt(schema, model, messages, r, task)
         except Exception as e:  # noqa: BLE001 — route failure -> next route
@@ -409,6 +457,8 @@ async def chat_json(
                         _err_desc(e))
             last_error = e
             continue
+        finally:
+            _parts.reset(token)
         _count(r)
         if value is not None:
             _get_cache().set(key, {"route": r, "value": value.model_dump()})

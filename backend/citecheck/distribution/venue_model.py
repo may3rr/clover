@@ -55,8 +55,12 @@ class _HeadOut(BaseModel):
     items: list[_HeadItem] = Field(default_factory=list)
 
 
-async def classify_headings(titles: list[str]) -> dict[str, str]:
-    """title -> canonical for titles the keyword table maps to other."""
+async def classify_headings(titles: list[str],
+                            mine: set[str] | None = None) -> dict[str, str]:
+    """title -> canonical for titles the keyword table maps to other.
+    ``mine``: the manuscript's own titles (send list: manuscript text;
+    the rest are the exemplars')."""
+    own = mine or set()
     from ..llm import client
 
     todo = sorted({t for t in titles if t and canonical_for(t) == "other"
@@ -65,8 +69,9 @@ async def classify_headings(titles: list[str]) -> dict[str, str]:
 
     async def batch(chunk: list[str]):
         listing = "\n".join(f"{k}. {t}" for k, t in enumerate(chunk, 1))
-        res = await client.chat_json("structure", [{"role": "user",
-                                                    "content": _HEAD_PROMPT + listing}], _HeadOut)
+        res = await client.chat_json(
+            "structure", [{"role": "user", "content": _HEAD_PROMPT + listing}], _HeadOut,
+            parts=[("manuscript" if t in own else "exemplar", t) for t in chunk])
         for it in (res.value.items if res.value else []):
             if 1 <= it.i <= len(chunk) and it.canonical in _CANONS:
                 out[chunk[it.i - 1]] = it.canonical
@@ -126,15 +131,18 @@ def excerpt(title: str | None, abstract: str | None, headings: list[str],
     return "\n".join(parts)[:limit]
 
 
-async def read_elements(parts: list[str], text: str) -> dict[str, dict]:
+async def read_elements(parts: list[str], text: str, *,
+                        mine: bool = False) -> dict[str, dict]:
     """key -> {"value": float | None, "quote": str | None}. ``text`` is
     what the model reads, ``parts`` the pieces it is built from: a "yes"
     or a count needs a quote found verbatim inside one piece, else the
-    value becomes unknown (AGENTS §5.3); a "no" needs no quote."""
+    value becomes unknown (AGENTS §5.3); a "no" needs no quote.
+    ``mine``: the manuscript's parts (send list category)."""
     from ..llm import client
 
     res = await client.chat_json("profile", [{"role": "user", "content": _ELEM_PROMPT + text}],
-                                 _ElemOut)
+                                 _ElemOut,
+                                 parts=[("manuscript" if mine else "exemplar", text)])
     out: dict[str, dict] = {}
     for key, (_label, kind) in ELEMENTS.items():
         it: _Item = getattr(res.value, key) if res.value else _Item()
@@ -192,7 +200,8 @@ async def exemplar_functions(sentences: list[dict]) -> dict[str, int]:
         if not k:
             return
         res = await client.chat_json("function", [{"role": "user", "content":
-                                     _FUNC_PROMPT.replace("{text}", text)}], _FuncOut)
+                                     _FUNC_PROMPT.replace("{text}", text)}], _FuncOut,
+                                     parts=[("exemplar", text)])
         seen: set[str] = set()
         for it in (res.value.items if res.value else []):
             if it.function in counts and it.marker_id not in seen and \

@@ -222,6 +222,13 @@ class VenueSettings(BaseModel):
     model: bool = True
 
 
+class PrivacySettings(BaseModel):
+    # 隐私模式：稿件自身的文字只在本机处理。错别字、引用功能、文献结构化、
+    # 论断抽取和期刊画像只走 [llm.local]，本机没有模型时跳过；表述作者自身
+    # 贡献的论断只在本机判断；向量只用本机后端（llm/privacy.py）
+    enabled: bool = False
+
+
 class CacheSettings(BaseModel):
     path: str = "~/Library/Application Support/citecheck/cache.sqlite"
 
@@ -241,6 +248,7 @@ class Settings(BaseModel):
     retrieval: RetrievalSettings = Field(default_factory=RetrievalSettings)
     support: SupportSettings = Field(default_factory=SupportSettings)
     venue: VenueSettings = Field(default_factory=VenueSettings)
+    privacy: PrivacySettings = Field(default_factory=PrivacySettings)
     cache: CacheSettings = Field(default_factory=CacheSettings)
 
     @property
@@ -292,6 +300,7 @@ def _load_settings() -> Settings:
         retrieval=RetrievalSettings(**data.get("retrieval", {})),
         support=SupportSettings(**data.get("support", {})),
         venue=VenueSettings(**data.get("venue", {})),
+        privacy=PrivacySettings(**data.get("privacy", {})),
         cache=CacheSettings(**data.get("cache", {})),
     )
 

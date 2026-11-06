@@ -340,6 +340,46 @@ class LLMCalls(BaseModel):
     cloud: int = 0
 
 
+class SendItem(BaseModel):
+    """One distinct piece of text sent to the cloud (truncated for display)."""
+    text: str
+    chars: int  # full length of the piece
+    times: int = 1  # requests that carried it
+    tasks: list[str] = Field(default_factory=list)  # Chinese task labels
+
+
+class SendCategory(BaseModel):
+    category: Literal["claim", "excerpt", "reference", "manuscript",
+                      "exemplar", "other"]
+    label: str
+    count: int  # distinct pieces
+    chars: int  # their full lengths, each counted once
+    items: list[SendItem] = Field(default_factory=list)
+    truncated: int = 0  # pieces beyond the list cap
+
+
+class SendSkipped(BaseModel):
+    task: str
+    label: str
+    count: int  # model calls privacy mode did not make
+
+
+class SendSummary(BaseModel):
+    """发送清单: what this run sent to cloud services, from the llm_usage
+    rows it recorded (llm/sendlog.py) — never estimated."""
+    run: str = ""  # llm_usage.run of the rows it was computed from
+    privacy: bool = False
+    manuscript_chars: int = 0  # characters of the manuscript's text
+    requests: int = 0  # cloud requests (chat, embedding, rerank)
+    cached_requests: int = 0  # answered from the local cache, nothing sent
+    local_requests: int = 0  # served by the on-device model
+    sent_chars: int = 0  # every character of every cloud request
+    content_chars: int = 0  # the user-data part of sent_chars
+    manuscript_sent_chars: int = 0  # distinct claim + manuscript text sent
+    categories: list[SendCategory] = Field(default_factory=list)
+    skipped: list[SendSkipped] = Field(default_factory=list)
+
+
 class ReportMeta(BaseModel):
     llm_calls: LLMCalls = Field(default_factory=LLMCalls)
     layers: dict[str, LayerStatus] = Field(default_factory=dict)
@@ -348,6 +388,7 @@ class ReportMeta(BaseModel):
     token_usage: dict[str, dict[str, int]] = Field(default_factory=dict)
     # {"parse": s, "layers": {layer: s}, "sources": {src: {calls, seconds, cached}}}
     timings: dict = Field(default_factory=dict)
+    send: SendSummary | None = None
 
 
 OverviewTier = Literal["below", "near", "at", "above", "na"]

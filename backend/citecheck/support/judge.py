@@ -8,11 +8,33 @@ model must answer undetermined rather than guess.
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
 from pydantic import BaseModel
 
 from ..llm.client import chat_json
+
+
+_TAG = re.compile(r"⟦[^⟧]*⟧")
+
+
+def claim_part(claim_text: str, sentence: str | None) -> tuple[str, str, str]:
+    """Send-list piece for a claim: the sentence it sits in (the claim is
+    a span of it), keyed by the sentence without the judge's tags so one
+    sentence counts once however many works it cites."""
+    text = sentence or claim_text
+    return ("claim", text, _TAG.sub("", text))
+
+
+def _ref_parts(entry: str | None, title: str | None,
+               cocited: list[str] | None) -> list:
+    out = []
+    if entry or title:
+        out.append(("reference", "\n".join(x for x in (entry, title) if x),
+                    entry or title))
+    out += [("reference", e) for e in cocited or []]
+    return out
 
 
 class JudgeOut(BaseModel):
@@ -114,6 +136,8 @@ async def judge_claim(
         [{"role": "user", "content": prompt}],
         JudgeOut,
         route=route,
+        parts=[claim_part(claim_text, sentence),
+               *_ref_parts(entry, ref_title, cocited), ("excerpt", excerpt)],
     )
     return res.value
 
@@ -139,6 +163,7 @@ async def search_terms(claim_text: str, sentence: str | None = None) -> list[str
             claim=claim_text,
             sentence_line=f"所在句子：{sentence}\n" if sentence else "")}],
         _Terms,
+        parts=[claim_part(claim_text, sentence)],
     )
     return [t for t in (res.value.terms if res.value else []) if t.strip()][:12]
 
@@ -167,7 +192,7 @@ _DETAIL_PROMPT = (
 
 async def check_details(
     claim_text: str, ref_title: str | None, excerpt: str,
-    *, sentence: str | None = None,
+    *, sentence: str | None = None, entry: str | None = None,
 ) -> DetailOut | None:
     """Second look at a first-pass 'supported' verdict, on the fast model:
     one concrete detail the excerpt states differently sends the claim
@@ -181,5 +206,8 @@ async def check_details(
             excerpt=excerpt,
         )}],
         DetailOut,
+        parts=[claim_part(claim_text, sentence),
+               *([("reference", ref_title, entry or ref_title)] if ref_title else []),
+               ("excerpt", excerpt)],
     )
     return res.value

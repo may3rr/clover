@@ -55,6 +55,23 @@ interface ModelCfg {
   deep: string
   dense_retrieval: boolean
   venue_model: boolean
+  // 隐私模式 (backend llm/privacy.py)
+  privacy_mode: boolean
+  local_model: boolean
+  privacy_skipped: string[]
+  embedding_local: boolean
+}
+
+/** What privacy mode changes with the current configuration. */
+export function privacyNotes(cfg: ModelCfg): string[] {
+  const out: string[] = []
+  if (!cfg.local_model && cfg.privacy_skipped.length)
+    out.push(
+      `本机还没有可用的模型，开启后会跳过${cfg.privacy_skipped.join('、')}，这些内容不会改发到云端。要在本机运行这些检查，请在 config.toml 的 llm.local 一节配置本机模型。`
+    )
+  if (cfg.dense_retrieval && !cfg.embedding_local)
+    out.push('向量检索现在使用云端服务，开启隐私模式后改用本机的关键词检索挑选证据片段。')
+  return out
 }
 
 interface UsageRow {
@@ -535,6 +552,10 @@ const SHOT_CFG: ModelCfg = {
   deep: 'qwen3.8-max',
   dense_retrieval: true,
   venue_model: true,
+  privacy_mode: false,
+  local_model: false,
+  privacy_skipped: ['错别字检查', '引用功能分类', '参考文献结构化', '论断抽取', '期刊画像', '作者自身贡献论断的判断'],
+  embedding_local: false,
 }
 
 const SHOT_USAGE: Usage = {
@@ -851,6 +872,7 @@ export function ModelSection({
         deep: cfg.deep,
         dense_retrieval: cfg.dense_retrieval,
         venue_model: cfg.venue_model,
+        privacy_mode: cfg.privacy_mode,
       }),
     }).catch(() => null)
     if (r && r.ok) {
@@ -1033,6 +1055,31 @@ export function ModelSection({
             <option key={m} value={m} />
           ))}
         </datalist>
+      </div>
+      <div className="group-label">隐私</div>
+      <div className="card">
+        <div className="switch-row">
+          <div className="flex-1">
+            <div id="privacy-label">隐私模式</div>
+            <div className="field-hint">
+              开启后，错别字检查、引用功能分类、参考文献结构化、论断抽取和期刊画像只用本机模型运行，表述作者自身贡献的论断只在本机判断，向量检索只用本机模型。云端只收到带引用的论断句、被引文献的原文片段和参考文献条目，题目、摘要、章节标题和图表题注留在本机。每次体检实际发送了什么，报告开头的发往云端一行可以展开查看。
+            </div>
+            {privacyNotes(cfg).map((t) => (
+              <div key={t} className="field-hint" style={{ marginTop: 8 }}>
+                {t}
+              </div>
+            ))}
+          </div>
+          <button
+            role="switch"
+            aria-checked={cfg.privacy_mode}
+            aria-labelledby="privacy-label"
+            className={`switch${cfg.privacy_mode ? ' on' : ''}`}
+            onClick={() => setCfg({ ...cfg, privacy_mode: !cfg.privacy_mode })}
+          >
+            <span className="switch-knob" />
+          </button>
+        </div>
       </div>
       <div className="group-label">挑选被引原文片段</div>
       <div className="card">
