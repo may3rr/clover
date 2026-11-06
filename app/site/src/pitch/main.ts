@@ -7,6 +7,7 @@
  *  第「拖入论文」页把 Clover 的网页复刻版（app.html）嵌在窗口里，用合成的
  *  拖放事件驱动它：画面上的运行页和报告都是应用自己的界面。 */
 import './pitch.css'
+import logoUrl from './assets/logo.svg'
 
 const deck = document.getElementById('deck') as HTMLElement
 const hud = document.getElementById('hud') as HTMLElement
@@ -132,7 +133,7 @@ function loadApp(frame: HTMLIFrameElement, state: string, id: number): Promise<v
       else resolve()
     }
     addEventListener('message', onMsg)
-    const params = `state=${state}&t=${Date.now()}`
+    const params = `state=${state}&data=zh&t=${Date.now()}`
     if (APP_HTML) {
       // single-file deck: same document every time, parameters in the name
       frame.name = params
@@ -148,7 +149,7 @@ function dragInto(frame: HTMLIFrameElement, type: 'dragover' | 'drop') {
   const doc = frame.contentDocument
   if (!w || !doc) return
   const dt = new w.DataTransfer()
-  dt.items.add(new w.File(['clover'], '基于深度学习的目标检测研究综述.docx', {
+  dt.items.add(new w.File(['clover'], 'paper.docx', {
     type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   }))
   const target = doc.elementFromPoint(760, 400) ?? doc.body
@@ -175,17 +176,11 @@ function drawChrome() {
 drawChrome()
 
 // every content page carries the Clover mark and slogan at the bottom
-const LEAVES = [
-  'M494,473 L398,377 A67.9 67.9 0 0 1 494,281 A67.9 67.9 0 0 1 590,377 Z',
-  'M507,486 L603,390 A67.9 67.9 0 0 1 699,486 A67.9 67.9 0 0 1 603,582 Z',
-  'M494,499 L590,595 A67.9 67.9 0 0 1 494,691 A67.9 67.9 0 0 1 398,595 Z',
-  'M481,486 L385,582 A67.9 67.9 0 0 1 289,486 A67.9 67.9 0 0 1 385,390 Z',
-]
 for (const s of slides.filter((x) => x.classList.contains('framed'))) {
   const f = document.createElement('div')
   f.className = 'foot'
   f.innerHTML =
-    `<svg viewBox="270 262 448 448">${LEAVES.map((d, i) => `<path class="lf-${i}" d="${d}"/>`).join('')}</svg>` +
+    `<img src="${logoUrl}" alt="">` +
     '<span class="foot-mark">Clover</span>' +
     '<span class="foot-line">投稿前的最后一公里，替你核对每一条引用</span>'
   s.appendChild(f)

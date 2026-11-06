@@ -15,6 +15,8 @@ claim and revision is the pipeline's own output.
   python demo/curate_showcase.py
     -> app/site/public/data/showcase.json, grounded.json, showcase_outline.json
     -> app/site/public/samples/clover-sample.docx  (real export)
+    -> app/site/public/data/pitch_zh.json  (pitch deck: the Chinese demo paper,
+       demo/final/runs/zh_v7_r1105.json, figures embedded as JPEG data URIs)
 """
 
 from __future__ import annotations
@@ -59,6 +61,28 @@ def dump(obj, path: Path) -> None:
     print(f"{path.relative_to(ROOT)}  {path.stat().st_size // 1024} KB")
 
 
+ASSETS = Path("~/Library/Application Support/citecheck/assets").expanduser()
+
+
+def embed_figures(rep: dict) -> None:
+    """The replica cannot serve /assets/…: carry the report's figures along
+    as data URIs (JPEG, at most 1200 px wide) under rep["_assets"]."""
+    import base64
+    import io
+
+    from PIL import Image
+
+    out = {}
+    folder = ASSETS / rep["document"]["assets"]
+    for name in sorted({n for p in rep["paragraphs"] for n in (p.get("images") or [])}):
+        im = Image.open(folder / name).convert("RGB")
+        im.thumbnail((1200, 1200))
+        buf = io.BytesIO()
+        im.save(buf, "JPEG", quality=82)
+        out[name] = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+    rep["_assets"] = out
+
+
 def main() -> None:
     show = curate(json.loads((HERE / "showcase_report.json").read_text()), True,
                   "vericite_emnlp.docx")
@@ -71,6 +95,11 @@ def main() -> None:
     grounded = curate(json.loads((HERE / "demo_report_v2.json").read_text()), False,
                        "grounded_but_wrong.docx")
     dump(grounded, OUT / "data" / "grounded.json")
+
+    zh = curate(json.loads((HERE / "final" / "runs" / "zh_v7_r1105.json").read_text()),
+                False, "基于深度学习的目标检测研究综述.docx")
+    embed_figures(zh)
+    dump(zh, OUT / "data" / "pitch_zh.json")
 
     out = OUT / "samples" / "clover-sample.docx"
     out.parent.mkdir(parents=True, exist_ok=True)

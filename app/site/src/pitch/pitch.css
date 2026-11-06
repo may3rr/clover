@@ -120,28 +120,17 @@ body {
   gap: 48px;
 }
 .leaf-logo {
-  width: 220px;
-  height: 220px;
-  overflow: visible;
+  width: 260px;
+  height: 260px;
+  margin: -20px;
 }
-.lf {
-  transform-box: fill-box;
-  transform-origin: center;
+.slide.on .leaf-logo {
+  animation: logo-in 900ms var(--ease-out) both;
 }
-.lf-0 { fill: var(--leaf-0); }
-.lf-1 { fill: var(--leaf-1); }
-.lf-2 { fill: var(--leaf-2); }
-.lf-3 { fill: var(--leaf-3); }
-.slide.on .lf {
-  animation: leaf-in 900ms var(--ease-out) both;
-}
-.slide.on .lf-1 { animation-delay: 90ms; }
-.slide.on .lf-2 { animation-delay: 180ms; }
-.slide.on .lf-3 { animation-delay: 270ms; }
-@keyframes leaf-in {
+@keyframes logo-in {
   from {
     opacity: 0;
-    transform: scale(0.4) rotate(-40deg);
+    transform: scale(0.6) rotate(-30deg);
   }
 }
 .cover-name {
@@ -463,7 +452,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slide.on .lf,
+  .slide.on .leaf-logo,
   .slide.on .cover-text {
     animation: none;
   }
@@ -525,9 +514,10 @@ body {
   align-items: center;
   gap: 16px;
 }
-.foot svg {
-  width: 40px;
-  height: 40px;
+.foot img {
+  width: 56px;
+  height: 56px;
+  margin: -6px -4px;
 }
 .foot-mark {
   /* 软件自己的字体：macOS 上是 SF Pro，Windows 上是 Segoe UI */

@@ -59,10 +59,12 @@ def inline(html_path: Path) -> str:
 
 def main() -> None:
     app = inline(build("app"))
+    # the deck shows the Chinese demo paper (demo/curate_showcase.py makes
+    # pitch_zh.json); the outline is derived from the report in the page
     data = {
-        "showcase": json.loads((SITE / "public/data/showcase.json").read_text("utf-8")),
+        "showcase": json.loads((SITE / "public/data/pitch_zh.json").read_text("utf-8")),
         "grounded": json.loads((SITE / "public/data/grounded.json").read_text("utf-8")),
-        "outline": json.loads((SITE / "public/data/showcase_outline.json").read_text("utf-8")),
+        "outline": None,
     }
     data_js = "window.__CLOVER_DATA__ = " + json.dumps(data, ensure_ascii=False) + ";"
     app = app.replace("<head>", f"<head><script>{script_safe(data_js)}</script>", 1)
