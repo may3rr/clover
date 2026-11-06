@@ -4,11 +4,12 @@
  *  a "check" replays the showcase run's event stream on a fixed timeline. */
 import type { CitecheckApi } from '../../../src/preload/index'
 import type { Report } from '../../../src/renderer/src/types/report'
-import { anchorsFromReport } from '../../../src/renderer/src/lib/outline'
+import { anchorsFromReport, outlineFromReport } from '../../../src/renderer/src/lib/outline'
 
 const BASE = 'https://clover.local'
 const HOME = '/Users/liming/Documents'
-const SHOWCASE_FILE = 'vericite_emnlp.docx'
+/** the opened report's file name; the pitch deck swaps in its own report */
+let SHOWCASE_FILE = 'vericite_emnlp.docx'
 const GROUNDED_FILE = 'grounded_but_wrong.docx'
 const SAMPLE_DOCX = './samples/clover-sample.docx'
 
@@ -21,8 +22,10 @@ export const PREFS = {
 }
 
 interface Data {
-  showcase: Report
+  /** figures as data URIs keyed by asset name (pitch data only) */
+  showcase: Report & { _assets?: Record<string, string> }
   grounded: Report
+  /** running-screen skeleton; null = derive it from the report */
   outline: unknown
 }
 // one shared request: the state driver and App both wait on it, and the
@@ -30,13 +33,52 @@ interface Data {
 let data: Promise<Data> | null = null
 export function loadData(): Promise<Data> {
   if (data) return data
+  // the single-file pitch deck embeds the reports instead of serving files
+  const embedded = (window as { __CLOVER_DATA__?: Data }).__CLOVER_DATA__
+  if (embedded) return (data = Promise.resolve(embedded).then(adopt))
   const get = (p: string) => fetch(p).then((r) => r.json())
+  // app.html?data=zh: the pitch deck's Chinese demo paper as the showcase
+  const params = new URLSearchParams(location.search || window.name)
+  if (params.get('data') === 'zh')
+    return (data = Promise.all([get('./data/pitch_zh.json'), get('./data/grounded.json')])
+      .then(([showcase, grounded]) => adopt({ showcase, grounded, outline: null })))
   data = Promise.all([
     get('./data/showcase.json'),
     get('./data/grounded.json'),
     get('./data/showcase_outline.json'),
   ]).then(([showcase, grounded, outline]) => ({ showcase, grounded, outline }))
   return data
+}
+
+function adopt(d: Data): Data {
+  SHOWCASE_FILE = d.showcase.document?.filename ?? SHOWCASE_FILE
+  if (d.outline == null) d.outline = outlineFromReport(d.showcase)
+  if (d.showcase._assets) showFigures(d.showcase._assets)
+  return d
+}
+
+/** Figures come from GET /assets/… in the app; here an <img> pointing there
+ *  gets the embedded data URI instead. */
+function showFigures(assets: Record<string, string>) {
+  const fix = (img: HTMLImageElement) => {
+    const src = img.getAttribute('src') ?? ''
+    if (!src.startsWith(`${BASE}/assets/`)) return
+    const name = decodeURIComponent(src.split('?')[0].split('/').pop() ?? '')
+    if (assets[name]) img.src = assets[name]
+  }
+  const scan = (root: ParentNode) => root.querySelectorAll('img').forEach(fix)
+  new MutationObserver((records) => {
+    for (const r of records) {
+      if (r.type === 'attributes' && r.target instanceof HTMLImageElement) fix(r.target)
+      r.addedNodes.forEach((n) => {
+        if (n instanceof HTMLImageElement) fix(n)
+        else if (n instanceof Element) scan(n)
+      })
+    }
+  }).observe(document.documentElement, {
+    subtree: true, childList: true, attributes: true, attributeFilter: ['src'],
+  })
+  scan(document)
 }
 
 // ----------------------------------------------------------------- routes

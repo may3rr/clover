@@ -131,7 +131,8 @@ async def _ask_model(pdf: LocalPdf) -> str | None:
     if not page:
         return None
     res = await client.chat_json("structure", [{"role": "user", "content": _PROMPT.format(
-        head=page[:500], foot=page[-200:])}], _Venue)
+        head=page[:500], foot=page[-200:])}], _Venue,
+        parts=[("exemplar", page[:500]), ("exemplar", page[-200:])])
     name = clean_venue(res.value.venue if res.value else None)
     # the answer must be printed on the page (no invented journals)
     if not name or squash(name) not in squash(page):

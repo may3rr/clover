@@ -33,7 +33,7 @@ def test_manuscript_profile_is_local_stats_plus_short_excerpt():
 
 
 def _patch_chat(monkeypatch, verdict: dict | None):
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         if task == "profile":
             return LLMResult(value=Shape(n_datasets=3, n_baselines=4,
                                          has_ablation=True), route="cloud")

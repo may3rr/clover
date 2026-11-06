@@ -110,7 +110,9 @@ async def _ask_model(ref: Reference, cands: list[LocalPdf]) -> LocalPdf | None:
         lines.append(f"[{k}] 标题：{p.doc.title or '未知'}；作者：{'，'.join(p.doc.authors[:4]) or '未知'}；"
                      f"开头：{p.first_pages[:200]}")
     res = await chat_json("structure", [{"role": "user", "content": _PROMPT.format(
-        ref=ref.raw[:500], cands="\n".join(lines))}], _Choice)
+        ref=ref.raw[:500], cands="\n".join(lines))}], _Choice,
+        parts=[("reference", ref.raw[:500], ref.raw),
+               *(("exemplar", ln) for ln in lines)])
     if res.value is None or not 1 <= res.value.choice <= len(cands):
         return None
     return cands[res.value.choice - 1]

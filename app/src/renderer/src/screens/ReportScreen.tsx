@@ -41,6 +41,7 @@ import ExportDone from '../components/ExportDone'
 import PaperSearch from '../components/PaperSearch'
 import { MagnifierIcon } from '../components/Icons'
 import OverviewCard from '../components/OverviewCard'
+import SendList from '../components/SendList'
 import OrbitDots from '../components/OrbitDots'
 import { useReports, type ReportMeta } from '../lib/useReports'
 import { SideIcon, LAYER_SIDE } from '../components/SideIcons'
@@ -1116,6 +1117,7 @@ function PaperBody({
               <span className="prop-value font-normal">{value}</span>
             </div>
           ))}
+          {report.meta?.send && <SendList send={report.meta.send} />}
         </div>
         <div
           className="callout"

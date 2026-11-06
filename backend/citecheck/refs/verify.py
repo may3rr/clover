@@ -717,7 +717,8 @@ async def _adjudicate(ref: Reference, hits: list[dict]) -> dict | None:
         for k, h in enumerate(gray)
     )
     res = await chat_json("judge", [{"role": "user", "content": _ADJ_PROMPT.format(
-        raw=ref.raw, cands=cands)}], _Verdict)
+        raw=ref.raw, cands=cands)}], _Verdict,
+        parts=[("reference", ref.raw), ("other", cands)])
     v = res.value
     if v is None or v.match is None or not 1 <= v.match <= len(gray):
         return None

@@ -23,6 +23,7 @@ app/shots/
 
 # ---- landing page (app/site): build output and recorded videos
 app/site-dist/
+app/site-single/
 app/site-videos/
 
 # ---- local data and caches
@@ -91,3 +92,6 @@ demo/final/runs/*.json
 # 基线定格前的旧评测结果，只留在本机
 demo/testset/results_f33/
 intel-bong.html
+
+# prefilter_eval.py full reports carry cited-paper excerpts
+demo/testset/results/prefilter/*_k*.json

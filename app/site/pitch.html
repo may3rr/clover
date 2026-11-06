@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./icon.svg" />
+    <title>Clover 路演</title>
+  </head>
+  <body>
+    <div id="deck">
+      <!-- ============ 1 封面 ============ -->
+      <section class="slide cover" data-title="封面">
+        <div class="cover-track">效率进化赛道</div>
+        <div class="cover-main">
+          <img class="leaf-logo" src="./src/pitch/assets/logo.svg" alt="" />
+          <div class="cover-text">
+            <div class="cover-name">Clover</div>
+            <div class="cover-line">投稿前的最后一公里，替你核对每一条引用</div>
+          </div>
+        </div>
+        <div class="cover-team">
+          <span class="team-name">我要发顶刊</span>
+          <span>天津师范大学</span>
+          <span>吕浩博</span>
+        </div>
+      </section>
+
+      <!-- ============ 2 最后一公里 ============ -->
+      <section class="slide framed" data-title="最后一公里" data-steps="2">
+        <div class="bar-title">投稿前的最后一公里</div>
+        <div class="mile">
+          <svg class="mile-svg" viewBox="0 0 1480 520" aria-hidden="true">
+            <defs>
+              <linearGradient id="trail" x1="0" x2="1">
+                <stop offset="0" stop-color="#ff0036" stop-opacity="0" />
+                <stop offset="1" stop-color="#ff0036" />
+              </linearGradient>
+            </defs>
+            <!-- track -->
+            <line class="track" x1="90" y1="300" x2="1390" y2="300" />
+            <line class="track-slow" x1="1060" y1="300" x2="1390" y2="300" />
+            <rect class="trail" x="90" y="296" width="970" height="8" rx="4" />
+          </svg>
+          <!-- stations, positioned in the same 1480×520 box -->
+          <div class="stn" style="--x: 90px">点子</div>
+          <div class="stn" style="--x: 332px">文献综述</div>
+          <div class="stn" style="--x: 575px">实验</div>
+          <div class="stn" style="--x: 818px">图表</div>
+          <div class="stn" style="--x: 1060px">初稿</div>
+          <div class="stn stn-end" style="--x: 1390px">投稿</div>
+          <div class="seg-label seg-fast">AI 一路加速</div>
+          <div class="seg-label seg-slow">作者逐条核对</div>
+          <svg class="rocket" viewBox="-70 0 290 88" aria-hidden="true">
+            <defs>
+              <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" />
+                <stop offset="0.55" stop-color="#e9e9e9" />
+                <stop offset="1" stop-color="#9a9a9a" />
+              </linearGradient>
+              <linearGradient id="exhaust" x1="1" x2="0">
+                <stop offset="0" stop-color="#ffe2e8" />
+                <stop offset="0.25" stop-color="#ff0036" />
+                <stop offset="1" stop-color="#ff0036" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path class="flame" d="M42 30 C10 34 -30 40 -66 44 C-30 48 10 54 42 58 Z" fill="url(#exhaust)" />
+            <path class="flame-core" d="M42 36 C28 38 18 41 8 44 C18 47 28 50 42 52 Z" />
+            <path class="fin" d="M60 26 L40 4 Q38 1 42 1 H66 Q70 1 72 4 L92 26 Z" />
+            <path class="fin" d="M60 62 L40 84 Q38 87 42 87 H66 Q70 87 72 84 L92 62 Z" />
+            <path class="hull" d="M44 26 H150 C180 26 204 34 218 44 C204 54 180 62 150 62 H44 Q38 62 38 56 V32 Q38 26 44 26 Z" fill="url(#hull)" />
+            <rect class="band" x="104" y="26" width="10" height="36" />
+            <circle class="port-ring" cx="160" cy="44" r="11" />
+            <circle class="port" cx="160" cy="44" r="7" />
+          </svg>
+          <!-- 行人剪影：两帧交替就是走路 -->
+          <svg class="walker" viewBox="0 0 80 140" aria-hidden="true">
+            <g class="pose pa">
+              <circle cx="44" cy="14" r="12" />
+              <path d="M42 32 L36 76 M40 38 L56 58 L64 74 M40 38 L28 58 L20 70 M36 76 L52 102 L54 134 M36 76 L24 104 L10 128" />
+            </g>
+            <g class="pose pb">
+              <circle cx="44" cy="14" r="12" />
+              <path d="M42 32 L36 76 M40 38 L48 60 L46 78 M40 38 L34 60 L36 78 M36 76 L42 104 L38 134 M36 76 L32 104 L30 134" />
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ============ 4 拖入一篇论文 ============ -->
+      <section class="slide framed" data-title="拖入论文" data-steps="1">
+        <div class="bar-title">拖进来，交给 Clover</div>
+        <div class="checks" aria-hidden="true">
+          <div class="checks-title">四项检查同时进行</div>
+          <div class="check"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-0)" /></svg>文献真实性</div>
+          <div class="check"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-1)" /></svg>论断支持度</div>
+          <div class="check"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-3)" /></svg>格式规范</div>
+          <div class="check"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-2)" /></svg>期刊对标</div>
+          <div class="checks-note">整篇论文在本机解析</div>
+        </div>
+        <div class="drop-scene">
+          <div class="docx" aria-hidden="true">
+            <svg viewBox="0 0 96 120">
+              <path class="paper" d="M8 0 H64 L96 32 V112 Q96 120 88 120 H8 Q0 120 0 112 V8 Q0 0 8 0 Z" />
+              <path class="fold" d="M64 0 V24 Q64 32 72 32 H96 Z" />
+              <rect class="w" x="16" y="56" width="64" height="40" rx="6" />
+              <text x="48" y="84" text-anchor="middle">W</text>
+            </svg>
+            <div class="docx-name">基于深度学习的目标检测研究综述.docx</div>
+          </div>
+          <div class="win">
+            <div class="win-inner">
+              <iframe class="app-frame" title="Clover"></iframe>
+              <div class="win-chrome"></div>
+            </div>
+          </div>
+          <svg class="cursor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 2 L5 20 L9.5 15.5 L12.5 22 L15.5 20.6 L12.6 14.2 L19 14.2 Z" />
+          </svg>
+        </div>
+      </section>
+    </div>
+    <div id="hud"></div>
+    <script type="module" src="./src/pitch/main.ts"></script>
+  </body>
+</html>

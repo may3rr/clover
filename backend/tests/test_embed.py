@@ -59,7 +59,7 @@ def test_excerpt_fuses_dense_ranking(monkeypatch):
     body = (filler + "The taxonomy taxonomy section is long. " + filler
             + "The taxonomy holds about 150 named entity types. " + filler)
 
-    def fake_dense(windows, query):
+    def fake_dense(windows, query, bm25=None):
         return np.array([1.0 if "150" in w else -1.0 if "taxonomy taxonomy" in w else 0.0
                          for w in windows])
 
@@ -78,7 +78,7 @@ def test_rerank_reorders_fused_candidates(monkeypatch):
     body = (filler + "The taxonomy taxonomy section is long. " + filler
             + "The taxonomy holds about 150 named entity types. " + filler)
 
-    def fake_dense(windows, query):
+    def fake_dense(windows, query, bm25=None):
         return np.array([0.5 if "taxonomy" in w else 0.0 for w in windows])
 
     def fake_rerank(query, docs):
@@ -228,3 +228,32 @@ def test_retrieval_key_stays_with_its_provider(monkeypatch):
                    "embedding": {"base_url": "https://api.siliconflow.cn/v1",
                                  "api_key_env": "SILICONFLOW_API_KEY"}}}
     assert _retrieval_key(own, {}, "embedding", "X") == "sf"
+
+
+def test_prefilter_keeps_bm25_top_and_neighbours():
+    scores = [0.0] * 20
+    scores[5], scores[15] = 3.0, 2.0
+    assert sources.prefilter(scores, 2, 1) == [4, 5, 6, 14, 15, 16]
+    assert sources.prefilter(scores, 0, 1) is None        # off
+    assert sources.prefilter(scores[:6], 2, 1) is None    # short text: embed all
+
+
+def test_dense_scores_embed_only_candidates(monkeypatch):
+    _on(monkeypatch)
+    s = get_settings()
+    monkeypatch.setattr(s.llm.embedding, "prefilter_k", 1)
+    monkeypatch.setattr(s.llm.embedding, "prefilter_neighbors", 1)
+    seen = []
+
+    def fake_embed(texts, query=False):
+        if not query:
+            seen.extend(texts)
+        return np.ones((len(texts), 2)) / np.sqrt(2)
+
+    monkeypatch.setattr(embed_mod, "embed", fake_embed)
+    windows = [f"w{i}" for i in range(10)]
+    bm25 = [0.0] * 10
+    bm25[7] = 1.0
+    sim = sources._dense_scores(windows, "q", bm25)
+    assert seen == ["w6", "w7", "w8"]
+    assert sim[7] > 0.99 and sim[0] == -1.0

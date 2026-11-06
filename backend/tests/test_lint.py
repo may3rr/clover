@@ -357,7 +357,7 @@ class _FakeLLM:
         self.out = out
         self.calls = 0
 
-    async def __call__(self, task, messages, schema, *, route="auto"):
+    async def __call__(self, task, messages, schema, *, route="auto", **_kw):
         self.calls += 1
         return LLMResult(value=schema.model_validate(self.out), route="cloud")
 

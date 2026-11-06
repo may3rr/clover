@@ -63,7 +63,7 @@ async def test_venue_traces_header_and_model(odd_folder, monkeypatch):
 
     answers = {"Ranking": "Applied Retrieval Letters", "Journal": "Nature"}
 
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         text = messages[-1]["content"]
         name = next((v for k, v in answers.items() if k in text), None)
         return LLMResult(value=schema.model_validate({"venue": name}), route="cloud")
@@ -112,7 +112,7 @@ def _fake_llm(monkeypatch, seen: list | None = None):
     """structure: type "IG-RAG框架设计"-like titles as method; profile:
     one verifiable and one invented quote; function: m1 = method."""
 
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         text = messages[-1]["content"]
         if seen is not None:
             seen.append(task)

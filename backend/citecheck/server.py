@@ -35,6 +35,7 @@ from sse_starlette.sse import EventSourceResponse
 
 from .cache import Cache
 from .config import get_settings
+from .llm import privacy as _privacy
 from .pipeline import PipelineError, run_pipeline
 
 log = logging.getLogger(__name__)
@@ -736,6 +737,12 @@ async def get_config() -> dict:
         "dense_retrieval": s.llm.embedding.enabled,
         # 期刊对标细化: model reads of the exemplars
         "venue_model": s.venue.model,
+        # 隐私模式 (llm/privacy.py): which tasks it skips without a local model
+        "privacy_mode": s.privacy.enabled,
+        "local_model": _privacy.local_available(s),
+        "privacy_skipped": [_privacy.TASK_LABELS[t]
+                            for t in _privacy.skipped_tasks(s)],
+        "embedding_local": s.llm.embedding.backend == "openvino",
     }
 
 
@@ -774,6 +781,9 @@ async def put_config(request: Request):
     vm = body.get("venue_model")
     if isinstance(vm, bool):
         text = _toml_set(text, "venue", "model", vm)
+    pm = body.get("privacy_mode")
+    if isinstance(pm, bool):
+        text = _toml_set(text, "privacy", "enabled", pm)
 
     try:
         _CONFIG_PATH.write_text(text, encoding="utf-8")

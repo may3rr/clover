@@ -1487,6 +1487,17 @@
           "additionalProperties": true,
           "title": "Timings",
           "type": "object"
+        },
+        "send": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SendSummary"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "title": "ReportMeta",
@@ -1684,6 +1695,169 @@
         "density"
       ],
       "title": "SectionDist",
+      "type": "object"
+    },
+    "SendCategory": {
+      "properties": {
+        "category": {
+          "enum": [
+            "claim",
+            "excerpt",
+            "reference",
+            "manuscript",
+            "exemplar",
+            "other"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "count": {
+          "title": "Count",
+          "type": "integer"
+        },
+        "chars": {
+          "title": "Chars",
+          "type": "integer"
+        },
+        "items": {
+          "items": {
+            "$ref": "#/$defs/SendItem"
+          },
+          "title": "Items",
+          "type": "array"
+        },
+        "truncated": {
+          "default": 0,
+          "title": "Truncated",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "category",
+        "label",
+        "count",
+        "chars"
+      ],
+      "title": "SendCategory",
+      "type": "object"
+    },
+    "SendItem": {
+      "description": "One distinct piece of text sent to the cloud (truncated for display).",
+      "properties": {
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "chars": {
+          "title": "Chars",
+          "type": "integer"
+        },
+        "times": {
+          "default": 1,
+          "title": "Times",
+          "type": "integer"
+        },
+        "tasks": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Tasks",
+          "type": "array"
+        }
+      },
+      "required": [
+        "text",
+        "chars"
+      ],
+      "title": "SendItem",
+      "type": "object"
+    },
+    "SendSkipped": {
+      "properties": {
+        "task": {
+          "title": "Task",
+          "type": "string"
+        },
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "count": {
+          "title": "Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "task",
+        "label",
+        "count"
+      ],
+      "title": "SendSkipped",
+      "type": "object"
+    },
+    "SendSummary": {
+      "description": "发送清单: what this run sent to cloud services, from the llm_usage\nrows it recorded (llm/sendlog.py) — never estimated.",
+      "properties": {
+        "privacy": {
+          "default": false,
+          "title": "Privacy",
+          "type": "boolean"
+        },
+        "manuscript_chars": {
+          "default": 0,
+          "title": "Manuscript Chars",
+          "type": "integer"
+        },
+        "requests": {
+          "default": 0,
+          "title": "Requests",
+          "type": "integer"
+        },
+        "cached_requests": {
+          "default": 0,
+          "title": "Cached Requests",
+          "type": "integer"
+        },
+        "local_requests": {
+          "default": 0,
+          "title": "Local Requests",
+          "type": "integer"
+        },
+        "sent_chars": {
+          "default": 0,
+          "title": "Sent Chars",
+          "type": "integer"
+        },
+        "content_chars": {
+          "default": 0,
+          "title": "Content Chars",
+          "type": "integer"
+        },
+        "manuscript_sent_chars": {
+          "default": 0,
+          "title": "Manuscript Sent Chars",
+          "type": "integer"
+        },
+        "categories": {
+          "items": {
+            "$ref": "#/$defs/SendCategory"
+          },
+          "title": "Categories",
+          "type": "array"
+        },
+        "skipped": {
+          "items": {
+            "$ref": "#/$defs/SendSkipped"
+          },
+          "title": "Skipped",
+          "type": "array"
+        }
+      },
+      "title": "SendSummary",
       "type": "object"
     },
     "SentenceRefs": {

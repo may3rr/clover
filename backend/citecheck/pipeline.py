@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import re
+import secrets
 import time
 from collections.abc import Callable
 from pathlib import Path
@@ -38,6 +39,8 @@ from .library.venue_match import paper_type
 from .library import build_library, scan_folder
 from .lint.venue_rules import check_venue_rules
 from .lint.typos import check_typos
+from .llm import privacy, sendlog
+from .llm import client as llm_client
 from .llm.client import doc_scope, stats_scope
 from .parse.bibguess import guess_bibliography_start
 from .parse import ParsedDocument, apply_bibliography_start, parse_document
@@ -200,13 +203,22 @@ async def run_pipeline(
         send({"type": "failed", "error": PARSE_ERROR})
         raise PipelineError(PARSE_ERROR) from e
 
+    # uploaded files are stored as "<hex>_<name>.docx" — strip the prefix
+    # so usage rows show the document's real name
+    doc_label = (parsed.document.filename or
+                 re.sub(r"^[0-9a-f]{16}_", "", Path(path).name))
+    # every llm_usage row of this run carries run_id: the send list
+    run_id = secrets.token_hex(8)
+    pre_skipped: dict[str, int] = {}
     # last resort for the bibliography: no heading, no ZOTERO_BIBL field,
     # no trailing numbered run -> ask the cheap model where the list
     # starts and accept only a deterministically-verifiable span (T1e)
     if (not parsed.references and parsed.paragraphs
             and parsed.document.source_format == "docx"):
         try:
-            start = await guess_bibliography_start(parsed)
+            with stats_scope() as pre, doc_scope(doc_label, run_id):
+                start = await guess_bibliography_start(parsed)
+            pre_skipped = pre.skipped
         except Exception as e:  # noqa: BLE001 — guessing is optional
             log.warning("bibliography boundary guess failed: %s", e)
             start = None
@@ -220,11 +232,27 @@ async def run_pipeline(
     send({"type": "parsed", "outline": _outline(parsed),
           "n_refs": len(parsed.references), "n_markers": len(parsed.markers)})
 
-    # uploaded files are stored as "<hex>_<name>.docx" — strip the prefix
-    # so usage rows show the document's real name
-    doc_label = (parsed.document.filename or
-                 re.sub(r"^[0-9a-f]{16}_", "", Path(path).name))
-    with stats_scope() as stats, doc_scope(doc_label):
+    ref_paras = {r.paragraph_id for r in parsed.references if r.paragraph_id}
+    manuscript_chars = sum(len(p.text) for p in parsed.paragraphs
+                           if p.id not in ref_paras)
+    privacy_on = privacy.enabled()
+
+    def _send_summary():
+        """发送清单 from this run's llm_usage rows."""
+        try:
+            # the usage log the model clients write to (llm/client.py)
+            rows = llm_client._get_cache().usage_for_run(run_id)
+        except Exception as e:  # noqa: BLE001 — the report goes on without it
+            log.warning("send list unavailable: %s", e)
+            return None
+        skipped = dict(pre_skipped)
+        for t, n in stats.skipped.items():
+            skipped[t] = skipped.get(t, 0) + n
+        return sendlog.summarize(rows, manuscript_chars, run=run_id,
+                                 privacy=privacy_on,
+                                 skipped=skipped)
+
+    with stats_scope() as stats, doc_scope(doc_label, run_id):
         own_retrieval = retrieval is None
         cache = cache or Cache(get_settings().cache_path)
         retrieval = retrieval or RetrievalClient(cache=cache)
@@ -485,6 +513,7 @@ async def run_pipeline(
             meta.llm_calls = LLMCalls(local=stats.local, cloud=stats.cloud)
             meta.duration_s = round(time.monotonic() - t0, 1)
             meta.token_usage = {m: dict(u) for m, u in stats.usage.items()}
+            meta.send = _send_summary()
             meta.timings = {
                 "parse": round(t_parsed - t0, 1),
                 "layers": layer_times,
@@ -526,6 +555,7 @@ async def run_pipeline(
                 send({"type": "overview", "status": "unavailable"})
                 report.overview = None
             report.meta.timings["overview"] = round(time.monotonic() - t_ov, 1)
+            report.meta.send = _send_summary() or report.meta.send
             report.meta.duration_s = round(time.monotonic() - t0, 1)
             send({"type": "overview_done"})
             return report

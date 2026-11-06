@@ -182,6 +182,7 @@ async def extract_claims(
             "extract",
             [{"role": "user", "content": _PROMPT.format(sentence=tagged)}],
             _ClaimsOut,
+            parts=[("claim", tagged, sent.text)],
         )
 
         # verifiable space = sentence text with marker spans removed

@@ -1182,6 +1182,49 @@ html[data-platform='win32'] header.drag-strip {
   line-height: var(--lh-15);
 }
 
+/* send list (发送清单): a property row that opens the list below it */
+.send-row {
+  width: calc(100% + 16px);
+  text-align: left;
+  gap: 8px;
+  transition: background-color 160ms var(--ease-out);
+}
+.send-row:disabled:hover {
+  background: none;
+}
+.send-chev {
+  display: flex;
+  align-items: center;
+  height: var(--lh-15);
+  transition: transform 160ms var(--ease-out);
+}
+.send-chev.open {
+  transform: rotate(180deg);
+}
+.send-list {
+  background: var(--bg-subtle);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+.send-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.send-item {
+  display: flex;
+  flex-direction: column;
+}
+.send-text {
+  overflow-wrap: anywhere;
+}
+
 /* summary callout (Notion callout) */
 .callout {
   background: var(--bg-subtle);
@@ -2154,6 +2197,7 @@ html[data-platform='win32'] header.drag-strip {
 .sk-page,
 .sk-shimmer,
 .callout,
+.send-list,
 .field-input,
 .account-chip,
 .prov-card,

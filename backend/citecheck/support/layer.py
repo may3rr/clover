@@ -33,6 +33,9 @@ from .sources import build_source
 log = logging.getLogger(__name__)
 
 
+# privacy mode, own-contribution claim, no local model (llm/privacy.py)
+OWN_SKIPPED = "这句话表述作者自身的贡献，隐私模式下只在本机判断，本机没有可用的模型，未作判断"
+
 THIS_REF = "⟦本条文献⟧"
 OTHER_REF = "⟦其他文献⟧"
 
@@ -194,6 +197,36 @@ class SupportRun:
         self._judge_tasks.append(asyncio.create_task(self._do(c, rid)))
 
     async def _do(self, c: Claim, rid: str) -> None:
+        """One (claim, ref) pair. In privacy mode a sentence stating the
+        author's own contribution is judged on this machine only
+        (llm/privacy.py): every model call of the pair runs inside
+        ``local_only``, and without a local model the pair is not sent at
+        all and ends undetermined."""
+        from ..llm import privacy
+
+        own = privacy.enabled() and privacy.own_contribution(c.sentence or c.text)
+        if own and not privacy.local_available():
+            from ..llm.client import note_skipped
+
+            note_skipped("own_claim")
+            ref = self._ref_by_id.get(rid)
+            self._out[(c.id, rid)] = SupportCheck(
+                claim_id=c.id, ref_id=rid, label="undetermined", evidence=None,
+                source_kind="none", rationale=OWN_SKIPPED,
+                source_title=(self._matched.get(rid) or {}).get("title")
+                or (ref.title if ref else None))
+            self._count_judged()
+            return
+        with privacy.local_only(own):
+            await self._do_pair(c, rid)
+
+    def _count_judged(self) -> None:
+        self._judged += 1
+        total = max(len(self._jobs), 1)
+        self._report(0.25 + 0.75 * self._judged / total,
+                     f"判定论断与文献 {self._judged}/{len(self._jobs)} 对")
+
+    async def _do_pair(self, c: Claim, rid: str) -> None:
         # the source fetch (abstract lookups, PDF download — network-bound,
         # deduplicated per URL) runs outside the judge semaphore: a slow
         # PDF host must not hold a slot that a ready judge call could use
@@ -240,10 +273,7 @@ class SupportRun:
                 out.source_file = pdf.doc.filename
                 out.source_page = page_of(pdf, out.evidence)
             self._out[(c.id, rid)] = out
-        self._judged += 1
-        total = max(len(self._jobs), 1)
-        self._report(0.25 + 0.75 * self._judged / total,
-                     f"判定论断与文献 {self._judged}/{len(self._jobs)} 对")
+        self._count_judged()
 
     def _report(self, frac: float, label: str) -> None:
         if self._progress is not None:
@@ -330,7 +360,9 @@ def _support_findings(
                     refs=[rid],
                 )
             )
-        if check.source_kind == "none":
+        # an own-contribution claim privacy mode kept off the cloud is not
+        # a missing source (the report's send list names it)
+        if check.source_kind == "none" and check.rationale != OWN_SKIPPED:
             no_source.setdefault(rid, set()).add(claim.id)
     # one note for the whole document: every unreachable source raises the
     # same question with the same next step, so the list reads as one item
@@ -487,7 +519,8 @@ async def _cascade(
         # sends it to the review with a neutral note
         hint = review_hint(claim.text, excerpt)
         # a located contradiction in one detail sends it to the review too
-        d = await check_details(claim.text, title, excerpt, sentence=claim.sentence)
+        d = await check_details(claim.text, title, excerpt, sentence=claim.sentence,
+                                entry=entry)
         escalate = bool(d and d.conflict and locate_evidence(d.quote, excerpt))
         escalate = escalate or hint is not None
     if escalate:

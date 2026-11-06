@@ -78,6 +78,13 @@ def device_order(spec: str, present: list[str]) -> list[str]:
     return out
 
 
+# One model compiles at a time. Two pipelines compiling at once (the
+# reranker and the 8B generator, both on GPU) shared the CACHE_DIR blob
+# cache and one read the other's half-written file: "'utf-8' codec can't
+# decode byte 0xc1" on the Intel machine, after which rerank stayed off.
+_COMPILE_LOCK = threading.Lock()
+
+
 def compile_first(spec: str, build: Callable[[str], T],
                   present: list[str] | None = None) -> tuple[T, str]:
     """Build on the first device in ``spec`` that works. Raises with every
@@ -89,7 +96,8 @@ def compile_first(spec: str, build: Callable[[str], T],
     errors = []
     for dev in order:
         try:
-            obj = build(dev)
+            with _COMPILE_LOCK:
+                obj = build(dev)
             log.info("openvino: compiled on %s", dev)
             return obj, dev
         except Exception as e:  # noqa: BLE001 — try the next device

@@ -40,7 +40,9 @@ if (window.parent !== window) {
   }
 }
 
-const q = new URLSearchParams(location.search)
+// the single-file pitch deck loads this page through srcdoc, which has no
+// query string; it passes the same parameters in the frame's name
+const q = new URLSearchParams(location.search || window.name)
 const root = document.documentElement
 if (q.get('frame')) root.classList.add('framed')
 if (q.get('state')) root.classList.add('booting')

@@ -26,7 +26,7 @@ def test_grounding_rejects_invented_fields():
 
 
 def _fake(monkeypatch, payload):
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         return LLMResult(value=schema.model_validate(payload), route="cloud")
     monkeypatch.setattr(llm, "chat_json", fake)
 

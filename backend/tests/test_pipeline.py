@@ -22,7 +22,7 @@ def _patch_llm(monkeypatch, responses: dict | None = None):
     """Route every task through a fake client."""
     responses = responses or {}
 
-    async def fake(task, messages, schema, *, route="auto"):
+    async def fake(task, messages, schema, *, route="auto", **_kw):
         payload = responses.get(task, {"items": [], "claims": []})
         return LLMResult(value=schema.model_validate(payload), route="cloud")
 
