@@ -86,6 +86,35 @@
         </div>
       </section>
 
+      <!-- ============ 3 已发表论文里的真错引 ============ -->
+      <section class="slide framed" data-title="真实错引" data-steps="2">
+        <div class="bar-title">已发表的论文里，也有引错的</div>
+        <div class="gt-stat">
+          <div class="gt-num">105</div>
+          <div class="gt-label">处原文问题</div>
+          <div class="gt-note">Clover 在 10 篇已发表的中英文论文里报出，人工逐条核实。这些论文发表于 2016 至 2020 年，都在 ChatGPT 出现之前</div>
+        </div>
+        <div class="gt-pair">
+          <div class="doc-card gt-claim">
+            <div class="doc-src">顾迎捷等，基于神经网络的机器阅读理解综述，软件学报，2020</div>
+            <p class="doc-text">Xiong 等人<sup>[100]</sup>……提出了基于 HMN 的 DCN 模型，并通过实验证明，HMN 模块可以使模型在 SQuAD1.1 数据集上的 F1 值提高 <mark class="bad">5.5%</mark>。</p>
+          </div>
+          <div class="doc-card gt-source">
+            <div class="doc-src">[100] Xiong 等，Dynamic Coattention Networks for Question Answering，ICLR 2017，表 2</div>
+            <div class="abl">
+              <div class="abl-row"><span>DCN，使用 HMN</span><b>F1 75.6</b></div>
+              <div class="abl-row"><span>DCN，HMN 换成两层 MLP</span><b>F1 74.4</b></div>
+              <div class="abl-diff">相差 <mark class="ok">1.2</mark></div>
+            </div>
+          </div>
+          <div class="verdict">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" /><path d="M10 5.5v5.5M10 13.6v.4" /></svg>
+            <span>被引文献不支持这条论断</span>
+            <span class="verdict-src">Clover 的判断，证据已在原文中逐字定位</span>
+          </div>
+        </div>
+      </section>
+
       <!-- ============ 4 拖入一篇论文 ============ -->
       <section class="slide framed" data-title="拖入论文" data-steps="1">
         <div class="bar-title">拖进来，交给 Clover</div>

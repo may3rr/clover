@@ -203,7 +203,10 @@ function run(p: Promise<void> | undefined) {
 
 function show(i: number) {
   i = Math.max(0, Math.min(slides.length - 1, i))
-  slides.forEach((s, k) => s.classList.toggle('on', k === i))
+  slides.forEach((s, k) => {
+    s.classList.toggle('on', k === i)
+    for (const c of Array.from(s.classList)) if (c.startsWith('step-')) s.classList.remove(c)
+  })
   cur = i
   stepNo = 0
   runId++
@@ -217,6 +220,7 @@ function next() {
   const el = slides[cur]
   if (stepNo + 1 < steps(el)) {
     stepNo++
+    el.classList.add(`step-${stepNo}`)
     run(hooks[el.dataset.title ?? '']?.step?.(el, stepNo, runId))
   } else if (cur < slides.length - 1) show(cur + 1)
 }
