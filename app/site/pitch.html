@@ -194,6 +194,66 @@
         <div class="proof-rule">每一条判断都附被引原文，原文里逐字找不到就标为无法判断</div>
       </section>
 
+      <!-- ============ 7 技术路线 ============ -->
+      <section class="slide framed" data-title="技术路线" data-steps="3">
+        <div class="bar-title">一条引用，怎么被核对</div>
+        <div class="flow">
+          <svg class="fw" viewBox="0 0 1536 680" aria-hidden="true">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" /></marker></defs>
+            <g class="fa"><path d="M104 64H170" /><path d="M490 64H556" /></g>
+            <g class="fb"><path d="M108 330H138" /><path d="M262 330H288" /><path d="M578 330H604" /><path d="M726 330H752" /><path d="M1046 330H1072" /><path class="q" d="M902 124V280" /></g>
+            <g class="fc"><path d="M1190 330H1232" /><path class="q" d="M1086 64H1386V280" /><path d="M1386 378V406" /><path d="M1386 572V612" /></g>
+          </svg>
+          <div class="fa">
+            <div class="art" style="left:12px;top:4px"><svg viewBox="0 0 80 100"><path class="pp" d="M6 0H54L80 26V94Q80 100 74 100H6Q0 100 0 94V6Q0 0 6 0Z"/><path class="pf2" d="M54 0V20Q54 26 60 26H80Z"/><rect class="pw" x="14" y="44" width="52" height="36" rx="5"/><text x="40" y="70" text-anchor="middle">W</text></svg><span>稿件</span></div>
+          <div class="fn " style="left:180px;top:20px;width:300px">
+            <span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span>
+            <span class="fn-text"><b>Qwen3.8-flash</b><span>抽出带引用的论断</span></span>
+            <span class="fn-tag cloud">云端</span>
+          </div>
+
+            <div class="claim" style="left:566px;top:12px">
+              <span class="claim-k">论断</span>
+              <span>HMN 模块可以使模型在 SQuAD1.1 数据集上的 F1 值提高 5.5%<sup>[100]</sup></span>
+            </div>
+          </div>
+          <div class="fb">
+            <div class="ibox" style="left:0;top:180px;width:1210px;height:330px">
+              <div class="ibadge">在这台电脑上运行<img src="./src/pitch/assets/brand/intel-white.svg" alt="intel" /></div>
+            </div>
+            <div class="art" style="left:22px;top:274px"><svg viewBox="0 0 80 100"><path class="pp" d="M6 0H54L80 26V94Q80 100 74 100H6Q0 100 0 94V6Q0 0 6 0Z"/><path class="pf2" d="M54 0V20Q54 26 60 26H80Z"/><rect class="pr" x="14" y="44" width="52" height="30" rx="5"/><text x="40" y="66" text-anchor="middle" class="pdf">PDF</text></svg><span>被引原文</span></div>
+            <div class="art wide" style="left:146px;top:274px"><svg viewBox="0 0 110 100"><g transform="translate(24,24)"><rect class="sn" x="0" y="0" width="80" height="62" rx="6"/><rect class="pl" x="10" y="12" width="58" height="5" rx="2.5"/><rect class="pl" x="10" y="24" width="50" height="5" rx="2.5"/><rect class="pl" x="10" y="36" width="58" height="5" rx="2.5"/><rect class="pl" x="10" y="48" width="32" height="5" rx="2.5"/></g><g transform="translate(12,12)"><rect class="sn" x="0" y="0" width="80" height="62" rx="6"/><rect class="pl" x="10" y="12" width="58" height="5" rx="2.5"/><rect class="pl" x="10" y="24" width="50" height="5" rx="2.5"/><rect class="pl" x="10" y="36" width="58" height="5" rx="2.5"/><rect class="pl" x="10" y="48" width="32" height="5" rx="2.5"/></g><g transform="translate(0,0)"><rect class="sn" x="0" y="0" width="80" height="62" rx="6"/><rect class="pl" x="10" y="12" width="58" height="5" rx="2.5"/><rect class="pl" x="10" y="24" width="50" height="5" rx="2.5"/><rect class="pl" x="10" y="36" width="58" height="5" rx="2.5"/><rect class="pl" x="10" y="48" width="32" height="5" rx="2.5"/></g></svg><span>切成 512 词的片段</span></div>
+          <div class="fn " style="left:292px;top:286px;width:282px">
+            <span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span>
+            <span class="fn-text"><b>Qwen3-Embedding</b><span>把片段变成向量</span></span>
+            <span class="fn-tag gpu">核显</span>
+          </div>
+
+            <div class="art wide" style="left:612px;top:274px"><svg viewBox="0 0 120 100"><rect class="vc" x="0" y="2" width="20" height="9" rx="2" style="opacity:0.39"/><rect class="vc" x="0" y="14" width="20" height="9" rx="2" style="opacity:0.64"/><rect class="vc" x="0" y="26" width="20" height="9" rx="2" style="opacity:0.5"/><rect class="vc" x="0" y="38" width="20" height="9" rx="2" style="opacity:0.68"/><rect class="vc" x="0" y="50" width="20" height="9" rx="2" style="opacity:0.7"/><rect class="vc" x="0" y="62" width="20" height="9" rx="2" style="opacity:0.25"/><rect class="vc" x="0" y="74" width="20" height="9" rx="2" style="opacity:0.21"/><rect class="vc" x="0" y="86" width="20" height="9" rx="2" style="opacity:0.87"/><rect class="vc" x="24" y="2" width="20" height="9" rx="2" style="opacity:0.41"/><rect class="vc" x="24" y="14" width="20" height="9" rx="2" style="opacity:0.39"/><rect class="vc" x="24" y="26" width="20" height="9" rx="2" style="opacity:1.0"/><rect class="vc" x="24" y="38" width="20" height="9" rx="2" style="opacity:0.58"/><rect class="vc" x="24" y="50" width="20" height="9" rx="2" style="opacity:0.87"/><rect class="vc" x="24" y="62" width="20" height="9" rx="2" style="opacity:0.58"/><rect class="vc" x="24" y="74" width="20" height="9" rx="2" style="opacity:0.71"/><rect class="vc" x="24" y="86" width="20" height="9" rx="2" style="opacity:0.32"/><rect class="vc" x="48" y="2" width="20" height="9" rx="2" style="opacity:0.71"/><rect class="vc" x="48" y="14" width="20" height="9" rx="2" style="opacity:0.89"/><rect class="vc" x="48" y="26" width="20" height="9" rx="2" style="opacity:0.62"/><rect class="vc" x="48" y="38" width="20" height="9" rx="2" style="opacity:0.79"/><rect class="vc" x="48" y="50" width="20" height="9" rx="2" style="opacity:0.74"/><rect class="vc" x="48" y="62" width="20" height="9" rx="2" style="opacity:0.25"/><rect class="vc" x="48" y="74" width="20" height="9" rx="2" style="opacity:0.81"/><rect class="vc" x="48" y="86" width="20" height="9" rx="2" style="opacity:0.67"/><rect class="vc" x="72" y="2" width="20" height="9" rx="2" style="opacity:0.44"/><rect class="vc" x="72" y="14" width="20" height="9" rx="2" style="opacity:0.22"/><rect class="vc" x="72" y="26" width="20" height="9" rx="2" style="opacity:0.89"/><rect class="vc" x="72" y="38" width="20" height="9" rx="2" style="opacity:0.58"/><rect class="vc" x="72" y="50" width="20" height="9" rx="2" style="opacity:0.78"/><rect class="vc" x="72" y="62" width="20" height="9" rx="2" style="opacity:0.9"/><rect class="vc" x="72" y="74" width="20" height="9" rx="2" style="opacity:0.77"/><rect class="vc" x="72" y="86" width="20" height="9" rx="2" style="opacity:0.94"/><rect class="vc" x="96" y="2" width="20" height="9" rx="2" style="opacity:0.52"/><rect class="vc" x="96" y="14" width="20" height="9" rx="2" style="opacity:0.84"/><rect class="vc" x="96" y="26" width="20" height="9" rx="2" style="opacity:0.56"/><rect class="vc" x="96" y="38" width="20" height="9" rx="2" style="opacity:0.95"/><rect class="vc" x="96" y="50" width="20" height="9" rx="2" style="opacity:0.9"/><rect class="vc" x="96" y="62" width="20" height="9" rx="2" style="opacity:0.28"/><rect class="vc" x="96" y="74" width="20" height="9" rx="2" style="opacity:0.31"/><rect class="vc" x="96" y="86" width="20" height="9" rx="2" style="opacity:0.37"/></svg><span>按相似度取前 40 段</span></div>
+          <div class="fn " style="left:760px;top:286px;width:282px">
+            <span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span>
+            <span class="fn-text"><b>Qwen3-Reranker</b><span>对照论断逐段打分</span></span>
+            <span class="fn-tag gpu">核显</span>
+          </div>
+
+            <div class="art wide" style="left:1078px;top:274px"><svg viewBox="0 0 120 100"><rect class="sn" x="0" y="0" width="120" height="26" rx="5"/><rect class="pl" x="10" y="10" width="62" height="5" rx="2.5"/><rect class="rk" x="82" y="8" width="30" height="9" rx="3"/><rect class="sn" x="0" y="36" width="120" height="26" rx="5"/><rect class="pl" x="10" y="46" width="62" height="5" rx="2.5"/><rect class="rk" x="82" y="44" width="24" height="9" rx="3"/><rect class="sn" x="0" y="72" width="120" height="26" rx="5"/><rect class="pl" x="10" y="82" width="62" height="5" rx="2.5"/><rect class="rk" x="82" y="80" width="16" height="9" rx="3"/></svg><span>最相关的几段</span></div>
+          </div>
+          <div class="fc">
+          <div class="fn judge" style="left:1236px;top:286px;width:300px">
+            <span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span>
+            <span class="fn-text"><b>Qwen3.8-flash</b><span>判断原文是否支持论断</span></span>
+            <span class="fn-tag cloud">云端</span>
+          </div>
+
+            <div class="verdict2" style="left:1236px;top:412px;width:300px">
+              <b>不支持</b>
+              <p>原文表 2：用 HMN，F1 75.6<br />换成两层 MLP，F1 74.4<br />实际只差 1.2</p>
+            </div>
+            <div class="out" style="left:1236px;top:620px"><svg viewBox="0 0 60 56"><path class="cm" d="M8 0H52Q60 0 60 8V36Q60 44 52 44H22L10 56V44H8Q0 44 0 36V8Q0 0 8 0Z"/><rect class="cml" x="12" y="14" width="36" height="5" rx="2.5"/><rect class="cml" x="12" y="26" width="24" height="5" rx="2.5"/></svg><span>证据在原文中逐字找到<br />写成 Word 批注</span></div>
+          </div>
+        </div>
+      </section>
+
       <!-- ============ 7 Intel 本地 AI 应用挑战（必填页） ============ -->
       <section class="slide framed" data-title="Intel 本地 AI" data-steps="2">
         <div class="bar-title">Intel 本地 AI 应用挑战</div>
