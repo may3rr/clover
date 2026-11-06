@@ -207,11 +207,10 @@ function dragInto(frame: HTMLIFrameElement, type: 'dragover' | 'drop') {
 function drawChrome() {
   for (const c of document.querySelectorAll<HTMLElement>('.win-chrome')) {
     if (IS_WIN) {
-      c.className = 'win-chrome win'
-      c.innerHTML =
-        '<svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg>' +
-        '<svg viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9"/></svg>' +
-        '<svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg>'
+      // Windows draws its caption buttons itself (titleBarOverlay); a
+      // drawn copy never sits where the system puts them, so draw none
+      c.className = 'win-chrome'
+      c.innerHTML = ''
     } else {
       c.className = 'win-chrome mac'
       c.innerHTML = '<i></i><i></i><i></i>'

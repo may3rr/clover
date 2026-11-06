@@ -11,8 +11,8 @@
     python app/site/scripts/pitch-pptx.py
         -> app/site-single/效率进化赛道-我要发顶刊-Clover.pptx
 
-软件窗口按 Windows 版界面渲染（浏览器 UA 设为 Windows，复刻版据此换成
-Windows 的窗口按钮和布局）。
+软件窗口优先用 Intel 决赛机上用截图模式拍的真实 Windows 截图
+（demo/intel/shots-pitch/win/），没有时才用网页复刻版渲染。
 """
 from __future__ import annotations
 
@@ -40,6 +40,24 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
 FONT = "阿里巴巴普惠体 2.0"
 MONO = "JetBrains Mono"
 PX = 6350  # EMU per px on the 1920 × 1080 canvas
+
+# Real screenshots from the Windows finals machine (app shots mode, see
+# demo/intel/shots-pitch/win/README.md). When present they replace the
+# rendered app window on these stills, in PLAN order.
+WIN_SHOTS = ROOT / "demo" / "intel" / "shots-pitch" / "win"
+WIN_STATES = {  # (page, still number) -> shots-mode state
+    (4, 1): "running-mid", (4, 2): "report",
+    (5, 1): "item:f40", (5, 2): "item:f28", (5, 3): "item:v5", (5, 4): "item:f35",
+}
+
+
+def real_shot(page: int, n: int) -> bytes | None:
+    state = WIN_STATES.get((page, n))
+    if not state:
+        return None
+    f = WIN_SHOTS / f"light-{state.replace(':', '-')}.png"
+    return f.read_bytes() if f.exists() else None
+
 
 # (page, actions, keep, title): see pitch-static.py; title None = template
 # cover / THANKS, handled separately
@@ -147,7 +165,7 @@ EXTRACT = r"""(opts) => {
   const img = (el) => {
     if (!sized(el)) return
     el.dataset.pid = String(++pid)
-    out.push({ t: 'img', pid, ...R(el.getBoundingClientRect()) })
+    out.push({ t: 'img', pid, win: el.matches('.win'), ...R(el.getBoundingClientRect()) })
   }
   const inlineKid = (n) => n.nodeType === 3 || (n.nodeType === 1 && /^inline/.test(getComputedStyle(n).display) &&
     [...n.childNodes].every(inlineKid))
@@ -251,6 +269,12 @@ def capture() -> list[dict]:
                     images[it["pid"]] = pg.screenshot(clip=clip, omit_background=True)
                     pg.evaluate(ISOLATE, None)
                 pg.evaluate("() => document.querySelectorAll('[data-pid]').forEach(e => delete e.dataset.pid)")
+                real = real_shot(page, n)
+                if real:
+                    for it in items:
+                        if it["t"] == "img" and it.get("win"):
+                            images[it["pid"]] = real
+                            print(f"  page {page} still {n}: real Windows screenshot")
                 head = pg.evaluate("() => document.querySelector('.slide.on .bar-title')?.innerText ?? ''")
                 stills.append({"title": title or head, "items": items, "images": images})
             print(f"page {page}: {n} stills")

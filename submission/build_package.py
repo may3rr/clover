@@ -32,6 +32,7 @@ DOCS = ROOT / "submission" / "docs"
 FONTS = ROOT / "app" / "site" / "src" / "pitch" / "assets" / "fonts"
 INTEL = ROOT / "app" / "site" / "src" / "pitch" / "assets" / "intel"
 HOME = "https://jackielyu.is-a.dev/clover/"
+WIN_SHOTS = ROOT / "demo" / "intel" / "shots-pitch" / "win"  # finals machine, shots mode
 APP = "http://localhost:5180/app.html"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
@@ -55,14 +56,7 @@ INTEL_SHOTS = [
     ("06-任务管理器-核显.png", "06-gpu-vector.png"),
     ("07-任务管理器-NPU.png", "01-taskmanager-active.png"),
 ]
-# Windows caption buttons, as the system draws them over the window
-CAPTION = """() => {
-  const d = document.createElement('div')
-  d.style.cssText = 'position:fixed;top:0;right:0;height:32px;display:flex;z-index:99;pointer-events:none'
-  const b = (path) => `<svg viewBox="0 0 10 10" style="width:46px;height:32px;padding:11px 18px;box-sizing:border-box;stroke:#37352f;stroke-width:1;fill:none">${path}</svg>`
-  d.innerHTML = b('<path d="M0 5h10"/>') + b('<rect x="0.5" y="0.5" width="9" height="9"/>') + b('<path d="M0 0l10 10M10 0L0 10"/>')
-  document.body.appendChild(d)
-}"""
+
 
 CSS = f"""
 @font-face {{ font-family: P; src: url('{(FONTS / 'PuHuiTi-55-Regular.woff2').as_uri()}'); font-weight: 400; }}
@@ -99,10 +93,14 @@ def shots(browser) -> None:
     pg = browser.new_page(viewport={"width": 1280, "height": 800}, device_scale_factor=2,
                           user_agent=UA)
     for name, state in SHOTS:
+        real = WIN_SHOTS / f"light-{state.replace(':', '-')}.png"
+        if real.exists():
+            shutil.copy(real, out / name)
+            print(f"{name}  {state}  real Windows screenshot")
+            continue
         pg.goto(f"{APP}?state={state}&data=zh")
         pg.wait_for_function("() => window.clover && window.clover.ready", timeout=30000)
         pg.wait_for_timeout(1500)
-        pg.evaluate(CAPTION)
         opened = pg.evaluate(
             "() => (document.querySelector('.detail-in')?.innerText ?? '').split('\\n')"
             ".filter(Boolean).slice(0, 2).join(' | ')")
