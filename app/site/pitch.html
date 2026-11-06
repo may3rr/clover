@@ -11,17 +11,17 @@
       <!-- ============ 1 封面 ============ -->
       <section class="slide cover" data-title="封面">
         <div class="cover-track">效率进化赛道</div>
-        <div class="cover-main">
-          <img class="leaf-logo" src="./src/pitch/assets/logo.svg" alt="" />
-          <div class="cover-text">
-            <div class="cover-name">Clover</div>
-            <div class="cover-line">投稿前的最后一公里，替你核对每一条引用</div>
-          </div>
-        </div>
-        <div class="cover-team">
-          <span class="team-name">我要发顶刊</span>
-          <span>天津师范大学</span>
-          <span>吕浩博</span>
+        <!-- 模板封面：作品名称两侧的红白小块，团队名称红色，学校、成员各一行，都居中 -->
+        <i class="cover-deco" style="left:761px;top:357px;width:54px;height:12px;background:var(--hack-white)"></i>
+        <i class="cover-deco" style="left:790px;top:369px;width:21px;height:12px;background:var(--tmall-red)"></i>
+        <i class="cover-deco" style="left:1128px;top:342px;width:12px;height:12px;background:var(--hack-white)"></i>
+        <i class="cover-deco" style="left:1094px;top:419px;width:33px;height:12px;background:var(--tmall-red)"></i>
+        <i class="cover-deco" style="left:1121px;top:413px;width:33px;height:9px;background:var(--tmall-red)"></i>
+        <div class="cover-text">
+          <div class="cover-name">Clover</div>
+          <div class="cover-team">我要发顶刊</div>
+          <div class="cover-school">学校名称：天津师范大学</div>
+          <div class="cover-members">吕浩博</div>
         </div>
       </section>
 
@@ -96,7 +96,7 @@
         </div>
         <div class="gt-pair">
           <div class="doc-card gt-claim">
-            <div class="doc-src">顾迎捷等，基于神经网络的机器阅读理解综述，软件学报，2020</div>
+            <div class="doc-src">顾<span class="redact">迎捷</span>等，基于神经网络的<span class="redact">机器阅读理解</span>综述，CCF 推荐中文 A 类期刊，2020</div>
             <p class="doc-text">Xiong 等人<sup>[100]</sup>……提出了基于 HMN 的 DCN 模型，并通过实验证明，HMN 模块可以使模型在 SQuAD1.1 数据集上的 F1 值提高 <mark class="bad">5.5%</mark>。</p>
           </div>
           <div class="doc-card gt-source">
@@ -175,12 +175,12 @@
             <div class="pf-note">在测试稿件里注入编造文献、张冠李戴、改写数字，Clover 找出 84 处</div>
           </div>
           <div class="pf">
-            <div class="pf-label">识别不准确引用，F1</div>
+            <div class="pf-label">报出的问题里，属实的比例</div>
             <div class="pf-bars">
-              <div class="pb"><span>Clover</span><i style="--w: 0.25"></i><b>0.25 至 0.30</b></div>
-              <div class="pb dim"><span>GPT-4</span><i style="--w: 0.09"></i><b>0.09</b></div>
+              <div class="pb"><span>Clover</span><i style="--w: 0.73"></i><b>73%</b></div>
+              <div class="pb dim"><span>SemanticCite</span><i style="--w: 0.50"></i><b>50%</b></div>
             </div>
-            <div class="pf-note">公开数据集 Citation-Integrity，606 条人工标注的真实引用，GPT-4 结果取自原论文</div>
+            <div class="pf-note">公开数据集 Citation-Integrity，606 条人工标注的真实引用。SemanticCite 是开源的引用核查专用模型，在同一份数据上复测</div>
           </div>
           <div class="pf">
             <div class="pf-label">体检一篇论文的花费</div>
@@ -200,29 +200,29 @@
         <div class="ov">
           <svg class="fw" viewBox="0 0 1536 680" aria-hidden="true">
             <defs><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" /></marker></defs>
-            <path d="M478 46H524" /><path d="M866 46H894" /><path d="M1236 46H1264" /><path d="M478 196H524" /><path d="M866 196H894" /><path d="M1236 196H1264" /><path d="M478 346H524" /><path d="M866 346H894" /><path d="M1236 346H1264" /><path d="M478 496H524" /><path d="M866 496H894" /><path d="M1236 496H1264" />
+            <path d="M424 60H452" /><path d="M844 60H872" /><path d="M1264 60H1292" /><path d="M424 208H452" /><path d="M844 208H872" /><path d="M1264 208H1292" /><path d="M424 356H452" /><path d="M844 356H872" /><path d="M1264 356H1292" /><path d="M424 504H452" /><path d="M844 504H872" /><path d="M1264 504H1292" />
           </svg>
-          <div class="ov-check" style="top:22px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-0)" /></svg><b>文献真实性</b></div>
-          <div class="ov-in" style="left:250px;top:16px">参考文献条目</div>
-          <div class="fn sm" style="left:532px;top:0px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>拆出作者、年份、题名</span></span><span class="fn-tag cloud">云端</span></div>
-          <div class="fn sm" style="left:902px;top:0px;width:330px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><ellipse cx="10" cy="5" rx="7" ry="2.6"/><path d="M3 7.2c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V10c0 1.4-3.1 2.6-7 2.6S3 11.4 3 10z"/><path d="M3 12.6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v2.8c0 1.4-3.1 2.6-7 2.6s-7-1.2-7-2.6z"/></svg></span><span class="fn-text"><b>四个学术数据库</b><span>逐条比对，连上的 PDF 读封面</span></span><span class="fn-tag cloud">联网</span></div>
-          <div class="ov-out" style="left:1272px;top:16px">一致、不一致、无法核验</div>
-          <div class="ov-check" style="top:172px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-1)" /></svg><b>论断支持度</b></div>
-          <div class="ov-in" style="left:250px;top:166px">带引用的论断</div>
-          <div class="fn sm" style="left:532px;top:150px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3 向量与重排</b><span>挑出被引原文的相关段落</span></span><span class="fn-tag gpu">核显</span></div>
-          <div class="fn sm" style="left:902px;top:150px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>判断原文是否支持论断</span></span><span class="fn-tag cloud">云端</span></div>
-          <div class="ov-out" style="left:1272px;top:166px">附原文证据，逐字可查</div>
-          <div class="ov-check" style="top:322px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-3)" /></svg><b>格式规范</b></div>
-          <div class="ov-in" style="left:250px;top:316px">正文段落</div>
-          <div class="fn sm" style="left:532px;top:300px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>逐段找错别字</span></span><span class="fn-tag cloud">云端</span></div>
-          <div class="fn sm" style="left:902px;top:300px;width:330px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><path d="M4 2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.6 4.6 1.6 1.6 3-3-1-1-2 2-.6-.6zm6 .2v1.4h4V6.8zm-6 4.8 1.6 1.6 3-3-1-1-2 2-.6-.6zm6 .2V13h4v-1.4z"/></svg></span><span class="fn-text"><b>规则检查</b><span>重复条目、漏引、编号错位</span></span><span class="fn-tag gpu">本机</span></div>
-          <div class="ov-out" style="left:1272px;top:316px">错别字写成修订</div>
-          <div class="ov-check" style="top:472px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-2)" /></svg><b>期刊对标</b></div>
-          <div class="ov-in" style="left:250px;top:466px">目标期刊的同刊范文</div>
-          <div class="fn sm" style="left:532px;top:450px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>读章节、研究要素、引用功能</span></span><span class="fn-tag cloud">云端</span></div>
-          <div class="fn sm" style="left:902px;top:450px;width:330px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><rect x="2" y="10" width="4" height="8" rx="1"/><rect x="8" y="5" width="4" height="13" rx="1"/><rect x="14" y="2" width="4" height="16" rx="1"/></svg></span><span class="fn-text"><b>六组指标</b><span>和每篇范文逐项比较</span></span><span class="fn-tag gpu">本机</span></div>
-          <div class="ov-out" style="left:1272px;top:466px">偏离常态处写批注</div>
-          <div class="ov-note">打开隐私模式后，拆分文献、找错别字、读范文改由本机核显上的 Qwen3-8B 完成</div>
+          <div class="ov-check" style="top:40px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-0)" /></svg><b>文献真实性</b></div>
+          <div class="ov-in" style="left:220px;top:30px">参考文献条目</div>
+          <div class="fn dual" style="left:460px;top:0px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>拆出作者、年份、题名</b><span class="mrow"><i class="mt cloud">云端</i>Qwen3.8-flash</span><span class="mrow"><i class="mt gpu">本机</i>Qwen3-8B</span></span></div>
+          <div class="fn dual" style="left:880px;top:0px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><ellipse cx="10" cy="5" rx="7" ry="2.6"/><path d="M3 7.2c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V10c0 1.4-3.1 2.6-7 2.6S3 11.4 3 10z"/><path d="M3 12.6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v2.8c0 1.4-3.1 2.6-7 2.6s-7-1.2-7-2.6z"/></svg></span><span class="fn-text"><b>四个学术数据库</b><span class="mrow"><i class="mt cloud">联网</i>逐条比对，连上的 PDF 读封面</span></span></div>
+          <div class="ov-out" style="left:1300px;top:30px">一致、不一致<br />无法核验</div>
+          <div class="ov-check" style="top:188px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-1)" /></svg><b>论断支持度</b></div>
+          <div class="ov-in" style="left:220px;top:178px">带引用的论断</div>
+          <div class="fn dual" style="left:460px;top:148px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>挑出被引原文的相关段落</b><span class="mrow"><i class="mt cloud">云端</i>Qwen3 向量、重排</span><span class="mrow"><i class="mt gpu">本机</i>Qwen3 向量、重排 0.6B</span></span></div>
+          <div class="fn dual" style="left:880px;top:148px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>判断原文是否支持论断</b><span class="mrow"><i class="mt cloud">云端</i>Qwen3.8-flash、max</span><span class="mrow"><i class="mt gpu">本机</i>Qwen3-8B</span></span></div>
+          <div class="ov-out" style="left:1300px;top:178px">附原文证据<br />逐字可查</div>
+          <div class="ov-check" style="top:336px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-3)" /></svg><b>格式规范</b></div>
+          <div class="ov-in" style="left:220px;top:326px">正文段落</div>
+          <div class="fn dual" style="left:460px;top:296px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>逐段找错别字</b><span class="mrow"><i class="mt cloud">云端</i>Qwen3.8-flash</span><span class="mrow"><i class="mt gpu">本机</i>Qwen3-8B</span></span></div>
+          <div class="fn dual" style="left:880px;top:296px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><path d="M4 2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.6 4.6 1.6 1.6 3-3-1-1-2 2-.6-.6zm6 .2v1.4h4V6.8zm-6 4.8 1.6 1.6 3-3-1-1-2 2-.6-.6zm6 .2V13h4v-1.4z"/></svg></span><span class="fn-text"><b>规则检查</b><span class="mrow"><i class="mt gpu">本机</i>重复条目、漏引、编号错位</span></span></div>
+          <div class="ov-out" style="left:1300px;top:326px">错别字写成修订</div>
+          <div class="ov-check" style="top:484px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-2)" /></svg><b>期刊对标</b></div>
+          <div class="ov-in" style="left:220px;top:474px">目标期刊范文</div>
+          <div class="fn dual" style="left:460px;top:444px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>读章节、研究要素、引用功能</b><span class="mrow"><i class="mt cloud">云端</i>Qwen3.8-flash</span><span class="mrow"><i class="mt gpu">本机</i>Qwen3-8B</span></span></div>
+          <div class="fn dual" style="left:880px;top:444px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><rect x="2" y="10" width="4" height="8" rx="1"/><rect x="8" y="5" width="4" height="13" rx="1"/><rect x="14" y="2" width="4" height="16" rx="1"/></svg></span><span class="fn-text"><b>六组指标</b><span class="mrow"><i class="mt gpu">本机</i>和每篇范文逐项比较</span></span></div>
+          <div class="ov-out" style="left:1300px;top:474px">偏离常态处写批注</div>
+          <div class="ov-note">用户可以自行选择每一个阶段用什么模型，云端的、本机的都可以</div>
         </div>
       </section>
 
@@ -335,10 +335,55 @@
           </div>
           <div class="priv-note">每一次发往云端的请求都记进发送清单，报告里逐条可查</div>
         </div>
+        <!-- 决赛机上的发送清单与设置页，文字照录，重画成矢量 -->
         <div class="priv-shots">
-          <img class="ps-list" src="./src/pitch/assets/intel/send-list-crop.png" alt="报告里的发送清单" />
-          <img class="ps-toggle" src="./src/pitch/assets/intel/privacy-toggle-crop.png" alt="设置页的隐私模式开关" />
+          <div class="pcard ps-list">
+            <p class="pc-lead">论断 54 句，被引片段 98 段，参考文献 55 条。其中出自稿件的文字 5,910 字，包括带引用的论断句。</p>
+            <p class="pc-lead">隐私模式已开启，稿件自身的文字只在本机处理。</p>
+            <div class="pc-sec">论断 54 句，共 5,910 字</div>
+            <div class="pc-item">
+              <p>2014 年 He 等人[20]提出了空间金字塔网络（Spatial Pyramid Pooling Network，SPP-Net）检测算法，它在 CNN 最后一层卷积层和全连接层之间加入 SPP 层，使得网络能够输入任意尺度的候选区域……</p>
+              <span>167 字，支持度判断，发送 2 次</span>
+            </div>
+            <div class="pc-item">
+              <p>2014 年，Girshick 等人[15]成功将卷积神经网络（Convolutional Neural Networks，CNN[16]）运用在目标检测领域中，提出了 R-CNN 算法……</p>
+              <span>237 字，支持度判断，发送 5 次</span>
+            </div>
+          </div>
+          <div class="pcard ps-toggle">
+            <div class="pc-row">
+              <div>
+                <b>隐私模式</b>
+                <p>开启后，错别字检查、引用功能分类、参考文献结构化、论断抽取和期刊画像只用本机模型运行，表述作者自身贡献的论断只在本机判断，向量检索只用本机模型。云端只收到带引用的论断句、被引文献的原文片段和参考文献条目，题目、摘要、章节标题和图表题注留在本机。每次体检实际发送了什么，报告开头的发往云端一行可以展开查看。</p>
+              </div>
+              <i class="pc-switch"></i>
+            </div>
+          </div>
         </div>
+      </section>
+
+      <!-- ============ 用到的千问模型 ============ -->
+      <section class="slide framed" data-title="千问模型">
+        <div class="bar-title">Clover 用到的千问模型</div>
+        <div class="qm">
+          <div class="qm-col">
+            <div class="qm-head">云端，阿里云百炼</div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3.8-flash</b><span>支持度判断、论断抽取、错别字、读范文</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3.7-flash</b><span>参考文献结构化、引用功能分类</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3.8-max</b><span>复核有疑问的判断、期刊评审</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3.7-max</b><span>复核备用</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>text-embedding-v4</b><span>被引原文切片的向量</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>qwen3-rerank</b><span>候选片段重排</span></div>
+          </div>
+          <div class="qm-col">
+            <div class="qm-head">本机，Intel 决赛机，OpenVINO</div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3-8B，int4</b><span>隐私模式下的抽取、错别字、读范文，核显</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3-Embedding-0.6B</b><span>向量，核显或 NPU</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3-Reranker-0.6B</b><span>重排，核显</span></div>
+            <div class="qm-row"><img src="./src/pitch/assets/brand/qwen.svg" alt="" /><b>Qwen3-1.7B、Qwen3-4B</b><span>选型时在决赛机上实测</span></div>
+          </div>
+        </div>
+        <div class="qm-thanks">感谢千问提供了如此丰富的全尺寸模型，让本地部署 AI 成为了可能。</div>
       </section>
 
       <!-- ============ 9 THANKS ============ -->
