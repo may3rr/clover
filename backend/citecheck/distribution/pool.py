@@ -153,9 +153,11 @@ async def fetch_pages(url: str, client: httpx.AsyncClient, cache: Cache) -> list
         try:
             from pypdf import PdfReader
 
+            from ..pdftext import page_text
+
             reader = PdfReader(io.BytesIO(data))
             pages = await asyncio.to_thread(
-                lambda: [p.extract_text() or "" for p in reader.pages])
+                lambda: [page_text(p) for p in reader.pages])
         except Exception as e:  # noqa: BLE001
             log.warning("exemplar pdf parse failed %s: %s", url, e)
     cache.set(key, pages)

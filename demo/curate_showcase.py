@@ -15,8 +15,10 @@ claim and revision is the pipeline's own output.
   python demo/curate_showcase.py
     -> app/site/public/data/showcase.json, grounded.json, showcase_outline.json
     -> app/site/public/samples/clover-sample.docx  (real export)
-    -> app/site/public/data/pitch_zh.json  (pitch deck: the Chinese demo paper,
-       demo/final/runs/zh_v7_r1105.json, figures embedded as JPEG data URIs)
+    -> app/site/public/data/pitch_zh.json  (pitch deck: the Chinese demo paper
+       benchmarked against 《电子学报》 with three of its 2026 reviews as
+       exemplars, demo/final/runs/zh_v12_venue_dzxb.json, figures embedded
+       as JPEG data URIs)
 """
 
 from __future__ import annotations
@@ -96,8 +98,8 @@ def main() -> None:
                        "grounded_but_wrong.docx")
     dump(grounded, OUT / "data" / "grounded.json")
 
-    zh = curate(json.loads((HERE / "final" / "runs" / "zh_v7_r1105.json").read_text()),
-                False, "基于深度学习的目标检测研究综述.docx")
+    zh = curate(json.loads((HERE / "final" / "runs" / "zh_v12_venue_dzxb.json").read_text()),
+                True, "基于深度学习的目标检测研究综述.docx")
     embed_figures(zh)
     dump(zh, OUT / "data" / "pitch_zh.json")
 

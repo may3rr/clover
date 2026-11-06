@@ -26,6 +26,7 @@ from pathlib import Path
 
 from ..cache import Cache
 from ..config import get_settings
+from ..pdftext import page_text
 from ..refs.structure import parse_reference
 from ..schema import LibraryDoc
 from .text import clean_page, squash, squash_cjk_spaces
@@ -168,7 +169,7 @@ def _read(path: Path) -> tuple[list[str], str, str | None, str | None]:
 
     logging.getLogger("pypdf").setLevel(logging.ERROR)
     reader = PdfReader(str(path))
-    raw_pages = [(p.extract_text() or "") for p in reader.pages]
+    raw_pages = [page_text(p) for p in reader.pages]
     big = _largest_text(reader.pages[0]) if reader.pages else None
     meta_title = None
     try:

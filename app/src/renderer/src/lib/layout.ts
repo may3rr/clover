@@ -78,6 +78,12 @@ function buildTable(id: string, run: Paragraph[]): Block {
   return { kind: 'table', id, rows, cols }
 }
 
+// screenshot mode: a report carrying its figures as data URIs (_assets)
+let shotAssets: Record<string, string> | null = null
+export function setShotAssets(a: Record<string, string> | null): void {
+  shotAssets = a
+}
+
 /** URL of an extracted figure (img tags can't send the auth header). */
 export function assetUrl(
   baseUrl: string,
@@ -85,6 +91,7 @@ export function assetUrl(
   bundle: string,
   name: string
 ): string {
+  if (shotAssets?.[name]) return shotAssets[name]
   const q = token ? `?token=${encodeURIComponent(token)}` : ''
   const path = `${encodeURIComponent(bundle)}/${encodeURIComponent(name)}`
   return `${baseUrl}/assets/${path}${q}`

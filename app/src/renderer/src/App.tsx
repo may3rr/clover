@@ -17,6 +17,7 @@ import type { Outline, SkAnchor } from './lib/outline'
 import { getPrefs, DEFAULT_PREFS, type Prefs } from './lib/prefs'
 import { ACCEPT_ERROR, isPaperPath, looksLikeFolder } from './lib/accept'
 import { readVenue, saveVenue } from './lib/targetVenue'
+import { setShotAssets } from './lib/layout'
 import type { RebenchState } from './screens/ReportScreen'
 
 
@@ -408,6 +409,7 @@ export default function App() {
   useEffect(() => {
     if (!window.citecheck.sampleData) return
     window.citecheck.sampleReport().then((r) => {
+      setShotAssets((r as { _assets?: Record<string, string> })._assets ?? null)
       setJobId('shot') // report/running branches require a truthy jobId
       shotState.current.report = r as Report
       shotState.current.setScreen = setScreen
