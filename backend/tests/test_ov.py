@@ -289,3 +289,28 @@ def test_route_order_uses_local_tasks(monkeypatch):
 
     monkeypatch.setattr(s.llm.local, "enabled", False)
     assert route_order("extract", s) == ["cloud"]
+
+
+def test_compiles_are_serialized():
+    import threading
+    import time as _time
+
+    active = {"now": 0, "max": 0}
+    lock = threading.Lock()
+
+    def build(dev):
+        with lock:
+            active["now"] += 1
+            active["max"] = max(active["max"], active["now"])
+        _time.sleep(0.05)
+        with lock:
+            active["now"] -= 1
+        return object()
+
+    ts = [threading.Thread(target=ov.compile_first, args=("GPU", build, ["GPU"]))
+          for _ in range(4)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+    assert active["max"] == 1
