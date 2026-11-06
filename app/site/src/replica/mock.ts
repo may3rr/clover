@@ -30,6 +30,9 @@ interface Data {
 let data: Promise<Data> | null = null
 export function loadData(): Promise<Data> {
   if (data) return data
+  // the single-file pitch deck embeds the reports instead of serving files
+  const embedded = (window as { __CLOVER_DATA__?: Data }).__CLOVER_DATA__
+  if (embedded) return (data = Promise.resolve(embedded))
   const get = (p: string) => fetch(p).then((r) => r.json())
   data = Promise.all([
     get('./data/showcase.json'),

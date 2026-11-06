@@ -23,6 +23,7 @@ app/shots/
 
 # ---- landing page (app/site): build output and recorded videos
 app/site-dist/
+app/site-single/
 app/site-videos/
 
 # ---- local data and caches

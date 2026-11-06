@@ -11,7 +11,7 @@ from fontTools import subset
 
 SITE = Path(__file__).resolve().parent.parent
 SRC = SITE.parent.parent / "天猫Ai黑客松｜选手路演PPT模版" / "字体包"
-OUT = SITE / "public" / "pitch" / "fonts"
+OUT = SITE / "src" / "pitch" / "assets" / "fonts"
 
 chars = set(chr(c) for c in range(0x20, 0x7F))
 for hi in range(0xA1, 0xF8):

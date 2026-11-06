@@ -4,17 +4,17 @@
 
 @font-face {
   font-family: 'PuHuiTi';
-  src: url('/pitch/fonts/PuHuiTi-55-Regular.woff2') format('woff2');
+  src: url('./assets/fonts/PuHuiTi-55-Regular.woff2') format('woff2');
   font-weight: 400;
 }
 @font-face {
   font-family: 'PuHuiTi';
-  src: url('/pitch/fonts/PuHuiTi-65-Medium.woff2') format('woff2');
+  src: url('./assets/fonts/PuHuiTi-65-Medium.woff2') format('woff2');
   font-weight: 500;
 }
 @font-face {
   font-family: 'PuHuiTi';
-  src: url('/pitch/fonts/PuHuiTi-85-Bold.woff2') format('woff2');
+  src: url('./assets/fonts/PuHuiTi-85-Bold.woff2') format('woff2');
   font-weight: 700;
 }
 
@@ -73,18 +73,21 @@ body {
   transition: opacity 420ms var(--ease-out);
 }
 .slide.cover {
-  background-image: url('/pitch/tpl/image1.jpg');
+  background-image: url('./assets/tpl/image1.jpg');
 }
+/* 内容页把模板背景放大 10%：框随之变大，四角装饰仍在画面内 */
 .slide.framed {
-  background-image: url('/pitch/tpl/image2.jpg');
+  background-image: url('./assets/tpl/image2.jpg');
+  background-size: 2112px 1188px;
+  background-position: center;
 }
 
 /* 银色标题栏上的页标题（模板：大标题 Bold） */
 .bar-title {
   position: absolute;
-  left: 262px;
-  top: 118px;
-  height: 84px;
+  left: 192px;
+  top: 76px;
+  height: 92px;
   display: flex;
   align-items: center;
   font-size: 40px;
@@ -142,6 +145,7 @@ body {
   }
 }
 .cover-name {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
   font-size: 150px;
   line-height: 1;
   font-weight: 700;
@@ -266,23 +270,31 @@ body {
 .rocket {
   position: absolute;
   left: 0;
-  top: 255px;
-  width: 180px;
-  height: 90px;
-  transform: translateX(30px);
+  top: 256px;
+  width: 290px;
+  height: 88px;
+  transform: translateX(0);
   opacity: 0;
+  overflow: visible;
+  filter: drop-shadow(0 0 18px rgba(255, 0, 54, 0.35));
 }
-.rocket .body { fill: var(--hack-white); }
-.rocket .port { fill: var(--tmall-red); }
-.rocket .fin { fill: var(--silver); }
+.rocket .fin { fill: #ff0036; }
+.rocket .band { fill: #ff0036; }
+.rocket .port-ring { fill: #2a2a2a; }
+.rocket .port { fill: #8fd3ff; }
 .rocket .flame {
-  fill: var(--tmall-red);
   transform-box: fill-box;
   transform-origin: right center;
-  animation: flicker 120ms linear infinite alternate;
+  animation: flicker 110ms linear infinite alternate;
+}
+.rocket .flame-core {
+  fill: #ffffff;
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: flicker 90ms linear infinite alternate-reverse;
 }
 @keyframes flicker {
-  to { transform: scaleX(1.5) scaleY(0.8); }
+  to { transform: scaleX(1.25) scaleY(0.86); }
 }
 .walker {
   position: absolute;
@@ -329,8 +341,8 @@ body {
 }
 .docx {
   position: absolute;
-  left: 330px;
-  top: 470px;
+  left: 296px;
+  top: 452px;
   width: 200px;
   display: flex;
   flex-direction: column;
@@ -360,9 +372,9 @@ body {
 .win {
   position: absolute;
   left: 640px;
-  top: 250px;
-  width: 1024px;
-  height: 640px;
+  top: 222px;
+  width: 1101px;
+  height: 688px;
   border-radius: 12px;
   overflow: hidden;
   background: #ffffff;
@@ -374,7 +386,7 @@ body {
   top: 0;
   width: 1280px;
   height: 800px;
-  transform: scale(0.8);
+  transform: scale(0.86);
   transform-origin: 0 0;
 }
 .app-frame {
@@ -455,4 +467,77 @@ body {
   .slide.on .cover-text {
     animation: none;
   }
+}
+
+/* ---------------- 左栏：四项检查 ---------------- */
+.checks {
+  position: absolute;
+  left: 192px;
+  top: 250px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.checks-title {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 34px;
+  font-weight: 500;
+}
+.check svg {
+  width: 40px;
+  height: 40px;
+  flex: none;
+}
+.checks-note {
+  margin-top: 20px;
+  font-size: 26px;
+  color: var(--silver-text);
+}
+.checks > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 500ms var(--ease-out), transform 500ms var(--ease-out);
+}
+.checks.show > * {
+  opacity: 1;
+  transform: none;
+}
+.checks.show > :nth-child(2) { transition-delay: 120ms; }
+.checks.show > :nth-child(3) { transition-delay: 240ms; }
+.checks.show > :nth-child(4) { transition-delay: 360ms; }
+.checks.show > :nth-child(5) { transition-delay: 480ms; }
+.checks.show > :nth-child(6) { transition-delay: 640ms; }
+
+/* ---------------- 页脚：Clover 字标与 slogan ---------------- */
+.foot {
+  position: absolute;
+  left: 192px;
+  bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.foot svg {
+  width: 40px;
+  height: 40px;
+}
+.foot-mark {
+  /* 软件自己的字体：macOS 上是 SF Pro，Windows 上是 Segoe UI */
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.foot-line {
+  margin-left: 8px;
+  font-size: 24px;
+  color: var(--silver-text);
 }

@@ -12,6 +12,8 @@ const deck = document.getElementById('deck') as HTMLElement
 const hud = document.getElementById('hud') as HTMLElement
 const slides = Array.from(deck.querySelectorAll<HTMLElement>('.slide'))
 const IS_WIN = /Windows/.test(navigator.userAgent)
+/** set by scripts/pitch-single.py: the whole app page, inlined */
+const APP_HTML = (window as { __APP_HTML__?: string }).__APP_HTML__ ?? null
 
 // ---------------------------------------------------------------- layout
 
@@ -53,7 +55,7 @@ const hooks: Record<string, Hook> = {
       await sleep(600, id)
       // the rocket's nose rides the trail head: x 90 → 1060 in the track box
       const dur = 1700
-      anim(rocket, [{ opacity: 0, transform: 'translateX(-90px)' }, { opacity: 1, offset: 0.08 }, { opacity: 1, transform: 'translateX(880px)' }], { duration: dur, easing: 'cubic-bezier(0.5, 0, 0.2, 1)' })
+      anim(rocket, [{ opacity: 0, transform: 'translateX(-198px)' }, { opacity: 1, offset: 0.08 }, { opacity: 1, transform: 'translateX(772px)' }], { duration: dur, easing: 'cubic-bezier(0.5, 0, 0.2, 1)' })
       anim(trail, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, easing: 'cubic-bezier(0.5, 0, 0.2, 1)' })
       // stations light as the rocket passes (same easing, sampled)
       const pos = [332, 575, 818, 1060].map((x) => (x - 90) / 970)
@@ -65,7 +67,7 @@ const hooks: Record<string, Hook> = {
       }
       el.querySelector('.seg-fast')?.classList.add('show')
       await sleep(500, id)
-      anim(rocket, [{ opacity: 1, transform: 'translateX(880px)' }, { opacity: 0, transform: 'translateX(960px)' }], { duration: 500, easing: 'ease-out' })
+      anim(rocket, [{ opacity: 1, transform: 'translateX(772px)' }, { opacity: 0, transform: 'translateX(870px)' }], { duration: 500, easing: 'ease-out' })
     },
     async step(el, n, id) {
       if (n !== 1) return
@@ -87,13 +89,14 @@ const hooks: Record<string, Hook> = {
       const cursor = el.querySelector('.cursor') as SVGElement
       const win = el.querySelector('.win') as HTMLElement
       for (const n of [docx, cursor, win]) n.getAnimations().forEach((a) => a.cancel())
+      el.querySelector('.checks')?.classList.remove('show')
       await loadApp(frame, 'empty', id)
       await sleep(900, id)
       // cursor → file → drag into the window → drop
       const at = (x: number, y: number) => `translate(${x}px, ${y}px)`
-      const start = { x: 400, y: 760 }
-      const grab = { x: 440, y: 560 }
-      const drop = { x: 1150, y: 560 }
+      const start = { x: 360, y: 760 }
+      const grab = { x: 406, y: 540 }
+      const drop = { x: 1190, y: 566 }
       await anim(cursor, [{ opacity: 0, transform: at(start.x, start.y) }, { opacity: 1, transform: at(grab.x, grab.y) }], { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }).finished
       await sleep(200, id)
       anim(docx, [{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }], { duration: 160 })
@@ -111,8 +114,9 @@ const hooks: Record<string, Hook> = {
       dragInto(frame, 'drop')
       anim(docx, [{ transform: `translate(${dx}px, ${dy}px) scale(0.9)`, opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0 }], { duration: 260, easing: 'ease-in' })
       anim(cursor, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 300 })
-      // the file is in: bring the window to the middle of the frame
-      anim(win, [{ transform: 'translateX(0)' }, { transform: 'translateX(-193px)' }], { duration: 700, delay: 350, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' })
+      // the file is in: the four checks start on the left
+      await sleep(400, id)
+      el.querySelector('.checks')?.classList.add('show')
     },
   },
 }
@@ -128,7 +132,12 @@ function loadApp(frame: HTMLIFrameElement, state: string, id: number): Promise<v
       else resolve()
     }
     addEventListener('message', onMsg)
-    frame.src = `./app.html?state=${state}&t=${Date.now()}`
+    const params = `state=${state}&t=${Date.now()}`
+    if (APP_HTML) {
+      // single-file deck: same document every time, parameters in the name
+      frame.name = params
+      frame.srcdoc = APP_HTML
+    } else frame.src = `./app.html?${params}`
   })
 }
 
@@ -164,6 +173,23 @@ function drawChrome() {
   }
 }
 drawChrome()
+
+// every content page carries the Clover mark and slogan at the bottom
+const LEAVES = [
+  'M494,473 L398,377 A67.9 67.9 0 0 1 494,281 A67.9 67.9 0 0 1 590,377 Z',
+  'M507,486 L603,390 A67.9 67.9 0 0 1 699,486 A67.9 67.9 0 0 1 603,582 Z',
+  'M494,499 L590,595 A67.9 67.9 0 0 1 494,691 A67.9 67.9 0 0 1 398,595 Z',
+  'M481,486 L385,582 A67.9 67.9 0 0 1 289,486 A67.9 67.9 0 0 1 385,390 Z',
+]
+for (const s of slides.filter((x) => x.classList.contains('framed'))) {
+  const f = document.createElement('div')
+  f.className = 'foot'
+  f.innerHTML =
+    `<svg viewBox="270 262 448 448">${LEAVES.map((d, i) => `<path class="lf-${i}" d="${d}"/>`).join('')}</svg>` +
+    '<span class="foot-mark">Clover</span>' +
+    '<span class="foot-line">投稿前的最后一公里，替你核对每一条引用</span>'
+  s.appendChild(f)
+}
 
 // ---------------------------------------------------------------- navigation
 
