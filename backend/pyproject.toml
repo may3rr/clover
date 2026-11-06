@@ -34,6 +34,9 @@ include = ["citecheck*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# `uv run pytest` (console script) does not put the backend root on
+# sys.path; tests import `tests.fixtures.make_fixtures`.
+pythonpath = ["."]
 markers = [
     "live: tests that hit real network/LLM endpoints (skipped unless CITECHECK_LIVE=1)",
 ]

@@ -2,7 +2,14 @@
 
 给明天接手的 Mac 会话。先读这份，再读 `AGENTS.md` 5.5 节（两台电脑的同步规则）。
 
-## 1. 现状
+## 0. 11-06 更新
+
+- Intel 机器夜里跑完了 T0 到 T7（`296a34b`），结论见 `demo/intel/bench/MORNING_REPORT.md` 和 `JUDGE_ACCURACY.md`。
+- **判断默认走云端**（用户 11-06 决定）。本地 8B 检出 51/93 个已标注问题，云端 flash 检出 76/93。本地生成只用于隐私模式和离线兜底。
+- `cn/intel` 已合并进 master，第 3 节问题 1 到 4 已修：开启批处理时本地并发自动取 `max(max_concurrency, batch_max_num_seqs)`，超时改用 `batch_timeout`（默认 120 秒），本地用量按请求记录，`batch_cache_size` 默认降到 4（英文稿峰值 18GB），`uv.lock` 纳入版本管理。
+- 下一步：隐私模式与发送清单（第 6 节），然后做向量 BM25 预选（`demo/intel/bench/EMBED_PREFILTER.md`）。
+
+## 1. 现状（11-05 晚的记录）
 
 **仓库同步：**
 - `master` = `ee8f4c3`，Mac 本地、GitHub、GitCode 三处一致。

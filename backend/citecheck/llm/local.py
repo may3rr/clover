@@ -12,15 +12,23 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import contextvars
 import json
 import logging
 import os
+import queue
 import threading
+import time
 
 log = logging.getLogger(__name__)
 
 _lock = threading.Lock()
 _engine: "LocalEngine | None" = None
+# token counts of the caller's own last local generation. A ContextVar, not
+# an engine attribute: with concurrent (batched) requests a shared field
+# would hand one request's usage to another.
+_usage: contextvars.ContextVar[dict[str, int] | None] = contextvars.ContextVar(
+    "local_usage", default=None)
 
 
 def _extract_json(text: str) -> str | None:
@@ -51,7 +59,6 @@ class LocalEngine:
         )
         self._model = None
         self._tokenizer = None
-        self._last_usage: dict[str, int] | None = None
         if hf_endpoint:
             os.environ.setdefault("HF_ENDPOINT", hf_endpoint)
         try:
@@ -69,7 +76,9 @@ class LocalEngine:
             self.unavailable_reason = f"模型加载失败: {e}"
             log.warning("local LLM model load failed: %s", e)
 
-    def _generate_sync(self, messages: list[dict], max_tokens: int) -> str:
+    def _generate_sync(
+        self, messages: list[dict], max_tokens: int
+    ) -> tuple[str, dict[str, int]]:
         prompt = self._tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
@@ -89,13 +98,13 @@ class LocalEngine:
             )
         out = out if isinstance(out, str) else str(out)
         try:
-            self._last_usage = {
+            usage = {
                 "prompt": len(self._tokenizer.encode(prompt)),
                 "completion": len(self._tokenizer.encode(out)),
             }
         except Exception:  # noqa: BLE001 — token counting is best-effort
-            self._last_usage = None
-        return out
+            usage = {}
+        return out, usage
 
     async def generate_json(
         self, messages: list[dict], max_tokens: int = 1024
@@ -106,11 +115,13 @@ class LocalEngine:
         fut = loop.run_in_executor(
             self._executor, self._generate_sync, messages, max_tokens
         )
+        _usage.set(None)
         try:
-            text = await asyncio.wait_for(fut, timeout=self.timeout)
+            text, usage = await asyncio.wait_for(fut, timeout=self.timeout)
         except (asyncio.TimeoutError, Exception) as e:  # noqa: BLE001
             log.warning("local generation failed: %s", e)
             return None
+        _usage.set(usage or None)
         return _extract_json(text)
 
 
@@ -126,8 +137,15 @@ class OpenVINOEngine(LocalEngine):
         self.available = False
         self.unavailable_reason = None
         self.device = None
-        self._last_usage = None
         self._gen = None
+        self._batcher = None
+        self._batch_queue: queue.Queue | None = None
+        self._batching = bool(getattr(settings, "batching", False))
+        if self._batching:
+            # a full batch of judge calls takes ~17 s on Arc B370, plus
+            # queueing behind the previous batch
+            self.timeout = settings.batch_timeout
+        self._config = settings
         self._executor = concurrent.futures.ThreadPoolExecutor(
             max_workers=1, thread_name_prefix="local-llm"
         )
@@ -135,22 +153,107 @@ class OpenVINOEngine(LocalEngine):
             from . import ov
 
             # compile on the worker thread that will run every generation
-            self._gen = self._executor.submit(
-                ov.Generator, settings.model, settings.device,
-                settings.max_prompt_len, settings.min_response_len,
-                settings.ov_cache_dir,
-            ).result()
-            self.device = self._gen.device
+            if self._batching:
+                self._batcher = self._executor.submit(
+                    ov.BatchGenerator, settings.model, settings.device,
+                    settings.max_prompt_len, settings.min_response_len,
+                    settings.ov_cache_dir,
+                    settings.batch_max_num_seqs, settings.batch_cache_size,
+                    settings.batch_max_num_batched_tokens,
+                    settings.batch_prefix_caching,
+                ).result()
+                self.device = self._batcher.device
+                self._batch_queue = queue.Queue()
+                threading.Thread(target=self._batch_loop, name="local-batch",
+                                 daemon=True).start()
+            else:
+                self._gen = self._executor.submit(
+                    ov.Generator, settings.model, settings.device,
+                    settings.max_prompt_len, settings.min_response_len,
+                    settings.ov_cache_dir,
+                ).result()
+                self.device = self._gen.device
             self.available = True
         except Exception as e:  # noqa: BLE001
             self.unavailable_reason = f"OpenVINO 模型加载失败: {e}"
             log.warning("openvino LLM unavailable: %s", e)
 
-    def _generate_sync(self, messages: list[dict], max_tokens: int) -> str:
+    def _generate_sync(
+        self, messages: list[dict], max_tokens: int
+    ) -> tuple[str, dict[str, int]]:
         assert self._gen is not None
-        text, usage = self._gen.generate(messages, max_tokens)
-        self._last_usage = usage or None
-        return text
+        return self._gen.generate(messages, max_tokens)
+
+    def _batch_loop(self) -> None:
+        """Collect queued requests for up to batch_wait_ms (or max_num_seqs)
+        and run them through one ContinuousBatchingPipeline call."""
+        assert self._batch_queue is not None and self._batcher is not None
+        wait_s = max(0.0, float(getattr(self._config, "batch_wait_ms", 30)) / 1000.0)
+        max_seqs = max(1, int(getattr(self._config, "batch_max_num_seqs", 16)))
+        while True:
+            first = self._batch_queue.get()
+            batch = [first]
+            deadline = time.monotonic() + wait_s
+            while len(batch) < max_seqs:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                try:
+                    batch.append(self._batch_queue.get(timeout=remaining))
+                except queue.Empty:
+                    break
+            items = [(messages, max_tokens)
+                     for _loop, _fut, messages, max_tokens in batch]
+            try:
+                results = self._batcher.generate_batch(items)
+            except Exception as e:  # noqa: BLE001 — fail this batch only
+                for loop, fut, _m, _t in batch:
+                    self._deliver(loop, self._resolve_error, fut, e)
+                continue
+            for (loop, fut, _m, _t), result in zip(batch, results):
+                self._deliver(loop, self._resolve_ok, fut, result)
+
+    @staticmethod
+    def _deliver(loop: asyncio.AbstractEventLoop, fn, *args) -> None:
+        """Set a future result from the worker thread; the event loop may
+        already be closed when the caller timed out and the script exited."""
+        if loop.is_closed():
+            return
+        try:
+            loop.call_soon_threadsafe(fn, *args)
+        except RuntimeError:  # loop closed between the check and the call
+            pass
+
+    @staticmethod
+    def _resolve_ok(fut: asyncio.Future, result: tuple[str, dict]) -> None:
+        if not fut.done():
+            fut.set_result(result)
+
+    @staticmethod
+    def _resolve_error(fut: asyncio.Future, exc: Exception) -> None:
+        if not fut.done():
+            fut.set_exception(exc)
+
+    async def generate_json(
+        self, messages: list[dict], max_tokens: int = 1024
+    ) -> str | None:
+        """Queue one request for the micro-batcher (or run it serially when
+        batching is off). Never raises; returns None on timeout/failure."""
+        if not self._batching or self._batch_queue is None:
+            return await super().generate_json(messages, max_tokens)
+        if not self.available:
+            return None
+        loop = asyncio.get_running_loop()
+        fut: asyncio.Future = loop.create_future()
+        self._batch_queue.put((loop, fut, messages, max_tokens))
+        _usage.set(None)
+        try:
+            text, usage = await asyncio.wait_for(fut, timeout=self.timeout)
+        except Exception as e:  # noqa: BLE001 — timeout or batch failure
+            log.warning("local batched generation failed: %s", e)
+            return None
+        _usage.set(usage or None)
+        return _extract_json(text) if text else None
 
 
 async def generate_or_raise(
@@ -169,9 +272,9 @@ async def generate_or_raise(
 
 
 def last_usage() -> dict[str, int] | None:
-    """Token counts from the most recent local generation, for the usage log."""
-    e = _engine
-    return e._last_usage if e is not None else None
+    """Token counts of this task's most recent local generation, for the
+    usage log."""
+    return _usage.get()
 
 
 def get_engine() -> LocalEngine | None:

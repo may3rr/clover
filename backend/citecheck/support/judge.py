@@ -87,6 +87,7 @@ async def judge_claim(
     task: str = "judge",
     hint: str | None = None,
     template: str | None = None,
+    route: str = "auto",
 ) -> JudgeOut | None:
     """One judging pass. ``task`` selects the configured model: 'judge'
     for the first pass, 'review'/'review_fallback' for the cascade.
@@ -112,6 +113,7 @@ async def judge_claim(
         task,
         [{"role": "user", "content": prompt}],
         JudgeOut,
+        route=route,
     )
     return res.value
 

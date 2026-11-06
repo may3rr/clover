@@ -131,10 +131,61 @@ Qwen3.5 的 0.8B / 2B 未下载；全部 Qwen3.5 仓库与大小见 `ov_models.j
 
 截图目录：`screenshots/`。
 
-## 6. 待完成
+## 6. 连续批处理调优（T5）
 
-- NPU 8B-cw：MAX_PROMPT_LEN=4096 结果、judge/extract 质量、组合负载。
-- 4B / Qwen3.5-9B / Qwen3.5-4B 的 probe、批量与质量。
-- 单篇耗时估算与最终结论。
+8B-int4，GPU，16 请求 × 1315 token 输入 / 128 token 输出，`ignore_eos=True`：
 
-详细命令与偏差记录见 `LOG.md`。
+| cache_size | max_num_seqs | 吞吐 | 平均每请求 | 峰值 RSS | 最低可用 |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 2 | 8 | 113.7 tok/s | 1.13 s | 7.92 GB | 11.68 GB |
+| 2 | 16 | 116.4 tok/s | 1.10 s | 7.96 GB | 11.41 GB |
+| 4 | 16 | 119.5 tok/s | 1.07 s | 7.98 GB | 12.27 GB |
+| 6 | 16 | 122.4 tok/s | 1.05 s | 8.02 GB | 12.32 GB |
+| 6 + prefix caching | 16 | **157.6 tok/s** | — | 6.99 GB | 13.19 GB |
+
+推荐：**cache_size=6、max_num_seqs=16、max_num_batched_tokens=32768、prefix caching=True**。共享 600 token 前缀时快 29%。
+
+## 7. 向量吞吐（6000 窗口，231–249 token）
+
+| 设备/组合 | 规模 | 总耗时 | 窗口/s |
+| --- | ---: | ---: | ---: |
+| NPU batch=1 | 6000 | 373.0 s | 16.1 |
+| NPU batch 8/24/64 | — | 编译器 LLVM abort | 不支持 |
+| GPU batch 8 / 24 / 64 | 6000 | 71.6 / 70.8 / 72.5 s | 83.7 / 84.8 / 82.8 |
+| CPU batch 8 / 24 / 64 | 600 采样 | 385 / 357 / 389 s | 1.6 / 1.7 / 1.5 |
+| NPU+CPU 各半 | 600 采样 | 180.9 s | 3.3 |
+| GPU 8B judge 忙时 + NPU/CPU | 600 采样 | 189.6 s | 3.2（GPU judge 151 tok/s） |
+
+- CPU 是向量瓶颈；NPU 单个批次 19 s 就完成自己的一半。分工应按速度比例，不要把窗口平均分给 CPU。
+- GPU 空闲时向量最快（84 窗口/s），但 GPU 要优先给 8B judge。
+
+## 8. 推荐配置与单篇估算
+
+- **生成**：GPU，8B-int4，`ContinuousBatchingPipeline`，cache_size=6、max_num_seqs=16、max_num_batched_tokens=32768、prefix caching=True；judge/review/review_fallback/extract/typo/function/structure 全部走本地。
+- **向量**：NPU 优先（batch=1，16 窗口/s）；GPU 空闲可接；CPU 只作兜底。若 NPU+CPU 同时跑，按约 9:1 分配窗口。
+- **重排**：GPU（NPU 编译失败）。
+- **单篇估算**：
+  - 200 次 judge：508 对实测 911.6 s → 0.557 对/s，200 对约 **359 s（6.0 min）**；把 judge 输出上限从 1024 降到 256、并利用 prefix caching 后可压到约 3–4 min。
+  - 加 12 extract + 12 typo + 31 function（55 次）：按同样批处理吞吐约 99 s；LLM 合计约 7.6 min（1024 上限）。
+  - 端到端实测（T4）：中文 533.2 s（8.9 min）、英文 736.0 s（12.3 min），主要耗时在文献网络请求与 support 层。
+- **资源警告**：英文 T4 峰值 RSS 18.07 GB、最低可用 2.61 GB，超过 16 GB/3 GB 限制；需要把 `batch_cache_size` 降到 2–4，或限制 support 层并发。
+
+## 9. 本地 judge 准确率（T3）
+
+| 组 | injected | true_issue | false_alarm | failed | 证据降级 | 墙钟 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| 云端 flash 基线 | 37 / 41 | 39 / 52 | 233 / 415 | 0 | — | — |
+| 8B GPU 批处理 | 27 / 41 | 24 / 52 | 127 / 415 | 8 | 120 | 911.6 s |
+| 4B GPU | — | — | — | 508 | — | 加载失败 |
+| 8B-cw NPU（256 上限） | 未完成 | 未完成 | 未完成 | 未完成 | 未完成 | 不可行 |
+
+- 8B 与云端逐条一致 311/500（62.2%）；本地更保守，false_alarm 少但召回也低。
+- 120 条 evidence 无法逐字定位被降级为 undetermined，是召回损失的主要来源。
+
+## 10. 备注
+
+- Qwen3.5 放弃（VLM IR；LLMPipeline 不支持，VLMPipeline 关不掉 thinking）。
+- 4B 加载失败（Reshape 动态边界，OpenVINO 2026.4.1）。
+- NPU 的 extract/向量不要与大模型共存：会互相拖慢约 3 倍。
+- NPU judge 的 prompt 常见 2200+ token：2048 直接拒绝；改 4096 后单条约 5 分钟，150 条采样预计 12 小时，按时间盒停止。8 条短 prompt 冒烟 8.8 s/对（2 条失败）。NPU 只适合向量。
+- 详细命令与偏差记录见 `LOG.md`，任务进度见 `PROGRESS.md`，晨报见 `MORNING_REPORT.md`。

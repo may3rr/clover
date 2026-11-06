@@ -33,6 +33,8 @@ Route = Literal["local", "cloud"]
 _cache: Cache | None = None
 _cloud_client: AsyncOpenAI | None = None
 _cloud_sem: "PrioritySemaphore | None" = None
+_local_sem: "PrioritySemaphore | None" = None
+_local_loop: asyncio.AbstractEventLoop | None = None
 
 # Who goes first when every cloud slot is busy (lower = sooner). Only
 # reference structuring jumps the queue: it gates authenticity,
@@ -238,6 +240,19 @@ def _get_cloud() -> tuple[AsyncOpenAI, PrioritySemaphore]:
     return _cloud_client, _cloud_sem  # type: ignore[return-value]
 
 
+def _get_local_sem() -> PrioritySemaphore:
+    """Local concurrency has its own limit; it never shares the cloud
+    semaphore (a local NPU/GPU queue and a remote API queue are different
+    resources)."""
+    global _local_sem, _local_loop
+    settings = get_settings()
+    loop = asyncio.get_running_loop()
+    if _local_sem is None or _local_loop is not loop:
+        _local_loop = loop
+        _local_sem = PrioritySemaphore(settings.llm.local.effective_concurrency())
+    return _local_sem
+
+
 def _cache_key(model: str, messages: list[dict]) -> str:
     # cache_version is part of the key: bump it in config.toml to
     # invalidate every cached verdict after a model upgrade / prompt fix
@@ -310,7 +325,9 @@ async def _cloud_call(model: str, messages: list[dict], task: str) -> str:
 
 
 async def _local_call(messages: list[dict], task: str) -> str:
-    raw = await local.generate_or_raise(messages)  # raises on failure
+    sem = _get_local_sem()
+    async with sem.slot(_PRIORITY.get(task, 2)):
+        raw = await local.generate_or_raise(messages)  # raises on failure
     usage = local.last_usage() or {}
     _log_usage(
         "local", task, get_settings().llm.local.model,

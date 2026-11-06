@@ -1,0 +1,35 @@
+{
+ "n": 240,
+ "text_token_range": [
+  231,
+  249
+ ],
+ "solo": [
+  {
+   "device": "GPU",
+   "batch": 8,
+   "ok": true,
+   "load_s": 18.7,
+   "total_s": 4.2,
+   "windows_s": 57.7
+  },
+  {
+   "device": "GPU",
+   "batch": 24,
+   "ok": true,
+   "load_s": 3.1,
+   "total_s": 4.0,
+   "windows_s": 60.1
+  },
+  {
+   "device": "GPU",
+   "batch": 64,
+   "ok": true,
+   "load_s": 3.1,
+   "total_s": 4.1,
+   "windows_s": 59.2
+  }
+ ],
+ "split": null,
+ "busy": null
+}

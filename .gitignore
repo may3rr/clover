@@ -13,8 +13,6 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .venv/
-# uv resolves per machine; pyproject.toml is the source of truth
-uv.lock
 
 # ---- Node / Electron
 node_modules/

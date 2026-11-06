@@ -10,6 +10,7 @@ from citecheck.config import LocalSettings, get_settings
 from citecheck.llm import embed as embed_mod
 from citecheck.llm import local, ov
 from citecheck.llm import rerank as rerank_mod
+from citecheck.llm.router import route_order
 
 
 def test_device_order_keeps_config_order_and_matches_gpu_index():
@@ -153,7 +154,40 @@ def test_openvino_engine_selected_and_generates(monkeypatch):
     eng = local.OpenVINOEngine(cfg)
     assert eng.available and eng.device == "NPU" and eng.provider == "openvino-local"
     out = asyncio.run(eng.generate_json([{"role": "user", "content": "x"}]))
-    assert out == '{"claims": []}' and eng._last_usage == {"prompt": 12, "completion": 5}
+    assert out == '{"claims": []}'
+
+
+def test_local_usage_is_per_request(monkeypatch):
+    class FakeBatch:
+        device = "GPU"
+
+        def __init__(self, *a, **k):
+            pass
+
+        def generate_batch(self, batch):
+            return [('{"ok": 1}', {"prompt": int(m[0]["content"]), "completion": 1})
+                    for m, _t in batch]
+
+    monkeypatch.setattr(ov, "BatchGenerator", FakeBatch)
+    cfg = LocalSettings(enabled=True, engine="openvino", model="x",
+                        batching=True, batch_wait_ms=30)
+    eng = local.OpenVINOEngine(cfg)
+
+    async def one(i):
+        await eng.generate_json([{"role": "user", "content": str(i)}], 8)
+        return local.last_usage()
+
+    async def run():
+        return await asyncio.gather(*[one(i) for i in range(8)])
+
+    assert [u["prompt"] for u in asyncio.run(run())] == list(range(8))
+
+
+def test_batching_widens_concurrency_and_timeout():
+    cfg = LocalSettings(batching=True, max_concurrency=8, batch_max_num_seqs=16)
+    assert cfg.effective_concurrency() == 16
+    assert LocalSettings(max_concurrency=8).effective_concurrency() == 8
+    assert cfg.batch_timeout >= 90
 
 
 def test_openvino_engine_load_failure_is_reported(monkeypatch):
@@ -163,3 +197,95 @@ def test_openvino_engine_load_failure_is_reported(monkeypatch):
     monkeypatch.setattr(ov, "Generator", boom)
     eng = local.OpenVINOEngine(LocalSettings(enabled=True, engine="openvino", model="x"))
     assert not eng.available and "模型目录不存在" in eng.unavailable_reason
+
+
+def test_openvino_engine_micro_batches_concurrent_requests(monkeypatch):
+    class FakeBatch:
+        device = "GPU"
+        batches = []
+
+        def __init__(self, *a, **k):
+            pass
+
+        def generate_batch(self, batch):
+            FakeBatch.batches.append(len(batch))
+            return [(f'{{"ok": {i}}}', {"prompt": 1, "completion": 1})
+                    for i in range(len(batch))]
+
+    class FakeBatchWithPrompt(FakeBatch):
+        def prompt(self, messages):
+            return "p"
+
+    monkeypatch.setattr(ov, "BatchGenerator", FakeBatchWithPrompt)
+    cfg = LocalSettings(enabled=True, engine="openvino", model="x",
+                        batching=True, batch_wait_ms=50, timeout=5)
+    eng = local.OpenVINOEngine(cfg)
+
+    async def run():
+        return await asyncio.gather(*[
+            eng.generate_json([{"role": "user", "content": str(i)}], 8)
+            for i in range(10)])
+
+    out = asyncio.run(run())
+    assert all(o is not None for o in out)
+    assert sum(FakeBatch.batches) == 10
+    assert max(FakeBatch.batches) >= 2  # requests were grouped, not serialized
+
+
+def test_batch_result_failure_does_not_poison_the_batch(monkeypatch):
+    class FakeBatch:
+        device = "GPU"
+
+        def __init__(self, *a, **k):
+            pass
+
+        def generate_batch(self, batch):
+            return [('{"ok": true}' if i % 2 == 0 else "not json", {})
+                    for i in range(len(batch))]
+
+    monkeypatch.setattr(ov, "BatchGenerator", FakeBatch)
+    cfg = LocalSettings(enabled=True, engine="openvino", model="x",
+                        batching=True, batch_wait_ms=20, timeout=5)
+    eng = local.OpenVINOEngine(cfg)
+
+    async def run():
+        return await asyncio.gather(*[
+            eng.generate_json([{"role": "user", "content": str(i)}], 8)
+            for i in range(6)])
+
+    out = asyncio.run(run())
+    assert sum(o is not None for o in out) == 3
+    assert all(o == '{"ok": true}' for o in out if o is not None)
+
+
+def test_batch_timeout_returns_none(monkeypatch):
+    import time as _time
+
+    class SlowBatch:
+        device = "GPU"
+
+        def __init__(self, *a, **k):
+            pass
+
+        def generate_batch(self, batch):
+            _time.sleep(0.3)
+            return [('{"ok": true}', {}) for _ in batch]
+
+    monkeypatch.setattr(ov, "BatchGenerator", SlowBatch)
+    cfg = LocalSettings(enabled=True, engine="openvino", model="x",
+                        batching=True, batch_wait_ms=5, batch_timeout=0.05)
+    eng = local.OpenVINOEngine(cfg)
+    out = asyncio.run(eng.generate_json([{"role": "user", "content": "x"}], 8))
+    assert out is None
+
+
+def test_route_order_uses_local_tasks(monkeypatch):
+    s = get_settings()
+    monkeypatch.setattr(s.llm.local, "enabled", True)
+    monkeypatch.setattr(s.llm.local, "tasks", ["extract", "judge"])
+    assert route_order("extract", s) == ["local", "cloud"]
+    assert route_order("judge", s) == ["local", "cloud"]
+    assert route_order("typo", s) == ["cloud"]
+
+    monkeypatch.setattr(s.llm.local, "enabled", False)
+    assert route_order("extract", s) == ["cloud"]

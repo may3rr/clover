@@ -239,3 +239,94 @@ class Generator:
         except Exception:  # noqa: BLE001 — token counts are best-effort
             pass
         return strip_think(text), usage
+
+
+class BatchGenerator:
+    """Continuous-batching chat generation for the local engine.
+
+    One ``ContinuousBatchingPipeline`` serves a whole micro-batch. Requests
+    are grouped by the caller (``OpenVINOEngine`` waits up to 30 ms or
+    ``max_num_seqs``). Thinking is disabled through the chat template; a
+    closed ``<think>`` block is appended when a template ignores the flag.
+    """
+
+    def __init__(self, path: str, devices: str = "GPU",
+                 max_prompt_len: int = 2048, min_response_len: int = 256,
+                 cache: str = "", max_num_seqs: int = 16,
+                 cache_size: float = 6.0, max_num_batched_tokens: int = 32768,
+                 enable_prefix_caching: bool = True,
+                 present: list[str] | None = None):
+        import openvino_genai as g
+
+        p = _check_dir(path)
+        self._g = g
+        sched = g.SchedulerConfig()
+        for attr, value in (("max_num_seqs", max_num_seqs),
+                            ("max_num_batched_tokens", max_num_batched_tokens),
+                            ("cache_size", cache_size),
+                            ("enable_prefix_caching", enable_prefix_caching)):
+            try:
+                setattr(sched, attr, value)
+            except Exception:  # noqa: BLE001 — older runtimes lack some knobs
+                pass
+
+        def build(dev: str):
+            extra = {}
+            if dev == "NPU":
+                extra = {"MAX_PROMPT_LEN": max_prompt_len,
+                         "MIN_RESPONSE_LEN": min_response_len}
+            return g.ContinuousBatchingPipeline(
+                str(p), sched, dev, _props(cache, extra))
+
+        self.pipe, self.device = compile_first(devices, build, present)
+        self.tokenizer = g.Tokenizer(str(p))
+        self._lock = threading.Lock()
+
+    def prompt(self, messages: list[dict]) -> str:
+        prompt = self.tokenizer.apply_chat_template(
+            messages, True, extra_context={"enable_thinking": False})
+        if not prompt.rstrip().endswith("</think>"):
+            # templates that ignore enable_thinking: force a closed block
+            prompt += "<think>\n\n</think>\n\n"
+        return prompt
+
+    def generate_batch(
+        self, batch: list[tuple[list[dict], int]]
+    ) -> list[tuple[str, dict]]:
+        """Run one micro-batch; returns (text, usage) per request."""
+        g = self._g
+        prompts = [self.prompt(m) for m, _ in batch]
+        configs = []
+        for _, max_tokens in batch:
+            cfg = g.GenerationConfig()
+            cfg.max_new_tokens = max_tokens
+            cfg.do_sample = False
+            configs.append(cfg)
+        with self._lock:
+            results = self.pipe.generate(prompts, configs)
+        out: list[tuple[str, dict]] = []
+        for res, prompt in zip(results, prompts):
+            token_ids: list[int] = []
+            text = ""
+            try:
+                ids = res.get_generation_ids()
+                if ids:
+                    first = ids[0]
+                    token_ids = [first] if isinstance(first, int) else list(first)
+                    text = self.tokenizer.decode(token_ids)
+            except Exception:  # noqa: BLE001 — fall back to a text attribute
+                try:
+                    text = res.texts[0]
+                except Exception:
+                    text = str(res)
+            text = strip_think(text)
+            usage: dict[str, int] = {}
+            try:
+                usage = {
+                    "prompt": int(self.tokenizer.encode(prompt).input_ids.shape[-1]),
+                    "completion": len(token_ids),
+                }
+            except Exception:  # noqa: BLE001 — token counts are best-effort
+                pass
+            out.append((text, usage))
+        return out

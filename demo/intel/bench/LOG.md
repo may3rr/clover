@@ -307,3 +307,168 @@ cd C:\clover\backend
 - 无热降频迹象：judge 前/后半段 0.165 / 0.164 次/s，extract 0.077 / 0.077 次/s。
 - 说明：组合脚本里的「solo embed」段被已加载的 NPU 8B-cw 拖慢（平均 67 s/批），不是干净基线；干净基线用 `embed_solo_test.py` 单独测得 1.55 s/批（10 次 1.48–1.78 s）。上表的 3.26× 用干净基线计算。
 - 结论：NPU 上 extract 与向量互相抢设备，各慢约 3 倍；GPU judge 只慢 42%。如果按推荐分工（GPU judge + NPU extract/向量），需要接受 NPU 内部两项的互相拖慢。
+
+## 10. 同步 master 与 FastAPI lifespan
+
+```powershell
+git fetch cn
+git merge cn/master        # fast-forward 到 2f39c40
+cd backend
+uv sync --extra dev --extra intel
+uv pip install psutil huggingface_hub   # 基准脚本需要
+```
+
+- master 变更：`server.py` 的 startup 改为 lifespan；`Onboarding.tsx` 的平台文案。
+- 仓库没有 `uv.lock`，`uv sync` 直接解析 71 个包：FastAPI 0.162.0、Starlette 1.10.0。
+- 移除之前 venv 里的 `fastapi<0.116` 固定。
+- pytest：**500 passed, 2 failed, 8 skipped in 300.59s**（FastAPI 的收集错误已消失）。
+  - 仍失败：`test_parse_latex.py::test_tables_become_cell_paragraphs`、`test_pipeline.py::test_library_scan_reports_stages`（缺 PDF）。
+
+## 11. LaTeX 测试失败的根因：CRLF
+
+```powershell
+.venv\Scripts\python -m pytest tests/test_parse_latex.py::test_tables_become_cell_paragraphs -vv
+```
+
+失败断言：
+
+```text
+lm = d.latex
+big = next(p for p in d.paragraphs if p.text == "EN-FR")
+f, off, exact = lm.locate(big.id, 0)
+src = (tmp_path / "main.tex").read_text()
+assert exact and src[off:off + 5] == "EN-FR"
+E   AssertionError: assert (True and '\\midr' == 'EN-FR')
+```
+
+`git ls-files --eol backend/tests/fixtures` 中 LaTeX 相关行全部是 `i/lf w/lf`：
+
+```text
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_authoryear.tex
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_numeric/main.tex
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_numeric/method.tex
+i/lf w/lf attr/text=auto eol=lf  backend/tests/fixtures/latex_numeric/refs.bib
+```
+
+对照实验（`diag_latex_eol.py`，同一段 TeX）：
+
+```text
+LF (newline='')  bytes_has_CRLF=False  off=227  slice='EN-FR'  exact=True
+CRLF (default)   bytes_has_CRLF=True   off=236  slice='\\midr'  exact=True
+```
+
+- 测试用 `Path.write_text()` 写临时 `main.tex`，Windows 默认把 `\n` 转成 `\r\n`。
+- 解析器的 `tex.read_text()` 是 `path.read_bytes().decode()`，**保留 CRLF**，偏移按 2 字节换行计算。
+- 测试随后用 `Path.read_text()` 读回，通用换行把 CRLF 归一成 LF，字符串变短，`off` 就落到后面的 `\midrule` 上。
+- 偏移差 9，正好等于该位置之前的换行数。Mac 上 `os.linesep` 是 `\n`，所以通过。
+- 未改产品代码；修法应是测试写入时 `newline=""`，或解析器/测试统一换行归一。
+
+## 12. Qwen3.5 放弃与 Qwen3-4B 加载失败
+
+### Qwen3.5
+
+- `Qwen3.5-9B-int4-ov` 是 `Qwen3_5ForConditionalGeneration`（VLM）复合 IR：language_model + text_embeddings + vision_embeddings + mtp。
+- `LLMPipeline` 加载后生成报：
+  `RuntimeError: ... Port for tensor name input_ids was not found.`
+- `VLMPipeline` 能加载（GPU 30.7 s），`generate(prompt, [], cfg)` 能出文本，但输出带 `Thinking Process:`，没有可用的关闭 thinking 路径。
+- 按要求放弃 Qwen3.5；停止 Qwen3.5-4B 下载；9B 文件保留在磁盘，不再参与测试。
+
+### Qwen3-4B
+
+- 下载完成，sha256 与 HF LFS 一致（`openvino_model.bin` 2158.8 MB、`openvino_tokenizer.bin` 5.3 MB）。
+- GPU 和 CPU 加载都失败，错误相同：
+
+```text
+Check 'false' failed at src/core/shape_inference/include/reshape_shape_inference.hpp:210:
+While validating node 'opset1::Reshape Reshape_295
+(opset1::Multiply self.model.layers.0.mlp.down_proj.weight/fq_weights_1[0]:f16[2560,76,128],
+ opset1::Constant Constant_209892[0]:i64[2]) -> ()' with friendly_name 'Reshape_295':
+Output pattern dim[1] has invalid bounds: -3891109803858067456,-3891109803858067456
+```
+
+- 版本：OpenVINO 2026.4.1 / openvino-genai 2026.4.1.0。未升级（等指示）。
+- 因此 4B 的 batch/quality 无法执行，GPU/CPU probe 均记为失败。
+
+## 13. 过夜任务 T0-T2（摘要）
+
+- 同步到 `ee8f4c3`；`uv sync --extra dev --extra intel`（无 uv.lock，解析 71 包，FastAPI 0.162 / Starlette 1.10）。
+- LaTeX 测试失败为 CRLF：临时 `.tex` 由 `write_text()` 写成 CRLF，解析器按原始字节保留 CRLF，测试 `read_text()` 归一化后偏移错位。测试读回改为 `read_bytes().decode("utf-8")`。
+- `test_pipeline` 缺私有 PDF：不存在时用 pypdf 生成空白 PDF。
+- `uv run pytest` 的 console script 不把 backend 根加入 sys.path；`pyproject.toml` 加 `pythonpath = ["."]`。
+- T1：`ov.BatchGenerator` + `OpenVINOEngine` 30 ms 微批；`LocalSettings.batching` 与 batch_* 参数；测试覆盖组批/超时/单条失败隔离。
+- T1 真实冒烟：32 并发 `chat_json("extract")` → 13.98 s，32/32 成功，平均 0.44 s/请求，全部 local。
+- T2：`[llm.local].tasks`（默认 `["extract"]`）、`client._get_local_sem()` 独立并发上限、示例配置注释。
+- 全量 pytest：**506 passed, 8 skipped**。
+
+## 14. T3 judge 准确率（8B / 4B）
+
+- 数据解压到 `C:\clover-data\judge_pairs.json`（508 对，仓库外，未提交）。
+- 8B GPU（批处理 16 并发，variant current）：
+  - injected 27/41，true_issue 24/52，false_alarm 127/415，failed 8，证据降级 120。
+  - 与云端逐条一致 311/500（62.2%）；墙钟 911.6 s，0.557 对/s，200 对约 6.0 min。
+- 4B GPU：引擎加载失败，508/508 失败（Reshape 错误，见第 12 节）。
+- 8B-cw NPU：待跑（逐条，预计约 1 小时）。
+
+## 15. T5 调优与向量
+
+### 15.1 连续批处理
+
+| cache_size | max_num_seqs | 吞吐 | 每请求 | 峰值 RSS |
+| ---: | ---: | ---: | ---: | ---: |
+| 2 | 16 | 116.4 tok/s | 1.10 s | 7.96 GB |
+| 4 | 16 | 119.5 tok/s | 1.07 s | 7.98 GB |
+| 6 | 16 | 122.4 tok/s | 1.05 s | 8.02 GB |
+| 6 + prefix caching | 16 | 157.6 tok/s | — | 6.99 GB |
+
+推荐：cache_size=6、max_num_seqs=16、max_num_batched_tokens=32768、prefix caching=True。
+
+### 15.2 向量
+
+- NPU TextEmbeddingPipeline 只支持 batch=1；batch=8/24/64 直接 LLVM abort：
+  `LLVM ERROR: Failed to infer result type(s): "IE.Add"(tensor<1x128x512x512xf32>, tensor<1x64x512x512xf32>)`。
+- NPU batch=1：冷加载 240.9 s，6000 窗口 373.0 s，16.1 窗口/s。
+- CPU/GPU 与 NPU+CPU 组合、GPU 忙时数据见 `vector.json`（本文件生成时仍在跑）。
+
+## 16. T6 向量预选
+
+方案见 `EMBED_PREFILTER.md`：BM25 先选 top-K（建议 128）加邻居，再只对候选算向量；预计把 6000 窗口的向量量降到 2–6%，召回需用 item bench 验证。
+
+## 17. T4 端到端（中文稿）
+
+配置 `C:\clover-data\e2e\config.toml`：本地 8B GPU 批处理跑 judge/review/review_fallback/extract/typo/function/structure；Embedding NPU；Rerank GPU；无 API Key。
+
+```powershell
+python demo/intel/bench/e2e_run.py --src "demo/final/演示稿/基于深度学习的目标检测研究综述.docx" --out demo/intel/bench/e2e/zh.json
+python demo/final/check_final.py demo/intel/bench/e2e/zh.json demo/final/injections.json
+```
+
+| 指标 | 结果 |
+| --- | --- |
+| 墙钟 | 533.2 s（8.9 min） |
+| LLM 调用 | local 363，cloud 0 |
+| 问题数 | 53（真实性 22、支持度 17、分布 3、规范 11） |
+| 峰值 RSS | 14.02 GB |
+| 最低可用内存 | 6.4 GB |
+| 注入检出 | 14 / 17 |
+| 各层耗时 | support 533.0 s、authenticity 195.0 s、norms 168.8 s、distribution 42.5 s、parse 0.1 s |
+| 文献源 | crossref 87 次/220.9 s、openalex 87/177.3、s2 74/228.1、arxiv 33/972.9（并发累计） |
+
+- 所有 LLM 任务都走了本地（tasks 列表包含 judge/review/review_fallback/extract/typo/function/structure），云端 0 次。
+- 网络是主要瓶颈：arXiv PDF 多次 20 s 超时，回落到摘要；arXiv API 出现 429。
+- 有 23 条“未能获得被引文献原文，0 条论断无法判断”的低优先级提示，符合无本地 PDF 的情况。
+
+英文 LaTeX 稿（`deep_residual_learning.zip`，7 个 PDF 都是插图，没有参考文献 PDF）：
+
+| 指标 | 结果 |
+| --- | --- |
+| 墙钟 | 736.0 s（12.3 min） |
+| LLM 调用 | local 536，cloud 0 |
+| 问题数 | 89（真实性 19、支持度 46、分布 5、规范 19） |
+| 峰值 RSS | **18.07 GB（超过 16 GB 上限）** |
+| 最低可用内存 | **2.61 GB（低于 3 GB 停止线）** |
+| 注入检出 | 12 / 16 |
+| 各层耗时 | support 730.7 s、authenticity 299.4 s、distribution 274.8 s、norms 224.5 s、parse 0.3 s |
+| 文献源 | crossref 68 次/923.2 s（后期限流跳过）、arxiv 27/837.3、openalex 56/529.0、s2 36/50.8（后期限流跳过） |
+
+- 英文稿的 support 层 46 条问题、536 次本地调用；峰值 18.07 GB 超出任务单的 16 GB 上限，最低可用 2.61 GB 也低于 3 GB 停止线。原因：8B CB（cache_size=6）+ 向量/重排 + 解析同时驻留，且 support 层并发较高。后续需要把 cache_size 降到 2–4，或在 support 层限制并发。
+- 两篇都有“无法核验/无原文”的降级提示，符合无 API Key、无本地 PDF 的条件。

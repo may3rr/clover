@@ -1,0 +1,186 @@
+{
+ "label": "8b-smoke",
+ "model": "Qwen3-8B-int4-ov",
+ "device": "GPU",
+ "pairs": 8,
+ "injected": [
+  2,
+  2
+ ],
+ "true_issue": [
+  1,
+  4
+ ],
+ "false_alarm": [
+  0,
+  2
+ ],
+ "failed": 0,
+ "downgraded": 3,
+ "wall_s": 21.2,
+ "avg_s": 16.772,
+ "flags": {
+  "reports/liuqiao_kg/c24/r23|false_alarm": false,
+  "reports/liuqiao_kg/c69/r65|true_issue": true,
+  "reports/liuqiao_kg/c73/r54|injected": true,
+  "reports/liuqiao_kg/c39/r6|injected": true,
+  "reports/luohuilan_odt/c15/r22|false_alarm": false,
+  "reports/luohuilan_odt/c27/r34|true_issue": false,
+  "reports/luohuilan_odt/c3/r9|true_issue": false,
+  "reports/luohuilan_odt/c3/r10|true_issue": false
+ },
+ "items": [
+  {
+   "id": "reports/liuqiao_kg/c24/r23",
+   "want": false,
+   "why": "false_alarm",
+   "s": 21.212,
+   "json_ok": true,
+   "label": "undetermined",
+   "off_topic": false,
+   "flagged": false,
+   "downgraded": true,
+   "error": null,
+   "raw_label": "partial"
+  },
+  {
+   "id": "reports/liuqiao_kg/c69/r65",
+   "want": true,
+   "why": "true_issue",
+   "s": 16.133,
+   "json_ok": true,
+   "label": "unsupported",
+   "off_topic": true,
+   "flagged": true,
+   "downgraded": false,
+   "error": null,
+   "raw_label": "unsupported"
+  },
+  {
+   "id": "reports/liuqiao_kg/c73/r54",
+   "want": true,
+   "why": "injected",
+   "s": 16.134,
+   "json_ok": true,
+   "label": "unsupported",
+   "off_topic": false,
+   "flagged": true,
+   "downgraded": false,
+   "error": null,
+   "raw_label": "unsupported"
+  },
+  {
+   "id": "reports/liuqiao_kg/c39/r6",
+   "want": true,
+   "why": "injected",
+   "s": 16.134,
+   "json_ok": true,
+   "label": "unsupported",
+   "off_topic": false,
+   "flagged": true,
+   "downgraded": false,
+   "error": null,
+   "raw_label": "unsupported"
+  },
+  {
+   "id": "reports/luohuilan_odt/c15/r22",
+   "want": false,
+   "why": "false_alarm",
+   "s": 16.135,
+   "json_ok": true,
+   "label": "undetermined",
+   "off_topic": false,
+   "flagged": false,
+   "downgraded": true,
+   "error": null,
+   "raw_label": "supported"
+  },
+  {
+   "id": "reports/luohuilan_odt/c27/r34",
+   "want": true,
+   "why": "true_issue",
+   "s": 16.141,
+   "json_ok": true,
+   "label": "supported",
+   "off_topic": false,
+   "flagged": false,
+   "downgraded": false,
+   "error": null,
+   "raw_label": "supported"
+  },
+  {
+   "id": "reports/luohuilan_odt/c3/r9",
+   "want": true,
+   "why": "true_issue",
+   "s": 16.144,
+   "json_ok": true,
+   "label": "supported",
+   "off_topic": false,
+   "flagged": false,
+   "downgraded": false,
+   "error": null,
+   "raw_label": "supported"
+  },
+  {
+   "id": "reports/luohuilan_odt/c3/r10",
+   "want": true,
+   "why": "true_issue",
+   "s": 16.145,
+   "json_ok": true,
+   "label": "undetermined",
+   "off_topic": false,
+   "flagged": false,
+   "downgraded": true,
+   "error": null,
+   "raw_label": "unsupported"
+  }
+ ],
+ "cloud": {
+  "injected": [
+   37,
+   41
+  ],
+  "true_issue": [
+   39,
+   52
+  ],
+  "false_alarm": [
+   233,
+   415
+  ],
+  "agreement": [
+   5,
+   8
+  ]
+ },
+ "divergent": [
+  {
+   "id": "reports/liuqiao_kg/c24/r23",
+   "want": false,
+   "why": "false_alarm",
+   "local": "undetermined",
+   "local_off_topic": false,
+   "cloud": "unsupported",
+   "cloud_off_topic": false
+  },
+  {
+   "id": "reports/luohuilan_odt/c15/r22",
+   "want": false,
+   "why": "false_alarm",
+   "local": "undetermined",
+   "local_off_topic": false,
+   "cloud": "unsupported",
+   "cloud_off_topic": true
+  },
+  {
+   "id": "reports/luohuilan_odt/c3/r10",
+   "want": true,
+   "why": "true_issue",
+   "local": "undetermined",
+   "local_off_topic": false,
+   "cloud": "unsupported",
+   "cloud_off_topic": false
+  }
+ ],
+ "divergent_total": 3
+}
