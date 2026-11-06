@@ -27,7 +27,7 @@ git merge cn/master
 ```powershell
 cd C:\clover\app
 $env:CITECHECK_SHOTS_REPORT = "C:\clover\app\site\public\data\pitch_zh.json"
-$env:CITECHECK_SHOTS_STATES = "running-mid,report,item:f40,item:f28,item:v5,item:f35"
+$env:CITECHECK_SHOTS_STATES = "running-mid,report,item:f40,item:f28,item:v5,venue:f35"
 $env:CITECHECK_SHOTS_THEMES = "light"
 node scripts\shots.mjs C:\clover\demo\intel\shots-pitch\win 2>&1 | Tee-Object C:\clover\demo\intel\shots-pitch\win\run.log
 ```
@@ -39,7 +39,7 @@ node scripts\shots.mjs C:\clover\demo\intel\shots-pitch\win 2>&1 | Tee-Object C:
 | item:f40 | 未能在数据库中找到这篇文献 |
 | item:f28 | 被引文献与这条论断说的不是同一项工作 |
 | item:v5 | 建议修订：制 改为 置 |
-| item:f35 | 参考文献构成偏离《电子学报》范文的常见范围 |
+| venue:f35 | 参考文献构成偏离《电子学报》范文的常见范围 |
 
 对不上或写着 `(no detail open)` 就停下来，把 `run.log` 原文发给用户。
 

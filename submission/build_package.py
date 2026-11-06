@@ -50,7 +50,7 @@ SHOTS = [
     ("02-文献真实性.png", "item:f40"),
     ("03-论断支持度.png", "item:f28"),
     ("04-格式规范.png", "item:v5"),
-    ("05-期刊对标.png", "item:f35"),
+    ("05-期刊对标.png", "venue:f35"),
 ]
 INTEL_SHOTS = [
     ("06-任务管理器-核显.png", "06-gpu-vector.png"),

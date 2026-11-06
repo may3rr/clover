@@ -110,6 +110,14 @@ body {
   font-weight: 700;
   color: var(--tmall-red);
 }
+/* Clover 图标，居中放在作品名称上方的空白处 */
+.cover-logo {
+  position: absolute;
+  left: 912px;
+  top: 214px;
+  width: 104px;
+  height: 104px;
+}
 /* 模板封面的文本框位置（1920 宽画布），文字居中 */
 .cover-deco {
   position: absolute;

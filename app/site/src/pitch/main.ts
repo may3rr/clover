@@ -95,6 +95,12 @@ const hooks: Record<string, Hook> = {
       const frame = el.querySelector('.app-frame') as HTMLIFrameElement
       markLeaf(el, n)
       await openFinding(frame, FINDINGS[n], id)
+      // 期刊对标: the journal review card in the reading pane, beside the
+      // reference-composition detail
+      if (n === 3) {
+        await sleep(900, id)
+        frame.contentDocument?.querySelector('.overview-card')?.scrollIntoView({ block: 'start', behavior: 'smooth' })
+      }
     },
   },
   拖入论文: {

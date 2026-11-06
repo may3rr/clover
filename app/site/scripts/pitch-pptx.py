@@ -47,7 +47,7 @@ PX = 6350  # EMU per px on the 1920 × 1080 canvas
 WIN_SHOTS = ROOT / "demo" / "intel" / "shots-pitch" / "win"
 WIN_STATES = {  # (page, still number) -> shots-mode state
     (4, 1): "running-mid", (4, 2): "report",
-    (5, 1): "item:f40", (5, 2): "item:f28", (5, 3): "item:v5", (5, 4): "item:f35",
+    (5, 1): "item:f40", (5, 2): "item:f28", (5, 3): "item:v5", (5, 4): "venue:f35",
 }
 
 
@@ -228,9 +228,95 @@ ISOLATE = """(pid) => {
   if (!st) { st = document.createElement('style'); st.id = 'iso'; document.head.appendChild(st) }
   st.textContent = pid === null ? '' :
     `html, body, #deck, .slide { background: transparent !important; }
-     body * { visibility: hidden !important; }
-     [data-pid="${pid}"], [data-pid="${pid}"] * { visibility: visible !important; }`
+     body *:not([data-pid="${pid}"], [data-pid="${pid}"] *) { visibility: hidden !important; }
+     [data-pid="${pid}"] { visibility: visible !important; }`
 }"""
+
+
+VIDEO = ROOT / "app" / "site-single" / "clover-drop.mp4"
+
+
+def record_drop(seconds: float = 21.0) -> tuple[Path, float]:
+    """The drag-in page as a video, cropped to the app window: the file
+    drops in, the running screen's Qwen and Intel loading mark, then the
+    report. Frames come from Chrome's screencast (lossless enough at
+    JPEG 90), timed by their own timestamps."""
+    import json
+    import shutil
+    import subprocess
+    import tempfile
+
+    frames: list[tuple[float, bytes]] = []
+    with sync_playwright() as p:
+        b = p.chromium.launch(channel="chrome")
+        pg = b.new_page(viewport={"width": 1920, "height": 1080}, device_scale_factor=2,
+                        user_agent=UA)
+        pg.goto(f"{URL}#4")
+        pg.wait_for_timeout(500)
+        cdp = pg.context.new_cdp_session(pg)
+
+        def on_frame(ev):
+            import base64
+            frames.append((ev["metadata"]["timestamp"], base64.b64decode(ev["data"])))
+            cdp.send("Page.screencastFrameAck", {"sessionId": ev["sessionId"]})
+
+        cdp.on("Page.screencastFrame", on_frame)
+        pg.reload()
+        cdp.send("Page.startScreencast", {"format": "jpeg", "quality": 90,
+                                          "maxWidth": 3840, "maxHeight": 2160})
+        pg.wait_for_timeout(seconds * 1000)
+        cdp.send("Page.stopScreencast")
+        r = pg.evaluate("() => { const r = document.querySelector('.slide.on .win')"
+                        ".getBoundingClientRect(); return [r.x, r.y, r.width, r.height] }")
+        b.close()
+
+    tmp = Path(tempfile.mkdtemp())
+    lines = []
+    t0 = frames[0][0]
+    for i, (ts, jpg) in enumerate(frames):
+        f = tmp / f"{i:05d}.jpg"
+        f.write_bytes(jpg)
+        nxt = frames[i + 1][0] if i + 1 < len(frames) else ts + 1.5  # hold the report
+        lines += [f"file '{f}'", f"duration {max(nxt - ts, 0.001):.4f}"]
+    lines.append(f"file '{tmp / f'{len(frames) - 1:05d}.jpg'}'")
+    (tmp / "list.txt").write_text("\n".join(lines))
+    from PIL import Image
+    k = Image.open(io.BytesIO(frames[0][1])).width / 1920  # frame px per CSS px
+    x, y, w, h = (round(v * k) for v in r)
+    w, h = w - w % 2, h - h % 2
+    VIDEO.parent.mkdir(parents=True, exist_ok=True)
+    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0",
+                    "-i", str(tmp / "list.txt"),
+                    "-vf", f"crop={w}:{h}:{x}:{y},scale=1760:-2,fps=30,format=yuv420p",
+                    "-c:v", "libx264", "-crf", "18", "-preset", "slow",
+                    "-movflags", "+faststart", str(VIDEO)], check=True)
+    shutil.rmtree(tmp, ignore_errors=True)
+    dur = frames[-1][0] - t0 + 1.5
+    print(f"video {VIDEO.name}: {len(frames)} frames, {dur:.1f} s")
+    return VIDEO, dur
+
+
+AUTOPLAY = """<p:timing xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"><p:tnLst><p:par>
+<p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>
+<p:par><p:cTn id="2" fill="hold"><p:stCondLst><p:cond delay="indefinite"/><p:cond evt="onBegin" delay="0"><p:tn val="2"/></p:cond></p:stCondLst><p:childTnLst>
+<p:par><p:cTn id="3" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>
+<p:par><p:cTn id="4" presetID="1" presetClass="mediacall" presetSubtype="0" fill="hold" nodeType="afterEffect"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>
+<p:cmd type="call" cmd="playFrom(0.0)"><p:cBhvr><p:cTn id="5" dur="{dur}" fill="hold"/><p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl></p:cBhvr></p:cmd>
+</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>
+<p:video><p:cMediaNode vol="80000"><p:cTn id="6" fill="hold" display="0"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid="{spid}"/></p:tgtEl></p:cMediaNode></p:video>
+</p:childTnLst></p:cTn></p:par></p:tnLst></p:timing>"""
+
+
+def add_video(slide, it, poster: bytes, video: Path, dur: float) -> None:
+    """The movie in the app window's place, starting by itself; the still
+    is its poster frame (and what the PDF shows)."""
+    mv = slide.shapes.add_movie(str(video), TX(it["x"]), TY(it["y"]), T(it["w"]), T(it["h"]),
+                                poster_frame_image=io.BytesIO(poster), mime_type="video/mp4")
+    old = slide._element.find(qn("p:timing"))
+    if old is not None:
+        slide._element.remove(old)
+    slide._element.append(etree.fromstring(
+        AUTOPLAY.format(dur=round(dur * 1000), spid=mv.shape_id)))
 
 
 def capture() -> list[dict]:
@@ -276,7 +362,8 @@ def capture() -> list[dict]:
                             images[it["pid"]] = real
                             print(f"  page {page} still {n}: real Windows screenshot")
                 head = pg.evaluate("() => document.querySelector('.slide.on .bar-title')?.innerText ?? ''")
-                stills.append({"title": title or head, "items": items, "images": images})
+                stills.append({"title": title or head, "items": items, "images": images,
+                               "video": (page, n) == (4, 1)})
             print(f"page {page}: {n} stills")
         b.close()
     return stills
@@ -394,14 +481,17 @@ def add_img(slide, it, png: bytes, transform=True) -> None:
                                  round(it["w"] * PX), round(it["h"] * PX))
 
 
-def fill(slide, still, transform=True) -> None:
+def fill(slide, still, transform=True, video=None) -> None:
     for it in still["items"]:
         if it["t"] == "box":
             add_box(slide, it) if transform else None
         elif it["t"] == "text":
             add_text(slide, it, transform)
         elif it["t"] == "img":
-            add_img(slide, it, still["images"][it["pid"]], transform)
+            if video and still.get("video") and it.get("win"):
+                add_video(slide, it, still["images"][it["pid"]], *video)
+            else:
+                add_img(slide, it, still["images"][it["pid"]], transform)
 
 
 def set_text(shape, text: str) -> None:
@@ -441,6 +531,7 @@ def thanks_sign() -> dict:
 
 
 def main() -> None:
+    video = record_drop()
     stills = capture()
     sign = thanks_sign()
 
@@ -455,6 +546,14 @@ def main() -> None:
     set_text(texts["文本框 6"], "我要发顶刊")
     set_text(texts["文本框 7"], "学校名称：天津师范大学")
     set_text(texts["文本框 8"], "吕浩博")
+    # the template set the weight through the font name (普惠体 B / M);
+    # with the bundled 2.0 family the bold has to be explicit
+    for k in ("文本框 4", "文本框 5", "文本框 6", "文本框 7"):
+        for r in texts[k].text_frame.paragraphs[0].runs:
+            r.font.bold = True
+    # the Clover icon above the work's name (same place as the HTML cover)
+    logo = ROOT / "submission" / "logo-512.png"
+    cover.shapes.add_picture(str(logo), 912 * PX, 214 * PX, 104 * PX, 104 * PX)
 
     # THANKS: the date (the template's fraction slashes render as fractions), then the team sign
     for s in thanks.shapes:
@@ -490,7 +589,7 @@ def main() -> None:
         for r in title.text_frame.paragraphs[0].runs:
             r.font.bold = True
             r.font.color.rgb = RGBColor(0x1B, 0x1B, 0x1B)
-        fill(s, still)
+        fill(s, still, video=video)
         new_ids.append(prs.slides._sldIdLst[-1])
 
     # order: cover, content pages, THANKS; drop the template's other pages

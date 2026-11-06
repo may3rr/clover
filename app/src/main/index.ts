@@ -480,6 +480,7 @@ async function runShots() {
       win.webContents.send('citecheck:shot-state', state)
       await ready
       await sleep(300) // let the 200ms detail/list transitions finish
+      if (state.startsWith('venue:')) await sleep(1200) // the card scroll lands
       const p = path.join(SHOTS_DIR, `${theme}-${state.replace(/[^\w-]/g, '-')}.png`)
       method = await captureWindow(p)
       console.log(`shot saved (${method}): ${p}`)
