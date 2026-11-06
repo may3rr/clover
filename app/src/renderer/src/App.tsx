@@ -6,7 +6,7 @@ import Running, { type LayerUI } from './screens/Running'
 import ReportScreen from './screens/ReportScreen'
 import LibraryConfirm from './screens/LibraryConfirm'
 import Scanning from './screens/Scanning'
-import type { LibraryScan } from './lib/library'
+import { baseName, type LibraryScan } from './lib/library'
 import ErrorScreen from './screens/Error'
 import Settings from './screens/Settings'
 import Onboarding, { type OnboardStep } from './screens/Onboarding'
@@ -112,7 +112,7 @@ export default function App() {
   const startJob = useCallback(
     async (path: string, extra: Record<string, string> = {}) => {
       setJobError(null)
-      setFileName(path.split('/').pop() ?? path)
+      setFileName(baseName(path))
       try {
         const fd = new FormData()
         fd.append('path', path)
@@ -157,7 +157,7 @@ export default function App() {
       const id = Math.random().toString(36).slice(2, 10)
       scanToken.current = id
       setScanId(id)
-      setFileName(path.split('/').pop() ?? path)
+      setFileName(baseName(path))
       setScreen('scanning')
       const stale = () => scanToken.current !== id
       try {
@@ -171,7 +171,7 @@ export default function App() {
         if (r.ok) {
           const sc = (await r.json()) as LibraryScan
           if (stale()) return
-          setFileName(sc.paper.split('/').pop() ?? sc.paper)
+          setFileName(baseName(sc.paper))
           morph(() => {
             setScan(sc)
             setScreen('library')

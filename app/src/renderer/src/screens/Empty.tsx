@@ -10,6 +10,7 @@ import HistoryRow from '../components/HistoryRow'
 import { useReports } from '../lib/useReports'
 import type { Prefs } from '../lib/prefs'
 import { ACCEPT_ERROR, isPaperPath } from '../lib/accept'
+import { baseName } from '../lib/library'
 
 interface Props {
   benchmark: string
@@ -191,7 +192,7 @@ export default function Empty({
               {libraryDir ? (
                 <span className="pill-quiet flex items-center gap-2">
                   <span className="secondary">文献文件夹</span>
-                  <span className="font-normal">{libraryDir.split('/').pop()}</span>
+                  <span className="font-normal">{baseName(libraryDir)}</span>
                   <button className="t13 link-accent" onClick={onClearLibrary}>
                     移除
                   </button>

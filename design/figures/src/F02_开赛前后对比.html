@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="fig.css">
+<style>
+  /* 数据来源：FINALS_DELTA.md（仓库根目录），每个数字都能在那里找到出处 */
+  .grp { display: flex; flex-direction: column; gap: 4px; }
+  .grp-head { display: flex; align-items: baseline; gap: 8px; padding: 0 16px 4px; }
+  .rows { background: var(--bg-subtle); border-radius: 12px; padding: 8px 0; }
+  .r {
+    display: grid;
+    grid-template-columns: 236px 152px 20px 152px 1fr;
+    column-gap: 12px;
+    align-items: center;
+    padding: 8px 16px;
+  }
+  .r.cols { padding-top: 0; padding-bottom: 0; }
+  .val { display: flex; flex-direction: column; }
+  .val span { white-space: nowrap; }
+  .lang { color: var(--text-secondary); font-size: 13px; font-weight: 400; margin-right: 4px; }
+  .after { font-weight: 600; }
+  .note { font-size: 13px; line-height: 1.45; color: var(--text-secondary); }
+  .r .chev { justify-self: center; }
+  .r .chev svg { width: 7px; height: 12px; }
+  .intel {
+    display: inline-flex; align-items: center;
+    background: var(--brand-intel); color: var(--on-brand);
+    border-radius: 980px; padding: 0 8px; font-size: 13px; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+<div class="fig">
+  <div class="col g4" style="margin-bottom: 24px">
+    <div class="t26">开赛前后：查得更准，最贵的向量与重排可以留在本机</div>
+    <div class="t15 sec">开赛前取 11 月 1 日基线，现在取 11 月 5 日语料重跑、11 月 6 日测速和 Intel 决赛机实测</div>
+  </div>
+
+  <div class="r cols t13 sec" style="margin-bottom: 4px">
+    <span></span><span>开赛前</span><span></span><span>现在</span><span></span>
+  </div>
+
+  <div class="col g16">
+    <!-- 准确度 -->
+    <div class="grp">
+      <div class="grp-head"><span class="t17 w6">准确度</span><span class="t13 sec">中英文各 5 篇已发表论文，注入错误后体检</span></div>
+      <div class="rows">
+        <div class="r">
+          <span class="t15">注入错误的查全率</span>
+          <div class="val t15"><span><span class="lang">中文</span>0.977</span><span><span class="lang">英文</span>0.905</span></div>
+          <span class="chev"></span>
+          <div class="val t15 after"><span class="sem-ok"><span class="lang">中文</span>1.000</span><span class="sem-ok"><span class="lang">英文</span>0.952</span></div>
+          <span class="note">中英文共 86 处注入</span>
+        </div>
+        <div class="r">
+          <span class="t15">张冠李戴检出</span>
+          <span class="t15">15 / 20</span>
+          <span class="chev"></span>
+          <span class="t15 after sem-ok">18 / 20</span>
+          <span class="note">最难的一类，漏检原来全在这里</span>
+        </div>
+        <div class="r">
+          <span class="t15">英文演示稿检出</span>
+          <span class="t15">12 / 16</span>
+          <span class="chev"></span>
+          <span class="t15 after sem-ok">16 / 16</span>
+          <span class="note">中文演示稿保持 17 / 17</span>
+        </div>
+        <div class="r">
+          <span class="t15">人工逐条核对后的查准率</span>
+          <div class="val t15"><span><span class="lang">中文</span>0.358</span><span><span class="lang">英文</span>0.310</span></div>
+          <span class="chev"></span>
+          <div class="val t15 after"><span class="sem-medium"><span class="lang">中文</span>0.330</span><span class="sem-ok"><span class="lang">英文</span>0.343</span></div>
+          <span class="note">干净稿报警全部人工核对后计算</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成本 -->
+    <div class="grp">
+      <div class="grp-head"><span class="t17 w6">云端成本</span><span class="t13 sec">演示稿冷启动实测，按百炼原价折算</span></div>
+      <div class="rows">
+        <div class="r">
+          <span class="t15">单篇云端花费</span>
+          <div class="val t15"><span><span class="lang">中文</span>2.34 元</span><span><span class="lang">英文</span>2.38 元</span></div>
+          <span class="chev"></span>
+          <div class="val t15 after"><span class="sem-medium"><span class="lang">中文</span>2.43 元</span><span class="sem-medium"><span class="lang">英文</span>2.77 元</span></div>
+          <span class="note">复核触发率升到 28%</span>
+        </div>
+        <div class="r">
+          <span class="t15">向量与重排移到本机后</span>
+          <span class="t15 sec">全部在云端</span>
+          <span class="chev"></span>
+          <div class="val t15 after"><span class="sem-ok"><span class="lang">中文</span>0.46 元</span><span class="sem-ok"><span class="lang">英文</span>0.59 元</span></div>
+          <span class="note">向量与重排约占八成，按同次用量扣除</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 本机 -->
+    <div class="grp">
+      <div class="grp-head"><span class="t17 w6">本机 AI</span><span class="intel">Intel Core Ultra 5 338H</span></div>
+      <div class="rows">
+        <div class="r">
+          <span class="t15">本机运行的 Qwen 能力</span>
+          <span class="t15">0 项</span>
+          <span class="chev"></span>
+          <span class="t15 after sem-ok">3 项</span>
+          <span class="note">NPU 算向量，核显跑重排和 Qwen3-8B</span>
+        </div>
+        <div class="r">
+          <span class="t15">核显 Qwen3-8B 生成吞吐</span>
+          <span class="t15">20.8 token/s</span>
+          <span class="chev"></span>
+          <span class="t15 after sem-ok">122 token/s</span>
+          <span class="note">16 条连续批处理，约 5.9 倍</span>
+        </div>
+        <div class="r">
+          <span class="t15">被引全文上传到云端</span>
+          <span class="t15">开启向量检索即上传</span>
+          <span class="chev"></span>
+          <span class="t15 after sem-ok">不上传</span>
+          <span class="note">NPU 每秒算 16.1 个片段</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="icons.js"></script>
+</body>
+</html>

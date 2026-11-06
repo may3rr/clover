@@ -704,16 +704,6 @@ export default function ReportScreen({
                 <MagnifierIcon size={15} />
               </button>
             )}
-            {rightCollapsed && (
-              <button
-                className="icon-btn"
-                aria-label="展开检查器"
-                title={`展开检查器 ${keys('⌘⇧\\')}`}
-                onClick={toggleRightPane}
-              >
-                <SidebarTrailingIcon size={15} />
-              </button>
-            )}
             {exported && (
               <ExportDone
                 path={exported}
@@ -763,6 +753,18 @@ export default function ReportScreen({
                   ? '导出批注版源码'
                   : '导出到 Word'}
             </button>
+            {/* where the inspector's own collapse button was: the window's
+                right edge */}
+            {rightCollapsed && (
+              <button
+                className="icon-btn"
+                aria-label="展开检查器"
+                title={`展开检查器 ${keys('⌘⇧\\')}`}
+                onClick={toggleRightPane}
+              >
+                <SidebarTrailingIcon size={15} />
+              </button>
+            )}
           </div>
         </div>
         <main

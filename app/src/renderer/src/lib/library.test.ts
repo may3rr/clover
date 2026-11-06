@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
+import { isPaperPath, looksLikeFolder } from './accept'
 import {
+  baseName,
   baselineText,
   counts,
   docLabel,
@@ -99,5 +101,18 @@ describe('link confirmation', () => {
 
   it('labels a PDF without middle dots', () => {
     expect(docLabel(doc('a', null))).toBe('标题a，张三，2026')
+  })
+})
+
+describe('baseName on Windows paths', () => {
+  it('splits on backslashes too', () => {
+    expect(baseName('C:\\clover\\demo\\paper.docx')).toBe('paper.docx')
+    expect(baseName('C:\\papers\\ref\\')).toBe('ref')
+    expect(baseName('/Users/a/paper.docx')).toBe('paper.docx')
+  })
+  it('accepts Windows paper paths and folders', () => {
+    expect(isPaperPath('C:\\clover\\demo\\paper.docx')).toBe(true)
+    expect(looksLikeFolder('C:\\clover\\demo\\latex_project')).toBe(true)
+    expect(looksLikeFolder('C:\\clover\\demo\\v1.2\\main.tex')).toBe(false)
   })
 })
