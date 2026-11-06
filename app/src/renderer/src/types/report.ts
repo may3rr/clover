@@ -213,6 +213,29 @@ export type Status3 = "pending" | "running" | "done" | "failed";
 export type Error = string | null;
 export type Findings1 = number;
 export type DurationS = number;
+export type Privacy = boolean;
+export type ManuscriptChars = number;
+export type Requests = number;
+export type CachedRequests = number;
+export type LocalRequests = number;
+export type SentChars = number;
+export type ContentChars = number;
+export type ManuscriptSentChars = number;
+export type Category = "claim" | "excerpt" | "reference" | "manuscript" | "exemplar" | "other";
+export type Label7 = string;
+export type Count = number;
+export type Chars = number;
+export type Text2 = string;
+export type Chars1 = number;
+export type Times = number;
+export type Tasks = string[];
+export type Items = SendItem[];
+export type Truncated = number;
+export type Categories = SendCategory[];
+export type Task = string;
+export type Label8 = string;
+export type Count1 = number;
+export type Skipped = SendSkipped[];
 
 export interface Report {
   document: Document;
@@ -552,6 +575,7 @@ export interface ReportMeta {
   duration_s?: DurationS;
   token_usage?: TokenUsage;
   timings?: Timings;
+  send?: SendSummary | null;
 }
 export interface LLMCalls {
   local?: Local;
@@ -574,4 +598,42 @@ export interface TokenUsage {
 }
 export interface Timings {
   [k: string]: unknown | undefined;
+}
+/**
+ * 发送清单: what this run sent to cloud services, from the llm_usage
+ * rows it recorded (llm/sendlog.py) — never estimated.
+ */
+export interface SendSummary {
+  privacy?: Privacy;
+  manuscript_chars?: ManuscriptChars;
+  requests?: Requests;
+  cached_requests?: CachedRequests;
+  local_requests?: LocalRequests;
+  sent_chars?: SentChars;
+  content_chars?: ContentChars;
+  manuscript_sent_chars?: ManuscriptSentChars;
+  categories?: Categories;
+  skipped?: Skipped;
+}
+export interface SendCategory {
+  category: Category;
+  label: Label7;
+  count: Count;
+  chars: Chars;
+  items?: Items;
+  truncated?: Truncated;
+}
+/**
+ * One distinct piece of text sent to the cloud (truncated for display).
+ */
+export interface SendItem {
+  text: Text2;
+  chars: Chars1;
+  times?: Times;
+  tasks?: Tasks;
+}
+export interface SendSkipped {
+  task: Task;
+  label: Label8;
+  count: Count1;
 }
