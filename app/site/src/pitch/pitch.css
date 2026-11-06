@@ -1,0 +1,458 @@
+/* Clover 路演稿：组委会模板的黑红舞台（原图做背景，窗口框也在图里），
+   框内放 Clover 的真实界面与少量图形。画布 1920×1080，按窗口等比缩放。
+   舞台文字用模板附带的阿里巴巴普惠体；窗口里的 Clover 用它自己的系统字体。 */
+
+@font-face {
+  font-family: 'PuHuiTi';
+  src: url('/pitch/fonts/PuHuiTi-55-Regular.woff2') format('woff2');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'PuHuiTi';
+  src: url('/pitch/fonts/PuHuiTi-65-Medium.woff2') format('woff2');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'PuHuiTi';
+  src: url('/pitch/fonts/PuHuiTi-85-Bold.woff2') format('woff2');
+  font-weight: 700;
+}
+
+:root {
+  /* 模板配色页：黑客黑、天猫红、黑客白、次元银 */
+  --hack-black: #000000;
+  --tmall-red: #ff0036;
+  --hack-white: #ffffff;
+  --silver: #c9c9c9;
+  --silver-text: rgba(255, 255, 255, 0.62);
+  /* 四片叶子 = 四项检查，色相取自 Clover 的图层色 */
+  --leaf-0: #5856d6; /* 文献真实性 */
+  --leaf-1: #007aff; /* 论断支持度 */
+  --leaf-2: #30b0c7; /* 期刊对标 */
+  --leaf-3: #af52de; /* 格式规范 */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--hack-black);
+  overflow: hidden;
+}
+body {
+  font-family: 'PuHuiTi', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: var(--hack-white);
+  -webkit-font-smoothing: antialiased;
+}
+
+#deck {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 420ms var(--ease-out), visibility 0s 420ms;
+}
+.slide.on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 420ms var(--ease-out);
+}
+.slide.cover {
+  background-image: url('/pitch/tpl/image1.jpg');
+}
+.slide.framed {
+  background-image: url('/pitch/tpl/image2.jpg');
+}
+
+/* 银色标题栏上的页标题（模板：大标题 Bold） */
+.bar-title {
+  position: absolute;
+  left: 262px;
+  top: 118px;
+  height: 84px;
+  display: flex;
+  align-items: center;
+  font-size: 40px;
+  font-weight: 700;
+  color: #1b1b1b;
+  letter-spacing: 0.02em;
+}
+
+/* ---------------- 1 封面 ---------------- */
+.cover-track {
+  position: absolute;
+  left: 189px;
+  top: 157px;
+  width: 480px;
+  height: 158px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--tmall-red);
+  letter-spacing: 0.08em;
+}
+.cover-main {
+  position: absolute;
+  left: 380px;
+  top: 400px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+}
+.leaf-logo {
+  width: 220px;
+  height: 220px;
+  overflow: visible;
+}
+.lf {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.lf-0 { fill: var(--leaf-0); }
+.lf-1 { fill: var(--leaf-1); }
+.lf-2 { fill: var(--leaf-2); }
+.lf-3 { fill: var(--leaf-3); }
+.slide.on .lf {
+  animation: leaf-in 900ms var(--ease-out) both;
+}
+.slide.on .lf-1 { animation-delay: 90ms; }
+.slide.on .lf-2 { animation-delay: 180ms; }
+.slide.on .lf-3 { animation-delay: 270ms; }
+@keyframes leaf-in {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-40deg);
+  }
+}
+.cover-name {
+  font-size: 150px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.cover-line {
+  margin-top: 24px;
+  font-size: 36px;
+  font-weight: 500;
+  color: var(--silver-text);
+}
+.slide.on .cover-text {
+  animation: rise 900ms 200ms var(--ease-out) both;
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+.cover-team {
+  position: absolute;
+  left: 384px;
+  top: 760px;
+  display: flex;
+  gap: 48px;
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--silver-text);
+}
+.cover-team .team-name {
+  color: var(--hack-white);
+}
+
+/* ---------------- 2 最后一公里 ---------------- */
+.mile {
+  position: absolute;
+  left: 220px;
+  top: 300px;
+  width: 1480px;
+  height: 520px;
+}
+.mile-svg {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+.track {
+  stroke: rgba(255, 255, 255, 0.16);
+  stroke-width: 4;
+}
+.track-slow {
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 4;
+  stroke-dasharray: 2 14;
+  stroke-linecap: round;
+}
+.trail {
+  fill: url(#trail);
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.stn {
+  position: absolute;
+  left: var(--x);
+  top: 300px;
+  transform: translate(-50%, 0);
+  padding-top: 40px;
+  font-size: 32px;
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.4);
+  transition: color 300ms var(--ease-out);
+}
+.stn::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -12px;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  border-radius: 50%;
+  background: #3a3a3a;
+  transition: background 300ms var(--ease-out), transform 300ms var(--ease-out);
+}
+.stn.lit {
+  color: var(--hack-white);
+}
+.stn.lit::before {
+  background: var(--tmall-red);
+  transform: scale(1.15);
+}
+.stn-end {
+  color: rgba(255, 255, 255, 0.4);
+}
+.stn-end.lit::before {
+  background: var(--hack-white);
+}
+.seg-label {
+  position: absolute;
+  top: 96px;
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--silver-text);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
+}
+.seg-fast {
+  left: 575px;
+  transform: translateX(-50%);
+}
+.seg-slow {
+  left: 1225px;
+  transform: translateX(-50%);
+}
+.seg-label.show {
+  opacity: 1;
+}
+.rocket {
+  position: absolute;
+  left: 0;
+  top: 255px;
+  width: 180px;
+  height: 90px;
+  transform: translateX(30px);
+  opacity: 0;
+}
+.rocket .body { fill: var(--hack-white); }
+.rocket .port { fill: var(--tmall-red); }
+.rocket .fin { fill: var(--silver); }
+.rocket .flame {
+  fill: var(--tmall-red);
+  transform-box: fill-box;
+  transform-origin: right center;
+  animation: flicker 120ms linear infinite alternate;
+}
+@keyframes flicker {
+  to { transform: scaleX(1.5) scaleY(0.8); }
+}
+.walker {
+  position: absolute;
+  left: 0;
+  top: 160px;
+  width: 80px;
+  height: 140px;
+  transform: translateX(1020px);
+  opacity: 0;
+  overflow: visible;
+}
+.walker circle {
+  fill: var(--hack-white);
+}
+.walker path {
+  fill: none;
+  stroke: var(--hack-white);
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.walker .pb {
+  visibility: hidden;
+}
+.walker.walking .pa {
+  animation: pose-a 640ms steps(1) infinite;
+}
+.walker.walking .pb {
+  animation: pose-b 640ms steps(1) infinite;
+}
+@keyframes pose-a {
+  0% { visibility: visible; }
+  50% { visibility: hidden; }
+}
+@keyframes pose-b {
+  0% { visibility: hidden; }
+  50% { visibility: visible; }
+}
+
+/* ---------------- 4 拖入论文 ---------------- */
+.drop-scene {
+  position: absolute;
+  inset: 0;
+}
+.docx {
+  position: absolute;
+  left: 330px;
+  top: 470px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  transform-origin: center;
+  will-change: transform;
+}
+.docx svg {
+  width: 112px;
+  height: 140px;
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.45));
+}
+.docx .paper { fill: #ffffff; }
+.docx .fold { fill: #d9d9d9; }
+.docx .w { fill: #2b579a; }
+.docx text {
+  fill: #ffffff;
+  font: 700 30px -apple-system, 'Segoe UI', sans-serif;
+}
+.docx-name {
+  font-size: 22px;
+  line-height: 30px;
+  text-align: center;
+  color: var(--hack-white);
+}
+.win {
+  position: absolute;
+  left: 640px;
+  top: 250px;
+  width: 1024px;
+  height: 640px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 32px 80px rgba(0, 0, 0, 0.6);
+}
+.win-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1280px;
+  height: 800px;
+  transform: scale(0.8);
+  transform-origin: 0 0;
+}
+.app-frame {
+  position: absolute;
+  inset: 0;
+  width: 1280px;
+  height: 800px;
+  border: 0;
+}
+/* 系统窗口按钮，按应用自己的 1280×800 坐标画：
+   macOS 红绿灯在 (20, 20)，Windows 三个按钮占右上角 52px 高 */
+.win-chrome {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+}
+.win-chrome.mac {
+  left: 20px;
+  top: 20px;
+  display: flex;
+  gap: 8px;
+}
+.win-chrome.mac i {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ff5f57;
+}
+.win-chrome.mac i:nth-child(2) { background: #febc2e; }
+.win-chrome.mac i:nth-child(3) { background: #28c840; }
+.win-chrome.win {
+  right: 0;
+  top: 0;
+  height: 52px;
+  display: flex;
+}
+.win-chrome.win svg {
+  width: 48px;
+  height: 52px;
+  padding: 21px 19px;
+  stroke: #37352f;
+  stroke-width: 1;
+  fill: none;
+}
+.cursor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 40px;
+  height: 40px;
+  opacity: 0;
+  z-index: 5;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
+}
+.cursor path {
+  fill: #ffffff;
+  stroke: #000000;
+  stroke-width: 1.2;
+}
+
+/* 页码与快捷键提示，只在按 H 时出现 */
+#hud {
+  position: fixed;
+  right: 16px;
+  bottom: 12px;
+  font: 13px -apple-system, sans-serif;
+  color: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  transition: opacity 200ms;
+}
+#hud.show {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slide.on .lf,
+  .slide.on .cover-text {
+    animation: none;
+  }
+}

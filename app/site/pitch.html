@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./icon.svg" />
+    <title>Clover 路演</title>
+  </head>
+  <body>
+    <div id="deck">
+      <!-- ============ 1 封面 ============ -->
+      <section class="slide cover" data-title="封面">
+        <div class="cover-track">效率进化赛道</div>
+        <div class="cover-main">
+          <svg class="leaf-logo" viewBox="270 262 448 448" aria-hidden="true">
+            <path class="lf lf-0" d="M494,473 L398,377 A67.9 67.9 0 0 1 494,281 A67.9 67.9 0 0 1 590,377 Z" />
+            <path class="lf lf-1" d="M507,486 L603,390 A67.9 67.9 0 0 1 699,486 A67.9 67.9 0 0 1 603,582 Z" />
+            <path class="lf lf-2" d="M494,499 L590,595 A67.9 67.9 0 0 1 494,691 A67.9 67.9 0 0 1 398,595 Z" />
+            <path class="lf lf-3" d="M481,486 L385,582 A67.9 67.9 0 0 1 289,486 A67.9 67.9 0 0 1 385,390 Z" />
+          </svg>
+          <div class="cover-text">
+            <div class="cover-name">Clover</div>
+            <div class="cover-line">投稿前的最后一公里，替你核对每一条引用</div>
+          </div>
+        </div>
+        <div class="cover-team">
+          <span class="team-name">五一发顶刊</span>
+          <span>天津师范大学</span>
+          <span>吕浩博</span>
+        </div>
+      </section>
+
+      <!-- ============ 2 最后一公里 ============ -->
+      <section class="slide framed" data-title="最后一公里" data-steps="2">
+        <div class="bar-title">投稿前的最后一公里</div>
+        <div class="mile">
+          <svg class="mile-svg" viewBox="0 0 1480 520" aria-hidden="true">
+            <defs>
+              <linearGradient id="trail" x1="0" x2="1">
+                <stop offset="0" stop-color="#ff0036" stop-opacity="0" />
+                <stop offset="1" stop-color="#ff0036" />
+              </linearGradient>
+            </defs>
+            <!-- track -->
+            <line class="track" x1="90" y1="300" x2="1390" y2="300" />
+            <line class="track-slow" x1="1060" y1="300" x2="1390" y2="300" />
+            <rect class="trail" x="90" y="296" width="970" height="8" rx="4" />
+          </svg>
+          <!-- stations, positioned in the same 1480×520 box -->
+          <div class="stn" style="--x: 90px">点子</div>
+          <div class="stn" style="--x: 332px">文献综述</div>
+          <div class="stn" style="--x: 575px">实验</div>
+          <div class="stn" style="--x: 818px">图表</div>
+          <div class="stn" style="--x: 1060px">初稿</div>
+          <div class="stn stn-end" style="--x: 1390px">投稿</div>
+          <div class="seg-label seg-fast">AI 一路加速</div>
+          <div class="seg-label seg-slow">作者逐条核对</div>
+          <svg class="rocket" viewBox="0 0 120 60" aria-hidden="true">
+            <path class="flame" d="M18 30 L0 22 Q6 30 0 38 Z" />
+            <path class="body" d="M22 18 H78 Q106 18 118 30 Q106 42 78 42 H22 Z" />
+            <circle class="port" cx="80" cy="30" r="6" />
+            <path class="fin" d="M30 18 L18 4 H40 L52 18 Z" />
+            <path class="fin" d="M30 42 L18 56 H40 L52 42 Z" />
+          </svg>
+          <!-- 行人剪影：两帧交替就是走路 -->
+          <svg class="walker" viewBox="0 0 80 140" aria-hidden="true">
+            <g class="pose pa">
+              <circle cx="44" cy="14" r="12" />
+              <path d="M42 32 L36 76 M40 38 L56 58 L64 74 M40 38 L28 58 L20 70 M36 76 L52 102 L54 134 M36 76 L24 104 L10 128" />
+            </g>
+            <g class="pose pb">
+              <circle cx="44" cy="14" r="12" />
+              <path d="M42 32 L36 76 M40 38 L48 60 L46 78 M40 38 L34 60 L36 78 M36 76 L42 104 L38 134 M36 76 L32 104 L30 134" />
+            </g>
+          </svg>
+        </div>
+      </section>
+
+      <!-- ============ 4 拖入一篇论文 ============ -->
+      <section class="slide framed" data-title="拖入论文" data-steps="1">
+        <div class="bar-title">拖进来，交给 Clover</div>
+        <div class="drop-scene">
+          <div class="docx" aria-hidden="true">
+            <svg viewBox="0 0 96 120">
+              <path class="paper" d="M8 0 H64 L96 32 V112 Q96 120 88 120 H8 Q0 120 0 112 V8 Q0 0 8 0 Z" />
+              <path class="fold" d="M64 0 V24 Q64 32 72 32 H96 Z" />
+              <rect class="w" x="16" y="56" width="64" height="40" rx="6" />
+              <text x="48" y="84" text-anchor="middle">W</text>
+            </svg>
+            <div class="docx-name">基于深度学习的目标检测研究综述.docx</div>
+          </div>
+          <div class="win">
+            <div class="win-inner">
+              <iframe class="app-frame" title="Clover" src="./app.html?state=empty"></iframe>
+              <div class="win-chrome"></div>
+            </div>
+          </div>
+          <svg class="cursor" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 2 L5 20 L9.5 15.5 L12.5 22 L15.5 20.6 L12.6 14.2 L19 14.2 Z" />
+          </svg>
+        </div>
+      </section>
+    </div>
+    <div id="hud"></div>
+    <script type="module" src="./src/pitch/main.ts"></script>
+  </body>
+</html>

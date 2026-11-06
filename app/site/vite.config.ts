@@ -20,6 +20,7 @@ export default defineConfig({
       input: {
         index: resolve(root, 'index.html'),
         app: resolve(root, 'app.html'),
+        pitch: resolve(root, 'pitch.html'),
       },
     },
   },

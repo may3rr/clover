@@ -1,0 +1,240 @@
+/** Clover 路演稿的播放器。
+ *
+ *  → 空格 PageDown 回车：下一步（同一页内的分步动画走完再翻页）
+ *  ← PageUp：上一页        R：重放本页        F：全屏        H：页码
+ *  地址栏 #3 直接打开第 3 页。
+ *
+ *  第「拖入论文」页把 Clover 的网页复刻版（app.html）嵌在窗口里，用合成的
+ *  拖放事件驱动它：画面上的运行页和报告都是应用自己的界面。 */
+import './pitch.css'
+
+const deck = document.getElementById('deck') as HTMLElement
+const hud = document.getElementById('hud') as HTMLElement
+const slides = Array.from(deck.querySelectorAll<HTMLElement>('.slide'))
+const IS_WIN = /Windows/.test(navigator.userAgent)
+
+// ---------------------------------------------------------------- layout
+
+function fit() {
+  const s = Math.min(innerWidth / 1920, innerHeight / 1080)
+  deck.style.transform = `scale(${s}) translate(-50%, -50%)`
+}
+addEventListener('resize', fit)
+fit()
+
+// ---------------------------------------------------------------- helpers
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+/** each slide run gets a token; a newer run cancels the older one's awaits */
+let runId = 0
+class Cancelled extends Error {}
+async function sleep(ms: number, id: number) {
+  await wait(ms)
+  if (id !== runId) throw new Cancelled()
+}
+function anim(el: Element, frames: Keyframe[], opts: KeyframeAnimationOptions) {
+  return el.animate(frames, { fill: 'forwards', ...opts })
+}
+
+// ---------------------------------------------------------------- slides
+
+type Hook = { enter?: (el: HTMLElement, id: number) => Promise<void>; step?: (el: HTMLElement, n: number, id: number) => Promise<void> }
+const hooks: Record<string, Hook> = {
+  最后一公里: {
+    async enter(el, id) {
+      const rocket = el.querySelector('.rocket') as SVGElement
+      const trail = el.querySelector('.trail') as SVGElement
+      const walker = el.querySelector('.walker') as SVGElement
+      const stns = Array.from(el.querySelectorAll<HTMLElement>('.stn'))
+      el.querySelectorAll('.lit, .show').forEach((n) => n.classList.remove('lit', 'show'))
+      for (const n of [rocket, trail, walker]) n.getAnimations().forEach((a) => a.cancel())
+      walker.classList.remove('walking')
+      stns[0].classList.add('lit')
+      await sleep(600, id)
+      // the rocket's nose rides the trail head: x 90 → 1060 in the track box
+      const dur = 1700
+      anim(rocket, [{ opacity: 0, transform: 'translateX(-90px)' }, { opacity: 1, offset: 0.08 }, { opacity: 1, transform: 'translateX(880px)' }], { duration: dur, easing: 'cubic-bezier(0.5, 0, 0.2, 1)' })
+      anim(trail, [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: dur, easing: 'cubic-bezier(0.5, 0, 0.2, 1)' })
+      // stations light as the rocket passes (same easing, sampled)
+      const pos = [332, 575, 818, 1060].map((x) => (x - 90) / 970)
+      const ease = (t: number) => cubic(0.5, 0, 0.2, 1, t)
+      const t0 = performance.now()
+      for (let i = 0; i < pos.length; i++) {
+        while (ease(Math.min(1, (performance.now() - t0) / dur)) < pos[i]) await sleep(16, id)
+        stns[i + 1].classList.add('lit')
+      }
+      el.querySelector('.seg-fast')?.classList.add('show')
+      await sleep(500, id)
+      anim(rocket, [{ opacity: 1, transform: 'translateX(880px)' }, { opacity: 0, transform: 'translateX(960px)' }], { duration: 500, easing: 'ease-out' })
+    },
+    async step(el, n, id) {
+      if (n !== 1) return
+      const walker = el.querySelector('.walker') as SVGElement
+      el.querySelector('.seg-slow')?.classList.add('show')
+      walker.classList.add('walking')
+      const a = anim(walker, [{ opacity: 0, transform: 'translateX(1020px)' }, { opacity: 1, offset: 0.05 }, { opacity: 1, transform: 'translateX(1350px)' }], { duration: 9000, easing: 'linear' })
+      await a.finished.catch(() => {})
+      if (id !== runId) return
+      walker.classList.remove('walking')
+      el.querySelector('.stn-end')?.classList.add('lit')
+    },
+  },
+
+  拖入论文: {
+    async enter(el, id) {
+      const frame = el.querySelector('.app-frame') as HTMLIFrameElement
+      const docx = el.querySelector('.docx') as HTMLElement
+      const cursor = el.querySelector('.cursor') as SVGElement
+      const win = el.querySelector('.win') as HTMLElement
+      for (const n of [docx, cursor, win]) n.getAnimations().forEach((a) => a.cancel())
+      await loadApp(frame, 'empty', id)
+      await sleep(900, id)
+      // cursor → file → drag into the window → drop
+      const at = (x: number, y: number) => `translate(${x}px, ${y}px)`
+      const start = { x: 400, y: 760 }
+      const grab = { x: 440, y: 560 }
+      const drop = { x: 1150, y: 560 }
+      await anim(cursor, [{ opacity: 0, transform: at(start.x, start.y) }, { opacity: 1, transform: at(grab.x, grab.y) }], { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }).finished
+      await sleep(200, id)
+      anim(docx, [{ transform: 'scale(1)' }, { transform: 'scale(1.06)' }], { duration: 160 })
+      await sleep(180, id)
+      const dx = drop.x - grab.x
+      const dy = drop.y - grab.y
+      const move = { duration: 1300, easing: 'cubic-bezier(0.45, 0, 0.2, 1)' }
+      anim(cursor, [{ transform: at(grab.x, grab.y) }, { transform: at(drop.x, drop.y) }], move)
+      const fly = anim(docx, [{ transform: 'scale(1.06)' }, { transform: `translate(${dx}px, ${dy}px) scale(0.9)` }], move)
+      await sleep(700, id)
+      dragInto(frame, 'dragover')
+      await fly.finished
+      if (id !== runId) return
+      await sleep(250, id)
+      dragInto(frame, 'drop')
+      anim(docx, [{ transform: `translate(${dx}px, ${dy}px) scale(0.9)`, opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity: 0 }], { duration: 260, easing: 'ease-in' })
+      anim(cursor, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 300 })
+      // the file is in: bring the window to the middle of the frame
+      anim(win, [{ transform: 'translateX(0)' }, { transform: 'translateX(-193px)' }], { duration: 700, delay: 350, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' })
+    },
+  },
+}
+
+// ---------------------------------------------------------------- app frame
+
+function loadApp(frame: HTMLIFrameElement, state: string, id: number): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const onMsg = (e: MessageEvent) => {
+      if (e.source !== frame.contentWindow || e.data?.clover !== 'ready') return
+      removeEventListener('message', onMsg)
+      if (id !== runId) reject(new Cancelled())
+      else resolve()
+    }
+    addEventListener('message', onMsg)
+    frame.src = `./app.html?state=${state}&t=${Date.now()}`
+  })
+}
+
+/** A synthetic drag of the demo paper onto the app's home screen; the app
+ *  handles it with its own drop handler, as if a file were dropped. */
+function dragInto(frame: HTMLIFrameElement, type: 'dragover' | 'drop') {
+  const w = frame.contentWindow as (Window & typeof globalThis) | null
+  const doc = frame.contentDocument
+  if (!w || !doc) return
+  const dt = new w.DataTransfer()
+  dt.items.add(new w.File(['clover'], '基于深度学习的目标检测研究综述.docx', {
+    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  }))
+  const target = doc.elementFromPoint(760, 400) ?? doc.body
+  if (type === 'dragover') {
+    target.dispatchEvent(new w.DragEvent('dragenter', { bubbles: true, cancelable: true, dataTransfer: dt }))
+  }
+  target.dispatchEvent(new w.DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: dt }))
+}
+
+function drawChrome() {
+  for (const c of document.querySelectorAll<HTMLElement>('.win-chrome')) {
+    if (IS_WIN) {
+      c.className = 'win-chrome win'
+      c.innerHTML =
+        '<svg viewBox="0 0 10 10"><path d="M0 5h10"/></svg>' +
+        '<svg viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9"/></svg>' +
+        '<svg viewBox="0 0 10 10"><path d="M0 0l10 10M10 0L0 10"/></svg>'
+    } else {
+      c.className = 'win-chrome mac'
+      c.innerHTML = '<i></i><i></i><i></i>'
+    }
+  }
+}
+drawChrome()
+
+// ---------------------------------------------------------------- navigation
+
+let cur = -1
+let stepNo = 0
+
+function steps(el: HTMLElement) {
+  return Number(el.dataset.steps ?? 1)
+}
+
+function run(p: Promise<void> | undefined) {
+  p?.catch((e) => {
+    if (!(e instanceof Cancelled)) console.error(e)
+  })
+}
+
+function show(i: number) {
+  i = Math.max(0, Math.min(slides.length - 1, i))
+  slides.forEach((s, k) => s.classList.toggle('on', k === i))
+  cur = i
+  stepNo = 0
+  runId++
+  const el = slides[i]
+  run(hooks[el.dataset.title ?? '']?.enter?.(el, runId))
+  history.replaceState(null, '', `#${i + 1}`)
+  hud.textContent = `${i + 1} / ${slides.length}  ${el.dataset.title ?? ''}`
+}
+
+function next() {
+  const el = slides[cur]
+  if (stepNo + 1 < steps(el)) {
+    stepNo++
+    run(hooks[el.dataset.title ?? '']?.step?.(el, stepNo, runId))
+  } else if (cur < slides.length - 1) show(cur + 1)
+}
+
+addEventListener('keydown', (e) => {
+  if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) next()
+  else if (['ArrowLeft', 'PageUp'].includes(e.key)) show(cur - 1)
+  else if (e.key === 'Home') show(0)
+  else if (e.key === 'End') show(slides.length - 1)
+  else if (e.key === 'r' || e.key === 'R') show(cur)
+  else if (e.key === 'h' || e.key === 'H') hud.classList.toggle('show')
+  else if (e.key === 'f' || e.key === 'F') {
+    if (document.fullscreenElement) document.exitFullscreen()
+    else document.documentElement.requestFullscreen()
+  } else return
+  e.preventDefault()
+})
+// clicks advance too, except inside the app window
+deck.addEventListener('click', (e) => {
+  if ((e.target as HTMLElement).closest('.win')) return
+  next()
+})
+// the iframe takes keyboard focus when clicked; keep the keys on the deck
+addEventListener('blur', () => setTimeout(() => window.focus(), 0))
+
+show(Math.max(0, Number(location.hash.slice(1) || 1) - 1))
+
+// ---------------------------------------------------------------- math
+
+/** y of a CSS cubic-bezier at progress x (Newton on x(t)). */
+function cubic(x1: number, y1: number, x2: number, y2: number, x: number) {
+  const bx = (t: number) => 3 * x1 * t * (1 - t) ** 2 + 3 * x2 * t * t * (1 - t) + t ** 3
+  const by = (t: number) => 3 * y1 * t * (1 - t) ** 2 + 3 * y2 * t * t * (1 - t) + t ** 3
+  let t = x
+  for (let k = 0; k < 8; k++) {
+    const d = (bx(t + 1e-4) - bx(t)) / 1e-4
+    if (!d) break
+    t -= (bx(t) - x) / d
+    t = Math.min(1, Math.max(0, t))
+  }
+  return by(t)
+}
