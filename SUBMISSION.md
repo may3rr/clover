@@ -13,26 +13,28 @@
 | 赛道 | 效率进化赛道；阿里云特别赛题：基于 Qwen 的科研提效 |
 | 进阶挑战 | Intel 本地 AI 应用挑战（路演 PPT 有必填页） |
 | 路演 | 讲 4 分钟，评审问答 2 分钟 |
-| 截止 | 48H 黑客松截止时间前提交全部材料（具体时刻待补） |
+| 截止 | 11 月 7 日 17:00 前把完整文件包上传到群文件，正式路演以这份文件包为准 |
+| 命名 | 文件包和包内文件统一为：效率进化赛道-我要发顶刊-Clover，PDF 与 PPT 同名 |
 
 ## 1. 必交材料
 
 | 材料 | 要求 | 我们的做法 | 状态 |
 | --- | --- | --- | --- |
-| 路演 PPT | 使用组委会统一模板（`天猫Ai黑客松｜选手路演PPT模版/`），决赛现场用 | 会场不能用 HTML，也不放动画，用静态 PPTX：`python app/site/scripts/pitch-static.py`（先 `npm run site:dev`）生成 `app/site-single/Clover-路演.pptx`，15 页，每页是 HTML 演示稿 `app/site/pitch.html` 某一步的最终画面，3840×2160。舞台用模板原图，窗口里是 Clover 网页复刻版 | 15 页完成，待现场核对 |
-| 产品一句话介绍 | 产品定位、目标用户、解决的核心问题 | | 未做 |
-| 单页项目说明 | 用户需求、核心方案、AI 能力、主要功能、应用价值 | 可以合并"赛期成果说明" | 未做 |
-| 技术说明 | AI 能力应用、关键技术、核心实现方式 | 素材：`README.md`、`PROJECT_REVIEW.md`、`design/figures/F01_本机与云端流程` | 未做 |
+| 路演 PPT | 官方模板，提交可编辑的 .pptx，另附由同一份 PPT 导出的 PDF | `python app/site/scripts/pitch-pptx.py`（先 `npm run site:dev`）在官方模板上生成可编辑 PPTX，16 页，文字是文本框，软件窗口按 Windows 版界面渲染成图片；PDF 由 `submission/build_package.py` 用 LibreOffice 从同一份 PPTX 导出 | 完成，待现场核对 |
+| 产品一句话介绍 | 产品定位、目标用户、解决的核心问题 | 在 `submission/docs/01-项目说明.md` 开头 | 完成 |
+| 单页项目说明 | 用户需求、核心方案、AI 能力、主要功能、应用价值 | `submission/docs/01-项目说明.md`，含赛期成果对比，导出 PDF 3 页 | 完成 |
+| 技术说明 | AI 能力应用、关键技术、核心实现方式 | `submission/docs/02-技术说明.md` | 完成 |
 | Demo 演示材料 | 可验证核心功能的 Demo 和备用演示材料 | Intel 决赛机上装好的应用加演示稿；网页复刻版 `app/site/app.html` | 部分 |
 | 赛期成果说明 | 赛前基础、48H 新增或优化、验证方式 | 可直接放进路演 PPT 或单页说明。底稿：`PRE_HACKATHON_BASELINE.md`（赛前）、`FINALS_DELTA.md`（前后对比）、`design/figures/out/png/F02_开赛前后对比.png` | 数据已有，待成稿 |
-| 项目介绍图文 | 赛事作品展示与传播用 | 已有 `submission/` 下的 logo 和封面图（10-27），需要更新 | 未做 |
+| 项目介绍图文 | 赛事作品展示与传播用 | 文件包里的 `截图/`（Windows 版界面、任务管理器实拍）、主页二维码、`submission/docs/03-作品链接与佐证.md` | 完成 |
+| 文件包 | 一个文件夹或压缩包，上传群文件 | `python submission/build_package.py` 生成 `app/site-single/效率进化赛道-我要发顶刊-Clover/` 和同名 zip；演示视频 11 月 7 日在 Intel 决赛机上录，放进 `演示视频/` | 待加视频 |
 
 ## 2. 软件类补充要求
 
 | 要求 | 我们的做法 | 状态 |
 | --- | --- | --- |
 | 可正常访问或运行的作品链接、二维码 | 主页与在线界面 https://jackielyu.is-a.dev/clover/ ；GitHub Releases 有 macOS 安装包。Windows 版和二维码待做 | 部分 |
-| 核心功能录屏，作为现场备用 | `npm run site:record` 可以录网页复刻版；Intel 机器上再录一段真实运行 | 未做 |
+| 核心功能录屏，作为现场备用 | 11 月 7 日在 Intel 决赛机上录真实运行 | 未做 |
 | 非 Web 作品提前准备好装好、调试好的设备 | Intel 决赛机（HP OmniBook 7），仓库在 `C:\clover`，模型在 `C:\clover-models` | 进行中 |
 
 ## 3. 其他说明
