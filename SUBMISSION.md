@@ -19,7 +19,7 @@
 
 | 材料 | 要求 | 我们的做法 | 状态 |
 | --- | --- | --- | --- |
-| 路演 PPT | 使用组委会统一模板（`天猫Ai黑客松｜选手路演PPT模版/`），决赛现场用 | 会场不能用 HTML，也不放动画，用静态 PPTX：`python app/site/scripts/pitch-static.py`（先 `npm run site:dev`）生成 `app/site-single/Clover-路演.pptx`，14 页，每页是 HTML 演示稿 `app/site/pitch.html` 某一步的最终画面，3840×2160。舞台用模板原图，窗口里是 Clover 网页复刻版 | 14 页完成，待现场核对 |
+| 路演 PPT | 使用组委会统一模板（`天猫Ai黑客松｜选手路演PPT模版/`），决赛现场用 | 会场不能用 HTML，也不放动画，用静态 PPTX：`python app/site/scripts/pitch-static.py`（先 `npm run site:dev`）生成 `app/site-single/Clover-路演.pptx`，15 页，每页是 HTML 演示稿 `app/site/pitch.html` 某一步的最终画面，3840×2160。舞台用模板原图，窗口里是 Clover 网页复刻版 | 15 页完成，待现场核对 |
 | 产品一句话介绍 | 产品定位、目标用户、解决的核心问题 | | 未做 |
 | 单页项目说明 | 用户需求、核心方案、AI 能力、主要功能、应用价值 | 可以合并"赛期成果说明" | 未做 |
 | 技术说明 | AI 能力应用、关键技术、核心实现方式 | 素材：`README.md`、`PROJECT_REVIEW.md`、`design/figures/F01_本机与云端流程` | 未做 |

@@ -144,7 +144,7 @@ const FINDINGS = [
   { title: '未能在数据库中找到这篇文献', ref: '[70]' },
   { title: '被引文献与这条论断说的不是同一项工作', ref: '[40]' },
   { title: '建议修订：制 改为 置', ref: '' },
-  { title: '这句话同时引用了 7 篇文献', ref: '' },
+  { title: '参考文献构成偏离《电子学报》范文的常见范围', ref: '' },
 ]
 
 function markLeaf(el: HTMLElement, n: number) {
