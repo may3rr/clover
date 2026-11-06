@@ -3,6 +3,7 @@ import { eventsUrl } from '../lib/api'
 import { CheckCircleFillIcon, ExclaimCircleFillIcon } from '../components/Icons'
 import Mascot, { type MascotState } from '../components/Mascot'
 import OrbitDots from '../components/OrbitDots'
+import QwenIntelMorph from '../components/QwenIntelMorph'
 import { AGENT_COLOR } from '../lib/mascot'
 import SkeletonPaper from '../components/Skeleton'
 import type { Outline, SkAnchor } from '../lib/outline'
@@ -255,7 +256,15 @@ export default function Running({
         style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 52 }}
       />
       <div className="run-col flex flex-col" style={{ width: COL_W }}>
-        <div className="t26 font-semibold truncate">{fileName}</div>
+        <div className="flex items-center" style={{ gap: 12 }}>
+          {/* a box one title line tall keeps the mark centred on it */}
+          <div className="flex items-center" style={{ height: 34, flex: 'none' }}>
+            <QwenIntelMorph width={48} />
+          </div>
+          <div className="t26 font-semibold truncate" style={{ minWidth: 0 }}>
+            {fileName}
+          </div>
+        </div>
         <div className="secondary" style={{ marginTop: 8 }}>
           {counts
             ? `${counts.refs} 条参考文献，${counts.markers} 处引用`

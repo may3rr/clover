@@ -15,7 +15,8 @@ import {
 } from '../lib/logoMorph'
 
 /** 千问 logo 转两圈、变成英特尔 logo、字母弹跳、再变回千问，循环播放。
- *  表示「千问模型正在这台英特尔电脑上运行」，只在本地模型工作时出现。
+ *  表示「千问模型正在这台英特尔电脑上运行」：运行页标题旁的加载动画，
+ *  以及窗口不在前台时的进度浮窗。
  *  颜色取 tokens.css 的 --brand-qwen / --brand-intel / --brand-intel-dot；
  *  减少动态效果时停在千问 logo。 */
 export default function QwenIntelMorph({ width = 56 }: { width?: number }) {
