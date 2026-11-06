@@ -223,7 +223,7 @@ def _bm25_excerpt(
         return (prefix or fulltext)[:limit]
     bm25 = BM25Okapi([_tokenize(w) for _, w in windows])
     scores = bm25.get_scores(_tokenize(claim))
-    sim = _dense_scores([w for _, w in windows], claim) if dense else None
+    sim = _dense_scores([w for _, w in windows], claim, scores) if dense else None
     if sim is not None:
         scores = _rrf(scores, sim)
         scores = _reranked(scores, [w for _, w in windows], claim)
@@ -250,14 +250,47 @@ def _bm25_excerpt(
     return (f"{prefix}\n\n{passages}" if prefix else passages)[:limit]
 
 
-def _dense_scores(windows: list[str], query: str):
+def prefilter(bm25_scores, k: int, radius: int) -> list[int] | None:
+    """Window indices worth embedding: the BM25 top ``k`` and ``radius``
+    neighbours on each side (windows overlap, so a neighbour carries the
+    sentences around a hit). None = embed every window."""
+    import numpy as np
+
+    n = len(bm25_scores)
+    if k <= 0 or n <= k * (2 * radius + 1):
+        return None
+    top = np.argsort(-np.asarray(bm25_scores, dtype=float), kind="stable")[:k]
+    keep: set[int] = set()
+    for i in top:
+        keep.update(range(max(0, i - radius), min(n, i + radius + 1)))
+    return sorted(keep)
+
+
+def _dense_scores(windows: list[str], query: str, bm25_scores=None):
+    """Cosine similarity of each window to the query. With
+    ``[llm.embedding] prefilter_k`` set, only the BM25 candidates are
+    embedded; the rest score -1 and rank last in the fusion."""
+    import numpy as np
+
+    from ..config import get_settings
     from ..llm.embed import embed
 
-    vecs = embed(windows)
+    cfg = get_settings().llm.embedding
+    keep = (prefilter(bm25_scores, cfg.prefilter_k, cfg.prefilter_neighbors)
+            if bm25_scores is not None else None)
+    subset = windows if keep is None else [windows[i] for i in keep]
+    vecs = embed(subset)
     if vecs is None:
         return None
     q = embed([query], query=True)
-    return None if q is None else vecs @ q[0]
+    if q is None:
+        return None
+    sim = vecs @ q[0]
+    if keep is None:
+        return sim
+    full = np.full(len(windows), -1.0)
+    full[keep] = sim
+    return full
 
 
 def _reranked(scores, windows: list[str], query: str):

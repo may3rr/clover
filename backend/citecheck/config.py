@@ -158,6 +158,10 @@ class EmbeddingSettings(BaseModel):
     device: str = _OV_DEVICES
     # tokens per window; NPU pads every input to this length
     max_length: int = 512
+    # embed only the BM25 top-k windows of each cited work (plus
+    # prefilter_neighbors on each side) instead of all of them; 0 = all
+    prefilter_k: int = 0
+    prefilter_neighbors: int = 1
 
 
 class RerankSettings(BaseModel):

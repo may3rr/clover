@@ -1,0 +1,44 @@
+[
+ {
+  "k": 0,
+  "embedded": 7581,
+  "embed_inputs": 42212,
+  "wall_s": 57.3,
+  "pairs": 155,
+  "findings": 50,
+  "score": "检出 16/16"
+ },
+ {
+  "k": 64,
+  "embedded": 4982,
+  "embed_inputs": 16938,
+  "wall_s": 88.5,
+  "pairs": 155,
+  "findings": 51,
+  "score": "检出 16/16",
+  "changed": 13,
+  "share": 0.657
+ },
+ {
+  "k": 128,
+  "embedded": 7164,
+  "embed_inputs": 30235,
+  "wall_s": 51.7,
+  "pairs": 155,
+  "findings": 50,
+  "score": "检出 16/16",
+  "changed": 6,
+  "share": 0.945
+ },
+ {
+  "k": 256,
+  "embedded": 7581,
+  "embed_inputs": 42334,
+  "wall_s": 41.4,
+  "pairs": 155,
+  "findings": 51,
+  "score": "检出 16/16",
+  "changed": 4,
+  "share": 1.0
+ }
+]

@@ -74,6 +74,11 @@ batch = 10
 # backend = "openvino"
 # local_model = "D:/clover-models/Qwen3-Embedding-0.6B-int8-ov"
 # device = "NPU,GPU,CPU"
+# Embed only the BM25 top-k windows of each cited work (plus neighbours).
+# On the demo papers k=128 embeds 70% (zh) / 95% (en) of the windows with
+# no change in detections (demo/testset/results/prefilter/README.md).
+# prefilter_k = 0
+# prefilter_neighbors = 1
 
 [llm.rerank]
 # Bailian qwen3-rerank over the top fused candidates (needs [llm.embedding]).
