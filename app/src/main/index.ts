@@ -578,13 +578,25 @@ function buildMenu() {
 // Windows: no vibrancy or traffic lights; a hidden title bar with the
 // system caption buttons drawn over the top-right corner, on Mica
 // (Windows 11; Windows 10 shows the solid background colour)
+// The renderer reports the surface under the top-right corner (the
+// inspector's --bg-subtle, or --bg once it is collapsed and on the other
+// screens); until it does, assume --bg.
+let captionColor: string | null = null
+
 function overlayColors() {
   const dark = nativeTheme.shouldUseDarkColors
-  // tokens.css --bg-subtle / --text (the inspector pane sits under them)
+  // tokens.css --bg / --text
   return dark
-    ? { color: '#202020', symbolColor: '#dedede' }
-    : { color: '#f7f7f5', symbolColor: '#37352f' }
+    ? { color: captionColor ?? '#191919', symbolColor: '#dedede' }
+    : { color: captionColor ?? '#ffffff', symbolColor: '#37352f' }
 }
+
+ipcMain.on('citecheck:caption-color', (_e, c: unknown) => {
+  if (IS_MAC || typeof c !== 'string' || !/^#[0-9a-f]{6}$/i.test(c)) return
+  if (c === captionColor) return
+  captionColor = c
+  win?.setTitleBarOverlay({ ...overlayColors(), height: 52 })
+})
 
 function chromeOptions(): Electron.BrowserWindowConstructorOptions {
   if (IS_MAC) {

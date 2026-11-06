@@ -42,6 +42,8 @@ export interface CitecheckApi {
     }) => void
   ): () => void
   toastClick(): void
+  /** Windows: paint the caption buttons on the colour under them */
+  setCaptionColor(color: string): void
   /** Debug hooks — used by shots/E2E modes only. */
   shotsMode: boolean
   /** Built-in sample data instead of the backend (settings usage/config)
@@ -91,6 +93,7 @@ const api: CitecheckApi = {
     return () => ipcRenderer.off('citecheck:toast', h)
   },
   toastClick: () => ipcRenderer.send('citecheck:toast-click'),
+  setCaptionColor: (color) => ipcRenderer.send('citecheck:caption-color', color),
   shotsMode: !!process.env.CITECHECK_SHOTS,
   sampleData: !!process.env.CITECHECK_SHOTS,
   e2eFile: process.env.CITECHECK_E2E || null,

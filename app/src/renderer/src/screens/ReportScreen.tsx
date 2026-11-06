@@ -555,8 +555,8 @@ export default function ReportScreen({
       <aside className={`glass-sidebar${leftCollapsed ? ' collapsed' : ''}`}>
         <div className="side-inner">
           <div
-            className="drag-strip flex items-center"
-            style={{ height: 52, flex: 'none', paddingLeft: 84 }}
+            className="drag-strip side-head flex items-center"
+            style={{ height: 52, flex: 'none' }}
           >
             <button
               className="icon-btn"

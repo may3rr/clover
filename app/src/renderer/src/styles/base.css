@@ -527,7 +527,8 @@ select {
 }
 /* the traffic lights (x:20) land on this strip once the left pane is
    gone — keep the toggle and the title clear of them */
-.center-pane.no-left > .drag-strip {
+.center-pane.no-left > .drag-strip,
+.glass-sidebar .side-head {
   padding-left: 84px;
 }
 
@@ -576,7 +577,8 @@ select {
 html[data-platform='win32'] .glass-sidebar {
   background: var(--bg-subtle);
 }
-html[data-platform='win32'] .center-pane.no-left > .drag-strip {
+html[data-platform='win32'] .center-pane.no-left > .drag-strip,
+html[data-platform='win32'] .glass-sidebar .side-head {
   padding-left: 24px;
 }
 html[data-platform='win32'] .inspector .drag-strip,
