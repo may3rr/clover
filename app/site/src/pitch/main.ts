@@ -143,7 +143,7 @@ const hooks: Record<string, Hook> = {
 const FINDINGS = [
   { title: '未能在数据库中找到这篇文献', ref: '[70]' },
   { title: '被引文献与这条论断说的不是同一项工作', ref: '[40]' },
-  { title: '这条参考文献与前面的条目重复', ref: '[43]' },
+  { title: '建议修订：制 改为 置', ref: '' },
   { title: '这句话同时引用了 7 篇文献', ref: '' },
 ]
 

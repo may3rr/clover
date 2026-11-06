@@ -153,7 +153,7 @@
         <div class="leaves">
           <div class="lv"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-0)" /></svg><div><b>文献真实性</b><span>编造的文献，写错的年份、作者</span></div></div>
           <div class="lv"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-1)" /></svg><div><b>论断支持度</b><span>被引原文不支持，或引错了文献</span></div></div>
-          <div class="lv"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-3)" /></svg><div><b>格式规范</b><span>错别字、重复条目、漏引和错位编号</span></div></div>
+          <div class="lv"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-3)" /></svg><div><b>格式规范</b><span>错别字写成修订，另查重复和漏引</span></div></div>
           <div class="lv"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-2)" /></svg><div><b>期刊对标</b><span>和同领域已发表论文的引用常态比较</span></div></div>
           <div class="lv-note">问题写成 Word 批注，错别字和重排写成修订，由作者逐条接受</div>
         </div>
@@ -194,9 +194,41 @@
         <div class="proof-rule">每一条判断都附被引原文，原文里逐字找不到就标为无法判断</div>
       </section>
 
+      <!-- ============ 总览：四项检查怎么做 ============ -->
+      <section class="slide framed" data-title="四项检查怎么做">
+        <div class="bar-title">四项检查，各用什么模型</div>
+        <div class="ov">
+          <svg class="fw" viewBox="0 0 1536 680" aria-hidden="true">
+            <defs><marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" /></marker></defs>
+            <path d="M478 46H524" /><path d="M866 46H894" /><path d="M1236 46H1264" /><path d="M478 196H524" /><path d="M866 196H894" /><path d="M1236 196H1264" /><path d="M478 346H524" /><path d="M866 346H894" /><path d="M1236 346H1264" /><path d="M478 496H524" /><path d="M866 496H894" /><path d="M1236 496H1264" />
+          </svg>
+          <div class="ov-check" style="top:22px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-0)" /></svg><b>文献真实性</b></div>
+          <div class="ov-in" style="left:250px;top:16px">参考文献条目</div>
+          <div class="fn sm" style="left:532px;top:0px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>拆出作者、年份、题名</span></span><span class="fn-tag cloud">云端</span></div>
+          <div class="fn sm" style="left:902px;top:0px;width:330px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><ellipse cx="10" cy="5" rx="7" ry="2.6"/><path d="M3 7.2c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6V10c0 1.4-3.1 2.6-7 2.6S3 11.4 3 10z"/><path d="M3 12.6c0 1.4 3.1 2.6 7 2.6s7-1.2 7-2.6v2.8c0 1.4-3.1 2.6-7 2.6s-7-1.2-7-2.6z"/></svg></span><span class="fn-text"><b>四个学术数据库</b><span>逐条比对，连上的 PDF 读封面</span></span><span class="fn-tag cloud">联网</span></div>
+          <div class="ov-out" style="left:1272px;top:16px">一致、不一致、无法核验</div>
+          <div class="ov-check" style="top:172px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-1)" /></svg><b>论断支持度</b></div>
+          <div class="ov-in" style="left:250px;top:166px">带引用的论断</div>
+          <div class="fn sm" style="left:532px;top:150px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3 向量与重排</b><span>挑出被引原文的相关段落</span></span><span class="fn-tag gpu">核显</span></div>
+          <div class="fn sm" style="left:902px;top:150px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>判断原文是否支持论断</span></span><span class="fn-tag cloud">云端</span></div>
+          <div class="ov-out" style="left:1272px;top:166px">附原文证据，逐字可查</div>
+          <div class="ov-check" style="top:322px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-3)" /></svg><b>格式规范</b></div>
+          <div class="ov-in" style="left:250px;top:316px">正文段落</div>
+          <div class="fn sm" style="left:532px;top:300px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>逐段找错别字</span></span><span class="fn-tag cloud">云端</span></div>
+          <div class="fn sm" style="left:902px;top:300px;width:330px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><path d="M4 2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm1.6 4.6 1.6 1.6 3-3-1-1-2 2-.6-.6zm6 .2v1.4h4V6.8zm-6 4.8 1.6 1.6 3-3-1-1-2 2-.6-.6zm6 .2V13h4v-1.4z"/></svg></span><span class="fn-text"><b>规则检查</b><span>重复条目、漏引、编号错位</span></span><span class="fn-tag gpu">本机</span></div>
+          <div class="ov-out" style="left:1272px;top:316px">错别字写成修订</div>
+          <div class="ov-check" style="top:472px"><svg viewBox="0 0 20 20"><path d="M10 18 L3 11 A5 5 0 0 1 10 4 A5 5 0 0 1 17 11 Z" fill="var(--leaf-2)" /></svg><b>期刊对标</b></div>
+          <div class="ov-in" style="left:250px;top:466px">目标期刊的同刊范文</div>
+          <div class="fn sm" style="left:532px;top:450px;width:330px"><span class="fn-tile"><img src="./src/pitch/assets/brand/qwen.svg" alt="Qwen" /></span><span class="fn-text"><b>Qwen3.8-flash</b><span>读章节、研究要素、引用功能</span></span><span class="fn-tag cloud">云端</span></div>
+          <div class="fn sm" style="left:902px;top:450px;width:330px"><span class="fn-tile plain"><svg viewBox="0 0 20 20"><rect x="2" y="10" width="4" height="8" rx="1"/><rect x="8" y="5" width="4" height="13" rx="1"/><rect x="14" y="2" width="4" height="16" rx="1"/></svg></span><span class="fn-text"><b>六组指标</b><span>和每篇范文逐项比较</span></span><span class="fn-tag gpu">本机</span></div>
+          <div class="ov-out" style="left:1272px;top:466px">偏离常态处写批注</div>
+          <div class="ov-note">打开隐私模式后，拆分文献、找错别字、读范文改由本机核显上的 Qwen3-8B 完成</div>
+        </div>
+      </section>
+
       <!-- ============ 7 技术路线 ============ -->
       <section class="slide framed" data-title="技术路线" data-steps="3">
-        <div class="bar-title">一条引用，怎么被核对</div>
+        <div class="bar-title">论断支持度，怎么核对</div>
         <div class="flow">
           <svg class="fw" viewBox="0 0 1536 680" aria-hidden="true">
             <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" /></marker></defs>
