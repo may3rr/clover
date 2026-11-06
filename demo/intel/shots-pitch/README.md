@@ -2,10 +2,10 @@
 
 浅色模式，Clover 与任务管理器都用默认窗口大小（未最大化）。任务管理器在“性能”页，GPU 的引擎下拉为 **Compute**。
 
-**关于“同时占用”的说明**：隐私模式下，本地 8B 的生成阶段（typo/extract/structure/function）和 NPU 的向量阶段在时间上基本错开——8B 在 GPU 上跑完时，NPU 向量还没开始。所以没有一张 GPU Compute 和 NPU 都到 90% 的图；下面用同一轮的两个阶段说明：
+**关于“同时占用”的说明**：隐私模式下，本地 8B 的生成阶段（typo/extract/structure/function）和 NPU 的向量阶段在时间上基本错开——8B 在 GPU 上跑完时，NPU 向量还没开始。所以没有一张 GPU Compute 和 NPU 都到 90% 的图；下面用同一配置、同一篇稿的两次运行，分别停在两个阶段：
 
 - `01-taskmanager-active.png`：向量阶段的同屏图，NPU 94%、GPU Compute 6% 的重排曲线、CPU 9%。
-- `01b-taskmanager-gpu8b.png`：同一轮 8B 生成阶段，GPU Compute 98%、CPU 35%、NPU 0%。
+- `01b-taskmanager-gpu8b.png`：8B 生成阶段，GPU Compute 98%、CPU 35%、NPU 0%。
 
 两张合起来就是“三颗芯都在干活”，也正好对应路演里“各干所长、分时复用”的说法。
 
