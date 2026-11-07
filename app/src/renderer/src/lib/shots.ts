@@ -97,6 +97,19 @@ export function applyShotState(state: string, ctx: ShotCtx) {
     return
   }
 
+  // venue:<id> — that item's detail open, and the reading pane scrolled to
+  // the journal review card (the pitch deck's 期刊对标 still)
+  if (state.startsWith('venue:')) {
+    ctx.setReport?.(report ?? null)
+    ctx.setScreen?.('report')
+    ctx.selectItem?.(state.slice(6))
+    // after the selection has scrolled the paper to the finding's anchor
+    setTimeout(() => {
+      document.querySelector('.overview-card')?.scrollIntoView({ block: 'start' })
+    }, 700)
+    return
+  }
+
   // item:<id> — report with that inspector item's detail open (the web
   // replica on the landing page points each section at one finding)
   if (state.startsWith('item:')) {

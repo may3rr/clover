@@ -13,6 +13,7 @@ import App from '../../../src/renderer/src/App'
 import '../../../src/renderer/src/styles/tokens.css'
 import '../../../src/renderer/src/styles/base.css'
 import './replica.css'
+import { IS_WIN } from '../../../src/renderer/src/lib/platform'
 
 // the window is always "key" here — the inactive look is for real focus loss
 document.hasFocus = () => true
@@ -44,6 +45,8 @@ if (window.parent !== window) {
 // query string; it passes the same parameters in the frame's name
 const q = new URLSearchParams(location.search || window.name)
 const root = document.documentElement
+// same switch as the app's main.tsx: Windows layout, no traffic lights
+if (IS_WIN) root.dataset.platform = 'win32'
 if (q.get('frame')) root.classList.add('framed')
 if (q.get('state')) root.classList.add('booting')
 

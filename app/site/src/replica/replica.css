@@ -39,6 +39,12 @@ body::before {
   pointer-events: none;
 }
 
+/* Windows (html[data-platform='win32'] from the user agent): no traffic
+   lights; the system draws caption buttons at the top right instead */
+html[data-platform='win32'] body::before {
+  display: none;
+}
+
 /* ?frame=1: the window sits on a desktop at its native 1280 x 820 */
 html.framed,
 html.framed body {
