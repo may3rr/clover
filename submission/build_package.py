@@ -59,6 +59,26 @@ INTEL_SHOTS = [
     ("06-任务管理器-核显.png", "06-gpu-vector.png"),
     ("07-任务管理器-NPU.png", "01-taskmanager-active.png"),
 ]
+SHOTS_PITCH = ROOT / "demo" / "intel" / "shots-pitch"
+# finals machine screenshots copied as is
+MORE_SHOTS = [
+    ("08-运行页.png", WIN_SHOTS / "light-running-mid.png"),
+    ("13-隐私模式开关.png", SHOTS_PITCH / "04-settings-privacy.png"),
+    ("14-发往云端清单.png", SHOTS_PITCH / "05-send-list.png"),
+]
+# frames of the finals-machine recording (seconds into the demo video)
+VIDEO_SHOTS = [
+    ("09-核对文献连接.png", 40),
+    ("10-核对对标范文.png", 90),
+    ("11-任务管理器-体检进行中.png", 220),
+    ("12-导出Word-WPS中的批注.png", 940),
+]
+PROMO = [
+    ("封面-1920x1080.png", ROOT / "submission" / "封面-1920x1080.png"),
+    ("封面-3840x2160.png", ROOT / "submission" / "封面-3840x2160.png"),
+    ("logo-1024.png", ROOT / "submission" / "logo-1024.png"),
+    ("logo.svg", ROOT / "submission" / "logo.svg"),
+]
 
 
 CSS = f"""
@@ -112,6 +132,17 @@ def shots(browser) -> None:
     pg.close()
     for dst, src in INTEL_SHOTS:
         shutil.copy(INTEL / src, out / dst)
+    for dst, src in MORE_SHOTS:
+        shutil.copy(src, out / dst)
+    videos = sorted((PKG / "演示视频").glob("*.mp4"))
+    for dst, t in VIDEO_SHOTS if videos else []:
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", str(t), "-i", str(videos[0]),
+                        "-frames:v", "1", str(out / dst)], check=True)
+        print(f"{dst}  {t}s of {videos[0].name}")
+    promo = PKG / "宣传素材"
+    promo.mkdir(exist_ok=True)
+    for dst, src in PROMO:
+        shutil.copy(src, promo / dst)
 
 
 def main() -> None:

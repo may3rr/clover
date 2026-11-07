@@ -27,14 +27,14 @@
 | Demo 演示材料 | 可验证核心功能的 Demo 和备用演示材料 | Intel 决赛机上装好的应用加演示稿；网页复刻版 `app/site/app.html` | 部分 |
 | 赛期成果说明 | 赛前基础、48H 新增或优化、验证方式 | 可直接放进路演 PPT 或单页说明。底稿：`PRE_HACKATHON_BASELINE.md`（赛前）、`FINALS_DELTA.md`（前后对比）、`design/figures/out/png/F02_开赛前后对比.png` | 数据已有，待成稿 |
 | 项目介绍图文 | 赛事作品展示与传播用 | 文件包里的 `截图/`（Windows 版界面、任务管理器实拍）、主页二维码、`submission/docs/03-作品链接与佐证.md` | 完成 |
-| 文件包 | 一个文件夹或压缩包，上传群文件 | `python submission/build_package.py` 生成 `app/site-single/效率进化赛道-我要发顶刊-Clover/` 和同名 zip；演示视频 11 月 7 日在 Intel 决赛机上录，放进 `演示视频/` | 待加视频 |
+| 文件包 | 一个文件夹或压缩包，上传群文件 | `python submission/build_package.py` 生成 `app/site-single/效率进化赛道-我要发顶刊-Clover/` 和同名 zip；演示视频 11 月 7 日在 Intel 决赛机上录，放进 `演示视频/`；截图 14 张，含演示视频抽帧；`宣传素材/` 放封面与图标 | 完成（11-07），待上传群文件 |
 
 ## 2. 软件类补充要求
 
 | 要求 | 我们的做法 | 状态 |
 | --- | --- | --- |
-| 可正常访问或运行的作品链接、二维码 | 主页与在线界面 https://jackielyu.is-a.dev/clover/ ；GitHub Releases 有 macOS 安装包。Windows 版和二维码待做 | 部分 |
-| 核心功能录屏，作为现场备用 | 11 月 7 日在 Intel 决赛机上录真实运行 | 未做 |
+| 可正常访问或运行的作品链接、二维码 | 主页与在线界面 https://jackielyu.is-a.dev/clover/ ；GitHub Releases 有 macOS 安装包；主页 Windows 按钮改为实心，注明已在 Intel AI PC 上运行；二维码在文件包里 | 完成 |
+| 核心功能录屏，作为现场备用 | 11 月 7 日在 Intel 决赛机上录真实运行，21 分 40 秒 | 完成 |
 | 非 Web 作品提前准备好装好、调试好的设备 | Intel 决赛机（HP OmniBook 7），仓库在 `C:\clover`，模型在 `C:\clover-models` | 进行中 |
 
 ## 3. 其他说明
