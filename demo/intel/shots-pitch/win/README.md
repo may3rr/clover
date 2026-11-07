@@ -1,7 +1,8 @@
 # Windows 版路演截图（应用自带 shots 模式）
 
 2026-11-07 在 Intel 决赛机上重拍。Windows 11（26200），Intel Core Ultra 5 338H / Arc B370，
-屏幕 2560 × 1600，**显示缩放 200%**，浅色主题。代码合并到 `cn/master` 的 `898b7f2`。
+屏幕 2560 × 1600，**显示缩放 200%**，浅色主题。代码合并到 `cn/master` 的 `0b8efd5`
+（报告里的检查用时改为推荐配置冷启动实测的 536 秒）。
 
 - 报告数据：`app/site/public/data/pitch_zh.json`（《基于深度学习的目标检测研究综述》）。
 - 状态固定为 `running-mid,report,item:f40,item:f28,item:v5,venue:f35`，主题只拍 `light`。
@@ -15,7 +16,7 @@
 | 文件 | 状态 | 画面 |
 | --- | --- | --- |
 | `light-running-mid.png` | `running-mid` | 运行页，44%。文献真实性已完成（3 个问题），引用分布已完成（3 个问题），论断支持度进行中，格式规范等待。 |
-| `light-report.png` | `report` | 报告页总览：43 个问题、9 项修订；引用标记 96 处、参考文献 73 条、检查用时 22 秒，属性里有“发往云端 80,689 字”。 |
+| `light-report.png` | `report` | 报告页总览：43 个问题、9 项修订；引用标记 96 处、参考文献 73 条，检查用时 **8 分 56 秒**（536 秒冷启动），属性里有“发往云端 80,689 字”。 |
 | `light-item-f40.png` | `item:f40` | 详情“未能在数据库中找到这篇文献”：Crossref、OpenAlex、arXiv 均未检索到 [70] 的题录。 |
 | `light-item-f28.png` | `item:f28` | 详情“被引文献与这条论断说的不是同一项工作，可能引错了文献”：正文说 CornerNet 借鉴 [40] 的关键点检测思想，[40] 实际是 Attention Is All You Need。 |
 | `light-item-v5.png` | `item:v5` | 详情“建议修订：制 改为 置”：NMS 段落“分类制置信度排序”的原文、修订对照。 |
@@ -39,6 +40,7 @@ SHOT_CHECK venue:f35 => 全部问题 | 参考文献构成偏离《电子学报�
 ## 核对
 
 - 六张图都已逐张打开：右侧详情（或 `venue:f35` 的评审卡片 + 详情）与上表一致。
+- `light-report.png` 单独核对过：属性行显示“检查用时 8 分 56 秒”，不是上一版的 22 秒。
 - 画面里没有 API Key，也没有用户名路径；报告页只显示文件名，不显示完整路径。
 - 左下角“李明”是 `lib/shots.ts` 的 `SAMPLE_PREFS` 示例资料；“最近检查”是
   `lib/useReports.ts` 的 `SHOT_HISTORY`，shots 模式固定的演示数据，不是本机真实检查记录。
