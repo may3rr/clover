@@ -1,6 +1,9 @@
 """组装决赛提交文件包：效率进化赛道-我要发顶刊-Clover/
 
-    python submission/build_package.py
+    python submission/build_package.py [--incoming <dir>]
+
+--incoming：从 Intel 决赛机拷来的文件夹。里面的 {NAME}.pdf（PowerPoint
+导出）替换 LibreOffice 导出的 PDF，*.mp4 放进 演示视频/。
 
 先启动网页复刻版的开发服务器（npm run site:dev，端口 5180），并且已经用
 app/site/scripts/pitch-pptx.py 生成了可编辑的 PPTX。产物在
@@ -112,6 +115,8 @@ def shots(browser) -> None:
 
 
 def main() -> None:
+    import sys
+    incoming = Path(sys.argv[sys.argv.index("--incoming") + 1]) if "--incoming" in sys.argv else None
     if not PPTX.exists():
         raise SystemExit(f"缺少 {PPTX}，先运行 app/site/scripts/pitch-pptx.py")
     shutil.rmtree(PKG, ignore_errors=True)
@@ -119,11 +124,19 @@ def main() -> None:
     (PKG / "演示视频").mkdir()
 
     shutil.copy(PPTX, PKG / PPTX.name)
-    with tempfile.TemporaryDirectory() as tmp:
-        subprocess.run([SOFFICE, "--headless", "--convert-to", "pdf", "--outdir", tmp,
-                        str(PKG / PPTX.name)], check=True, capture_output=True)
-        shutil.move(Path(tmp) / f"{NAME}.pdf", PKG / f"{NAME}.pdf")
-    print(f"{NAME}.pptx, {NAME}.pdf")
+    ppt_pdf = incoming / f"{NAME}.pdf" if incoming else None
+    if ppt_pdf and ppt_pdf.exists():
+        shutil.copy(ppt_pdf, PKG / f"{NAME}.pdf")
+        print(f"{NAME}.pptx, {NAME}.pdf (PowerPoint export from the finals machine)")
+    else:
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run([SOFFICE, "--headless", "--convert-to", "pdf", "--outdir", tmp,
+                            str(PKG / PPTX.name)], check=True, capture_output=True)
+            shutil.move(Path(tmp) / f"{NAME}.pdf", PKG / f"{NAME}.pdf")
+        print(f"{NAME}.pptx, {NAME}.pdf (LibreOffice)")
+    for v in sorted(incoming.glob("*.mp4")) if incoming else []:
+        shutil.copy(v, PKG / "演示视频" / v.name)
+        print(f"演示视频/{v.name}  {v.stat().st_size / 1e6:.0f} MB")
 
     qrcode.make(HOME, border=2, box_size=16).save(PKG / f"{NAME}-主页二维码.png")
 
