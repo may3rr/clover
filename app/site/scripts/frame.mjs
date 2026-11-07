@@ -26,7 +26,7 @@ const template = ti >= 0 ? argv[ti + 1] : 'frame'
 const TEMPLATES = {
   frame: { page: 'frame.html', dir: '05-成片-主页框' },
   desk: { page: 'desk.html', dir: '05-成片-桌面' },
-  cover: { page: 'index.html', ready: '.hero-window .window.ready' },
+  cover: { page: 'index.html?card=cover', ready: '.hero-window .window.ready' },
   end: { page: 'index.html?card=end', ready: '.hero-window .window.ready' },
   poster: { page: 'poster.html', ready: '.window.ready', size: [1080, 1920], themes: ['light'] },
 }

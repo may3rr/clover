@@ -34,6 +34,16 @@ if (new URLSearchParams(location.search).get('card') === 'end') {
   }
 }
 
+// ----------------------------------------------------- ?card=cover
+// showcase cover (frame.mjs --template cover): larger brand, Powered by 千问 and Intel
+if (new URLSearchParams(location.search).get('card') === 'cover') {
+  document.body.classList.add('cover')
+  document.querySelector('.hero-team')?.insertAdjacentHTML(
+    'afterend',
+    `<p class="hero-powered"><span>Powered by</span><img src="./brand/qwen-color.svg" alt="" width="28" height="28" /><b>千问</b><img class="hero-intel" src="./brand/intel.svg" alt="Intel" /></p>`
+  )
+}
+
 // ---------------------------------------------------------------- links
 for (const a of document.querySelectorAll<HTMLAnchorElement>('[data-link]')) {
   const href = LINKS[a.dataset.link as keyof typeof LINKS]

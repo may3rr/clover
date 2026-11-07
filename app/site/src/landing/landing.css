@@ -215,6 +215,24 @@ p {
   font-weight: 600;
   color: var(--text);
 }
+.hero-intel {
+  height: 22px;
+  width: auto;
+  margin-left: 16px;
+}
+.cover .brand {
+  gap: 12px;
+  font-size: 36px;
+  font-weight: 700;
+}
+.cover .brand img {
+  width: 56px;
+  height: 56px;
+}
+.cover .nav {
+  height: 96px;
+  padding: 0 32px;
+}
 .end-card {
   position: fixed;
   inset: 0;
