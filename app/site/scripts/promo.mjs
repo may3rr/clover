@@ -1,16 +1,18 @@
 // The captioned product cut on the Chinese demo paper: no narration, the
-// captions under the window tell the story, music underneath.
+// captions under the window tell the story over a slow flowing backdrop;
+// no audio (music is added in the editor).
 //
-//   node site/scripts/promo.mjs [--music song.(mp3|m4a|mov)] [--skip-record]
+//   node site/scripts/promo.mjs [--skip-record]       (PYTHON=<python with numpy>)
 //
 // 1. silent clips set each caption's reading time; record.mjs --film plays
 //    the film-zh tour (tour.ts FILM_ZH) on the redacted Chinese report and
 //    logs when each caption starts
-// 2. frame.mjs --template promo puts it on the desk with a caption band
+// 2. the window (promo slot from frame.mjs) goes over a flowing backdrop
+//    (promo-bg.py) with a soft shadow
 // 3. captions (rsvg-convert, PingFang SC) fade in under the window; the
-//    landing cover closes the cut; the music fades out at the end
+//    landing cover closes the cut
 //
-// Output: site-videos/07-宣传/宣传-无声.mp4 and, with --music, 宣传-配乐.mp4.
+// Output: site-videos/07-宣传/宣传-无配乐.mp4
 import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -19,11 +21,6 @@ import { fileURLToPath } from 'node:url'
 const here = path.dirname(fileURLToPath(import.meta.url))
 const appDir = path.resolve(here, '../..')
 const argv = process.argv.slice(2)
-const opt = (k) => {
-  const i = argv.indexOf(`--${k}`)
-  return i >= 0 ? argv[i + 1] : undefined
-}
-const music = opt('music') && path.resolve(opt('music'))
 const out = path.join(appDir, 'site-videos/07-宣传')
 const work = path.join(out, 'work')
 fs.mkdirSync(work, { recursive: true })
@@ -65,11 +62,24 @@ if (!argv.includes('--skip-record')) {
     '--query', 'data=zh&redact=1', '--fps', '60', '--out', work])
 }
 
-// 2. frame
-run('node', [path.join(here, 'frame.mjs'), '--template', 'promo', raw])
-const framed = path.join(appDir, 'site-videos/05-成片-宣传/film-zh.mp4')
-const slot = JSON.parse(fs.readFileSync(path.join(appDir, 'site-videos/frame/promo.slot.json'), 'utf8'))
-const filmLen = dur(framed)
+// 2. layout: the promo slot (desk.html?cap=1) and its rounded mask
+const slotFile = path.join(appDir, 'site-videos/frame/promo.slot.json')
+const maskFile = path.join(appDir, 'site-videos/frame/promo.mask.png')
+if (!fs.existsSync(slotFile) || !fs.existsSync(maskFile))
+  run('node', [path.join(here, 'frame.mjs'), '--template', 'promo', raw])
+const slot = JSON.parse(fs.readFileSync(slotFile, 'utf8'))
+const filmLen = dur(raw)
+
+// flowing backdrop (promo-bg.py) and the window's soft shadow
+const bg = path.join(work, 'bg.mp4')
+run(process.env.PYTHON ?? 'python3', [path.join(here, 'promo-bg.py'), bg, String(Math.ceil(filmLen) + 1)])
+const shadow = path.join(work, 'shadow.png')
+spawnSync('rsvg-convert', ['-o', shadow], {
+  input: `<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160">
+  <filter id="b" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="72"/></filter>
+  <rect x="${slot.x}" y="${slot.y + 40}" width="${slot.w}" height="${slot.h}" rx="${slot.radius}" fill="#1e2440" fill-opacity="0.22" filter="url(#b)"/>
+</svg>`,
+})
 
 // 3. captions: a 3840-wide strip for the band under the window (slot is in 2x px)
 const band = { y: slot.y + slot.h, h: 2160 - slot.y - slot.h }
@@ -79,7 +89,7 @@ const pngs = CAPTIONS.map(([k, t], i) => {
   const mid = band.h / 2
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="${band.h}">
   <style>text{font-family:'PingFang SC';text-anchor:middle}</style>
-  ${k ? `<text x="1920" y="${mid - 40}" font-size="44" font-weight="500" fill="#37352f" fill-opacity="0.6">${esc(k)}</text>` : ''}
+  ${k ? `<text x="1920" y="${mid - 40}" font-size="44" font-weight="500" fill="#37352f" fill-opacity="0.62">${esc(k)}</text>` : ''}
   <text x="1920" y="${k ? mid + 52 : mid + 26}" font-size="${k ? 64 : 72}" font-weight="600" fill="#37352f">${esc(t)}</text>
 </svg>`
   spawnSync('rsvg-convert', ['-o', f], { input: svg })
@@ -93,38 +103,41 @@ const cover = path.join(appDir, 'site-videos/frame/cover-zh-light.png')
 run('node', [path.join(here, 'frame.mjs'), '--template', 'cover-zh'])
 const HOLD = 4
 const XF = 0.8
-const total = filmLen + HOLD - XF
 
-const inputs = ['-i', framed]
-const parts = []
-let last = '[0:v]'
+const inputs = [
+  '-i', bg,
+  '-loop', '1', '-t', String(filmLen), '-i', shadow,
+  '-i', raw,
+  '-loop', '1', '-t', String(filmLen), '-i', maskFile,
+]
+const parts = [
+  `[0:v]trim=0:${filmLen.toFixed(3)},setpts=PTS-STARTPTS,scale=3840:2160:flags=bicubic,fps=60,noise=alls=3:allf=t,format=rgba[bg]`,
+  `[bg][1:v]overlay=0:0[bs]`,
+  `[2:v]scale=${slot.w}:${slot.h}:flags=lanczos,format=rgba[w]`,
+  `[3:v]format=rgba,alphaextract[m]`,
+  `[w][m]alphamerge[wm]`,
+  `[bs][wm]overlay=${slot.x}:${slot.y}:shortest=1[base]`,
+]
+let last = '[base]'
 pngs.forEach((f, i) => {
   const a = starts[i]
   const b = i + 1 < starts.length ? starts[i + 1] - 0.1 : filmLen - 0.2
+  const n = i + 4
   inputs.push('-loop', '1', '-t', String(filmLen), '-i', f)
   parts.push(
-    `[${i + 1}:v]format=rgba,fade=in:st=${a.toFixed(3)}:d=0.25:alpha=1,fade=out:st=${(b - 0.25).toFixed(3)}:d=0.25:alpha=1[c${i}]`,
+    `[${n}:v]format=rgba,fade=in:st=${a.toFixed(3)}:d=0.25:alpha=1,fade=out:st=${(b - 0.25).toFixed(3)}:d=0.25:alpha=1[c${i}]`,
     `${last}[c${i}]overlay=0:${band.y}:enable='between(t,${a.toFixed(3)},${b.toFixed(3)})'[v${i}]`)
   last = `[v${i}]`
 })
-const ci = pngs.length + 1
+const ci = pngs.length + 4
 inputs.push('-loop', '1', '-t', String(HOLD), '-r', '60', '-i', cover)
 parts.push(
   `${last}fps=60,format=yuv420p,settb=AVTB[film]`,
   `[${ci}:v]scale=3840:2160,fps=60,format=yuv420p,settb=AVTB[end]`,
   `[film][end]xfade=transition=fade:duration=${XF}:offset=${(filmLen - XF).toFixed(3)}[out]`)
 const vt = /h264_videotoolbox/.test(spawnSync('ffmpeg', ['-hide_banner', '-encoders'], { encoding: 'utf8' }).stdout)
-const enc = vt ? ['-c:v', 'h264_videotoolbox', '-b:v', '40M'] : ['-c:v', 'libx264', '-preset', 'medium', '-crf', '17']
-const silent = path.join(out, '宣传-无声.mp4')
+const enc = vt ? ['-c:v', 'h264_videotoolbox', '-b:v', '45M'] : ['-c:v', 'libx264', '-preset', 'medium', '-crf', '16']
+const dst = path.join(out, '宣传-无配乐.mp4')
 run('ffmpeg', ['-y', '-loglevel', 'error', ...inputs, '-filter_complex', parts.join(';'), '-map', '[out]',
-  '-r', '60', ...enc, '-movflags', '+faststart', silent])
-console.log(`${path.relative(appDir, silent)}  ${dur(silent).toFixed(1)} s`)
-
-// 4. music
-if (music) {
-  const dst = path.join(out, '宣传-配乐.mp4')
-  run('ffmpeg', ['-y', '-loglevel', 'error', '-i', silent, '-i', music,
-    '-filter_complex', `[1:a]atrim=0:${total.toFixed(3)},asetpts=PTS-STARTPTS,afade=t=in:d=0.5,afade=t=out:st=${(total - 3).toFixed(3)}:d=3[a]`,
-    '-map', '0:v', '-map', '[a]', '-c:v', 'copy', '-c:a', 'aac', '-b:a', '256k', '-shortest', '-movflags', '+faststart', dst])
-  console.log(`${path.relative(appDir, dst)}  ${dur(dst).toFixed(1)} s`)
-}
+  '-r', '60', ...enc, '-movflags', '+faststart', dst])
+console.log(`${path.relative(appDir, dst)}  ${dur(dst).toFixed(1)} s`)
