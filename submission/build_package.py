@@ -1,4 +1,4 @@
-"""组装决赛提交文件包：效率进化赛道-我要发顶刊-Clover/
+"""组装决赛提交文件包：效率进化赛道-我要发顶刊-Clover：投稿前的论文引用体检/
 
     python submission/build_package.py [--incoming <dir>]
 
@@ -7,7 +7,7 @@
 
 先启动网页复刻版的开发服务器（npm run site:dev，端口 5180），并且已经用
 app/site/scripts/pitch-pptx.py 生成了可编辑的 PPTX。产物在
-app/site-single/效率进化赛道-我要发顶刊-Clover/ 和同名 .zip（目录已被 git 忽略）。
+app/site-single/效率进化赛道-我要发顶刊-Clover：投稿前的论文引用体检/ 和同名 .zip（目录已被 git 忽略）。
 
 - PPTX 原样复制，PDF 由同一份 PPTX 经 LibreOffice 导出
 - submission/docs/01–03 渲染成 PDF，04（讲稿）不进包
@@ -28,7 +28,7 @@ import qrcode
 from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
-NAME = "效率进化赛道-我要发顶刊-Clover"
+NAME = "效率进化赛道-我要发顶刊-Clover：投稿前的论文引用体检"
 SITE = ROOT / "app" / "site-single"
 PKG = SITE / NAME
 PPTX = SITE / f"{NAME}.pptx"
@@ -139,7 +139,7 @@ def intro_pdf(pg) -> None:
       img {{ width: 100%; border-radius: 6pt; box-shadow: 0 0 0 0.5pt #ddd; }}
       figcaption {{ font-size: 9.5pt; color: #555; margin-top: 4pt; }}
       .cover {{ width: 100%; border-radius: 8pt; margin: 6pt 0 10pt; }}</style>
-      <h1>Clover：投稿前的引用体检</h1>
+      <h1>Clover：投稿前的论文引用体检</h1>
       <p>效率进化赛道，阿里云特别赛题，Intel 本地 AI 应用挑战。团队：我要发顶刊，天津师范大学，吕浩博。产品主页 {HOME}</p>
       <img class='cover' src='{(PKG / EVID / "宣传素材" / "封面-1920x1080.png").as_uri()}'>
       <p>{one}</p>

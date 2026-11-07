@@ -9,7 +9,7 @@
 需要先启动网页复刻版的开发服务器（npm run site:dev，端口 5180）。
 
     python app/site/scripts/pitch-pptx.py
-        -> app/site-single/效率进化赛道-我要发顶刊-Clover.pptx
+        -> app/site-single/效率进化赛道-我要发顶刊-Clover：投稿前的论文引用体检.pptx
 
 软件窗口优先用 Intel 决赛机上用截图模式拍的真实 Windows 截图
 （demo/intel/shots-pitch/win/），没有时才用网页复刻版渲染。
@@ -32,7 +32,7 @@ from pptx.util import Emu, Pt
 
 ROOT = Path(__file__).resolve().parents[3]
 TEMPLATE = ROOT / "天猫Ai黑客松｜选手路演PPT模版" / "路演PPT模版.pptx"
-OUT = ROOT / "app" / "site-single" / "效率进化赛道-我要发顶刊-Clover.pptx"
+OUT = ROOT / "app" / "site-single" / "效率进化赛道-我要发顶刊-Clover：投稿前的论文引用体检.pptx"
 URL = "http://localhost:5180/pitch.html"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
