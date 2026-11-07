@@ -1,27 +1,11 @@
 \documentclass[UTF8,zihao=5,fontset=none]{ctexart}
 \usepackage{clover}
 \renewcommand{\doctitle}{项目说明}
-\fancypagestyle{first}{\fancyhf{}}
-% 单页：版心放宽，字号收小
-\newgeometry{top=11mm,bottom=10mm,left=15mm,right=15mm,footskip=5mm}
-\fontsize{9pt}{12.3pt}\selectfont
-\linespread{1.0}
-\ctexset{section/beforeskip=5pt plus 1pt, section/afterskip=4pt,
-  section/format=\raggedright\sffamily\heiti\bfseries\fontsize{12pt}{16pt}\selectfont}
-\renewcommand{\arraystretch}{1.08}
-\setlength{\parskip}{1pt}
-\renewcommand{\ctablespread}{1.05}
-\renewenvironment{ctable}[1]
-  {\par\vspace{2pt}\noindent\small\linespread{1.05}\selectfont\tabularx{\linewidth}{#1}\toprule}
-  {\bottomrule\endtabularx\par\vspace{2pt}}
-\setlist{nosep, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
-
 \begin{document}
-\fontsize{9pt}{12.3pt}\selectfont
 
-\cloverhead{Clover：投稿前的论文引用体检}{项目说明}{效率进化赛道\quad 阿里云特别赛题，基于 Qwen 的科研提效\quad Intel 本地 AI 应用挑战\quad 团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
+\cloverhead{Clover：投稿前的论文引用体检}{项目说明}{效率进化赛道\quad 阿里云特别赛题，基于 Qwen 的科研提效\quad Intel 本地 AI 应用挑战\\
+团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
 
-\vspace{-4pt}
 \section{一句话介绍}
 
 Clover 是给研究生和青年教师用的投稿前引用体检工具：拖入一篇 Word 或 LaTeX 稿件，几分钟内核对每一条参考文献是否真实存在、被引原文是否支持正文的论断、格式是否规范、引用是否符合目标期刊的常态，问题写成 Word 批注和修订交还作者逐条处理。
@@ -44,7 +28,6 @@ Clover 是给研究生和青年教师用的投稿前引用体检工具：拖入�
 期刊对标 & 用目标期刊的范文逐项比较章节结构、引用位置、参考文献构成、引用功能、研究要素、篇幅与图表 & 偏离范文常态的地方写批注，附每篇范文的取值和页码 \\
 \end{ctable}
 
-\vspace{-4pt}
 \noindent 三条原则：
 \begin{enumerate}
 \item \textbf{证据必须逐字可查。}模型给出的证据句要能在被引原文里逐字找到，找不到就降级为无法判断。
@@ -54,7 +37,7 @@ Clover 是给研究生和青年教师用的投稿前引用体检工具：拖入�
 
 \section{AI 能力}
 
-\begin{ctable}{@{}>{\raggedright\arraybackslash}p{20em}>{\raggedright\arraybackslash}p{12.5em}L@{}}
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{15em}>{\raggedright\arraybackslash}p{10.5em}L@{}}
 \hd{模型} & \hd{位置} & \hd{用途} \\ \midrule
 Qwen3.8-flash & 阿里云百炼 & 支持度判断、论断抽取、错别字、读范文 \\
 Qwen3.7-flash & 阿里云百炼 & 参考文献结构化、引用功能分类 \\
@@ -63,7 +46,6 @@ text-embedding-v4、qwen3-rerank & 阿里云百炼 & 被引原文片段的向量
 Qwen3-Embedding-0.6B、Qwen3-Reranker-0.6B & Intel 本机，Arc 核显或 NPU & 向量与重排，挑出交给判断的原文段落 \\
 Qwen3-8B，int4 & Intel 本机，Arc 核显 & 隐私模式下的抽取、错别字、文献结构化、读范文 \\
 \end{ctable}
-\vspace{-4pt}
 \noindent 每个阶段用云端还是本机模型，可以在配置里分别指定。
 
 \section{应用价值}
@@ -79,7 +61,6 @@ Qwen3-8B，int4 & Intel 本机，Arc 核显 & 隐私模式下的抽取、错别�
 \end{ctable}
 {\noindent\footnotesize\color{muted}出处：\code{FINALS\_DELTA.md} 第 1 节，\code{demo/testset/item\_bench/results.md}，\code{demo/intel/bench/E2E\_REC.md}，报告中的发送清单。\par}
 
-\vspace{-4pt}
 \noindent{\color{muted}赛前基础与 48 小时内的新增或优化见《赛期成果说明》，实现细节见《技术说明》。}
 
 \end{document}
