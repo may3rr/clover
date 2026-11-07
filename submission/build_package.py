@@ -23,6 +23,7 @@ import tempfile
 from pathlib import Path
 
 import markdown
+import pypdf
 import qrcode
 from playwright.sync_api import sync_playwright
 
@@ -41,10 +42,16 @@ UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36")
 SOFFICE = "/Applications/LibreOffice.app/Contents/MacOS/soffice"
 
+EVID = "作品佐证材料"  # organizer: supporting files named by content title, in one folder
+# (source, output, extra css); the project description must fit on one page
+ONE_PAGE = ("@page { margin: 10mm 12mm; } body { font-size: 8.6pt; line-height: 1.45; } "
+            "h1 { font-size: 15pt; } h2 { font-size: 10.5pt; margin: 7pt 0 3pt; } "
+            "td, th { padding: 2pt 4pt; font-size: 8pt; } p, li { margin: 1.5pt 0; }")
 DOC_PDFS = [
-    ("01-项目说明.md", f"{NAME}-项目说明.pdf"),
-    ("02-技术说明.md", f"{NAME}-技术说明.pdf"),
-    ("03-作品链接与佐证.md", f"{NAME}-作品链接与佐证.pdf"),
+    ("01-项目说明.md", "项目说明.pdf", ONE_PAGE),
+    ("02-技术说明.md", "技术说明.pdf", ""),
+    ("05-赛期成果说明.md", "赛期成果说明.pdf", ""),
+    ("03-作品链接与佐证.md", "作品链接与佐证.pdf", ""),
 ]
 
 # (file, replica state): the Chinese demo report, one finding open each
@@ -98,20 +105,57 @@ p, li {{ margin: 3pt 0; }}
 
 
 def doc_pdfs(pg) -> None:
-    for src, dst in DOC_PDFS:
+    for src, dst, extra in DOC_PDFS:
         body = markdown.markdown((DOCS / src).read_text(), extensions=["tables"])
-        html = f"<!doctype html><meta charset='utf-8'><style>{CSS}</style>{body}"
+        html = f"<!doctype html><meta charset='utf-8'><style>{CSS}{extra}</style>{body}"
         with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False) as f:
             f.write(html)
         pg.goto(Path(f.name).as_uri())
         pg.wait_for_timeout(300)
-        pg.pdf(path=str(PKG / dst), format="A4", print_background=True,
-               margin={"top": "18mm", "bottom": "18mm", "left": "16mm", "right": "16mm"})
-        print(dst)
+        m = "10mm" if extra else "18mm"
+        pg.pdf(path=str(PKG / EVID / dst), format="A4", print_background=True,
+               margin={"top": m, "bottom": m, "left": "16mm" if not extra else "12mm",
+                       "right": "16mm" if not extra else "12mm"})
+        print(dst, len(pypdf.PdfReader(PKG / EVID / dst).pages), "pages")
+
+
+# 项目介绍图文: cover, one paragraph, captioned screenshots (captions from 03's table)
+INTRO_SHOTS = ["01-报告页.png", "09-核对文献连接.png", "02-文献真实性.png", "03-论断支持度.png",
+               "04-格式规范.png", "05-期刊对标.png", "12-导出Word-WPS中的批注.png",
+               "11-任务管理器-体检进行中.png", "14-发往云端清单.png"]
+
+
+def intro_pdf(pg) -> None:
+    import re
+    md = (DOCS / "01-项目说明.md").read_text()
+    one = md.split("## 一句话介绍", 1)[1].split("##", 1)[0].strip()
+    caps = dict(re.findall(r"^\| (\d\d-[^|]+\.png) \| ([^|]+) \|", (DOCS / "03-作品链接与佐证.md").read_text(), re.M))
+    shots_dir = PKG / EVID / "截图"
+    figs = "".join(
+        f"<figure><img src='{(shots_dir / n).as_uri()}'><figcaption>{caps.get(n, '').strip()}</figcaption></figure>"
+        for n in INTRO_SHOTS)
+    html = f"""<!doctype html><meta charset='utf-8'><style>{CSS}
+      figure {{ margin: 0 0 14pt; break-inside: avoid; }}
+      img {{ width: 100%; border-radius: 6pt; box-shadow: 0 0 0 0.5pt #ddd; }}
+      figcaption {{ font-size: 9.5pt; color: #555; margin-top: 4pt; }}
+      .cover {{ width: 100%; border-radius: 8pt; margin: 6pt 0 10pt; }}</style>
+      <h1>Clover：投稿前的引用体检</h1>
+      <p>效率进化赛道，阿里云特别赛题，Intel 本地 AI 应用挑战。团队：我要发顶刊，天津师范大学，吕浩博。产品主页 {HOME}</p>
+      <img class='cover' src='{(PKG / EVID / "宣传素材" / "封面-1920x1080.png").as_uri()}'>
+      <p>{one}</p>
+      <h2>界面与真实运行</h2>{figs}"""
+    with tempfile.NamedTemporaryFile("w", suffix=".html", delete=False) as f:
+        f.write(html)
+    pg.goto(Path(f.name).as_uri())
+    pg.wait_for_timeout(800)
+    dst = PKG / EVID / "项目介绍图文.pdf"
+    pg.pdf(path=str(dst), format="A4", print_background=True,
+           margin={"top": "16mm", "bottom": "16mm", "left": "16mm", "right": "16mm"})
+    print(dst.name, len(pypdf.PdfReader(dst).pages), "pages")
 
 
 def shots(browser) -> None:
-    out = PKG / "截图"
+    out = PKG / EVID / "截图"
     out.mkdir(exist_ok=True)
     pg = browser.new_page(viewport={"width": 1280, "height": 800}, device_scale_factor=2,
                           user_agent=UA)
@@ -139,7 +183,7 @@ def shots(browser) -> None:
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", str(t), "-i", str(videos[0]),
                         "-frames:v", "1", str(out / dst)], check=True)
         print(f"{dst}  {t}s of {videos[0].name}")
-    promo = PKG / "宣传素材"
+    promo = PKG / EVID / "宣传素材"
     promo.mkdir(exist_ok=True)
     for dst, src in PROMO:
         shutil.copy(src, promo / dst)
@@ -153,6 +197,7 @@ def main() -> None:
     shutil.rmtree(PKG, ignore_errors=True)
     PKG.mkdir(parents=True)
     (PKG / "演示视频").mkdir()
+    (PKG / EVID).mkdir()
 
     shutil.copy(PPTX, PKG / PPTX.name)
     ppt_pdf = incoming / f"{NAME}.pdf" if incoming else None
@@ -169,12 +214,13 @@ def main() -> None:
         shutil.copy(v, PKG / "演示视频" / v.name)
         print(f"演示视频/{v.name}  {v.stat().st_size / 1e6:.0f} MB")
 
-    qrcode.make(HOME, border=2, box_size=16).save(PKG / f"{NAME}-主页二维码.png")
+    qrcode.make(HOME, border=2, box_size=16).save(PKG / EVID / "主页二维码.png")
 
     with sync_playwright() as p:
         b = p.chromium.launch(channel="chrome")
         doc_pdfs(b.new_page())
         shots(b)
+        intro_pdf(b.new_page())
         b.close()
 
     zip_path = shutil.make_archive(str(SITE / NAME), "zip", SITE, NAME)
