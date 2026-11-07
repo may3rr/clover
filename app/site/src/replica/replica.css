@@ -115,3 +115,24 @@ html.framed body::before {
     transform: scale(1.6);
   }
 }
+
+/* &redact=blur (promo video): the paper's own text is blurred, only the
+   highlighted problems stay legible; the title, file name and outline too */
+.blur-paper .paper [data-pid],
+.blur-paper .paper .paper-table :is(td, th),
+.blur-paper .paper .t32,
+.blur-paper .paper .prop-row:first-child .prop-value,
+.blur-paper .toc-row .flex-1,
+.blur-paper .run-col .t26,
+.blur-paper .export-pop-name,
+.blur-paper .send-list .send-text {
+  color: transparent !important;
+  text-shadow: 0 0 12px var(--text);
+}
+.blur-paper .paper [data-pid] .hl {
+  color: var(--text);
+  text-shadow: none;
+}
+.blur-paper .paper .paper-fig img {
+  filter: blur(10px);
+}

@@ -29,7 +29,7 @@ const TEMPLATES = {
   desk: { page: 'desk.html', dir: '05-成片-桌面' },
   promo: { page: 'desk.html?cap=1', dir: '05-成片-宣传', themes: ['light'] },
   cover: { page: 'index.html?card=cover', ready: '.hero-window .window.ready' },
-  'cover-zh': { page: 'index.html?card=cover&data=zh&redact=1', ready: '.hero-window .window.ready', themes: ['light'] },
+  'cover-zh': { page: 'index.html?card=cover&data=zh&redact=blur', ready: '.hero-window .window.ready', themes: ['light'] },
   end: { page: 'index.html?card=end', ready: '.hero-window .window.ready' },
   poster: { page: 'poster.html', ready: '.window.ready', size: [1080, 1920], themes: ['light'] },
 }

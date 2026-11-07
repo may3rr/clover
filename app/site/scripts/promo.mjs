@@ -59,7 +59,7 @@ if (!argv.includes('--skip-record')) {
     run('ffmpeg', ['-y', '-loglevel', 'error', '-f', 'lavfi', '-i', 'anullsrc=r=48000:cl=stereo',
       '-t', reading(t).toFixed(2), path.join(durDir, `${String(i + 1).padStart(2, '0')}.wav`)]))
   run('node', [path.join(here, 'record.mjs'), '--film', durDir, '--tour', 'film-zh',
-    '--query', 'data=zh&redact=1', '--fps', '60', '--out', work])
+    '--query', 'data=zh&redact=blur', '--fps', '60', '--out', work])
 }
 
 // 2. layout: the promo slot (desk.html?cap=1) and its rounded mask

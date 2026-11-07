@@ -64,7 +64,10 @@ function redact(r: Report): void {
 }
 
 function adopt(d: Data): Data {
-  if (new URLSearchParams(location.search || window.name).get('redact')) redact(d.showcase)
+  // &redact=blur: blur the paper's own text instead (replica.css .blur-paper)
+  const mode = new URLSearchParams(location.search || window.name).get('redact')
+  if (mode === 'blur') document.documentElement.classList.add('blur-paper')
+  else if (mode) redact(d.showcase)
   SHOWCASE_FILE = d.showcase.document?.filename ?? SHOWCASE_FILE
   if (d.outline == null) d.outline = outlineFromReport(d.showcase)
   if (d.showcase._assets) showFigures(d.showcase._assets)
