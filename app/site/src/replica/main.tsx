@@ -82,8 +82,8 @@ async function boot() {
   if (tour) {
     await new Promise((r) => setTimeout(r, Number(q.get('delay') ?? 600)))
     try {
-      if (tour === 'film')
-        await playFilm((q.get('durs') ?? '').split(',').map(Number))
+      if (tour.startsWith('film'))
+        await playFilm((q.get('durs') ?? '').split(',').map(Number), tour)
       else await play(tour)
     } finally {
       clover.tourDone = true

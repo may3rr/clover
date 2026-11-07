@@ -50,7 +50,21 @@ export function loadData(): Promise<Data> {
   return data
 }
 
+/** &redact=1: hide the published paper's topic in its title and file name
+ *  (same length, so anchors and offsets stay put) for public videos */
+const REDACT = ['目标检测', 'Object Detection']
+function redact(r: Report): void {
+  const hide = (t: string) => REDACT.reduce((s, a) => s.split(a).join('█'.repeat(a.length)), t)
+  if (r.document) {
+    r.document.title = hide(r.document.title ?? '')
+    r.document.filename = hide(r.document.filename ?? '')
+  }
+  const s0 = r.sections?.[0]?.id
+  for (const p of r.paragraphs ?? []) if (p.section_id === s0 && p.text.length < 80) p.text = hide(p.text)
+}
+
 function adopt(d: Data): Data {
+  if (new URLSearchParams(location.search || window.name).get('redact')) redact(d.showcase)
   SHOWCASE_FILE = d.showcase.document?.filename ?? SHOWCASE_FILE
   if (d.outline == null) d.outline = outlineFromReport(d.showcase)
   if (d.showcase._assets) showFigures(d.showcase._assets)

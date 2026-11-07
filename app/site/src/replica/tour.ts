@@ -206,15 +206,89 @@ export const FILM: Step[][] = [
   [{ cursor: 'hide' }, { speak: 12, lead: 800, tail: 3200 }],
 ]
 
+// --------------------------------------------------------------- film-zh
+/** The captioned product cut on the Chinese demo paper (no narration):
+ *  `speak: n` marks where caption n appears; site/scripts/promo.mjs sets
+ *  each caption's reading time and lays the captions under the window. */
+export const FILM_ZH: Step[][] = [
+  // 1-2 intro: dots gather, the title shuffles in
+  [{ go: 'onboarding-intro' }, { cursor: 'hide' }, { wait: 1200 }, { speak: 1, lead: 0, tail: 300 }],
+  [{ speak: 2, lead: 0, tail: 600 }],
+  // 3 drop the paper, the four checks run
+  [
+    { go: 'empty' },
+    { cursor: 'show' },
+    { wait: 600 },
+    { click: { sel: '.pill-accent', text: '选择文件' }, pause: 200 },
+    { speak: 3, lead: 600 },
+    { cursor: 'hide' },
+    { wait: 10200 },
+  ],
+  // 4 the report
+  [{ cursor: 'show' }, { speak: 4, lead: 400 }, { hover: '.side-row', pause: 400 }],
+  // 5 authenticity: [70] is nowhere
+  [
+    { click: side('文献真实性'), pause: 500 },
+    { click: row('Adaptive scale-aware'), pause: 300 },
+    { speak: 5, lead: 300 },
+  ],
+  // 6-7 support: [40] is a different work; the evidence below
+  [
+    { click: back, pause: 400 },
+    { click: side('论断支持度'), pause: 500 },
+    { click: row('Attention is all'), pause: 300 },
+    { speak: 6, lead: 300 },
+  ],
+  [{ scroll: '.detail-in .overflow-y-auto', by: 360, ms: 1400 }, { speak: 7, lead: 0 }],
+  // 8 norms: a typo becomes a revision
+  [
+    { click: back, pause: 400 },
+    { click: side('格式规范'), pause: 500 },
+    { click: row('制 改为 置'), pause: 300 },
+    { speak: 8, lead: 300 },
+  ],
+  // 9 the target journal: reference make-up against three 电子学报 papers
+  [
+    { click: back, pause: 400 },
+    { click: side('引用分布'), pause: 500 },
+    { click: row('参考文献构成偏离'), pause: 300 },
+    { reveal: OVERVIEW_CARD, ms: 1200 },
+    { speak: 9, lead: 200 },
+  ],
+  // 10 export
+  [
+    { click: back, pause: 300 },
+    { scroll: reading, by: -6000, ms: 900 },
+    { click: { sel: 'button', text: '导出到 Word' }, pause: 300 },
+    { speak: 10, lead: 500 },
+  ],
+  // 11 privacy: what went to the cloud, and the switch
+  [
+    { go: 'report' },
+    { wait: 400 },
+    { click: { sel: 'button[aria-expanded]', text: '发往云端' }, pause: 300 },
+    { speak: 11, lead: 400 },
+  ],
+  [
+    { go: 'settings-model' },
+    { wait: 300 },
+    { click: { sel: 'button[aria-labelledby="privacy-label"]' }, pause: 300 },
+    { speak: 12, lead: 300 },
+  ],
+  // 13 over the finished report
+  [{ go: 'report' }, { cursor: 'hide' }, { speak: 13, lead: 600, tail: 1200 }],
+]
+export const FILMS: Record<string, Step[][]> = { film: FILM, 'film-zh': FILM_ZH }
+
 /** speech start times (wall clock ms) the recorder turns into audio offsets */
 export const marks: { line: number; at: number }[] = []
 
-export async function playFilm(durations: number[]): Promise<void> {
+export async function playFilm(durations: number[], name = 'film'): Promise<void> {
   marks.length = 0
   flags.quietExport = true
   ensureCursor().style.opacity = '1'
   try {
-    for (const shot of FILM) {
+    for (const shot of FILMS[name]) {
       let until = 0
       await run(shot, (s) => {
         const lead = s.lead ?? LEAD

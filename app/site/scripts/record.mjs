@@ -30,7 +30,7 @@ const opt = (k, d) => {
   return i >= 0 ? argv[i + 1] : d
 }
 const flag = (k) => argv.includes(`--${k}`)
-const valued = new Set(['--fps', '--scale', '--out', '--page', '--seconds', '--film'])
+const valued = new Set(['--fps', '--scale', '--out', '--page', '--seconds', '--film', '--tour', '--query'])
 const names = argv.filter((a, i) => !a.startsWith('--') && !valued.has(argv[i - 1]))
 
 const ALL = ['onboarding', 'check', 'authenticity', 'support', 'distribution', 'norms', 'overview', 'export', 'settings', 'full']
@@ -41,7 +41,11 @@ const durs = filmDir
       Number(spawnSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', path.join(filmDir, f)], { encoding: 'utf8' }).stdout.trim()))
   : null
 const jobs = durs
-  ? [{ name: 'film', url: `app.html?tour=film&durs=${durs.join(',')}${flag('frame') ? '&frame=1' : ''}`, timeline: true }]
+  ? [{
+      name: opt('tour', 'film'),
+      url: `app.html?tour=${opt('tour', 'film')}&durs=${durs.join(',')}${flag('frame') ? '&frame=1' : ''}${opt('query') ? `&${opt('query')}` : ''}`,
+      timeline: true,
+    }]
   : page
   ? [{ name: path.basename(page).replace(/\W+/g, '-'), url: page, seconds: +opt('seconds', 15) }]
   : (names.length ? names : ALL).map((t) => ({

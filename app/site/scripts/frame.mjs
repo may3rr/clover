@@ -5,6 +5,7 @@
 //   npm run site:frame -- a.mp4 b-dark.mp4     only these (*dark* -> dark frame)
 //   --template frame   logo, tagline and download button on top (frame.html)
 //   --template desk    the window on a desktop, padding all round (desk.html)
+//   --template promo   desk with a caption band under the window (promo.mjs)
 //   --template cover   no video: the landing page's first screen as a PNG
 //   --template end     same, plus "Powered by 千问" (closing card)
 //   --template poster  competition cover, 1080 x 1920 (rendered 2x)
@@ -26,7 +27,9 @@ const template = ti >= 0 ? argv[ti + 1] : 'frame'
 const TEMPLATES = {
   frame: { page: 'frame.html', dir: '05-成片-主页框' },
   desk: { page: 'desk.html', dir: '05-成片-桌面' },
+  promo: { page: 'desk.html?cap=1', dir: '05-成片-宣传', themes: ['light'] },
   cover: { page: 'index.html?card=cover', ready: '.hero-window .window.ready' },
+  'cover-zh': { page: 'index.html?card=cover&data=zh&redact=1', ready: '.hero-window .window.ready', themes: ['light'] },
   end: { page: 'index.html?card=end', ready: '.hero-window .window.ready' },
   poster: { page: 'poster.html', ready: '.window.ready', size: [1080, 1920], themes: ['light'] },
 }

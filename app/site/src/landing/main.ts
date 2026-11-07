@@ -68,7 +68,9 @@ const readyWaiters = new Map<HTMLIFrameElement, (() => void)[]>()
 function mount(box: HTMLElement) {
   if (frames.has(box)) return
   const f = document.createElement('iframe')
-  f.src = box.dataset.src!
+  // the cover card can show the Chinese demo report: &data=zh&redact=1
+  const pass = new URLSearchParams(location.search)
+  f.src = box.dataset.src! + ['data', 'redact'].map((k) => (pass.get(k) ? `&${k}=${pass.get(k)}` : '')).join('')
   f.title = 'Clover 界面'
   f.setAttribute('scrolling', 'no')
   box.appendChild(f)
