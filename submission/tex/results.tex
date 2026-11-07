@@ -1,0 +1,54 @@
+\documentclass[UTF8,zihao=5,fontset=none]{ctexart}
+\usepackage{clover}
+\renewcommand{\doctitle}{赛期成果说明}
+
+\begin{document}
+
+\cloverhead{Clover 赛期成果说明}{投稿前的论文引用体检}{效率进化赛道\quad 阿里云特别赛题\quad Intel 本地 AI 应用挑战\\
+团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
+
+\section{赛前基础}
+
+赛前版本定格于 11 月 1 日，代码仓库标签 \code{v0.9-pre-hackathon}，记录在仓库 \code{PRE\_HACKATHON\_BASELINE.md}。赛前已经完成的部分：
+
+\begin{itemize}
+\item 四项检查：文献真实性、论断支持度、格式规范、期刊对标。
+\item 导出 Word：问题写成批注，错别字和参考文献重排写成修订。
+\item LaTeX 稿件、文献文件夹与本地 PDF 连接、用目标期刊范文对标。
+\item macOS 桌面应用，所有模型都走阿里云百炼或其他云端接口，没有本机推理。
+\item 自动化测试：后端 pytest 482 项通过，前端 vitest 72 项通过。
+\end{itemize}
+
+\section{48 小时内新增或优化}
+
+\begin{ctable}{@{}p{4.6em}>{\raggedright\arraybackslash}p{12.5em}L@{}}
+\hd{方面} & \hd{赛前} & \hd{48 小时内新增或优化} \\ \midrule
+本机 AI & 没有本机方案，向量和重排走云端 & Qwen3-Embedding-0.6B 与 Qwen3-Reranker-0.6B 经 OpenVINO 跑在 Arc 核显和 NPU 上；Qwen3-8B 在核显上连续批处理 \\
+云端花费 & 中文演示稿全云端约 2.4 元一篇 & Intel 决赛机推荐配置 0.40 元一篇 \\
+隐私 & 没有隐私模式 & 设置页加入隐私模式，敏感内容只走本机模型；报告里的发送清单逐条列出发往云端的内容和字数 \\
+准确度 & 张冠李戴检出 15/20 & 支持度判断加入数字一致性检查，张冠李戴检出 18/20 \\
+平台 & 只有 macOS & Windows 适配：文件路径、窗口按钮、资源管理器入口，在 Intel 决赛机上完整运行 \\
+期刊对标 & 知网 PDF 有一类字体读不出文字 & 修复字宽表解析，中文演示稿可以用三篇《电子学报》范文对标 \\
+\end{ctable}
+
+\section{验证方式与前后对比}
+
+赛前和赛后用同一批稿件、同一套模型配置重跑。注入实验是在 10 篇中英文论文里人为注入已知错误，统计检出多少。Intel 决赛机的数字来自全新空缓存的冷启动实测。
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{9.2em}>{\raggedright\arraybackslash}p{6.6em}>{\raggedright\arraybackslash}p{11em}L@{}}
+\hd{指标} & \hd{赛前} & \hd{赛后} & \hd{怎么验证} \\ \midrule
+注入错误查全率，中文 & 0.977 & 1.000 & 同一语料重跑，结果在 \code{demo/testset/} \\
+注入错误查全率，英文 & 0.905 & 0.952 & 同上 \\
+张冠李戴检出 & 15/20 & 18/20 & 同上 \\
+英文演示稿注入检出 & 12/16 & 16/16 & \code{demo/final/runs/} \\
+本机运行的 Qwen 能力 & 0 项 & 3 项：NPU 向量，核显重排，核显 Qwen3-8B & 任务管理器截图，\code{demo/intel/bench/SUMMARY.md} \\
+核显 Qwen3-8B 生成速度 & 逐条 20.8 token/s & 16 并发 122 token/s & \code{demo/intel/bench/batch-tune.json} \\
+中文演示稿单篇云端花费 & 全云端 2.43 元 & 推荐配置 0.40 元，耗时 536 秒 & \code{demo/intel/bench/E2E\_REC.md} \\
+隐私模式发往云端的稿件文字 & 无此功能 & 11,700 字中 5,910 字，全部是带引用的论断句 & 报告中的发送清单，截图 14 \\
+\end{ctable}
+
+现场可以复核的内容：Intel 决赛机停在首页并使用空缓存，评委拖入一篇稿件即可开始体检，同时在任务管理器里看到核显或 NPU 的占用。演示视频记录了一次完整运行。
+
+完整对比见仓库 \code{FINALS\_DELTA.md}。
+
+\end{document}

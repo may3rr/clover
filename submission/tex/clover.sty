@@ -57,21 +57,22 @@
 \setlength{\lightrulewidth}{0.4pt}
 \arrayrulecolor{rule}
 \renewcommand{\arraystretch}{1.28}
-\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash\leavevmode}X}
 \newcommand{\hd}[1]{{\heiti\bfseries #1}}
+\newcommand{\ctablespread}{1.25}
 \newenvironment{ctable}[1]
-  {\par\vspace{6pt}\noindent\small\linespread{1.25}\selectfont\tabularx{\linewidth}{#1}\toprule}
+  {\par\vspace{6pt}\noindent\small\linespread{\ctablespread}\selectfont\tabularx{\linewidth}{#1}\toprule}
   {\bottomrule\endtabularx\par\vspace{6pt}}
 
 % ---------- 行内代码与路径 ----------
-\newcommand{\code}[1]{{\ttfamily\color{muted}#1}}
+\newcommand{\code}[1]{\leavevmode{\ttfamily\color{muted}#1}}
 \newcommand{\tag}[1]{\hspace{0.4em}{\normalfont\ttfamily\small\color{muted}#1}}
 
 % ---------- 链接 ----------
 \RequirePackage[hidelinks]{hyperref}
 \RequirePackage{xurl}
 \urlstyle{same}
-\newcommand{\link}[1]{{\color{accent}\url{#1}}}
+\newcommand{\link}[1]{\leavevmode{\color{accent}\url{#1}}}
 
 % ---------- 页眉页脚 ----------
 \RequirePackage{graphicx,fancyhdr,lastpage}
@@ -104,12 +105,13 @@
 
 % ---------- 插图 ----------
 \RequirePackage{caption}
+\graphicspath{{fig/}}
 \captionsetup{font={small,color=muted}, labelfont={sf}, labelsep=quad, skip=6pt}
 \captionsetup[figure]{name=图}
 \newcommand{\shot}[3][\linewidth]{%
   \begin{figure}[htbp]\centering
   \setlength{\fboxrule}{0.4pt}\setlength{\fboxsep}{0pt}%
-  \fcolorbox{rule}{white}{\includegraphics[width=\dimexpr#1-0.8pt]{fig/#2}}
+  \fcolorbox{rule}{white}{\includegraphics[width=\dimexpr#1-0.8pt]{#2}}
   \caption{#3}\end{figure}}
 
 % ---------- 提示框 ----------

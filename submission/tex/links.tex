@@ -1,0 +1,92 @@
+\documentclass[UTF8,zihao=5,fontset=none]{ctexart}
+\usepackage{clover}
+\renewcommand{\doctitle}{作品链接与佐证材料}
+\newcommand{\pkgname}{效率进化赛道-我要发顶刊-Clover：投稿前的论文引用体检}
+
+\begin{document}
+
+\cloverhead{Clover 作品链接与佐证材料}{投稿前的论文引用体检}{效率进化赛道\quad 阿里云特别赛题\quad Intel 本地 AI 应用挑战\\
+团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
+
+\section{链接}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{10.5em}L@{}}
+\hd{内容} & \hd{地址} \\ \midrule
+产品主页与在线界面 & \link{https://jackielyu.is-a.dev/clover/}，扫描本文件夹里的二维码可以直接打开 \\
+在线界面复刻版，载入真实体检报告 & \link{https://jackielyu.is-a.dev/clover/app.html} \\
+代码仓库 & \link{https://github.com/may3rr/clover} \\
+国内镜像 & \link{https://gitcode.com/may3rr/clover} \\
+macOS 安装包 & \link{https://github.com/may3rr/clover/releases}。v0.1.0 发布于 10 月 3 日，是赛前版本；决赛版本以仓库 master 分支和现场 Intel 决赛机为准 \\
+\end{ctable}
+
+\section{文件包内容}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{15em}L@{}}
+\hd{位置} & \hd{内容} \\ \midrule
+\pkgname.pptx & 路演 PPT，基于大赛官方模板，可编辑 \\
+\pkgname.pdf & 由同一份 PPT 原样导出 \\
+演示视频/ & Intel 决赛机上的真实运行录屏，以及 PPT 第 4 页内嵌的 24 秒操作视频，见第 4 节 \\
+作品佐证材料/项目说明.pdf & 单页：一句话介绍、用户需求、方案、AI 能力、应用价值 \\
+作品佐证材料/技术说明.pdf & 架构、四项检查的实现、Intel 本机 AI、隐私模式、评测、局限 \\
+作品佐证材料/赛期成果说明.pdf & 赛前基础、48 小时内新增或优化、验证方式与前后对比 \\
+作品佐证材料/项目介绍图文.pdf & 作品封面、一句话介绍与带说明的界面截图，供展示与传播 \\
+作品佐证材料/作品链接与佐证.pdf & 本文件 \\
+作品佐证材料/主页二维码.png & 产品主页二维码 \\
+作品佐证材料/截图/ & 软件界面与 Intel 决赛机任务管理器截图，见第 3 节 \\
+作品佐证材料/宣传素材/ & 作品封面，1920×1080 与 3840×2160，以及 Clover 图标 \\
+\end{ctable}
+
+\section{截图说明}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{11.2em}L>{\raggedright\arraybackslash}p{10.5em}@{}}
+\hd{文件} & \hd{内容} & \hd{来源} \\ \midrule
+01-报告页.png & 体检完成，左侧按检查分类，中间是稿件，右侧是问题列表 & Intel 决赛机上的 Clover 截图模式，载入中文演示稿的同一份体检报告，11 月 7 日 \\
+02-文献真实性.png & 编造的文献：未能在数据库中找到这篇文献 & 同上 \\
+03-论断支持度.png & 张冠李戴：被引文献与这条论断说的不是同一项工作 & 同上 \\
+04-格式规范.png & 错别字写成修订：制改为置 & 同上 \\
+05-期刊对标.png & 参考文献构成与三篇《电子学报》范文逐项比较 & 同上 \\
+06-任务管理器-核显.png & 推荐配置下向量与重排在 Arc 核显上运行，GPU 的 Compute 曲线升高 & Intel 决赛机实拍，11 月 6 日 \\
+07-任务管理器-NPU.png & 隐私模式下向量改在 NPU 上运行，NPU 曲线升高 & Intel 决赛机实拍，11 月 6 日 \\
+08-运行页.png & 体检进行到 44\%，四项检查分别显示进度和已发现的问题数 & Intel 决赛机上的 Clover 截图模式，11 月 7 日 \\
+09-核对文献连接.png & 73 条参考文献中 42 条在文献文件夹里找到原文，8 条由模型从相近候选中选出，等待用户确认 & 演示视频第 40 秒，11 月 7 日 \\
+10-核对对标范文.png & 文件夹中 3 篇识别为《电子学报》的未引用论文默认勾选为对标范文 & 演示视频第 1 分 30 秒 \\
+11-任务管理器-体检进行中.png & 体检进行中，Arc B370 核显的 Compute 曲线随向量与重排升高 & 演示视频第 3 分 40 秒 \\
+12-导出Word-WPS中的批注.png & 导出的 Word 在 WPS 中打开，问题以批注形式挂在对应位置 & 演示视频第 15 分 40 秒 \\
+13-隐私模式开关.png & 设置页的隐私模式开关 & Intel 决赛机实拍，11 月 6 日 \\
+14-发往云端清单.png & 隐私模式报告的发往云端清单：出自稿件的文字 5,910 字，全部是带引用的论断句、被引片段和参考文献条目 & Intel 决赛机实拍，11 月 6 日 \\
+\end{ctable}
+
+\section{演示视频}
+
+\subsection{完整运行录屏}
+
+{\small\code{演示视频/\pkgname-演示视频.mp4}}，21 分 40 秒，11 月 7 日在 Intel 决赛机上录制，推荐配置：向量与重排在 Arc 核显，其余走百炼，缓存清空后冷启动。
+
+\begin{itemize}
+\item 前 20 分钟是一次完整运行：首页填写目标期刊《电子学报》，添加演示稿文件夹，连接确认页逐条确认文献连接并勾选三篇范文，体检进行到一半切到任务管理器，可以看到核显的 Compute 占用，随后是报告页、张冠李戴的详情、导出 Word，并在 WPS 里查看批注和修订。
+\item 后 1 分 40 秒补录隐私模式的开关说明和发往云端清单。
+\item 录制时外部检索被限流，[70]、[71] 显示为暂时无法核验，没有显示为未能在数据库中找到。按无法核验不等于不存在的原则照实保留。
+\item 这次冷启动的检查用时 7 分 51 秒，发往云端 894,143 字，期刊评审完成后的最终值为 7 分 58 秒、945,126 字。PPT 和截图里的 80,689 字来自同一稿件在缓存命中时的重跑，大部分请求命中缓存没有再次发送；检查用时 8 分 56 秒取自 11 月 6 日的冷启动实测。
+\end{itemize}
+
+\subsection{PPT 内嵌视频}
+
+{\small\code{演示视频/\pkgname-路演PPT内嵌视频.mp4}}，24 秒，是 PPT 第 4 页内嵌视频的原文件，内容是从拖入论文、四项检查同时进行到报告页。
+
+\subsection{演示稿}
+
+演示稿是罗会兰等发表的目标检测综述，我们在其中人为注入了 17 处引用错误用于演示和评测，注入清单见仓库 \code{demo/final/injections.json}。期刊对标的批注由程序根据三篇《电子学报》2026 年综述的真实统计得出。
+
+\section{可以复现的数字}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{15em}L@{}}
+\hd{数字} & \hd{出处} \\ \midrule
+注入错误 86 处检出 84 处 & \code{FINALS\_DELTA.md} 第 1 节，\code{demo/testset/} \\
+报警准确率 73\%，SemanticCite 50\% & \code{demo/testset/item\_bench/results.md} 第 15 节 \\
+单篇 0.40 元、约 9 分钟 & \code{demo/intel/bench/E2E\_REC.md} \\
+隐私模式发出 5,910 / 11,700 字 & \code{demo/intel/bench/e2e/privacy\_send.json} \\
+已发表论文中人工核实的 105 处原文问题 & \code{demo/testset/ground\_truth/summary.md} 第 2.1 节：中文 73 个单元、英文 32 个单元判为真问题 \\
+赛前基线与 48 小时对比 & \code{PRE\_HACKATHON\_BASELINE.md}、\code{FINALS\_DELTA.md} \\
+\end{ctable}
+
+\end{document}

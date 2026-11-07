@@ -1,0 +1,47 @@
+\documentclass[UTF8,zihao=5,fontset=none]{ctexart}
+\usepackage{clover}
+\renewcommand{\doctitle}{项目介绍图文}
+% 图片来自打包目录：build_package.py 编译时把 作品佐证材料/截图 与 宣传素材 加进 TEXINPUTS
+\renewcommand{\shot}[2]{%
+  \par\vspace{10pt}\noindent\begin{minipage}{\linewidth}\centering
+  \setlength{\fboxrule}{0.4pt}\setlength{\fboxsep}{0pt}%
+  \fcolorbox{rule}{white}{\includegraphics[width=\dimexpr\linewidth-0.8pt,height=0.36\textheight,keepaspectratio]{#1}}\par
+  \vspace{6pt}{\small\color{muted}#2\par}\end{minipage}\par\vspace{10pt}}
+
+\begin{document}
+
+\cloverhead{Clover：投稿前的论文引用体检}{项目介绍图文}{效率进化赛道\quad 阿里云特别赛题\quad Intel 本地 AI 应用挑战\\
+团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
+
+\noindent\includegraphics[width=\linewidth]{封面-1920x1080.png}
+
+\vspace{12pt}
+{\fontsize{12pt}{21pt}\selectfont
+Clover 是给研究生和青年教师用的投稿前引用体检工具：拖入一篇 Word 或 LaTeX 稿件，几分钟内核对每一条参考文献是否真实存在、被引原文是否支持正文的论断、格式是否规范、引用是否符合目标期刊的常态，问题写成 Word 批注和修订交还作者逐条处理。\par}
+
+\vspace{16pt}
+\noindent\begin{minipage}[c]{0.2\linewidth}\includegraphics[width=\linewidth]{主页二维码.png}\end{minipage}\hspace{16pt}%
+\begin{minipage}[c]{0.7\linewidth}
+{\heiti\bfseries 产品主页}\par\vspace{2pt}
+\link{https://jackielyu.is-a.dev/clover/}\par\vspace{8pt}
+{\heiti\bfseries 代码仓库}\par\vspace{2pt}
+\link{https://github.com/may3rr/clover}\par
+\link{https://gitcode.com/may3rr/clover}
+\end{minipage}
+
+\newpage
+\section{界面与真实运行}
+
+以下截图均来自 Intel 决赛机。
+
+\shot{01-报告页.png}{图 1\quad 体检完成，左侧按检查分类，中间是稿件，右侧是问题列表。}
+\shot{09-核对文献连接.png}{图 2\quad 73 条参考文献中 42 条在文献文件夹里找到原文，8 条由模型从相近候选中选出，等待用户确认。}
+\shot{02-文献真实性.png}{图 3\quad 编造的文献：未能在数据库中找到这篇文献。}
+\shot{03-论断支持度.png}{图 4\quad 张冠李戴：被引文献与这条论断说的不是同一项工作，右侧给出被引原文中逐字定位到的证据。}
+\shot{04-格式规范.png}{图 5\quad 错别字写成修订：制改为置。}
+\shot{05-期刊对标.png}{图 6\quad 参考文献构成与三篇《电子学报》范文逐项比较。}
+\shot{12-导出Word-WPS中的批注.png}{图 7\quad 导出的 Word 在 WPS 中打开，问题以批注形式挂在对应位置。}
+\shot{11-任务管理器-体检进行中.png}{图 8\quad 体检进行中，Arc B370 核显的 Compute 曲线随本机向量与重排升高。}
+\shot{14-发往云端清单.png}{图 9\quad 隐私模式报告的发往云端清单：出自稿件的文字 5,910 字，全部是带引用的论断句、被引片段和参考文献条目。}
+
+\end{document}

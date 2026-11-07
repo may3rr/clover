@@ -1,0 +1,85 @@
+\documentclass[UTF8,zihao=5,fontset=none]{ctexart}
+\usepackage{clover}
+\renewcommand{\doctitle}{项目说明}
+\fancypagestyle{first}{\fancyhf{}}
+% 单页：版心放宽，字号收小
+\newgeometry{top=11mm,bottom=10mm,left=15mm,right=15mm,footskip=5mm}
+\fontsize{9pt}{12.3pt}\selectfont
+\linespread{1.0}
+\ctexset{section/beforeskip=5pt plus 1pt, section/afterskip=4pt,
+  section/format=\raggedright\sffamily\heiti\bfseries\fontsize{12pt}{16pt}\selectfont}
+\renewcommand{\arraystretch}{1.08}
+\setlength{\parskip}{1pt}
+\renewcommand{\ctablespread}{1.05}
+\renewenvironment{ctable}[1]
+  {\par\vspace{2pt}\noindent\small\linespread{1.05}\selectfont\tabularx{\linewidth}{#1}\toprule}
+  {\bottomrule\endtabularx\par\vspace{2pt}}
+\setlist{nosep, leftmargin=1.6em, itemsep=1pt, topsep=2pt}
+
+\begin{document}
+\fontsize{9pt}{12.3pt}\selectfont
+
+\cloverhead{Clover：投稿前的论文引用体检}{项目说明}{效率进化赛道\quad 阿里云特别赛题，基于 Qwen 的科研提效\quad Intel 本地 AI 应用挑战\quad 团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
+
+\vspace{-4pt}
+\section{一句话介绍}
+
+Clover 是给研究生和青年教师用的投稿前引用体检工具：拖入一篇 Word 或 LaTeX 稿件，几分钟内核对每一条参考文献是否真实存在、被引原文是否支持正文的论断、格式是否规范、引用是否符合目标期刊的常态，问题写成 Word 批注和修订交还作者逐条处理。
+
+\section{用户需求}
+
+\begin{itemize}
+\item 大模型让选题、实验、初稿都变快了，投稿前逐条核对引用仍然靠人工，几十上百条参考文献很少有人真的逐条翻原文。
+\item 错引在人工写作时代就普遍存在。我们用 Clover 检查了 10 篇 2016 至 2020 年发表的中英文论文，报出并经人工逐条核实的原文问题有 105 处，例如一篇期刊综述把某模块带来的 F1 提升 1.2 写成了 5.5。Sarol 等 2024 年对 3063 条生物医学引用的人工标注显示，约 39\% 存在准确性问题。
+\item 大模型辅助写作还带来编造文献的新风险：作者、期刊、卷期都像真的，题目却不存在。
+\end{itemize}
+
+\section{核心方案}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{5.2em}LL@{}}
+\hd{检查} & \hd{做什么} & \hd{结果怎么交给作者} \\ \midrule
+文献真实性 & 拆出作者、年份、题名，到 Crossref、OpenAlex、Semantic Scholar、arXiv 逐条比对，连上的本地 PDF 读封面核对 & 一致、不一致、无法核验；查不到的中文文献标为无法核验，不标为不存在 \\
+论断支持度 & 抽出带引用的论断，在被引原文里检索最相关的片段，由 Qwen 判断是否支持 & 不支持或引错时写批注，附被引原文的证据句 \\
+格式规范 & 逐段找错别字，规则检查重复条目、漏引、编号错位 & 错别字和参考文献重排写成 Word 修订，可以逐条接受或拒绝 \\
+期刊对标 & 用目标期刊的范文逐项比较章节结构、引用位置、参考文献构成、引用功能、研究要素、篇幅与图表 & 偏离范文常态的地方写批注，附每篇范文的取值和页码 \\
+\end{ctable}
+
+\vspace{-4pt}
+\noindent 三条原则：
+\begin{enumerate}
+\item \textbf{证据必须逐字可查。}模型给出的证据句要能在被引原文里逐字找到，找不到就降级为无法判断。
+\item \textbf{机械问题给修订，实质问题只给批注。}系统不改写正文，不删除或替换参考文献，不推荐该引哪篇，决定权留给作者。
+\item \textbf{稿件隐私可控。}隐私模式下，题目、摘要、章节标题、图表题注都不出本机，每次发往云端的请求都记进发送清单。
+\end{enumerate}
+
+\section{AI 能力}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{20em}>{\raggedright\arraybackslash}p{12.5em}L@{}}
+\hd{模型} & \hd{位置} & \hd{用途} \\ \midrule
+Qwen3.8-flash & 阿里云百炼 & 支持度判断、论断抽取、错别字、读范文 \\
+Qwen3.7-flash & 阿里云百炼 & 参考文献结构化、引用功能分类 \\
+Qwen3.8-max、Qwen3.7-max & 阿里云百炼 & 复核有疑问的判断、期刊评审 \\
+text-embedding-v4、qwen3-rerank & 阿里云百炼 & 被引原文片段的向量与重排 \\
+Qwen3-Embedding-0.6B、Qwen3-Reranker-0.6B & Intel 本机，Arc 核显或 NPU & 向量与重排，挑出交给判断的原文段落 \\
+Qwen3-8B，int4 & Intel 本机，Arc 核显 & 隐私模式下的抽取、错别字、文献结构化、读范文 \\
+\end{ctable}
+\vspace{-4pt}
+\noindent 每个阶段用云端还是本机模型，可以在配置里分别指定。
+
+\section{应用价值}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{12em}L@{}}
+\hd{指标} & \hd{结果} \\ \midrule
+人为注入的引用错误 & 中英文 10 篇稿件注入 86 处，检出 84 处 \\
+报出的问题里属实的比例 & 73\%；开源引用核查模型 SemanticCite 在同一数据上为 50\%。公开数据集 Citation-Integrity，606 条人工标注 \\
+识别不准确引用的 F1 & 0.30；原论文报告的 GPT-4 为 0.09 \\
+单篇云端花费，中文演示稿 & 全云端 2.43 元；向量与重排放到 Intel 本机后 0.40 元 \\
+单篇耗时，Intel 推荐配置 & 约 9 分钟 \\
+隐私模式发往云端的稿件文字 & 11,700 字中 5,910 字，全部是带引用的论断句；题目、摘要、章节标题、图表题注为 0 \\
+\end{ctable}
+{\noindent\footnotesize\color{muted}出处：\code{FINALS\_DELTA.md} 第 1 节，\code{demo/testset/item\_bench/results.md}，\code{demo/intel/bench/E2E\_REC.md}，报告中的发送清单。\par}
+
+\vspace{-4pt}
+\noindent{\color{muted}赛前基础与 48 小时内的新增或优化见《赛期成果说明》，实现细节见《技术说明》。}
+
+\end{document}
