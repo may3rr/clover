@@ -102,7 +102,7 @@ p, li {{ margin: 3pt 0; }}
 
 # typeset with xelatex (submission/tex/clover.sty holds fonts, colours, layout)
 TEX = ROOT / "submission" / "tex"
-TEX_PDFS = [("proj.tex", "项目说明.pdf"), ("tech.tex", "技术说明.pdf"), ("results.tex", "赛期成果说明.pdf"),
+TEX_PDFS = [("oneliner.tex", "产品一句话介绍.pdf"), ("proj.tex", "项目说明.pdf"), ("tech.tex", "技术说明.pdf"), ("results.tex", "赛期成果说明.pdf"),
             ("links.tex", "作品链接与佐证.pdf"), ("intro.tex", "项目介绍图文.pdf")]
 
 
