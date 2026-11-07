@@ -20,7 +20,7 @@
 
 | 材料 | 要求 | 我们的做法 | 状态 |
 | --- | --- | --- | --- |
-| 路演 PPT | 官方模板，提交可编辑的 .pptx，另附由同一份 PPT 导出的 PDF | `python app/site/scripts/pitch-pptx.py`（先 `npm run site:dev`）在官方模板上生成可编辑 PPTX，16 页，文字是文本框，软件窗口按 Windows 版界面渲染成图片；再运行 `app/site/scripts/pitch-pptx-flatten.py`，把第 11、12 页的模型流程图换成整张透明图，避免 PowerPoint 里标签错位；PDF 由 `submission/build_package.py` 用 LibreOffice 从同一份 PPTX 导出 | 完成，待现场核对 |
+| 路演 PPT | 官方模板，提交可编辑的 .pptx，另附由同一份 PPT 导出的 PDF | `python app/site/scripts/pitch-pptx.py`（先 `npm run site:dev`）在官方模板上生成可编辑 PPTX，16 页，文字是文本框，软件窗口按 Windows 版界面渲染成图片；再运行 `app/site/scripts/pitch-pptx-flatten.py`，把第 11、12 页的模型流程图换成整张透明图，避免 PowerPoint 里标签错位；再运行 `app/site/scripts/pitch-footer.py <pptx> <pdf>`，首页作品名改为全称，第 2 至 15 页底部加 Logo 与作品名；PDF 由 `submission/build_package.py` 用 LibreOffice 从同一份 PPTX 导出 | 完成，待现场核对 |
 | 产品一句话介绍 | 产品定位、目标用户、解决的核心问题 | 在 `submission/docs/01-项目说明.md` 开头 | 完成 |
 | 单页项目说明 | 用户需求、核心方案、AI 能力、主要功能、应用价值 | `submission/docs/01-项目说明.md`，含赛期成果对比，导出 PDF 3 页 | 完成 |
 | 技术说明 | AI 能力应用、关键技术、核心实现方式 | `submission/docs/02-技术说明.md` | 完成 |
