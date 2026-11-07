@@ -49,7 +49,6 @@ ONE_PAGE = ("@page { margin: 10mm 12mm; } body { font-size: 8.6pt; line-height: 
             "td, th { padding: 2pt 4pt; font-size: 8pt; } p, li { margin: 1.5pt 0; }")
 DOC_PDFS = [
     ("01-项目说明.md", "项目说明.pdf", ONE_PAGE),
-    ("02-技术说明.md", "技术说明.pdf", ""),
     ("05-赛期成果说明.md", "赛期成果说明.pdf", ""),
     ("03-作品链接与佐证.md", "作品链接与佐证.pdf", ""),
 ]
@@ -102,6 +101,20 @@ th {{ background: #f4f4f4; }}
 code {{ font-family: 'JetBrains Mono', Menlo, monospace; font-size: 8.5pt; }}
 p, li {{ margin: 3pt 0; }}
 """
+
+
+# typeset with xelatex (submission/tex/clover.sty holds fonts, colours, layout)
+TEX = ROOT / "submission" / "tex"
+TEX_PDFS = [("tech.tex", "技术说明.pdf")]
+
+
+def tex_pdfs() -> None:
+    for src, dst in TEX_PDFS:
+        with tempfile.TemporaryDirectory() as tmp:
+            subprocess.run(["latexmk", "-xelatex", "-interaction=nonstopmode", "-halt-on-error",
+                            f"-outdir={tmp}", src], cwd=TEX, check=True, capture_output=True)
+            shutil.copy(Path(tmp) / src.replace(".tex", ".pdf"), PKG / EVID / dst)
+        print(dst, len(pypdf.PdfReader(PKG / EVID / dst).pages), "pages (xelatex)")
 
 
 def doc_pdfs(pg) -> None:
@@ -215,6 +228,7 @@ def main() -> None:
         print(f"演示视频/{v.name}  {v.stat().st_size / 1e6:.0f} MB")
 
     qrcode.make(HOME, border=2, box_size=16).save(PKG / EVID / "主页二维码.png")
+    tex_pdfs()
 
     with sync_playwright() as p:
         b = p.chromium.launch(channel="chrome")

@@ -1,0 +1,137 @@
+\documentclass[UTF8,zihao=5,fontset=none]{ctexart}
+\usepackage{clover}
+\renewcommand{\doctitle}{技术说明}
+
+\begin{document}
+
+\cloverhead{Clover 技术说明}{投稿前的论文引用体检}{效率进化赛道\quad 阿里云特别赛题\quad Intel 本地 AI 应用挑战\\
+团队：我要发顶刊\quad 天津师范大学\quad 吕浩博}
+
+代码仓库 \link{https://github.com/may3rr/clover}，国内镜像 \link{https://gitcode.com/may3rr/clover}。本文的数字都能在仓库里找到出处，文中给出文件路径。
+
+\section{架构}
+
+\begin{ctable}{@{}p{5.2em}L@{}}
+\hd{层} & \hd{选型} \\ \midrule
+桌面应用 & Electron + React 18 + TypeScript，macOS 与 Windows \\
+本地服务 & Python 3.11 + FastAPI，监听 \code{127.0.0.1:8765}，稿件在本机解析，不经过我们的服务器 \\
+解析 & lxml 直接读 docx 的 XML；LaTeX 项目逐字符追溯到源文件行号；PDF 用 pypdf \\
+检索 & Crossref、OpenAlex、Semantic Scholar、arXiv 公开接口，带超时、重试和礼貌访问间隔 \\
+云端模型 & 阿里云百炼，OpenAI 兼容接口，模型名全部来自配置文件 \\
+本机模型 & Intel：OpenVINO GenAI，Arc 核显与 NPU；Apple Silicon：mlx-lm \\
+缓存 & SQLite：检索结果、模型结论、向量、体检报告、发送清单都落在本机 \\
+\end{ctable}
+
+一次体检的数据流：稿件解析成章节、段落、引用标记和参考文献，四项检查并行，结果汇总成一份报告（\code{backend/citecheck/schema.py} 的 Report），导出时问题全部写成 Word 批注，机械性改动写成 Word 修订。原文件不被覆盖，导出为新文件。
+
+\section{四项检查的实现}
+
+\subsection{文献真实性\tag{refs/}}
+
+\begin{enumerate}
+\item 每条参考文献由 Qwen 拆成作者、年份、题名、出处等字段，字段必须能在原条目里找到，规则解析的结果只作兜底。
+\item 按题名和作者到四个数据库检索，比对年份、作者、出处、DOI，给出一致、不一致、无法核验。
+\item 用户提供文献文件夹时，参考文献与本地 PDF 一对一建立连接，PDF 的知网封面或首页元数据也参与核验。
+\item 查不到的中文文献标为无法核验，绝不标为不存在。
+\end{enumerate}
+
+\subsection{论断支持度\tag{support/}}
+
+\begin{enumerate}
+\item Qwen 从正文抽出带引用标记的论断句。
+\item 被引原文依次取：文献文件夹里连上的 PDF、开放获取全文、摘要。
+\item 原文切成最多 512 个 token 的片段。论断与片段用 BM25 和向量两路打分，以倒数排名融合（RRF）合并，再取前 40 段交给重排模型逐段打分，最相关的几段交给判断模型。
+\item Qwen3.8-flash 判断支持、部分支持、不支持或无法判断，结构化 JSON 输出，温度 0，Pydantic 校验，失败重试一次。有疑问的判断由 Qwen3.8-max 复核。
+\item 数字一致性检查（\code{support/consistency.py}）：论断里的数字与证据里的数字对不上时，送去复核。
+\item \textbf{证据逐字校验}（\code{support/evidence.py}）：模型给出的证据句和原文都做 Unicode NFKC 归一化、压缩空白、统一引号，再做子串匹配。定位不到就把结论降级为无法判断，并在理由里写明。展示给作者的证据因此不可能是模型编造的。
+\end{enumerate}
+
+\shot{support.png}{论断支持度的一条结论。左侧正文高亮论断，右侧给出被引文献原文中逐字定位到的证据句和判定。}
+
+\subsection{格式规范\tag{lint/}}
+
+\begin{itemize}
+\item Qwen 逐段找错别字，每条修订附原因。
+\item 规则检查：参考文献重复、列表里有正文没引的条目、正文引了列表里没有的编号、引用编号未按首次出现顺序排列。
+\item 错别字、参考文献重排和随之变化的正文编号写成 Word 修订；其余问题只写批注。
+\end{itemize}
+
+\subsection{期刊对标\tag{distribution/}}
+
+\begin{itemize}
+\item 范文池：稿件参考文献里属于目标期刊、并且拿到了原文的论文，加上文献文件夹里未被引用的同刊 PDF。综述和研究论文分开对标，能完成统计的范文少于 3 篇时不对标，并告诉作者缺什么。
+\item 逐篇比较六组指标：章节结构、引用位置、参考文献构成、引用功能构成、研究要素、篇幅与图表。每项指标记下每篇范文的取值、页码和原文行。
+\item 章节标题归类兜底、研究要素和范文的引用功能由 Qwen 读取，研究要素只读标题、摘要、章节标题和图表题注，每个值附逐字证据。
+\item 偏离范文常态时写批注，不产生修订，也不推荐该引哪篇。
+\end{itemize}
+
+\section{Intel 本机 AI}
+
+决赛机：HP OmniBook 7，Core Ultra 5 338H，Arc B370 核显，NPU，32 GB 内存。模型经 OpenVINO 转成 IR 格式，存放在本机。
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{10.5em}>{\raggedright\arraybackslash}p{7em}L@{}}
+\hd{能力} & \hd{设备} & \hd{实测} \\ \midrule
+Qwen3-Embedding-0.6B，int8 & 核显 / NPU / CPU & 每秒 84 / 16.1 / 1.6 个片段 \\
+Qwen3-Reranker-0.6B，int8 & 核显 & 24 个候选 0.29 秒 \\
+Qwen3-8B，int4 & 核显 & 逐条 20.8 token/s；16 并发连续批处理 122 token/s，共享前缀 158 token/s \\
+\end{ctable}
+{\noindent\footnotesize\color{muted}出处：\code{demo/intel/bench/} 下的 \code{MORNING\_REPORT.md}、\code{SUMMARY.md}、\code{batch-tune.json}。\par}
+
+\shot[0.62\linewidth]{gpu.png}{决赛机体检进行中，Arc B370 核显的 Compute 引擎由本机向量与重排占满。}
+
+本机模型对最终结论有直接影响：向量与重排决定把被引原文的哪几段交给判断模型，判断只看这几段。
+
+推荐配置（向量与重排在核显，对话任务走云端 Qwen3.8-flash）与全云端的对比，中文演示稿冷启动：
+
+\begin{ctable}{@{}L>{\raggedleft\arraybackslash}p{4.6em}>{\raggedleft\arraybackslash}p{5.2em}>{\raggedleft\arraybackslash}p{5.2em}@{}}
+\hd{配置} & \hd{墙钟} & \hd{云端花费} & \hd{注入检出} \\ \midrule
+全云端（Mac） & 352 秒 & 2.43 元 & 17/17 \\
+Intel 推荐配置 & 536 秒 & 0.40 元 & 14/17 \\
+Intel 隐私模式（本机 Qwen3-8B，向量在 NPU） & 2255 秒 & 0.27 元 & 12/17 \\
+\end{ctable}
+
+推荐配置三次运行共漏检 11 条，逐条归因：10 条是会场网络下外部检索被限流，编造文献只能标为无法核验、被引文献拿不到原文；1 条是关键词预选丢掉了含数字的那一行。本机向量本身没有引入新的漏检（\code{FINALS\_DELTA.md} 第 3 节）。
+
+判断为什么留在云端：在 93 个人工标注的问题上，本机 Qwen3-8B 检出 51 个，云端 Qwen3.8-flash 检出 76 个（\code{demo/intel/bench/JUDGE\_ACCURACY.md}）。
+
+\section{隐私模式与发送清单}
+
+实现在 \code{llm/privacy.py} 和 \code{llm/sendlog.py}。
+
+\begin{itemize}
+\item 默认设置下，错别字检查逐段发送正文，论断抽取发送带引用的句子，支持度判断发送论断句、参考文献条目和被引文献片段。
+\item 打开隐私模式后，错别字、引用功能分类、参考文献结构化、论断抽取和期刊画像只走本机模型，本机没有可用模型时跳过，绝不改发云端；向量只用本机后端。云端只收到带引用的论断句、被引文献的原文片段、参考文献条目和统计数字。
+\item 每次发往云端的请求，包括向量和重排，都在本机数据库 \code{llm\_usage} 表里记下任务、字符数和内容类别。报告开头的发往云端一行可以展开逐条查看，数字以记录为准，不估算。
+\item 中文演示稿在隐私模式下：正文 11,700 字，发出 5,910 字，全部是 54 句带引用的论断；题目、摘要、章节标题、图表题注发出 0 字。
+\end{itemize}
+
+\shot{sendlist.png}{隐私模式下的发往云端清单。报告开头列出正文字数与实际发送字数，展开后逐条列出发出的论断句。}
+
+\section{评测}
+
+\begin{ctable}{@{}>{\raggedright\arraybackslash}p{5.4em}>{\raggedright\arraybackslash}p{14em}L@{}}
+\hd{评测} & \hd{数据} & \hd{结果} \\ \midrule
+注入实验 & 中文期刊综述 5 篇、英文 arXiv 论文 5 篇，人为注入编造文献、错年、张冠李戴、错别字、引用堆砌、漏引等 86 处 & 检出 84 处；张冠李戴 18/20 \\
+公开数据集 & Citation-Integrity 测试集，606 条人工标注的真实引用（Sarol 等，2024） & 报警准确率 0.73，中高严重度 0.78；识别不准确引用 F1 0.30，GPT-4 为 0.09；标准准确率 0.62，GPT-4 为 0.65 \\
+对照模型 & 同一数据、同样的原文片段，复测开源模型 SemanticCite（微调 Qwen3-4B） & 报警准确率 0.50，标准准确率 0.43 \\
+已发表论文 & 10 篇 2016 至 2020 年发表的中英文论文 & 报出并经人工核实的原文问题 105 处 \\
+\end{ctable}
+{\noindent\footnotesize\color{muted}出处：\code{FINALS\_DELTA.md}、\code{demo/testset/item\_bench/results.md}、\code{demo/testset/ground\_truth/summary.md}。\par}
+
+\section{工程质量}
+
+\begin{itemize}
+\item 后端 pytest 558 项通过、3 项跳过；前端 vitest 87 项通过；TypeScript 类型检查通过。
+\item 所有模型调用经过 \code{llm/} 模块统一路由，结果按模型名加提示词的哈希缓存，同一篇稿件重复体检不重复花钱。
+\item 判断类任务温度 0、结构化输出、校验失败重试，再失败记为无法判断。
+\end{itemize}
+
+\section{局限}
+
+\begin{itemize}
+\item 公开数据集上有问题的引用约一半没有报出来，没有报警不代表引用一定正确。
+\item 本机 Qwen3-8B 做支持度判断的检出低于云端（标注集 93 个问题中检出 51 个，云端 76 个），所以判断默认留在云端。
+\item 中文稿件还没有公开的人工标注数据集，中文结果来自我们自建的注入实验和人工核对。
+\end{itemize}
+
+\end{document}

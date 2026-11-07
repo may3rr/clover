@@ -1,0 +1,116 @@
+% Clover 提交文档的共用样式。字体、颜色、版心都只在这里改。
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{clover}
+
+% ---------- 版心 ----------
+\RequirePackage[a4paper,top=26mm,bottom=24mm,left=24mm,right=24mm,headsep=8mm,footskip=11mm]{geometry}
+
+% ---------- 字体 ----------
+% 中文正文 思源宋体，中文标题 思源黑体；西文正文 Charter，等宽 JetBrains Mono
+\setmainfont{Charter}
+\setsansfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
+\setmonofont{JetBrains Mono}[Scale=0.84]
+\setCJKmainfont{Noto Serif CJK SC}[BoldFont={Noto Serif CJK SC Bold}]
+\setCJKsansfont{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
+\setCJKmonofont{Noto Sans CJK SC}
+\newCJKfontfamily\heiti{Noto Sans CJK SC}[BoldFont={Noto Sans CJK SC Bold}]
+\newCJKfontfamily\heitimed{Noto Sans CJK SC Medium}
+
+\linespread{1.42}\selectfont
+\setlength{\parskip}{3pt plus 1pt}
+\raggedbottom
+
+% ---------- 颜色 ----------
+\RequirePackage{xcolor}
+\definecolor{ink}{HTML}{2B2A26}
+\definecolor{muted}{HTML}{7A776F}
+\definecolor{accent}{HTML}{2383E2}
+\definecolor{rule}{HTML}{C9C6BE}
+\definecolor{codebg}{HTML}{F4F3EF}
+\color{ink}
+
+% ---------- 标题 ----------
+\ctexset{
+  section = {
+    format = \raggedright\sffamily\heiti\bfseries\fontsize{14pt}{20pt}\selectfont,
+    name = {,}, number = {\color{accent}\arabic{section}},
+    aftername = \hspace{0.6em},
+    beforeskip = 20pt plus 4pt, afterskip = 8pt,
+  },
+  subsection = {
+    format = \raggedright\sffamily\heiti\bfseries\fontsize{11.5pt}{17pt}\selectfont,
+    number = {\color{accent}\arabic{section}.\arabic{subsection}},
+    aftername = \hspace{0.5em},
+    beforeskip = 12pt plus 3pt, afterskip = 4pt,
+  },
+}
+
+% ---------- 列表 ----------
+\RequirePackage{enumitem}
+\setlist{nosep, leftmargin=1.9em, itemsep=2pt, topsep=4pt}
+\setlist[itemize]{label={\color{accent}\small$\bullet$}}
+\setlist[enumerate]{label={\color{accent}\sffamily\small\arabic*}, leftmargin=1.9em}
+
+% ---------- 表格 ----------
+\RequirePackage{booktabs,tabularx,array,colortbl}
+\setlength{\heavyrulewidth}{0.8pt}
+\setlength{\lightrulewidth}{0.4pt}
+\arrayrulecolor{rule}
+\renewcommand{\arraystretch}{1.28}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcommand{\hd}[1]{{\heiti\bfseries #1}}
+\newenvironment{ctable}[1]
+  {\par\vspace{6pt}\noindent\small\linespread{1.25}\selectfont\tabularx{\linewidth}{#1}\toprule}
+  {\bottomrule\endtabularx\par\vspace{6pt}}
+
+% ---------- 行内代码与路径 ----------
+\newcommand{\code}[1]{{\ttfamily\color{muted}#1}}
+\newcommand{\tag}[1]{\hspace{0.4em}{\normalfont\ttfamily\small\color{muted}#1}}
+
+% ---------- 链接 ----------
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{xurl}
+\urlstyle{same}
+\newcommand{\link}[1]{{\color{accent}\url{#1}}}
+
+% ---------- 页眉页脚 ----------
+\RequirePackage{graphicx,fancyhdr,lastpage}
+\newcommand{\doctitle}{}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{\raisebox{-0.28\height}{\includegraphics[height=11pt]{logo.pdf}}\hspace{5pt}{\sffamily\footnotesize\color{muted}Clover}}
+\fancyhead[R]{{\heiti\footnotesize\color{muted}\doctitle}}
+\fancyfoot[C]{{\sffamily\footnotesize\color{muted}\thepage\ /\ \pageref{LastPage}}}
+\fancypagestyle{first}{\fancyhf{}\fancyfoot[C]{{\sffamily\footnotesize\color{muted}\thepage\ /\ \pageref{LastPage}}}}
+
+% ---------- 封头 ----------
+% \cloverhead{标题}{副标题}{署名行}
+\newcommand{\cloverhead}[3]{%
+  \thispagestyle{first}%
+  \noindent\begin{minipage}[c]{40pt}\includegraphics[width=40pt]{logo.pdf}\end{minipage}%
+  \hspace{12pt}%
+  \begin{minipage}[c]{\dimexpr\linewidth-52pt}
+    {\heiti\bfseries\fontsize{22pt}{28pt}\selectfont #1\par}
+    \vspace{2pt}
+    {\heitimed\fontsize{11pt}{15pt}\selectfont\color{muted}#2\par}
+  \end{minipage}\par
+  \vspace{12pt}
+  {\color{rule}\hrule height 0.6pt}
+  \vspace{6pt}
+  {\noindent\small\color{muted}#3\par}
+  \vspace{8pt}
+}
+
+% ---------- 插图 ----------
+\RequirePackage{caption}
+\captionsetup{font={small,color=muted}, labelfont={sf}, labelsep=quad, skip=6pt}
+\captionsetup[figure]{name=图}
+\newcommand{\shot}[3][\linewidth]{%
+  \begin{figure}[htbp]\centering
+  \setlength{\fboxrule}{0.4pt}\setlength{\fboxsep}{0pt}%
+  \fcolorbox{rule}{white}{\includegraphics[width=\dimexpr#1-0.8pt]{fig/#2}}
+  \caption{#3}\end{figure}}
+
+% ---------- 提示框 ----------
+\newcommand{\note}[1]{\par\vspace{4pt}\noindent\colorbox{codebg}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small\linespread{1.35}\selectfont #1}}\par\vspace{4pt}}
