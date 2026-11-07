@@ -19,17 +19,15 @@ body {
   margin-bottom: 20px;
 }
 .poster h1 {
-  display: flex;
-  align-items: center;
-  gap: 16px;
   font-size: 62px;
   line-height: 1.05;
   font-weight: 700;
   letter-spacing: -0.035em;
 }
 .p-logo {
-  width: 72px;
-  height: 72px;
+  width: 152px;
+  height: 152px;
+  margin-bottom: 16px;
 }
 .p-sub {
   margin-top: 8px;
@@ -58,25 +56,34 @@ body {
   margin-top: 16px;
   font-size: 17px;
 }
-/* the window is rendered tall: 1280 x 1740 */
+/* the window is rendered tall: 1280 x 1500 */
 .p-win {
   margin-top: 32px;
   width: 1032px;
 }
 .p-win .window {
-  aspect-ratio: 1280 / 1740;
+  aspect-ratio: 1280 / 1500;
 }
 .p-win .window iframe {
-  height: 1740px;
+  height: 1500px;
 }
 .p-powered {
   margin-top: auto;
   padding-bottom: 40px;
   display: flex;
   align-items: center;
-  gap: 10px;
   font-size: 20px;
   color: var(--text-secondary);
+}
+.p-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 16px;
+}
+.p-intel {
+  height: 30px;
+  width: auto;
 }
 .p-powered b {
   font-size: 26px;
